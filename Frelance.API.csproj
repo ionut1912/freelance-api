@@ -7,8 +7,51 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="FluentValidation" Version="11.10.0" />
+        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.10.0" />
+        <PackageReference Include="Mapster" Version="7.4.1-pre01" />
+        <PackageReference Include="MediatR" Version="12.4.1" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.10"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.10" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.10">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.10" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Frelance.Contracts\Dtos\ProjectDto.cs">
+        <Link>Frelamce.Contracts\Dtos\ProjectDto.cs</Link>
+      </Compile>
+      <Compile Update="Frelance.Contracts\Errors\ValidationError.cs">
+        <Link>Frelamce.Contracts\Errors\ValidationError.cs</Link>
+      </Compile>
+      <Compile Update="Frelance.Contracts\Exceptions\CustomValidationException.cs">
+        <Link>Frelamce.Contracts\Exceptions\CustomValidationException.cs</Link>
+      </Compile>
+      <Compile Update="Frelance.Contracts\Exceptions\NotFoundException.cs">
+        <Link>Frelamce.Contracts\Exceptions\NotFoundException.cs</Link>
+      </Compile>
+      <Compile Update="Frelance.Contracts\Requests\Common\PaginationParams.cs">
+        <Link>Frelamce.Contracts\Requests\Common\PaginationParams.cs</Link>
+      </Compile>
+      <Compile Update="Frelance.Contracts\Requests\Projects\CreateProjectRequest.cs">
+        <Link>Frelamce.Contracts\Requests\Projects\CreateProjectRequest.cs</Link>
+      </Compile>
+      <Compile Update="Frelance.Contracts\Requests\Projects\UpdateProjectRequest.cs">
+        <Link>Frelamce.Contracts\Requests\Projects\UpdateProjectRequest.cs</Link>
+      </Compile>
+      <Compile Update="Frelance.Contracts\Responses\PaginatedList.cs">
+        <Link>Frelamce.Contracts\Responses\PaginatedList.cs</Link>
+      </Compile>
+      <Compile Update="Frelance.Contracts\Responses\GetProjectsResponse.cs">
+        <Link>Frelamce.Contracts\Responses\GetProjectsResponse.cs</Link>
+      </Compile>
+      <Compile Update="Frelance.Contracts\Responses\GetProjectByIdResponse.cs">
+        <Link>Frelamce.Contracts\Responses\GetProjectByIdResponse.cs</Link>
+      </Compile>
     </ItemGroup>
 
 </Project>
