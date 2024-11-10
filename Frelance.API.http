@@ -1,0 +1,6 @@
+@Frelance.API_HostAddress = http://localhost:5276
+
+GET {{Frelance.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
