@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Frelance.API.Frelance.Application.Commands.Projects.UpdateProject;
+namespace Frelance.Application.Commands.Projects.UpdateProject;
 
 public class UpdateProjectCommandValidator:AbstractValidator<UpdateProjectCommand>
 {
@@ -9,6 +9,7 @@ public class UpdateProjectCommandValidator:AbstractValidator<UpdateProjectComman
         RuleFor(x=>x.Id).NotEmpty();
         RuleFor(x => x.Title).MaximumLength(40);
         RuleFor(x=>x.Description).MaximumLength(500);
+        
     }
     
 }

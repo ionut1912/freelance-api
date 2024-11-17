@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Frelance.API.Frelance.Application.Commands.Projects.DeleteProject;
+namespace Frelance.Application.Commands.Projects.DeleteProject;
 
 public class DeleteProjectCommandValidator:AbstractValidator<DeleteProjectCommand>
 {

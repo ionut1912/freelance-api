@@ -1,11 +1,13 @@
-﻿using Frelance.API.Extensions;
-using Frelance.API.Frelance.Application.Commands.Projects.DeleteProject;
-using Frelance.API.Frelance.Application.Commands.Projects.UpdateProject;
-using Frelance.API.Frelance.Application.Queries.Projects.GetProjects;
-using Frelance.API.Frelance.Contracts.Requests.Common;
-using Frelance.API.Frelance.Contracts.Requests.Projects;
-using Frelance.Application.Commands.Projects.CreateProject;
-using Frelance.Application.Queries.Projects.GetProjectById;
+﻿
+using Frelance.API.Extensions;
+using Frelance.API.Frelamce.Contracts.Common;
+using Frelance.API.Frelamce.Contracts.Projects;
+using Frelance.API.Frelance.Application.Commands.Projects.CreateProject;
+using Frelance.API.Frelance.Application.Queries.Projects.GetProjectById;
+using Frelance.Application.Commands.Projects.DeleteProject;
+using Frelance.Application.Commands.Projects.UpdateProject;
+using Frelance.Application.Queries.Projects.GetProjects;
+using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -32,8 +34,7 @@ public static class ProjectModule
             app.MapPost("/api/projects", async (IMediator mediator, CreateProjectRequest createProjectRequest,
                 CancellationToken ct) =>
             {
-                var command = new CreateProjectCommand(createProjectRequest.Title, createProjectRequest.Description,
-                    createProjectRequest.Deadline,createProjectRequest.Technologies);
+                var command = createProjectRequest.Adapt<CreateProjectCommand>();
                 var result = await mediator.Send(command, ct);
                 return Results.Ok(result);
             }).WithTags("Projects");
@@ -41,8 +42,7 @@ public static class ProjectModule
             app.MapPut("/api/projects/{id}", async (IMediator mediator, int id,
                 UpdateProjectRequest updateProjectRequest, CancellationToken ct) =>
             {
-                var command = new UpdateProjectCommand(id, updateProjectRequest.Title, updateProjectRequest.Description,
-                    updateProjectRequest.Deadline,updateProjectRequest.Technologies);
+                var command = updateProjectRequest.Adapt<UpdateProjectCommand>() with { Id = id };
                 var result = await mediator.Send(command, ct);
                 return Results.Ok(result);
             }).WithTags("Projects");

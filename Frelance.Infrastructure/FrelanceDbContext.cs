@@ -1,7 +1,7 @@
-﻿using Frelance.Domain.Entities;
+﻿using Frelance.API.Frelance.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Frelance.Infrastructure
+namespace Frelance.API.Frelance.Infrastructure
 {
     public class FrelanceDbContext : DbContext
     {
@@ -11,6 +11,7 @@ namespace Frelance.Infrastructure
         }
 
         public DbSet<Project> Projects { get; set; }
+        public DbSet<ProjectTask> Tasks { get; set; }
         
     }
 }

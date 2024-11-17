@@ -1,4 +1,4 @@
-﻿namespace Frelance.API.Frelance.Contracts.Requests.Common;
+﻿namespace Frelance.API.Frelamce.Contracts.Common;
 
 public class PaginationParams
 {

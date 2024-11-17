@@ -1,9 +1,8 @@
 ﻿using FluentValidation;
-using Frelance.API.Frelance.Contracts.Errors;
-using Frelance.API.Frelance.Contracts.Exceptions;
+using Frelance.API.Frelamce.Contracts;
 using MediatR;
 
-namespace Frelance.Application.Behaviors;
+namespace Frelance.API.Frelance.Application.Behaviors;
 
 
 public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>

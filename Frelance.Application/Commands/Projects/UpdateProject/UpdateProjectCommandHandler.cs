@@ -1,10 +1,10 @@
-﻿using Frelance.API.Frelance.Contracts.Exceptions;
-using Frelance.Domain.Entities;
-using Frelance.Infrastructure;
+﻿using Frelance.API.Frelamce.Contracts;
+using Frelance.API.Frelance.Domain.Entities;
+using Frelance.API.Frelance.Infrastructure;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Frelance.API.Frelance.Application.Commands.Projects.UpdateProject;
+namespace Frelance.Application.Commands.Projects.UpdateProject;
 
 public class UpdateProjectCommandHandler:IRequestHandler<UpdateProjectCommand,Unit>
 {
@@ -40,6 +40,11 @@ public class UpdateProjectCommandHandler:IRequestHandler<UpdateProjectCommand,Un
         if (request.Technologies != null)
         {
             projectToUpdate.Technologies=request.Technologies;
+        }
+
+        if (request.Budget != null)
+        {
+            projectToUpdate.Budget = request.Budget.Value;
         }
         _context.Projects.Update(projectToUpdate);
         await _context.SaveChangesAsync(cancellationToken);

@@ -1,8 +1,8 @@
-﻿using Frelance.Domain.Entities;
-using Frelance.Infrastructure;
+﻿using Frelance.API.Frelance.Domain.Entities;
+using Frelance.API.Frelance.Infrastructure;
 using MediatR;
 
-namespace Frelance.Application.Commands.Projects.CreateProject;
+namespace Frelance.API.Frelance.Application.Commands.Projects.CreateProject;
 
 public class CreateProjectCommandHandler:IRequestHandler<CreateProjectCommand,int>
 {
@@ -21,7 +21,8 @@ public class CreateProjectCommandHandler:IRequestHandler<CreateProjectCommand,in
             Title = request.Title,
             Description = request.Description,
             Deadline = request.Deadline,
-            Technologies = request.Technologies
+            Technologies = request.Technologies,
+            Budget = request.Budget
         };
         await _frelanceDbContext.Projects.AddAsync(project,cancellationToken);
         await _frelanceDbContext.SaveChangesAsync(cancellationToken);

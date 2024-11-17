@@ -1,16 +1,16 @@
-﻿using Frelance.API.Frelance.Contracts.Exceptions;
-using Frelance.Domain.Entities;
-using Frelance.Infrastructure;
+﻿using Frelance.API.Frelamce.Contracts;
+using Frelance.API.Frelance.Domain.Entities;
+using Frelance.API.Frelance.Infrastructure;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Frelance.API.Frelance.Application.Commands.Projects.DeleteProject;
+namespace Frelance.Application.Commands.Projects.DeleteProject;
 
-public class DeletProjectCommandHandler:IRequestHandler<DeleteProjectCommand,Unit>
+public class DeleteProjectCommandHandler:IRequestHandler<DeleteProjectCommand,Unit>
 {
     private readonly FrelanceDbContext _context;
 
-    public DeletProjectCommandHandler(FrelanceDbContext context)
+    public DeleteProjectCommandHandler(FrelanceDbContext context)
     {
         _context = context;
         

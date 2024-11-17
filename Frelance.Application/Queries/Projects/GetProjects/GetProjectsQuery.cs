@@ -1,8 +1,8 @@
-﻿using Frelance.API.Frelance.Contracts.Dtos;
-using Frelance.API.Frelance.Contracts.Requests.Common;
-using Frelance.API.Frelance.Contracts.Responses;
+﻿
+using Frelance.API.Frelamce.Contracts;
+using Frelance.API.Frelamce.Contracts.Common;
 using MediatR;
 
-namespace Frelance.API.Frelance.Application.Queries.Projects.GetProjects;
+namespace Frelance.Application.Queries.Projects.GetProjects;
 
 public record GetProjectsQuery(PaginationParams PaginationParams):IRequest<PaginatedList<ProjectDto>>;

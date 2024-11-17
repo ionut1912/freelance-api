@@ -1,3 +1,3 @@
-﻿namespace Frelance.API.Frelance.Contracts.Requests.Projects;
+﻿namespace Frelance.API.Frelamce.Contracts.Projects;
 
-public record CreateProjectRequest(string Title,string Description,DateTime Deadline,List<string> Technologies);
+public record CreateProjectRequest(string Title,string Description,DateTime Deadline,List<string> Technologies,float Budget);

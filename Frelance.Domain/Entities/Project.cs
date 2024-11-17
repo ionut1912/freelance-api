@@ -1,4 +1,4 @@
-﻿namespace Frelance.Domain.Entities;
+﻿namespace Frelance.API.Frelance.Domain.Entities;
 
 public class Project
 {
@@ -8,4 +8,5 @@ public class Project
     public string Description { get; set; }
     public DateTime Deadline { get; set; }
     public List<string> Technologies { get; set; } = new List<string>();
+    public float Budget { get; set; }
 }

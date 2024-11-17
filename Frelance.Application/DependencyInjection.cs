@@ -1,11 +1,13 @@
+
+
 using System.Reflection;
 using FluentValidation;
-using Frelance.Application.Behaviors;
-using Frelance.Application.Mappings;
+using Frelance.API.Frelance.Application.Behaviors;
+using Frelance.Application.Mapings;
 using Mapster;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Frelance.Application;
+namespace Frelance.API.Frelance.Application;
 
 public static class DependencyInjection
 {
@@ -17,7 +19,7 @@ public static class DependencyInjection
             cf.AddOpenBehavior(typeof(ValidationBehavior<,>));
         });
         
-        MappingConfig.Configure();
+        MapingConfig.Configure();
         var config = TypeAdapterConfig.GlobalSettings;
         config.Scan(Assembly.GetExecutingAssembly());
         services.AddSingleton(config);

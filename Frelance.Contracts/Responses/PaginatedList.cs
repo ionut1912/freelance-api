@@ -1,4 +1,4 @@
-﻿namespace Frelance.API.Frelance.Contracts.Responses;
+﻿namespace Frelance.API.Frelamce.Contracts;
 
 public class PaginatedList<T>
 {

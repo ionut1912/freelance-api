@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Frelance.Application.Queries.Projects.GetProjectById;
+namespace Frelance.API.Frelance.Application.Queries.Projects.GetProjectById;
 
 public class GetProjectByIdQueryValidator:AbstractValidator<GetProjectByIdQuery>
 {

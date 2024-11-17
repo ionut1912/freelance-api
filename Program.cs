@@ -1,7 +1,7 @@
+using Frelance.API.Frelance.Application;
+using Frelance.API.Frelance.Infrastructure;
 using Frelance.API.Handlers;
 using Frelance.API.Modules;
-using Frelance.Application;
-using Frelance.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,4 +26,5 @@ if (app.Environment.IsDevelopment())
 app.UseExceptionHandler(_ => { });
 app.UseHttpsRedirection();
 app.AddProjectsEndpoints();
+app.AddTasksEndpoints();
 app.Run();
