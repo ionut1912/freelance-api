@@ -1,3 +1,4 @@
+using Frelance.Contracts.Responses.Tasks;
 using MediatR;
 
 namespace Frelance.Application.Queries.Tasks.GetTaskById;

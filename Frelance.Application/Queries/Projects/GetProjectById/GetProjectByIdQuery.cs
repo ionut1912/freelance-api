@@ -1,3 +1,4 @@
+using Frelance.Contracts.Responses.Projects;
 using MediatR;
 
 namespace Frelance.Application.Queries.Projects.GetProjectById;

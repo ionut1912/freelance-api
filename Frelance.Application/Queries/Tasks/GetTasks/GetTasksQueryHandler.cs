@@ -1,4 +1,7 @@
 using Frelance.Application.Helpers;
+using Frelance.Contracts.Dtos;
+using Frelance.Contracts.Responses.Common;
+using Frelance.Infrastructure.Context;
 using MediatR;
 
 namespace Frelance.Application.Queries.Tasks.GetTasks;

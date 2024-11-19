@@ -1,3 +1,4 @@
+using Frelance.Contracts.Responses.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace Frelance.Application.Helpers;

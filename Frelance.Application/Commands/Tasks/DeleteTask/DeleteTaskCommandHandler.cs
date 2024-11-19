@@ -1,3 +1,6 @@
+using Frelance.Contracts.Exceptions;
+using Frelance.Infrastructure.Context;
+using Frelance.Infrastructure.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 

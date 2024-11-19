@@ -2,6 +2,13 @@
 using Frelance.Application.Commands.Projects.UpdateProject;
 using Frelance.Application.Commands.Tasks.CreateTask;
 using Frelance.Application.Commands.Tasks.UpdateTask;
+using Frelance.Contracts.Dtos;
+using Frelance.Contracts.Requests.Projects;
+using Frelance.Contracts.Requests.ProjectTasks;
+using Frelance.Contracts.Responses.Common;
+using Frelance.Contracts.Responses.Projects;
+using Frelance.Contracts.Responses.Tasks;
+using Frelance.Infrastructure.Entities;
 using Mapster;
 
 namespace Frelance.Application.Mapings;

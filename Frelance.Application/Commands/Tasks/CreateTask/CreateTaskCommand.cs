@@ -1,3 +1,4 @@
+using Frelance.Contracts.Enums;
 using MediatR;
 
 namespace Frelance.Application.Commands.Tasks.CreateTask;
