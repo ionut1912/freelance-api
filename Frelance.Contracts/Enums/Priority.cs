@@ -1,4 +1,4 @@
-﻿namespace Frelance.API.Frelance.Contracts.Enums;
+namespace Frelance.Contracts.Enums;
 
 public enum Priority
 {

@@ -1,6 +1,5 @@
-﻿using Frelance.API.Frelamce.Contracts;
 using MediatR;
-
-namespace Frelance.API.Frelance.Application.Queries.Tasks.GetTaskById;
+using Frelance.Contracts.Responses.Tasks;
+namespace Frelance.Application.Queries.Tasks.GetTaskById;
 
 public record GetTaskByIdQuery(int Id): IRequest<GetTaskByIdResponse>;

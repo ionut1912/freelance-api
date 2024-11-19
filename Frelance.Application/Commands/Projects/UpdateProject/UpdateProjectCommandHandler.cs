@@ -1,9 +1,8 @@
-﻿using Frelance.API.Frelamce.Contracts;
-using Frelance.API.Frelance.Domain.Entities;
-using Frelance.API.Frelance.Infrastructure;
 using MediatR;
+using Frelance.Infrastructure.Context;
+using Frelance.Infrastructure.Entities;
+using Frelance.Contracts.Exceptions;
 using Microsoft.EntityFrameworkCore;
-
 namespace Frelance.Application.Commands.Projects.UpdateProject;
 
 public class UpdateProjectCommandHandler:IRequestHandler<UpdateProjectCommand,Unit>

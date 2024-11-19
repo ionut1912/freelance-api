@@ -1,4 +1,4 @@
-﻿using Frelance.API.Frelamce.Contracts;
+﻿using Frelance.Contracts.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 

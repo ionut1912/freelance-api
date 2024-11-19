@@ -1,8 +1,7 @@
-﻿using Frelance.API.Frelance.Domain.Entities;
-using Frelance.API.Frelance.Infrastructure;
 using MediatR;
-
-namespace Frelance.API.Frelance.Application.Commands.Projects.CreateProject;
+using Frelance.Infrastructure.Context;
+using Frelance.Infrastructure.Entities;
+namespace Frelance.Application.Commands.Projects.CreateProject;
 
 public class CreateProjectCommandHandler:IRequestHandler<CreateProjectCommand,int>
 {

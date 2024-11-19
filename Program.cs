@@ -1,7 +1,7 @@
-using Frelance.API.Frelance.Application;
-using Frelance.API.Frelance.Infrastructure;
 using Frelance.API.Handlers;
 using Frelance.API.Modules;
+using Frelance.Application;
+using Frelance.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

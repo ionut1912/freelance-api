@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Frelance.API.Frelance.Application.Commands.Tasks.CreateTask;
+namespace Frelance.Application.Commands.Tasks.CreateTask;
 
 public class CreateTaskCommandValidator:AbstractValidator<CreateTaskCommand>
 {

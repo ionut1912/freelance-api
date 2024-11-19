@@ -1,9 +1,9 @@
-﻿using Frelance.API.Frelamce.Contracts;
-using Frelance.API.Frelance.Application.Helpers;
-using Frelance.API.Frelance.Infrastructure;
-using Mapster;
+using Frelance.Application.Helpers;
+using Frelance.Contracts.Responses.Common;
+using Frelance.Contracts.Dtos;
+using Frelance.Infrastructure.Context;
 using MediatR;
-
+using Mapster;
 namespace Frelance.Application.Queries.Projects.GetProjects;
 
 public class GetProjectsQueryHandler:IRequestHandler<GetProjectsQuery,PaginatedList<ProjectDto>>

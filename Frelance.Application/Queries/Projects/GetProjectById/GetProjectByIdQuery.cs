@@ -1,6 +1,5 @@
-﻿using Frelance.API.Frelamce.Contracts;
 using MediatR;
-
-namespace Frelance.API.Frelance.Application.Queries.Projects.GetProjectById;
+using Frelance.Contracts.Responses.Projects;
+namespace Frelance.Application.Queries.Projects.GetProjectById;
 
 public record GetProjectByIdQuery(int Id) : IRequest<GetProjectByIdResponse>;

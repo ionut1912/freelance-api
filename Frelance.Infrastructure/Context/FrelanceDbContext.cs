@@ -1,7 +1,7 @@
-﻿using Frelance.API.Frelance.Domain.Entities;
+﻿using Frelance.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Frelance.API.Frelance.Infrastructure
+namespace Frelance.Infrastructure.Context
 {
     public class FrelanceDbContext : DbContext
     {

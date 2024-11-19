@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Frelance.API.Frelance.Application.Commands.Tasks.UpdateTask;
+namespace Frelance.Application.Commands.Tasks.UpdateTask;
 
 public class UpdateTaskCommandValidator:AbstractValidator<UpdateTaskCommand>
 {

@@ -1,13 +1,11 @@
-
-
 using System.Reflection;
 using FluentValidation;
-using Frelance.API.Frelance.Application.Behaviors;
-using Frelance.Application.Mapings;
+using Frelance.API.Frelance.Application.Mapings;
+using Frelance.Application.Behaviors;
 using Mapster;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Frelance.API.Frelance.Application;
+namespace Frelance.Application;
 
 public static class DependencyInjection
 {

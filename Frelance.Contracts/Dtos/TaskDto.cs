@@ -1,6 +1,5 @@
-﻿using Frelance.API.Frelance.Contracts.Enums;
-using Frelance.API.Frelance.Domain.Entities;
+﻿using Frelance.Contracts.Enums;
 
-namespace Frelance.API.Frelamce.Contracts;
+namespace Frelance.Contracts.Dtos;
 
-public record TaskDto(int Id,string Title,string Description, Status Status, Priority Priority,ProjectDto Project);
+public record TaskDto(int Id,string Title,string Description, ProjectTaskStatus ProjectTaskStatus, Priority Priority,ProjectDto Project);

@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Frelance.API.Frelance.Application.Queries.Tasks.GetTaskById;
+namespace Frelance.Application.Queries.Tasks.GetTaskById;
 
 public class GetTaskByIdQueryValidator:AbstractValidator<GetTaskByIdQuery>
 {

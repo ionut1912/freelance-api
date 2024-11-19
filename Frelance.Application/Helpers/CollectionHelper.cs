@@ -1,7 +1,6 @@
-﻿using Frelance.API.Frelamce.Contracts;
 using Microsoft.EntityFrameworkCore;
-
-namespace Frelance.API.Frelance.Application.Helpers;
+using Frelance.Contracts.Responses.Common;
+namespace Frelance.Application.Helpers;
 
 public static class CollectionHelper<T>
 {

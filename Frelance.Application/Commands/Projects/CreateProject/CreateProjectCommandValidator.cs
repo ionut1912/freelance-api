@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Frelance.API.Frelance.Application.Commands.Projects.CreateProject;
+namespace Frelance.Application.Commands.Projects.CreateProject;
 
 public class CreateProjectCommandValidator:AbstractValidator<CreateProjectCommand>
 {

@@ -1,12 +1,11 @@
-﻿using Frelance.API.Frelamce.Contracts;
-using Frelance.API.Frelance.Application.Queries.Projects.GetProjectById;
-using Frelance.API.Frelance.Domain.Entities;
-using Frelance.API.Frelance.Infrastructure;
-using Mapster;
 using MediatR;
+using Frelance.Contracts.Responses.Tasks;
+using Frelance.Infrastructure.Context;
+using Frelance.Contracts.Exceptions;
+using Frelance.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
-
-namespace Frelance.API.Frelance.Application.Queries.Tasks.GetTaskById;
+using Mapster;
+namespace Frelance.Application.Queries.Tasks.GetTaskById;
 
 public class GetTaskByIdQueryHandler:IRequestHandler<GetTaskByIdQuery,GetTaskByIdResponse>
 {

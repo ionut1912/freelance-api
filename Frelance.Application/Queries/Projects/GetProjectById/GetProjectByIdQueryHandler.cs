@@ -1,11 +1,12 @@
-﻿using Frelance.API.Frelamce.Contracts;
-using Frelance.API.Frelance.Domain.Entities;
-using Frelance.API.Frelance.Infrastructure;
-using Mapster;
 using MediatR;
+using Frelance.Contracts.Responses.Projects;
+using Frelance.Infrastructure.Context;
+using Frelance.Infrastructure.Entities;
+using Frelance.Contracts.Exceptions;
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 
-namespace Frelance.API.Frelance.Application.Queries.Projects.GetProjectById;
+namespace Frelance.Application.Queries.Projects.GetProjectById;
 
 public class GetProjectByIdQueryHandler:IRequestHandler<GetProjectByIdQuery,GetProjectByIdResponse>
 {

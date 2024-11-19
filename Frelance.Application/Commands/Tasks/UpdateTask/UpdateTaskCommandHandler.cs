@@ -1,10 +1,9 @@
-﻿using Frelance.API.Frelamce.Contracts;
-using Frelance.API.Frelance.Domain.Entities;
-using Frelance.API.Frelance.Infrastructure;
-using MediatR;
+﻿using MediatR;
+using Frelance.Infrastructure.Context;
+using Frelance.Infrastructure.Entities;
+using Frelance.Contracts.Exceptions;
 using Microsoft.EntityFrameworkCore;
-
-namespace Frelance.API.Frelance.Application.Commands.Tasks.UpdateTask;
+namespace Frelance.Application.Commands.Tasks.UpdateTask;
 
 public class UpdateTaskCommandHandler:IRequestHandler<UpdateTaskCommand,Unit>
 {
@@ -34,7 +33,7 @@ public class UpdateTaskCommandHandler:IRequestHandler<UpdateTaskCommand,Unit>
 
         if (request.Status != null)
         {
-            projectTaskToUpdate.Status = request.Status.Value;
+            projectTaskToUpdate.ProjectTaskStatus = request.Status.Value;
         }
         if (request.Priority != null)
         {

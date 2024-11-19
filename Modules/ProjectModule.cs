@@ -1,12 +1,12 @@
 ﻿
 using Frelance.API.Extensions;
-using Frelance.API.Frelamce.Contracts.Common;
-using Frelance.API.Frelamce.Contracts.Projects;
-using Frelance.API.Frelance.Application.Commands.Projects.CreateProject;
-using Frelance.API.Frelance.Application.Queries.Projects.GetProjectById;
+using Frelance.Application.Commands.Projects.CreateProject;
 using Frelance.Application.Commands.Projects.DeleteProject;
 using Frelance.Application.Commands.Projects.UpdateProject;
+using Frelance.Application.Queries.Projects.GetProjectById;
 using Frelance.Application.Queries.Projects.GetProjects;
+using Frelance.Contracts.Requests.Common;
+using Frelance.Contracts.Requests.Projects;
 using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;

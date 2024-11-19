@@ -1,4 +1,6 @@
-﻿namespace Frelance.API.Frelamce.Contracts;
+﻿using Frelance.Contracts.Errors;
+
+namespace Frelance.Contracts.Exceptions;
 
 public class CustomValidationException : Exception
 {

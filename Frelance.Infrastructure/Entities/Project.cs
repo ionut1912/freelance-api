@@ -1,4 +1,4 @@
-﻿namespace Frelance.API.Frelance.Domain.Entities;
+namespace Frelance.Infrastructure.Entities;
 
 public class Project
 {

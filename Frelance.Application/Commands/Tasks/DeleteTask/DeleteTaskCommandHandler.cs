@@ -1,10 +1,10 @@
-﻿using Frelance.API.Frelamce.Contracts;
-using Frelance.API.Frelance.Domain.Entities;
-using Frelance.API.Frelance.Infrastructure;
 using MediatR;
+using Frelance.Infrastructure.Context;
+using Frelance.Infrastructure.Entities;
+using Frelance.Contracts.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Frelance.API.Frelance.Application.Commands.Tasks.DeleteTask;
+namespace Frelance.Application.Commands.Tasks.DeleteTask;
 
 public class DeleteTaskCommandHandler:IRequestHandler<DeleteTaskCommand,Unit>
 {

@@ -1,12 +1,11 @@
-﻿using Frelance.API.Frelamce.Contracts;
-using Frelance.API.Frelance.Application.Helpers;
-using Frelance.API.Frelance.Infrastructure;
-using Mapster;
+using Frelance.Application.Helpers;
 using MediatR;
+using Frelance.Contracts.Responses.Common;
+using Frelance.Contracts.Dtos;
+using Frelance.Infrastructure.Context;
+namespace Frelance.Application.Queries.Tasks.GetTasks;
 using Microsoft.EntityFrameworkCore;
-
-namespace Frelance.API.Frelance.Application.Queries.Tasks.GetTasks;
-
+using Mapster;
 public class GetTasksQueryHandler : IRequestHandler<GetTasksQuery, PaginatedList<TaskDto>>
 {
     private readonly FrelanceDbContext _context;

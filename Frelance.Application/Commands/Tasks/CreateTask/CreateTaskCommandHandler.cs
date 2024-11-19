@@ -1,11 +1,10 @@
-﻿using Frelance.API.Frelamce.Contracts;
-using Frelance.API.Frelance.Contracts.Enums;
-using Frelance.API.Frelance.Domain.Entities;
-using Frelance.API.Frelance.Infrastructure;
 using MediatR;
+using Frelance.Infrastructure.Context;
+using Frelance.Infrastructure.Entities;
+using Frelance.Contracts.Exceptions;
 using Microsoft.EntityFrameworkCore;
-
-namespace Frelance.API.Frelance.Application.Commands.Tasks.CreateTask;
+using Frelance.Contracts.Enums;
+namespace Frelance.Application.Commands.Tasks.CreateTask;
 
 public class CreateTaskCommandHandler:IRequestHandler<CreateTaskCommand,int>
 {
@@ -28,7 +27,7 @@ public class CreateTaskCommandHandler:IRequestHandler<CreateTaskCommand,int>
             ProjectId = taskProject.Id,
             Title = request.Title,
             Description = request.Description,
-            Status = Status.ToDo,
+            ProjectTaskStatus = ProjectTaskStatus.ToDo,
             Priority = request.Priority,
         };
         await _context.Tasks.AddAsync(task, cancellationToken);

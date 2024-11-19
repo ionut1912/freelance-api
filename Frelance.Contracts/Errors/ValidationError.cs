@@ -1,4 +1,4 @@
-﻿namespace Frelance.API.Frelamce.Contracts;
+﻿namespace Frelance.Contracts.Errors;
 
 public class ValidationError
 {

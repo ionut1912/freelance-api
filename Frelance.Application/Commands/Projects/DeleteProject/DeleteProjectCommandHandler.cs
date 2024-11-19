@@ -1,9 +1,9 @@
-﻿using Frelance.API.Frelamce.Contracts;
-using Frelance.API.Frelance.Domain.Entities;
-using Frelance.API.Frelance.Infrastructure;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
 
+using MediatR;
+using Frelance.Infrastructure.Context;
+using Frelance.Contracts.Exceptions;
+using Frelance.Infrastructure.Entities;
+using Microsoft.EntityFrameworkCore;
 namespace Frelance.Application.Commands.Projects.DeleteProject;
 
 public class DeleteProjectCommandHandler:IRequestHandler<DeleteProjectCommand,Unit>

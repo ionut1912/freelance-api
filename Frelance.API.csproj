@@ -23,34 +23,34 @@
 
     <ItemGroup>
       <Compile Update="Frelance.Contracts\Dtos\ProjectDto.cs">
-        <Link>Frelamce.Contracts\Dtos\ProjectDto.cs</Link>
+        <Link>Frelance.Contracts\Dtos\ProjectDto.cs</Link>
       </Compile>
       <Compile Update="Frelance.Contracts\Errors\ValidationError.cs">
-        <Link>Frelamce.Contracts\Errors\ValidationError.cs</Link>
+        <Link>Frelance.Contracts\Errors\ValidationError.cs</Link>
       </Compile>
       <Compile Update="Frelance.Contracts\Exceptions\CustomValidationException.cs">
-        <Link>Frelamce.Contracts\Exceptions\CustomValidationException.cs</Link>
+        <Link>Frelance.Contracts\Exceptions\CustomValidationException.cs</Link>
       </Compile>
       <Compile Update="Frelance.Contracts\Exceptions\NotFoundException.cs">
-        <Link>Frelamce.Contracts\Exceptions\NotFoundException.cs</Link>
+        <Link>Frelance.Contracts\Exceptions\NotFoundException.cs</Link>
       </Compile>
       <Compile Update="Frelance.Contracts\Requests\Common\PaginationParams.cs">
-        <Link>Frelamce.Contracts\Requests\Common\PaginationParams.cs</Link>
+        <Link>Frelance.Contracts\Requests\Common\PaginationParams.cs</Link>
       </Compile>
       <Compile Update="Frelance.Contracts\Requests\Projects\CreateProjectRequest.cs">
-        <Link>Frelamce.Contracts\Requests\Projects\CreateProjectRequest.cs</Link>
+        <Link>Frelance.Contracts\Requests\Projects\CreateProjectRequest.cs</Link>
       </Compile>
       <Compile Update="Frelance.Contracts\Requests\Projects\UpdateProjectRequest.cs">
-        <Link>Frelamce.Contracts\Requests\Projects\UpdateProjectRequest.cs</Link>
+        <Link>Frelance.Contracts\Requests\Projects\UpdateProjectRequest.cs</Link>
       </Compile>
       <Compile Update="Frelance.Contracts\Responses\PaginatedList.cs">
-        <Link>Frelamce.Contracts\Responses\PaginatedList.cs</Link>
+        <Link>Frelance.Contracts\Responses\PaginatedList.cs</Link>
       </Compile>
       <Compile Update="Frelance.Contracts\Responses\GetProjectsResponse.cs">
-        <Link>Frelamce.Contracts\Responses\GetProjectsResponse.cs</Link>
+        <Link>Frelance.Contracts\Responses\GetProjectsResponse.cs</Link>
       </Compile>
       <Compile Update="Frelance.Contracts\Responses\GetProjectByIdResponse.cs">
-        <Link>Frelamce.Contracts\Responses\GetProjectByIdResponse.cs</Link>
+        <Link>Frelance.Contracts\Responses\GetProjectByIdResponse.cs</Link>
       </Compile>
     </ItemGroup>
 

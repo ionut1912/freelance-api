@@ -1,17 +1,11 @@
-﻿
-using Frelamce.Contracts.Requests.ProjectTasks;
-using Frelance.API.Extensions;
-using Frelance.API.Frelamce.Contracts.Common;
-using Frelance.API.Frelamce.Contracts.Projects;
-using Frelance.API.Frelance.Application.Commands.Projects.CreateProject;
-using Frelance.API.Frelance.Application.Commands.Tasks.CreateTask;
-using Frelance.API.Frelance.Application.Commands.Tasks.DeleteTask;
-using Frelance.API.Frelance.Application.Commands.Tasks.UpdateTask;
-using Frelance.API.Frelance.Application.Queries.Projects.GetProjectById;
-using Frelance.API.Frelance.Application.Queries.Tasks.GetTaskById;
-using Frelance.API.Frelance.Application.Queries.Tasks.GetTasks;
-using Frelance.Application.Commands.Projects.DeleteProject;
-using Frelance.Application.Commands.Projects.UpdateProject;
+﻿using Frelance.API.Extensions;
+using Frelance.Application.Commands.Tasks.CreateTask;
+using Frelance.Application.Commands.Tasks.DeleteTask;
+using Frelance.Application.Commands.Tasks.UpdateTask;
+using Frelance.Application.Queries.Tasks.GetTaskById;
+using Frelance.Application.Queries.Tasks.GetTasks;
+using Frelance.Contracts.Requests.Common;
+using Frelance.Contracts.Requests.ProjectTasks;
 using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
