@@ -7,8 +7,4 @@
         <RootNamespace>Frelance.Contracts</RootNamespace>
     </PropertyGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\Frelance.API.csproj" />
-    </ItemGroup>
-
 </Project>

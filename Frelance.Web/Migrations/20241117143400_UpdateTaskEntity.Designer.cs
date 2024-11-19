@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Frelance.API.Migrations
+namespace Frelance.Web.Migrations
 {
     
     [DbContext(typeof(FrelanceDbContext))]

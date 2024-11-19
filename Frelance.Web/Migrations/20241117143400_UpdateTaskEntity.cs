@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Frelance.API.Migrations
+namespace Frelance.Web.Migrations
 {
     /// <inheritdoc />
     public partial class UpdateTaskEntity : Migration

@@ -1,7 +1,7 @@
 using System.Reflection;
 using FluentValidation;
-using Frelance.API.Frelance.Application.Mapings;
 using Frelance.Application.Behaviors;
+using Frelance.Application.Mapings;
 using Mapster;
 using Microsoft.Extensions.DependencyInjection;
 

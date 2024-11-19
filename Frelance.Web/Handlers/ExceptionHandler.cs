@@ -1,8 +1,8 @@
-﻿using Frelance.Contracts.Exceptions;
+using Frelance.Contracts.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Frelance.API.Handlers;
+namespace Frelance.Web.Handlers;
 
 public class ExceptionHandler : IExceptionHandler
 {

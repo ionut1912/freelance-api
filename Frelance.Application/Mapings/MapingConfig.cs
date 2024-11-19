@@ -1,16 +1,10 @@
-﻿using Frelance.Contracts.Responses.Common;
-using Frelance.Contracts.Dtos;
-using Frelance.Contracts.Responses.Projects;
-using Frelance.Contracts.Requests.Projects;
-using Frelance.Application.Commands.Projects.CreateProject;
+﻿using Frelance.Application.Commands.Projects.CreateProject;
 using Frelance.Application.Commands.Projects.UpdateProject;
-using Frelance.Infrastructure.Entities;
-using Frelance.Contracts.Responses.Tasks;
-using Mapster;
-using Frelance.Contracts.Requests.ProjectTasks;
-using Frelance.Application.Commands.Tasks.UpdateTask;
 using Frelance.Application.Commands.Tasks.CreateTask;
-namespace Frelance.API.Frelance.Application.Mapings;
+using Frelance.Application.Commands.Tasks.UpdateTask;
+using Mapster;
+
+namespace Frelance.Application.Mapings;
 
 public class MapingConfig
 {

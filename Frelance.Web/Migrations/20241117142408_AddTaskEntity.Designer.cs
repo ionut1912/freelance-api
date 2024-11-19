@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Frelance.API.Migrations
+namespace Frelance.Web.Migrations
 {
     [DbContext(typeof(FrelanceDbContext))]
-    [Migration("20241119104127_RenameStatus")]
-    partial class RenameStatus
+    [Migration("20241117142408_AddTaskEntity")]
+    partial class AddTaskEntity
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace Frelance.API.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Frelance.Infrastructure.Entities.Project", b =>
+            modelBuilder.Entity("Frelance.API.Frelance.Domain.Entities.Project", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -59,7 +59,7 @@ namespace Frelance.API.Migrations
                     b.ToTable("Projects");
                 });
 
-            modelBuilder.Entity("Frelance.Infrastructure.Entities.ProjectTask", b =>
+            modelBuilder.Entity("Frelance.API.Frelance.Domain.Entities.ProjectTask", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -77,7 +77,7 @@ namespace Frelance.API.Migrations
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ProjectTaskStatus")
+                    b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
@@ -91,9 +91,9 @@ namespace Frelance.API.Migrations
                     b.ToTable("Tasks");
                 });
 
-            modelBuilder.Entity("Frelance.Infrastructure.Entities.ProjectTask", b =>
+            modelBuilder.Entity("Frelance.API.Frelance.Domain.Entities.ProjectTask", b =>
                 {
-                    b.HasOne("Frelance.Infrastructure.Entities.Project", "Project")
+                    b.HasOne("Frelance.API.Frelance.Domain.Entities.Project", "Project")
                         .WithMany()
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)

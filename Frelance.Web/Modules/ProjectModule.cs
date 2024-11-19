@@ -1,5 +1,4 @@
 ﻿
-using Frelance.API.Extensions;
 using Frelance.Application.Commands.Projects.CreateProject;
 using Frelance.Application.Commands.Projects.DeleteProject;
 using Frelance.Application.Commands.Projects.UpdateProject;
@@ -7,11 +6,12 @@ using Frelance.Application.Queries.Projects.GetProjectById;
 using Frelance.Application.Queries.Projects.GetProjects;
 using Frelance.Contracts.Requests.Common;
 using Frelance.Contracts.Requests.Projects;
+using Frelance.Web.Extensions;
 using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Frelance.API.Modules;
+namespace Frelance.Web.Modules;
 
 public static class ProjectModule
 {

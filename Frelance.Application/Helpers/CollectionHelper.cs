@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Frelance.Contracts.Responses.Common;
+
 namespace Frelance.Application.Helpers;
 
 public static class CollectionHelper<T>

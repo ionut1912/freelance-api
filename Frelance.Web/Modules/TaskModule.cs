@@ -1,16 +1,16 @@
-﻿using Frelance.API.Extensions;
-using Frelance.Application.Commands.Tasks.CreateTask;
+﻿using Frelance.Application.Commands.Tasks.CreateTask;
 using Frelance.Application.Commands.Tasks.DeleteTask;
 using Frelance.Application.Commands.Tasks.UpdateTask;
 using Frelance.Application.Queries.Tasks.GetTaskById;
 using Frelance.Application.Queries.Tasks.GetTasks;
 using Frelance.Contracts.Requests.Common;
 using Frelance.Contracts.Requests.ProjectTasks;
+using Frelance.Web.Extensions;
 using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Frelance.API.Modules;
+namespace Frelance.Web.Modules;
 
 public static class TaskModule
 {

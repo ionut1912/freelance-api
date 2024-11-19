@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
 using MediatR;
-using Frelance.Contracts.Errors;
-using Frelance.Contracts.Exceptions;
+
 namespace Frelance.Application.Behaviors;
 
 

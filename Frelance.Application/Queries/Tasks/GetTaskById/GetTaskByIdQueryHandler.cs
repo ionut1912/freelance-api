@@ -1,8 +1,4 @@
 using MediatR;
-using Frelance.Contracts.Responses.Tasks;
-using Frelance.Infrastructure.Context;
-using Frelance.Contracts.Exceptions;
-using Frelance.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
 using Mapster;
 namespace Frelance.Application.Queries.Tasks.GetTaskById;

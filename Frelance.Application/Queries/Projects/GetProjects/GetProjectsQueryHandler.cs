@@ -1,7 +1,4 @@
 using Frelance.Application.Helpers;
-using Frelance.Contracts.Responses.Common;
-using Frelance.Contracts.Dtos;
-using Frelance.Infrastructure.Context;
 using MediatR;
 using Mapster;
 namespace Frelance.Application.Queries.Projects.GetProjects;

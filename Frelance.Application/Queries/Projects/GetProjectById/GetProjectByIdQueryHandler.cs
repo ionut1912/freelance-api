@@ -1,8 +1,4 @@
 using MediatR;
-using Frelance.Contracts.Responses.Projects;
-using Frelance.Infrastructure.Context;
-using Frelance.Infrastructure.Entities;
-using Frelance.Contracts.Exceptions;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 

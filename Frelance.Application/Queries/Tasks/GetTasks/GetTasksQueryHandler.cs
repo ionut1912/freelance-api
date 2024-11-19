@@ -1,8 +1,6 @@
 using Frelance.Application.Helpers;
 using MediatR;
-using Frelance.Contracts.Responses.Common;
-using Frelance.Contracts.Dtos;
-using Frelance.Infrastructure.Context;
+
 namespace Frelance.Application.Queries.Tasks.GetTasks;
 using Microsoft.EntityFrameworkCore;
 using Mapster;
