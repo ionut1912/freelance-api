@@ -27,7 +27,7 @@ public class CreateTaskCommandHandler:IRequestHandler<CreateTaskCommand,int>
             ProjectId = taskProject.Id,
             Title = request.Title,
             Description = request.Description,
-            ProjectTaskStatus = ProjectTaskStatus.ToDo,
+            Status = ProjectTaskStatus.ToDo,
             Priority = request.Priority,
         };
         await _context.Tasks.AddAsync(task, cancellationToken);

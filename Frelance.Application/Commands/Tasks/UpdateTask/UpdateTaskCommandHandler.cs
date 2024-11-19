@@ -33,7 +33,7 @@ public class UpdateTaskCommandHandler:IRequestHandler<UpdateTaskCommand,Unit>
 
         if (request.Status != null)
         {
-            projectTaskToUpdate.ProjectTaskStatus = request.Status.Value;
+            projectTaskToUpdate.Status = request.Status.Value;
         }
         if (request.Priority != null)
         {
