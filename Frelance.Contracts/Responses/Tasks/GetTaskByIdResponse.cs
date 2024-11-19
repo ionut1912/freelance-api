@@ -5,4 +5,4 @@ using Frelance.Contracts.Dtos;
 namespace Frelance.Contracts.Responses.Tasks;
 
 
-public record GetTaskByIdResponse(TaskDto TaskDto);
+public record GetTaskByIdResponse(TaskDto Task);
