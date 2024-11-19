@@ -19,7 +19,7 @@ public class GetProjectByIdQueryHandler:IRequestHandler<GetProjectByIdQuery,GetP
     }
     public async Task<GetProjectByIdResponse> Handle(GetProjectByIdQuery request, CancellationToken cancellationToken)
     {
-        var project=await _context.Projects.FirstOrDefaultAsync(x=>x.Id==request.Id, cancellationToken);
+        var project=await _context.Projects.AsNoTracking().Include(x=>x.Tasks).FirstOrDefaultAsync(x=>x.Id==request.Id, cancellationToken);
         if (project is null)
         {
             throw new NotFoundException($"{nameof(Project)} with {nameof(Project.Id)} : '{request.Id}' does not exist");

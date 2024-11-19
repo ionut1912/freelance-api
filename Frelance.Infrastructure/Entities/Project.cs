@@ -8,5 +8,6 @@ public class Project
     public string Description { get; set; }
     public DateTime Deadline { get; set; }
     public List<string> Technologies { get; set; } = new List<string>();
+    public List<ProjectTask> Tasks { get; set; } = new List<ProjectTask>();
     public float Budget { get; set; }
 }
