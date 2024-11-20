@@ -1,8 +1,5 @@
-﻿using Frelance.Application.Commands.Tasks.CreateTask;
-using Frelance.Application.Commands.Tasks.DeleteTask;
-using Frelance.Application.Commands.Tasks.UpdateTask;
-using Frelance.Application.Queries.Tasks.GetTaskById;
-using Frelance.Application.Queries.Tasks.GetTasks;
+﻿using Frelance.Application.Mediatr.Commands.Tasks;
+using Frelance.Application.Mediatr.Queries.Tasks;
 using Frelance.Contracts.Requests.Common;
 using Frelance.Contracts.Requests.ProjectTasks;
 using Frelance.Web.Extensions;

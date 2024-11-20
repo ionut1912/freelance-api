@@ -1,8 +1,5 @@
-using Frelance.Application.Commands.TimeLogs.CreateTimeLog;
-using Frelance.Application.Commands.TimeLogs.DeleteTimeLog;
-using Frelance.Application.Commands.TimeLogs.UpdateTimeLog;
-using Frelance.Application.Queries.TimeLogs.GetTimeLogById;
-using Frelance.Application.Queries.TimeLogs.GetTimeLogs;
+using Frelance.Application.Mediatr.Commands.TimeLogs;
+using Frelance.Application.Mediatr.Queries.TimeLogs;
 using Frelance.Contracts.Requests.Common;
 using Frelance.Contracts.Requests.TimeLogs;
 using Frelance.Web.Extensions;

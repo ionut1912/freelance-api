@@ -1,9 +1,5 @@
-﻿
-using Frelance.Application.Commands.Projects.CreateProject;
-using Frelance.Application.Commands.Projects.DeleteProject;
-using Frelance.Application.Commands.Projects.UpdateProject;
-using Frelance.Application.Queries.Projects.GetProjectById;
-using Frelance.Application.Queries.Projects.GetProjects;
+﻿using Frelance.Application.Mediatr.Commands.Projects;
+using Frelance.Application.Mediatr.Queries.Projects;
 using Frelance.Contracts.Requests.Common;
 using Frelance.Contracts.Requests.Projects;
 using Frelance.Web.Extensions;

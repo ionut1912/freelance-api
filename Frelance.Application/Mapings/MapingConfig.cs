@@ -1,9 +1,6 @@
-﻿using Frelance.Application.Commands.Projects.CreateProject;
-using Frelance.Application.Commands.Projects.UpdateProject;
-using Frelance.Application.Commands.Tasks.CreateTask;
-using Frelance.Application.Commands.Tasks.UpdateTask;
-using Frelance.Application.Commands.TimeLogs.CreateTimeLog;
-using Frelance.Application.Commands.TimeLogs.UpdateTimeLog;
+﻿using Frelance.Application.Mediatr.Commands.Projects;
+using Frelance.Application.Mediatr.Commands.Tasks;
+using Frelance.Application.Mediatr.Commands.TimeLogs;
 using Frelance.Contracts.Dtos;
 using Frelance.Contracts.Requests.Projects;
 using Frelance.Contracts.Requests.ProjectTasks;
