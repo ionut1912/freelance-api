@@ -22,7 +22,12 @@ namespace Frelance.Infrastructure.Context
                 .OnDelete(DeleteBehavior.NoAction);
             builder.Entity<Projects>().HasOne(x=>x.User).WithOne(u=>u.Projects).HasForeignKey<Projects>(x=>x.UserId).OnDelete(DeleteBehavior.NoAction);
             builder.Entity<TimeLogs>().HasOne(u=>u.User).WithMany(t=>t.TimeLogs).HasForeignKey(u=>u.UserId).OnDelete(DeleteBehavior.NoAction);
-            
+            builder.Entity<Roles>()
+                .HasData(
+                    new Roles { Id = 1, Name = "Frelancer", NormalizedName = "FRELANCER" },
+                    new Roles { Id = 2, Name = "Client", NormalizedName = "CLIENT" },
+                    new Roles { Id = 3, Name = "Admin", NormalizedName = "ADMIN" }
+                );
         }
     }
 }
