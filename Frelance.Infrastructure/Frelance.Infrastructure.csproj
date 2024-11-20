@@ -9,6 +9,8 @@
     <ItemGroup>
       <PackageReference Include="Mapster" Version="7.4.1-pre01" />
       <PackageReference Include="Mapster.DependencyInjection" Version="1.0.2-pre01" />
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11" />
+      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.11" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.11" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11">
         <PrivateAssets>all</PrivateAssets>
@@ -25,6 +27,10 @@
       <ProjectReference Include="..\Frelance.Application\Frelance.Application.csproj" />
       <ProjectReference Include="..\Frelance.Contracts\Frelance.Contracts.csproj" />
         
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Migrations\" />
     </ItemGroup>
 
 </Project>

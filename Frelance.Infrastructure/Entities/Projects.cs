@@ -1,6 +1,6 @@
 namespace Frelance.Infrastructure.Entities;
 
-public class Project
+public class Projects
 {
     public int Id { get; set; }
     public DateTime CreatedAt { get; set; }
@@ -8,6 +8,8 @@ public class Project
     public string Description { get; set; }
     public DateTime Deadline { get; set; }
     public List<string> Technologies { get; set; } = new List<string>();
-    public List<ProjectTask> Tasks { get; set; } = new List<ProjectTask>();
+    public List<ProjectTasks> Tasks { get; set; } = new List<ProjectTasks>();
+    public int UserId { get; set; }
+    public Users User { get; set; }
     public float Budget { get; set; }
 }

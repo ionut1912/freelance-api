@@ -23,17 +23,17 @@ public class MappingConfig
             .Map(dest => dest.Results, src => src);
         TypeAdapterConfig<CreateProjectRequest, CreateProjectCommand>.NewConfig().Map(dest => dest, src => src);
         TypeAdapterConfig<UpdateProjectRequest, UpdateProjectCommand>.NewConfig().Map(dest=>dest, src => src);
-        TypeAdapterConfig<Project, GetProjectByIdResponse>.NewConfig()
+        TypeAdapterConfig<Projects, GetProjectByIdResponse>.NewConfig()
             .Map(dest => dest.Project, src => src);
         
         TypeAdapterConfig<PaginatedList<TaskDto>,GetTasksResponse>.NewConfig().Map(dest=>dest.Results, src => src);
         TypeAdapterConfig<CreateProjectTaskRequest,CreateTaskCommand>.NewConfig().Map(dest=>dest, src => src);
         TypeAdapterConfig<UpdateProjectTaskRequest,UpdateTaskCommand>.NewConfig().Map(dest=>dest, src => src);
-        TypeAdapterConfig<ProjectTask,GetTaskByIdResponse>.NewConfig().Map(dest=>dest.Task, src => src);
+        TypeAdapterConfig<ProjectTasks,GetTaskByIdResponse>.NewConfig().Map(dest=>dest.Task, src => src);
         
         TypeAdapterConfig<PaginatedList<TimeLogDto>,GetTimeLogsResponse>.NewConfig().Map(dest=>dest.Results, src => src);
         TypeAdapterConfig<CreateTimeLogRequest,CreateTimeLogCommand>.NewConfig().Map(dest=>dest, src => src);
         TypeAdapterConfig<UpdateTimeLogRequest,UpdateTimeLogCommand>.NewConfig().Map(dest=>dest, src => src);
-        TypeAdapterConfig<TimeLog,GetTimeLogByIdResponse>.NewConfig().Map(dest=>dest.TimeLog,src => src);
+        TypeAdapterConfig<TimeLogs,GetTimeLogByIdResponse>.NewConfig().Map(dest=>dest.TimeLog,src => src);
     }
 }

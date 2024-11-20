@@ -24,7 +24,7 @@ public class ProjectRepository:IProjectRepository
     }
     public async Task AddProjectAsync(CreateProjectCommand createProjectCommand, CancellationToken cancellationToken)
     {
-        var project = new Project
+        var project = new Projects
         {
             CreatedAt = DateTime.Now.ToUniversalTime(),
             Title = createProjectCommand.Title,
@@ -41,7 +41,7 @@ public class ProjectRepository:IProjectRepository
         var projectToUpdate = await _context.Projects.FirstOrDefaultAsync(x => x.Id == updateProjectCommand.Id, cancellationToken);
         if (projectToUpdate is null)
         {
-            throw new NotFoundException($"{nameof(Project)} with {nameof(Project.Id)} : '{updateProjectCommand.Id}' does not exist");
+            throw new NotFoundException($"{nameof(Projects)} with {nameof(Projects.Id)} : '{updateProjectCommand.Id}' does not exist");
         }
         projectToUpdate.Description = updateProjectCommand.Description;
         projectToUpdate.Title = updateProjectCommand.Title;
@@ -56,7 +56,7 @@ public class ProjectRepository:IProjectRepository
         var projectToDelete = await _context.Projects.FirstOrDefaultAsync(x => x.Id == deleteProjectCommand.Id, cancellationToken);
         if (projectToDelete is null)
         {
-            throw new NotFoundException($"{nameof(Project)} with {nameof(Project.Id)} : '{deleteProjectCommand.Id}' does not exist");
+            throw new NotFoundException($"{nameof(Projects)} with {nameof(Projects.Id)} : '{deleteProjectCommand.Id}' does not exist");
         }
         _context.Projects.Remove(projectToDelete);
     }
@@ -66,7 +66,7 @@ public class ProjectRepository:IProjectRepository
         var project=await _context.Projects.AsNoTracking().Include(x=>x.Tasks).FirstOrDefaultAsync(x=>x.Id==getProjectByIdQuery.Id, cancellationToken);
         if (project is null)
         {
-            throw new NotFoundException($"{nameof(Project)} with {nameof(Project.Id)} : '{getProjectByIdQuery.Id}' does not exist");
+            throw new NotFoundException($"{nameof(Projects)} with {nameof(Projects.Id)} : '{getProjectByIdQuery.Id}' does not exist");
         }
 
         return project.Adapt<GetProjectByIdResponse>();

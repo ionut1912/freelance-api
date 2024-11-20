@@ -27,10 +27,10 @@ public class TaskRepository:ITaskRepository
         var taskProject= await _context.Projects.AsNoTracking().Where(x=>x.Title==createTaskCommand.ProjectTitle).FirstOrDefaultAsync(cancellationToken);
         if (taskProject is null)
         {
-            throw new NotFoundException($"{nameof(Project)} with {nameof(Project.Title)} : '{createTaskCommand.ProjectTitle}' does not exist");
+            throw new NotFoundException($"{nameof(Projects)} with {nameof(Projects.Title)} : '{createTaskCommand.ProjectTitle}' does not exist");
         }
 
-        var task = new ProjectTask
+        var task = new ProjectTasks
         {
             ProjectId = taskProject.Id,
             Title = createTaskCommand.Title,
@@ -46,7 +46,7 @@ public class TaskRepository:ITaskRepository
         var projectTaskToUpdate= await _context.Tasks.FirstOrDefaultAsync(x=>x.Id==updateTaskCommand.Id,cancellationToken);
         if (projectTaskToUpdate is null)
         {
-            throw new NotFoundException($"{nameof(ProjectTask)} with {nameof(ProjectTask.Id)} : '{updateTaskCommand.Id}' does not exist");
+            throw new NotFoundException($"{nameof(ProjectTasks)} with {nameof(ProjectTasks.Id)} : '{updateTaskCommand.Id}' does not exist");
         }
         
         projectTaskToUpdate.Title = updateTaskCommand.Title;
@@ -62,7 +62,7 @@ public class TaskRepository:ITaskRepository
         var projectTaskToDelete = await _context.Tasks.FirstOrDefaultAsync(x=>x.Id==deleteTaskCommand.Id,cancellationToken);
         if (projectTaskToDelete is null)
         {
-            throw new NotFoundException($"{nameof(ProjectTask)} with {nameof(ProjectTask.Id)} : '{deleteTaskCommand.Id}' does not exist");
+            throw new NotFoundException($"{nameof(ProjectTasks)} with {nameof(ProjectTasks.Id)} : '{deleteTaskCommand.Id}' does not exist");
         }
         _context.Tasks.Remove(projectTaskToDelete);
     }
@@ -70,13 +70,13 @@ public class TaskRepository:ITaskRepository
     public async Task<GetTaskByIdResponse> GetTaskByIdAsync(GetTaskByIdQuery getTaskByIdQuery, CancellationToken cancellationToken)
     {
         var task = await _context.Tasks.AsNoTracking()
-                                        .Include(x=>x.Project)
+                                        .Include(x=>x.Projects)
                                         .Include(x=>x.TimeLogs)
                                         .FirstOrDefaultAsync(x=>x.Id==getTaskByIdQuery.Id, cancellationToken);
         
         if (task is null)
         {
-            throw new NotFoundException($"{nameof(ProjectTask)} with {nameof(ProjectTask.Id)} : '{getTaskByIdQuery.Id}' does not exist");
+            throw new NotFoundException($"{nameof(ProjectTasks)} with {nameof(ProjectTasks.Id)} : '{getTaskByIdQuery.Id}' does not exist");
         }
         return task.Adapt<GetTaskByIdResponse>();
     }
@@ -84,7 +84,7 @@ public class TaskRepository:ITaskRepository
     public async Task<PaginatedList<TaskDto>> GetTasksAsync(GetTasksQuery getTasksQuery, CancellationToken cancellationToken)
     {
         var taskQuery = _context.Tasks.AsNoTracking()
-                                                        .Include(x=>x.Project)
+                                                        .Include(x=>x.Projects)
                                                         .Include(x=>x.TimeLogs)
                                                         .ProjectToType<TaskDto>().AsQueryable();
         return await CollectionHelper<TaskDto>.ToPaginatedList(taskQuery,getTasksQuery.PaginationParams.PageNumber,getTasksQuery.PaginationParams.PageSize);

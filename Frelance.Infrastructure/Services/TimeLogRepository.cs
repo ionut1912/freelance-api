@@ -26,10 +26,10 @@ public class TimeLogRepository:ITimeLogRepository
         var timeLogTask=await _context.Tasks.AsNoTracking().FirstOrDefaultAsync(x=>x.Title==createTimeLogCommand.TaskTitle, cancellationToken);
         if (timeLogTask is null)
         {
-            throw new NotFoundException($"{nameof(ProjectTask)} with {nameof(ProjectTask.Title)} : '{createTimeLogCommand.TaskTitle}' does not exist");
+            throw new NotFoundException($"{nameof(ProjectTasks)} with {nameof(ProjectTasks.Title)} : '{createTimeLogCommand.TaskTitle}' does not exist");
         }
 
-        var timeLog = new TimeLog
+        var timeLog = new TimeLogs
         {
             TaskId = timeLogTask.Id,
             StartTime = createTimeLogCommand.StartTime,
@@ -45,12 +45,12 @@ public class TimeLogRepository:ITimeLogRepository
         var timeLogTask=await _context.Tasks.AsNoTracking().FirstOrDefaultAsync(x=>x.Title==updateTimeLogCommand.TaskTitle, cancellationToken);
         if (timeLogTask is null)
         {
-            throw new NotFoundException($"{nameof(ProjectTask)} with {nameof(ProjectTask.Title)} : '{updateTimeLogCommand.TaskTitle}' does not exist");
+            throw new NotFoundException($"{nameof(ProjectTasks)} with {nameof(ProjectTasks.Title)} : '{updateTimeLogCommand.TaskTitle}' does not exist");
         }
         var timeLogToUpdate=await _context.TimeLogs.AsNoTracking().FirstOrDefaultAsync(x=>x.Id==updateTimeLogCommand.Id, cancellationToken);
         if (timeLogToUpdate is null)
         {
-            throw new NotFoundException($"{nameof(TimeLog)} with {nameof(TimeLog.Id)} : '{updateTimeLogCommand.Id}' does not exist");
+            throw new NotFoundException($"{nameof(TimeLogs)} with {nameof(TimeLogs.Id)} : '{updateTimeLogCommand.Id}' does not exist");
         }
 
         timeLogToUpdate.TaskId = timeLogTask.Id;
@@ -68,7 +68,7 @@ public class TimeLogRepository:ITimeLogRepository
         var timeLogToRemove=await _context.TimeLogs.AsNoTracking().FirstOrDefaultAsync(x=>x.Id==deleteTimeLogCommand.Id, cancellationToken);
         if (timeLogToRemove is null)
         {
-            throw new NotFoundException($"{nameof(TimeLog)} with {nameof(TimeLog.Id)} : '{deleteTimeLogCommand.Id}' does not exist");
+            throw new NotFoundException($"{nameof(TimeLogs)} with {nameof(TimeLogs.Id)} : '{deleteTimeLogCommand.Id}' does not exist");
         }
         _context.TimeLogs.Remove(timeLogToRemove);
     }
@@ -78,7 +78,7 @@ public class TimeLogRepository:ITimeLogRepository
         var timeLog= await _context.TimeLogs.AsNoTracking().FirstOrDefaultAsync(x=>x.Id == getTimeLogByIdQuery.Id,cancellationToken);
         if (timeLog is null)
         {
-            throw new NotFoundException($"{nameof(TimeLog)} with {nameof(TimeLog.Id)} : '{getTimeLogByIdQuery.Id}' does not exist");
+            throw new NotFoundException($"{nameof(TimeLogs)} with {nameof(TimeLogs.Id)} : '{getTimeLogByIdQuery.Id}' does not exist");
         }
         return timeLog.Adapt<GetTimeLogByIdResponse>();
     }
