@@ -27,4 +27,5 @@ app.UseExceptionHandler(_ => { });
 app.UseHttpsRedirection();
 app.AddProjectsEndpoints();
 app.AddTasksEndpoints();
+app.AddTimeLogsEndpoints();
 app.Run();

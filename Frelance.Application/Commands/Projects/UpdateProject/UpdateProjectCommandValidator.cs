@@ -9,7 +9,8 @@ public class UpdateProjectCommandValidator:AbstractValidator<UpdateProjectComman
         RuleFor(x=>x.Id).NotEmpty();
         RuleFor(x => x.Title).MaximumLength(40);
         RuleFor(x=>x.Description).MaximumLength(500);
-        
+        RuleFor(x => x.Budget).GreaterThan(0);
+
     }
     
 }

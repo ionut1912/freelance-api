@@ -20,26 +20,12 @@ public class UpdateTaskCommandHandler:IRequestHandler<UpdateTaskCommand,Unit>
         {
             throw new NotFoundException($"{nameof(ProjectTask)} with {nameof(ProjectTask.Id)} : '{request.Id}' does not exist");
         }
-
-        if (request.Title != null)
-        {
-            projectTaskToUpdate.Title = request.Title;
-        }
-
-        if (request.Description != null)
-        {
-            projectTaskToUpdate.Description = request.Description;
-        }
-
-        if (request.Status != null)
-        {
-            projectTaskToUpdate.Status = request.Status.Value;
-        }
-        if (request.Priority != null)
-        {
-            projectTaskToUpdate.Priority = request.Priority.Value;
-        }
-
+        
+        projectTaskToUpdate.Title = request.Title;
+        projectTaskToUpdate.Description = request.Description;
+        projectTaskToUpdate.Status = request.Status;
+        projectTaskToUpdate.Priority = request.Priority;
+        
         _context.Tasks.Update(projectTaskToUpdate);
         await _context.SaveChangesAsync(cancellationToken);
         return Unit.Value;

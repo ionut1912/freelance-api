@@ -17,7 +17,7 @@ public class GetTasksQueryHandler : IRequestHandler<GetTasksQuery, PaginatedList
     }
     public async Task<PaginatedList<TaskDto>> Handle(GetTasksQuery request, CancellationToken cancellationToken)
     {
-        var taskQuery = _context.Tasks.AsNoTracking().Include(x=>x.Project).ProjectToType<TaskDto>().AsQueryable();
+        var taskQuery = _context.Tasks.AsNoTracking().Include(x=>x.Project).Include(x=>x.TimeLogs).ProjectToType<TaskDto>().AsQueryable();
         return await CollectionHelper<TaskDto>.ToPaginatedList(taskQuery,request.PaginationParams.PageNumber,request.PaginationParams.PageSize);
     }
 }

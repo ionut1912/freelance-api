@@ -20,31 +20,11 @@ public class UpdateProjectCommandHandler:IRequestHandler<UpdateProjectCommand,Un
         {
             throw new NotFoundException($"{nameof(Project)} with {nameof(Project.Id)} : '{request.Id}' does not exist");
         }
-
-        if (request.Description != null)
-        {
-            projectToUpdate.Description = request.Description;
-        }
-
-        if (request.Title != null)
-        {
-            projectToUpdate.Title = request.Title;
-        }
-
-        if (request.Deadline != null)
-        {
-            projectToUpdate.Deadline = request.Deadline.Value;
-        }
-
-        if (request.Technologies != null)
-        {
-            projectToUpdate.Technologies=request.Technologies;
-        }
-
-        if (request.Budget != null)
-        {
-            projectToUpdate.Budget = request.Budget.Value;
-        }
+        projectToUpdate.Description = request.Description;
+        projectToUpdate.Title = request.Title;
+        projectToUpdate.Deadline = request.Deadline;
+        projectToUpdate.Technologies=request.Technologies;
+        projectToUpdate.Budget = request.Budget;
         _context.Projects.Update(projectToUpdate);
         await _context.SaveChangesAsync(cancellationToken);
         return Unit.Value;
