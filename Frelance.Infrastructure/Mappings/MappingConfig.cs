@@ -1,4 +1,4 @@
-﻿using Frelance.Application.Mediatr.Commands.Projects;
+using Frelance.Application.Mediatr.Commands.Projects;
 using Frelance.Application.Mediatr.Commands.Tasks;
 using Frelance.Application.Mediatr.Commands.TimeLogs;
 using Frelance.Contracts.Dtos;
@@ -12,9 +12,10 @@ using Frelance.Contracts.Responses.TimeLogs;
 using Frelance.Infrastructure.Entities;
 using Mapster;
 
-namespace Frelance.Application.Mapings;
+namespace Frelance.Infrastructure.Mappings;
 
-public class MapingConfig
+
+public class MappingConfig
 {
     public static void Configure()
     {

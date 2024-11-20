@@ -19,6 +19,7 @@
     <ItemGroup>
       <ProjectReference Include="..\Frelance.Application\Frelance.Application.csproj" />
       <ProjectReference Include="..\Frelance.Contracts\Frelance.Contracts.csproj" />
+      <ProjectReference Include="..\Frelance.Infrastructure\Frelance.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

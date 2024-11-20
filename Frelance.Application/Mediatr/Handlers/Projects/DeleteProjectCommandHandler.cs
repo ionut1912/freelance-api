@@ -1,30 +1,24 @@
 using Frelance.Application.Mediatr.Commands.Projects;
-using Frelance.Contracts.Exceptions;
-using Frelance.Infrastructure.Context;
-using Frelance.Infrastructure.Entities;
+using Frelance.Application.Repositories;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace Frelance.Application.Mediatr.Handlers.Projects;
 
 public class DeleteProjectCommandHandler:IRequestHandler<DeleteProjectCommand,Unit>
 {
-    private readonly FrelanceDbContext _context;
+    private readonly IProjectRepository _projectRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public DeleteProjectCommandHandler(FrelanceDbContext context)
+    public DeleteProjectCommandHandler(IProjectRepository projectRepository, IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _projectRepository = projectRepository;
+        _unitOfWork = unitOfWork;
         
     }
     public async Task<Unit> Handle(DeleteProjectCommand request, CancellationToken cancellationToken)
     {
-        var projectToDelete = await _context.Projects.FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
-        if (projectToDelete is null)
-        {
-            throw new NotFoundException($"{nameof(Project)} with {nameof(Project.Id)} : '{request.Id}' does not exist");
-        }
-        _context.Projects.Remove(projectToDelete);
-        await _context.SaveChangesAsync(cancellationToken);
+        await _projectRepository.DeleteProjectAsync(request, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
         return  Unit.Value;
     }
 }

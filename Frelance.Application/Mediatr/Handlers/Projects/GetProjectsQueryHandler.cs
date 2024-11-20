@@ -1,26 +1,22 @@
-using Frelance.Application.Helpers;
 using Frelance.Application.Mediatr.Queries.Projects;
+using Frelance.Application.Repositories;
 using Frelance.Contracts.Dtos;
 using Frelance.Contracts.Responses.Common;
-using Frelance.Infrastructure.Context;
-using Mapster;
 using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.Projects;
 
 public class GetProjectsQueryHandler:IRequestHandler<GetProjectsQuery,PaginatedList<ProjectDto>>
 {
-    private readonly FrelanceDbContext _context;
+    private readonly IProjectRepository _projectRepository;
 
-    public GetProjectsQueryHandler(FrelanceDbContext context)
+    public GetProjectsQueryHandler(IProjectRepository projectRepository)
     {
-        _context = context;
-        
+        _projectRepository = projectRepository;   
     }
 
     public async Task<PaginatedList<ProjectDto>> Handle(GetProjectsQuery request, CancellationToken cancellationToken)
     {
-        var projectQuery = _context.Projects.ProjectToType<ProjectDto>().AsQueryable();
-        return await CollectionHelper<ProjectDto>.ToPaginatedList(projectQuery,request.PaginationParams.PageNumber,request.PaginationParams.PageSize);
+        return await _projectRepository.FindProjectsAsync(request,cancellationToken);
     }
 }

@@ -1,29 +1,24 @@
 using Frelance.Application.Mediatr.Commands.TimeLogs;
-using Frelance.Contracts.Exceptions;
-using Frelance.Infrastructure.Context;
-using Frelance.Infrastructure.Entities;
+using Frelance.Application.Repositories;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace Frelance.Application.Mediatr.Handlers.TimeLogs;
 
 public class DeleteTimeLogCommandHandler:IRequestHandler<DeleteTimeLogCommand,Unit>
 {
-    private readonly FrelanceDbContext _context;
+    private readonly ITimeLogRepository _timeLogRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public DeleteTimeLogCommandHandler(FrelanceDbContext context)
+    public DeleteTimeLogCommandHandler(ITimeLogRepository timeLogRepository, IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _timeLogRepository = timeLogRepository;
+        _unitOfWork = unitOfWork;
     }
     public async Task<Unit> Handle(DeleteTimeLogCommand request, CancellationToken cancellationToken)
     {
-        var timeLogToRemove=await _context.TimeLogs.AsNoTracking().FirstOrDefaultAsync(x=>x.Id==request.Id, cancellationToken);
-        if (timeLogToRemove is null)
-        {
-            throw new NotFoundException($"{nameof(TimeLog)} with {nameof(TimeLog.Id)} : '{request.Id}' does not exist");
-        }
-        _context.TimeLogs.Remove(timeLogToRemove);
-        await _context.SaveChangesAsync(cancellationToken);
+
+        await _timeLogRepository.DeleteTimeLogAsync(request,cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;
     }
 }

@@ -1,33 +1,25 @@
 using Frelance.Application.Mediatr.Commands.Projects;
-using Frelance.Infrastructure.Context;
-using Frelance.Infrastructure.Entities;
+using Frelance.Application.Repositories;
 using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.Projects;
 
-public class CreateProjectCommandHandler:IRequestHandler<CreateProjectCommand,int>
+public class CreateProjectCommandHandler:IRequestHandler<CreateProjectCommand,Unit>
 {
-    public readonly FrelanceDbContext _frelanceDbContext;
+    private readonly IProjectRepository _projectRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public CreateProjectCommandHandler(FrelanceDbContext frelanceDbContext)
+    public CreateProjectCommandHandler(IProjectRepository projectRepository, IUnitOfWork unitOfWork)
     {
-        _frelanceDbContext = frelanceDbContext;
+        _projectRepository = projectRepository;
+        _unitOfWork = unitOfWork;
     }
 
-    public async Task<int> Handle(CreateProjectCommand request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(CreateProjectCommand request, CancellationToken cancellationToken)
     {
-        var project = new Project
-        {
-            CreatedAt = DateTime.Now.ToUniversalTime(),
-            Title = request.Title,
-            Description = request.Description,
-            Deadline = request.Deadline,
-            Technologies = request.Technologies,
-            Budget = request.Budget
-        };
-        await _frelanceDbContext.Projects.AddAsync(project,cancellationToken);
-        await _frelanceDbContext.SaveChangesAsync(cancellationToken);
-        return project.Id;
+        await _projectRepository.AddProjectAsync(request, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        return Unit.Value;
     }
     
 }

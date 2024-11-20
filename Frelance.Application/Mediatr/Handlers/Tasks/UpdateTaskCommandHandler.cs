@@ -1,36 +1,24 @@
 using Frelance.Application.Mediatr.Commands.Tasks;
-using Frelance.Contracts.Exceptions;
-using Frelance.Infrastructure.Context;
-using Frelance.Infrastructure.Entities;
+using Frelance.Application.Repositories;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace Frelance.Application.Mediatr.Handlers.Tasks;
 
 
 public class UpdateTaskCommandHandler:IRequestHandler<UpdateTaskCommand,Unit>
 {
-    private readonly FrelanceDbContext _context;
+    private readonly ITaskRepository _taskRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public UpdateTaskCommandHandler(FrelanceDbContext context)
+    public UpdateTaskCommandHandler(ITaskRepository taskRepository, IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _taskRepository = taskRepository;
+        _unitOfWork = unitOfWork;
     }
     public async Task<Unit> Handle(UpdateTaskCommand request, CancellationToken cancellationToken)
     {
-        var projectTaskToUpdate= await _context.Tasks.FirstOrDefaultAsync(x=>x.Id==request.Id,cancellationToken);
-        if (projectTaskToUpdate is null)
-        {
-            throw new NotFoundException($"{nameof(ProjectTask)} with {nameof(ProjectTask.Id)} : '{request.Id}' does not exist");
-        }
-        
-        projectTaskToUpdate.Title = request.Title;
-        projectTaskToUpdate.Description = request.Description;
-        projectTaskToUpdate.Status = request.Status;
-        projectTaskToUpdate.Priority = request.Priority;
-        
-        _context.Tasks.Update(projectTaskToUpdate);
-        await _context.SaveChangesAsync(cancellationToken);
+        await _taskRepository.UpdateTaskAsync(request,cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;
 
     }

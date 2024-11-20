@@ -1,29 +1,20 @@
 using Frelance.Application.Mediatr.Queries.TimeLogs;
-using Frelance.Contracts.Exceptions;
+using Frelance.Application.Repositories;
 using Frelance.Contracts.Responses.TimeLogs;
-using Frelance.Infrastructure.Context;
-using Frelance.Infrastructure.Entities;
-using Mapster;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace Frelance.Application.Mediatr.Handlers.TimeLogs;
 
 public class GetTimeLogByIdQueryHandler:IRequestHandler<GetTimeLogByIdQuery, GetTimeLogByIdResponse>
 {
-    private readonly FrelanceDbContext _context;
+    private readonly ITimeLogRepository _timeLogRepository;
 
-    public GetTimeLogByIdQueryHandler(FrelanceDbContext context)
+    public GetTimeLogByIdQueryHandler(ITimeLogRepository timeLogRepository)
     {
-        _context = context;
+        _timeLogRepository = timeLogRepository;
     }
     public async Task<GetTimeLogByIdResponse> Handle(GetTimeLogByIdQuery request, CancellationToken cancellationToken)
     {
-        var timeLog= await _context.TimeLogs.AsNoTracking().FirstOrDefaultAsync(x=>x.Id == request.Id,cancellationToken);
-        if (timeLog is null)
-        {
-            throw new NotFoundException($"{nameof(TimeLog)} with {nameof(TimeLog.Id)} : '{request.Id}' does not exist");
-        }
-        return timeLog.Adapt<GetTimeLogByIdResponse>();
+        return await _timeLogRepository.GetTimeLogByIdAsync(request, cancellationToken);
     }
 }

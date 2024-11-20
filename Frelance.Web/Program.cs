@@ -1,8 +1,7 @@
 using Frelance.Application;
-using Frelance.Infrastructure.Context;
+using Frelance.Infrastructure;
 using Frelance.Web.Handlers;
 using Frelance.Web.Modules;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,9 +10,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Register DbContext with the connection string from Configuration
-builder.Services.AddDbContext<FrelanceDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DatabaseSettings:ConnectionString")));
+
 builder.Services.AddApplication();
+builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddExceptionHandler<ExceptionHandler>();
 var app = builder.Build();
 

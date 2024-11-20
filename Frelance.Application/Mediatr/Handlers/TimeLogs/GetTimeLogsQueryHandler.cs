@@ -1,24 +1,21 @@
-using Frelance.Application.Helpers;
 using Frelance.Application.Mediatr.Queries.TimeLogs;
+using Frelance.Application.Repositories;
 using Frelance.Contracts.Dtos;
 using Frelance.Contracts.Responses.Common;
-using Frelance.Infrastructure.Context;
-using Mapster;
 using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.TimeLogs;
 
 public class GetTimeLogsQueryHandler : IRequestHandler<GetTimeLogsQuery,PaginatedList<TimeLogDto>>
 {
-    private readonly FrelanceDbContext _context;
+    private readonly ITimeLogRepository _timeLogRepository;
 
-    public GetTimeLogsQueryHandler(FrelanceDbContext context)
+    public GetTimeLogsQueryHandler(ITimeLogRepository timeLogRepository)
     {
-        _context = context;
+        _timeLogRepository = timeLogRepository;
     }
     public async Task<PaginatedList<TimeLogDto>> Handle(GetTimeLogsQuery request, CancellationToken cancellationToken)
     {
-        var timeLogsQuery = _context.TimeLogs.ProjectToType<TimeLogDto>().AsQueryable();
-        return await CollectionHelper<TimeLogDto>.ToPaginatedList(timeLogsQuery,request.PaginationParams.PageNumber,request.PaginationParams.PageSize);
+        return await _timeLogRepository.GetTimeLogsAsync(request, cancellationToken);
     }
 }

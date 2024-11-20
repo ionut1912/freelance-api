@@ -1,38 +1,25 @@
 using Frelance.Application.Mediatr.Commands.TimeLogs;
-using Frelance.Contracts.Exceptions;
-using Frelance.Infrastructure.Context;
-using Frelance.Infrastructure.Entities;
+using Frelance.Application.Repositories;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace Frelance.Application.Mediatr.Handlers.TimeLogs;
 
-public class CreateTimeLogCommandHandler:IRequestHandler<CreateTimeLogCommand,int>
+public class CreateTimeLogCommandHandler:IRequestHandler<CreateTimeLogCommand,Unit>
 {
-    private readonly FrelanceDbContext _context;
+    private readonly ITimeLogRepository _timeLogRepository;
+    private readonly IUnitOfWork _unitOfWork;
+    
 
-    public CreateTimeLogCommandHandler(FrelanceDbContext context)
+    public CreateTimeLogCommandHandler(ITimeLogRepository timeLogRepository, IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _timeLogRepository = timeLogRepository;
+        _unitOfWork = unitOfWork;
     }
-    public async Task<int> Handle(CreateTimeLogCommand request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(CreateTimeLogCommand request, CancellationToken cancellationToken)
     {
-        var timeLogTask=await _context.Tasks.AsNoTracking().FirstOrDefaultAsync(x=>x.Title==request.TaskTitle, cancellationToken);
-        if (timeLogTask is null)
-        {
-            throw new NotFoundException($"{nameof(ProjectTask)} with {nameof(ProjectTask.Title)} : '{request.TaskTitle}' does not exist");
-        }
 
-        var timeLog = new TimeLog
-        {
-            TaskId = timeLogTask.Id,
-            StartTime = request.StartTime,
-            EndTime = request.EndTime,
-            Date = request.Date,
-            TotalHours = request.EndTime.Hour - request.StartTime.Hour
-        };
-        await _context.TimeLogs.AddAsync(timeLog, cancellationToken);
-        await _context.SaveChangesAsync(cancellationToken);
-        return timeLog.Id;
+        await _timeLogRepository.AddTimeLogAsync(request, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        return Unit.Value;
     }
 }
