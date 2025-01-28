@@ -61,7 +61,7 @@ jobs:
         with:
           app-name: 'frelance-api'
           slot-name: 'Production'
-          package: ${{env.DOTNET_ROOT}}/myapp  # Path from the build step
+          package: .
 
       - name: Fetch app settings from Azure (optional)
         run: |
