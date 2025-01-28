@@ -33,7 +33,8 @@ public static class ProjectModule
                 var command = createProjectRequest.Adapt<CreateProjectCommand>();
                 var result = await mediator.Send(command, ct);
                 return Results.Ok(result);
-            }).WithTags("Projects");
+            }).WithTags("Projects")
+            .RequireAuthorization("ClientRole");
     
             app.MapPut("/api/projects/{id}", async (IMediator mediator, int id,
                 UpdateProjectRequest updateProjectRequest, CancellationToken ct) =>

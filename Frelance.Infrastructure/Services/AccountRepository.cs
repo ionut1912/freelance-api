@@ -1,10 +1,12 @@
 using Frelance.Application.Mediatr.Commands.Users;
 using Frelance.Application.Repositories;
+using Frelance.Contracts.Dtos;
 using Frelance.Infrastructure.Context;
 using Frelance.Infrastructure.Entities;
 using Mapster;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.EntityFrameworkCore;
 
 namespace Frelance.Infrastructure.Services;
 
@@ -40,11 +42,22 @@ public class AccountRepository:IAccountRepository
 
     }
 
+    public async Task<UserDto> LoginAsync(LoginDto loginDto,CancellationToken cancellationToken)
+    {
+        var user = await _userManager.Users.FirstOrDefaultAsync(x=>x.UserName==loginDto.Username,cancellationToken);
+        if (user is null || !await _userManager.CheckPasswordAsync(user, loginDto.Password))
+        {
+            throw new Exception("User not found or password is incorrect");
+        }
+        return new UserDto(user.PhoneNumber,await _tokenService.GenerateToken(user),user.UserName,user.Email);
+    }
+
     private static void AddErrorToModelState(IdentityResult result, ModelStateDictionary modelState)
     {
         foreach (var error in result.Errors)
         {
             modelState.AddModelError(error.Code, error.Description);
+            throw new Exception(error.Description);
             
         }
     }

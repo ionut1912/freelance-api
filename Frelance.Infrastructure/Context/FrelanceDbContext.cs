@@ -30,7 +30,7 @@ namespace Frelance.Infrastructure.Context
             base.OnModelCreating(builder);
             builder.Entity<ProjectTasks>().HasOne(u => u.Users).WithMany(u => u.Tasks).HasForeignKey(u => u.UserId)
                 .OnDelete(DeleteBehavior.NoAction);
-            builder.Entity<Projects>().HasOne(x=>x.User).WithOne(u=>u.Projects).HasForeignKey<Projects>(x=>x.UserId).OnDelete(DeleteBehavior.NoAction);
+            builder.Entity<Projects>().HasOne(x=>x.User).WithMany(u=>u.Projects).HasForeignKey(x=>x.UserId).OnDelete(DeleteBehavior.NoAction);
             builder.Entity<TimeLogs>().HasOne(u=>u.User).WithMany(t=>t.TimeLogs).HasForeignKey(u=>u.UserId).OnDelete(DeleteBehavior.NoAction);
             builder.Entity<Roles>()
                 .HasData(

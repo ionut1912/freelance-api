@@ -29,9 +29,8 @@ public class ProjectRepository:IProjectRepository
     public async Task AddProjectAsync(CreateProjectCommand createProjectCommand, CancellationToken cancellationToken)
     {
         var project = createProjectCommand.Adapt<Projects>();
-        var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(x=>x.UserName== _userAccessor.GetUsername(),cancellationToken);
+        var user = await _context.Users.FirstOrDefaultAsync(x=>x.UserName== _userAccessor.GetUsername(),cancellationToken);
         project.User = user;
-        
         await _context.Projects.AddAsync(project,cancellationToken);
     }
 
