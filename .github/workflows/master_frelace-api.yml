@@ -1,3 +1,6 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
 name: Build and deploy ASP.Net Core app to Azure Web App - frelace-api
 
 on:
@@ -22,7 +25,7 @@ jobs:
         run: dotnet build --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish D:\a\frelance-api\frelance-api\Frelance.Web\Frelance.Web.csproj -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -37,18 +40,21 @@ jobs:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write # This is required for requesting the JWT
+      id-token: write #This is required for requesting the JWT
 
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: .net-app
+      
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_B2B5B8E38C994BAA8E73CA5CA93605FB }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_4C5E2A6D66F34815B0157A9ECB6F3D62 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_B67C40577CB446C9B9D688430B23407F }}
 
-      - name: Azure CLI Login
-        run: |
-          az login --use-device-code
-          az account set --subscription ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID }}
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
@@ -56,3 +62,4 @@ jobs:
           app-name: 'frelace-api'
           slot-name: 'Production'
           package: .
+          
