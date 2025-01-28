@@ -48,6 +48,7 @@ jobs:
       - name: Azure CLI Login
         run: |
           az login --use-device-code
+          az account set --subscription ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
