@@ -52,12 +52,10 @@ jobs:
 
       - name: Set Azure App Service Configuration (App Settings)
         run: |
-          az webapp config appsettings set \
-            --name 'frelace-api' \
-            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-            --settings \
-              "DatabaseSettings__ConnectionString=${{ secrets.DATABASE_CONNECTION_STRING }}" \
-              "JWTSettings__TokenKey=${{ secrets.JWT_SECRET_KEY }}"
+          az webapp config appsettings set --name 'frelace-api' `
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} `
+            --settings "DatabaseSettings__ConnectionString=${{ secrets.DATABASE_CONNECTION_STRING }}" `
+            "JWTSettings__TokenKey=${{ secrets.JWT_SECRET_KEY }}"
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
