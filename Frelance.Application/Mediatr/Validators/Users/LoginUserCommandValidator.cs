@@ -10,7 +10,7 @@ public class LoginUserCommandValidator:AbstractValidator<LoginCommand>
     {
         RuleFor(x=>x.LoginDto.Password).NotEmpty();
         RuleFor(x=>x.LoginDto.Username).NotEmpty();
-        RuleFor(x=>x.LoginDto.Enail).NotEmpty().EmailAddress();
+        RuleFor(x=>x.LoginDto.Email).NotEmpty().EmailAddress();
         
     }
 }
