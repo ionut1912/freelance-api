@@ -31,7 +31,7 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
                 ErrorMessage = x.ErrorMessage
             }).ToList();
 
-        if (failures.Any())
+        if (failures.Count>0)
         {
             throw new CustomValidationException(failures);
         }

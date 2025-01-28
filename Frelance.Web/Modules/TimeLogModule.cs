@@ -30,8 +30,7 @@ public static class TimeLogModule
             app.MapPost("/api/timelogs", async (IMediator mediator, CreateTimeLogCommand createTimeLogCommand,
                 CancellationToken ct) =>
             {
-                var command = createTimeLogCommand.Adapt<CreateTimeLogCommand>();
-                var result = await mediator.Send(command, ct);
+                var result = await mediator.Send(createTimeLogCommand, ct);
                 return Results.Ok(result);
             }).WithTags("TimeLogs");
     

@@ -16,10 +16,14 @@ namespace Frelance.Infrastructure.Services;
 public class TimeLogRepository:ITimeLogRepository
 {
     private readonly FrelanceDbContext _context;
+    private readonly IUserAccessor _userAccessor;
 
-    public TimeLogRepository(FrelanceDbContext dbContext)
+    public TimeLogRepository(FrelanceDbContext dbContext,IUserAccessor userAccessor)
     {
+        ArgumentNullException.ThrowIfNull(dbContext, nameof(dbContext));
         _context = dbContext;
+        ArgumentNullException.ThrowIfNull(userAccessor, nameof(userAccessor));
+        _userAccessor = userAccessor;
     }
     public async Task AddTimeLogAsync(CreateTimeLogCommand createTimeLogCommand, CancellationToken cancellationToken)
     {
@@ -29,14 +33,11 @@ public class TimeLogRepository:ITimeLogRepository
             throw new NotFoundException($"{nameof(ProjectTasks)} with {nameof(ProjectTasks.Title)} : '{createTimeLogCommand.TaskTitle}' does not exist");
         }
 
-        var timeLog = new TimeLogs
-        {
-            TaskId = timeLogTask.Id,
-            StartTime = createTimeLogCommand.StartTime,
-            EndTime = createTimeLogCommand.EndTime,
-            Date = createTimeLogCommand.Date,
-            TotalHours = createTimeLogCommand.EndTime.Hour - createTimeLogCommand.StartTime.Hour
-        };
+        var timeLog = createTimeLogCommand.Adapt<TimeLogs>();
+        timeLog.TaskId = timeLogTask.Id;
+        timeLog.TotalHours = createTimeLogCommand.EndTime.Hour - createTimeLogCommand.StartTime.Hour;
+        var user=await _context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.UserName == _userAccessor.GetUsername(), cancellationToken);
+        timeLog.User = user;
         await _context.TimeLogs.AddAsync(timeLog, cancellationToken);
     }
 

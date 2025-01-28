@@ -1,6 +1,7 @@
 using Frelance.Application.Mediatr.Commands.Projects;
 using Frelance.Application.Mediatr.Commands.Tasks;
 using Frelance.Application.Mediatr.Commands.TimeLogs;
+using Frelance.Application.Mediatr.Commands.Users;
 using Frelance.Contracts.Dtos;
 using Frelance.Contracts.Requests.Projects;
 using Frelance.Contracts.Requests.ProjectTasks;
@@ -19,6 +20,11 @@ public class MappingConfig
 {
     public static void Configure()
     {
+        TypeAdapterConfig<CreateProjectCommand, Projects>.NewConfig();
+        TypeAdapterConfig<CreateTaskCommand,ProjectTasks>.NewConfig();
+        TypeAdapterConfig<CreateTimeLogCommand, TimeLogs>.NewConfig();
+        TypeAdapterConfig<CreateUserCommand, Users>.NewConfig();
+        
         TypeAdapterConfig<PaginatedList<ProjectDto>, GetProjectsResponse>.NewConfig()
             .Map(dest => dest.Results, src => src);
         TypeAdapterConfig<CreateProjectRequest, CreateProjectCommand>.NewConfig().Map(dest => dest, src => src);

@@ -1,20 +1,30 @@
 ﻿using Frelance.Infrastructure.Entities;
+using Frelance.Infrastructure.Settings;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Frelance.Infrastructure.Context
 {
     public class FrelanceDbContext : IdentityDbContext<Users,Roles,int>
     {
-        public FrelanceDbContext(DbContextOptions<FrelanceDbContext> options) 
+        private readonly DatabaseSettings _databaseSettings;
+        public FrelanceDbContext(DbContextOptions<FrelanceDbContext> options,IOptions<DatabaseSettings> databaseSettings) 
             : base(options)
         {
+            _databaseSettings = databaseSettings.Value;
         }
+        
 
         public DbSet<Projects> Projects { get; set; }
         public DbSet<ProjectTasks> Tasks { get; set; }
         public DbSet<TimeLogs> TimeLogs { get; set; }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlServer(_databaseSettings.ConnectionString);
+            optionsBuilder.EnableSensitiveDataLogging();
+        }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

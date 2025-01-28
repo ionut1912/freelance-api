@@ -17,10 +17,14 @@ namespace Frelance.Infrastructure.Services;
 public class TaskRepository:ITaskRepository
 {
     private readonly FrelanceDbContext _context;
+    private readonly IUserAccessor _userAccessor;
 
-    public TaskRepository(FrelanceDbContext context)
+    public TaskRepository(FrelanceDbContext context,IUserAccessor userAccessor)
     {
+        ArgumentNullException.ThrowIfNull(context, nameof(context));
         _context = context;
+        ArgumentNullException.ThrowIfNull(_userAccessor, nameof(userAccessor));
+        _userAccessor = userAccessor;
     }
     public async Task AddTaskAsync(CreateTaskCommand createTaskCommand, CancellationToken cancellationToken)
     {
@@ -29,15 +33,11 @@ public class TaskRepository:ITaskRepository
         {
             throw new NotFoundException($"{nameof(Projects)} with {nameof(Projects.Title)} : '{createTaskCommand.ProjectTitle}' does not exist");
         }
-
-        var task = new ProjectTasks
-        {
-            ProjectId = taskProject.Id,
-            Title = createTaskCommand.Title,
-            Description = createTaskCommand.Description,
-            Status = ProjectTaskStatus.ToDo,
-            Priority = createTaskCommand.Priority,
-        };
+        var user=await _context.Users.AsNoTracking().FirstOrDefaultAsync(x=>x.UserName == _userAccessor.GetUsername(), cancellationToken);
+        var task = createTaskCommand.Adapt<ProjectTasks>();
+        task.ProjectId = taskProject.Id;
+        task.Status = ProjectTaskStatus.ToDo;
+        task.Users = user;
         await _context.Tasks.AddAsync(task, cancellationToken);
     }
 

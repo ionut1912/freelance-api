@@ -17,22 +17,21 @@ namespace Frelance.Infrastructure.Services;
 public class ProjectRepository:IProjectRepository
 {
     private readonly FrelanceDbContext _context;
+    private readonly IUserAccessor _userAccessor;
 
-    public ProjectRepository(FrelanceDbContext context)
+    public ProjectRepository(FrelanceDbContext context, IUserAccessor userAccessor)
     {
+        ArgumentNullException.ThrowIfNull(context,nameof(context));
         _context = context;
+        ArgumentNullException.ThrowIfNull(userAccessor,nameof(userAccessor));
+        _userAccessor = userAccessor;
     }
     public async Task AddProjectAsync(CreateProjectCommand createProjectCommand, CancellationToken cancellationToken)
     {
-        var project = new Projects
-        {
-            CreatedAt = DateTime.Now.ToUniversalTime(),
-            Title = createProjectCommand.Title,
-            Description = createProjectCommand.Description,
-            Deadline = createProjectCommand.Deadline,
-            Technologies = createProjectCommand.Technologies,
-            Budget = createProjectCommand.Budget
-        };
+        var project = createProjectCommand.Adapt<Projects>();
+        var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(x=>x.UserName== _userAccessor.GetUsername(),cancellationToken);
+        project.User = user;
+        
         await _context.Projects.AddAsync(project,cancellationToken);
     }
 

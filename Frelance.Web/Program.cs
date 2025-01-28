@@ -5,12 +5,11 @@ using Frelance.Web.Modules;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-// Register DbContext with the connection string from Configuration
-
+builder.Services.AddCors();
+builder.Services.AddAuthorization();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddExceptionHandler<ExceptionHandler>();
@@ -22,9 +21,17 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 app.UseExceptionHandler(_ => { });
+app.UseCors(opt =>
+{
+    opt.AllowAnyHeader().AllowAnyMethod().AllowCredentials();
+});
 app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
 app.AddProjectsEndpoints();
 app.AddTasksEndpoints();
 app.AddTimeLogsEndpoints();
+app.AddUserEndpoints();
 app.Run();
