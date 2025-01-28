@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy ASP.Net Core app to Azure Web App - frelace-api
+name: Build and deploy ASP.Net Core app to Azure Web App - frelance-api
 
 on:
   push:
@@ -51,15 +51,15 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_B2B5B8E38C994BAA8E73CA5CA93605FB }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_4C5E2A6D66F34815B0157A9ECB6F3D62 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_B67C40577CB446C9B9D688430B23407F }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_AB944E37EFA44601B9D2DCFFE6BA8C22 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_67961ACA542E4BEF9AD59E35B49AA714 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DCC19E65B4AF4106B1ED3942B9CDF939 }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'frelace-api'
+          app-name: 'frelance-api'
           slot-name: 'Production'
           package: .
           
