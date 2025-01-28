@@ -62,9 +62,3 @@ jobs:
           app-name: 'frelance-api'
           slot-name: 'Production'
           package: .
-
-      - name: Fetch app settings from Azure (optional)
-        run: |
-          az webapp config appsettings list --name 'frelance-api' --resource-group 'frelace-api_group'
-        env:
-          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DCC19E65B4AF4106B1ED3942B9CDF939 }}
