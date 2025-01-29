@@ -50,7 +50,6 @@ public static class DependencyInjection
         services.AddAuthorization(options =>
         {
             options.AddPolicy("ClientRole", policy => policy.RequireRole("Client"));
-            options.AddPolicy("AdminRole", policy => policy.RequireRole("Admin"));
             options.AddPolicy("FrelancerRole",policy => policy.RequireRole("Frelancer"));
             
         });
