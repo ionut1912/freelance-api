@@ -10,5 +10,5 @@ public class TimeLogs
     public DateOnly Date { get; set; }
     public int UserId { get; set; }
     public Users User { get; set; }
-    public int TotalHours { get; set; }
+    public int TotalHours { get; set}
 }
