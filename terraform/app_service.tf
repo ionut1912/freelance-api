@@ -1,8 +1,3 @@
-provider "azurerm" {
-  features = {}
-  version  = ">=3.0.0"
-}
-
 resource "azurerm_service_plan" "app_service_plan" {
   name                = "frelance-api-plan"
   resource_group_name = azurerm_resource_group.main.name
