@@ -1,3 +1,8 @@
+provider "azurerm" {
+  features = {}
+  version  = ">=3.0.0"
+}
+
 resource "azurerm_service_plan" "app_service_plan" {
   name                = "frelance-api-plan"
   resource_group_name = azurerm_resource_group.main.name
@@ -15,7 +20,6 @@ resource "azurerm_linux_web_app" "app_service" {
   site_config {
     always_on        = false
     app_command_line = ""
-    
     linux_fx_version = "DOCKER|${azurerm_container_registry.acr.login_server}/frelance-api:latest"
   }
 
@@ -29,12 +33,27 @@ resource "azurerm_linux_web_app" "app_service" {
 
   logs {
     http_logs {
-      file_system_level = "Verbose"
-      retention_in_days = 7
+      file_system {
+        level             = "Verbose"
+        retention_in_days = 7
+      }
+      azure_blob_storage {
+        level             = "Verbose"
+        sas_url           = var.sas_url
+        retention_in_days = 7
+      }
     }
+
     application_logs {
-      file_system_level = "Verbose"
-      retention_in_days = 7
+      file_system {
+        level             = "Verbose"
+        retention_in_days = 7
+      }
+      azure_blob_storage {
+        level             = "Verbose"
+        sas_url           = var.sas_url
+        retention_in_days = 7
+      }
     }
   }
 }
