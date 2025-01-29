@@ -49,16 +49,17 @@ jobs:
         with:
           name: .net-app
 
-      - name: Set up Azure CLI
+      - name: Install Azure CLI
         run: |
-          curl -sL https://aka.ms/InstallAzureCLIDeb | powershell
-
+          Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile azure-cli-installer.msi
+          Start-Process msiexec.exe -ArgumentList '/i', 'azure-cli-installer.msi', '/quiet', '/norestart' -NoNewWindow -Wait
+          
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_AB944E37EFA44601B9D2DCFFE6BA8C22 }}
+          tenant-id: ${{ secrets.TENANTID_67961ACA542E4BEF9AD59E35B49AA714}}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DCC19E65B4AF4106B1ED3942B9CDF939 }}
 
       - name: Deploy to Azure Web App using Azure CLI
         run: |
