@@ -14,17 +14,18 @@ resource "azurerm_storage_container" "logs_container" {
   container_access_type = "private"
 }
 
-resource "azurerm_storage_account_sas" "sas" {
-  storage_account_name = azurerm_storage_account.logs.name
-  https_only           = true
-  start                = timestamp()
-  expiry               = timeadd(timestamp(), "168h")
+data "azurerm_storage_account_sas" "sas" {
+  connection_string = azurerm_storage_account.logs.primary_connection_string
 
-  resource_types = ["service", "container", "object"]
-  services       = ["b"]
-  permissions    = ["rw"]
+  https_only = true
+  start       = timestamp()
+  expiry      = timeadd(timestamp(), "168h")
+
+  permissions     = "rw"
+  resource_types  = "sco"
+  services        = "b"
 }
 
 locals {
-  sas_url = "https://${azurerm_storage_account.logs.name}.blob.core.windows.net/${azurerm_storage_container.logs_container.name}?${azurerm_storage_account_sas.sas.sas}"
+  sas_url = "https://${azurerm_storage_account.logs.name}.blob.core.windows.net/${azurerm_storage_container.logs_container.name}?${data.azurerm_storage_account_sas.sas.sas}"
 }
