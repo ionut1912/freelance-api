@@ -49,10 +49,9 @@ jobs:
         with:
           name: .net-app
 
-      - name: Azure CLI Install
-        uses: azure/setup-azurecli@v1
-        with:
-          azcliversion: latest
+      - name: Set up Azure CLI
+        run: |
+          curl -sL https://aka.ms/InstallAzureCLIDeb | powershell
 
       - name: Login to Azure
         uses: azure/login@v2
