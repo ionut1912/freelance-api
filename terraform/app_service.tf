@@ -25,30 +25,4 @@ resource "azurerm_linux_web_app" "app_service" {
     "DOCKER_REGISTRY_SERVER_PASSWORD"     = azurerm_container_registry.acr.admin_password
     "WEBSITES_CONTAINER_START_TIME_LIMIT" = "1800"
   }
-
-  logs {
-    http_logs {
-      file_system {
-        level             = "Verbose"
-        retention_in_days = 7
-      }
-      azure_blob_storage {
-        level             = "Verbose"
-        sas_url           = local.sas_url
-        retention_in_days = 7
-      }
-    }
-
-    application_logs {
-      file_system {
-        level             = "Verbose"
-        retention_in_days = 7
-      }
-      azure_blob_storage {
-        level             = "Verbose"
-        sas_url           = local.sas_url
-        retention_in_days = 7
-      }
-    }
-  }
 }
