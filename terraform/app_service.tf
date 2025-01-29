@@ -19,10 +19,10 @@ resource "azurerm_linux_web_app" "app_service" {
   }
 
   app_settings = {
-    "DATABASE_CONNECTION_STRING"        = azurerm_key_vault_secret.db_connection_string.value
-    "DOCKER_REGISTRY_SERVER_URL"        = "https://${azurerm_container_registry.acr.login_server}"
-    "DOCKER_REGISTRY_SERVER_USERNAME"   = azurerm_container_registry.acr.admin_username
-    "DOCKER_REGISTRY_SERVER_PASSWORD"   = azurerm_container_registry.acr.admin_password
+    "DATABASE_CONNECTION_STRING"          = azurerm_key_vault_secret.db_connection_string.value
+    "DOCKER_REGISTRY_SERVER_URL"          = "https://${azurerm_container_registry.acr.login_server}"
+    "DOCKER_REGISTRY_SERVER_USERNAME"     = azurerm_container_registry.acr.admin_username
+    "DOCKER_REGISTRY_SERVER_PASSWORD"     = azurerm_container_registry.acr.admin_password
     "WEBSITES_CONTAINER_START_TIME_LIMIT" = "1800"
   }
 
@@ -34,7 +34,7 @@ resource "azurerm_linux_web_app" "app_service" {
       }
       azure_blob_storage {
         level             = "Verbose"
-        sas_url           = var.sas_url
+        sas_url           = local.sas_url
         retention_in_days = 7
       }
     }
@@ -46,7 +46,7 @@ resource "azurerm_linux_web_app" "app_service" {
       }
       azure_blob_storage {
         level             = "Verbose"
-        sas_url           = var.sas_url
+        sas_url           = local.sas_url
         retention_in_days = 7
       }
     }
