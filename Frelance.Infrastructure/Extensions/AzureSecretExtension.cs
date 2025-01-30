@@ -9,12 +9,22 @@ public static class AzureSecretExtension
     public static string GetSecret(this IConfiguration configuration,string secretName)
     {
         var secretValue=string.Empty;
-        var keyVaultUrl = configuration["AzureKeyVault:VaultUrl"];
+        var credential = new DefaultAzureCredential(new DefaultAzureCredentialOptions
+        {
+            ExcludeAzureCliCredential = true,
+            ExcludeVisualStudioCredential = true,
+            ExcludeInteractiveBrowserCredential = true,
+            ExcludeAzurePowerShellCredential = true,
+            ExcludeManagedIdentityCredential = false,
+            ExcludeSharedTokenCacheCredential = true,
+            ExcludeAzureDeveloperCliCredential = true
+        });
+        var keyVaultUrl = configuration["AzureKeyVault:Url"];
         if (!string.IsNullOrEmpty(keyVaultUrl))
         {
             try
             {
-                var client = new SecretClient(new Uri(keyVaultUrl), new DefaultAzureCredential());
+                var client = new SecretClient(new Uri(keyVaultUrl), credential);
                 if (!string.IsNullOrEmpty(secretName))
                 {
                     secretValue= client.GetSecret(secretName).Value.Value;
