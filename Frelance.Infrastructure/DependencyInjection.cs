@@ -55,7 +55,11 @@ public static class DependencyInjection
         services.AddScoped<ITaskRepository, TaskRepository>();
         services.AddScoped<ITimeLogRepository, TimeLogRepository>();
         services.AddScoped<IAccountRepository, AccountRepository>();
-
+        services.AddIdentityCore<Users>(opt => opt.User.RequireUniqueEmail = true)
+            .AddRoles<Roles>()
+            .AddEntityFrameworkStores<FrelanceDbContext>()
+            .AddTokenProvider<DataProtectorTokenProvider<Users>>(TokenOptions.DefaultProvider);
+        
         services.AddAuthorization(options =>
         {
             options.AddPolicy("ClientRole", policy => policy.RequireRole("Client"));
