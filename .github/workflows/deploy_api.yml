@@ -23,15 +23,21 @@ jobs:
 
       - name: Create Storage Account (If Not Exists)
         run: |
-          export AZURE_LOCATION="${{ secrets.AZURE_LOCATION }}"
+          export AZURE_LOCATION="West Europe"  # CHANGE LOCATION TO AN ALLOWED REGION
+
+          echo "Using location: '$AZURE_LOCATION'"
+
+          # Check if Storage Account exists
           if ! az storage account show --name frelanceterraformsa --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} &>/dev/null; then
-            echo "Creating Storage Account..."
+            echo "Creating Storage Account in '$AZURE_LOCATION'..."
             az storage account create \
               --name frelanceterraformsa \
               --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
               --location "$AZURE_LOCATION" \
               --sku Standard_LRS \
-              --kind StorageV2
+              --kind StorageV2 \
+              --min-tls-version TLS1_2  # FIX: Enforce TLS 1.2
+            
             az storage container create \
               --name terraform-state \
               --account-name frelanceterraformsa
@@ -41,7 +47,8 @@ jobs:
 
       - name: Retrieve Storage Account Key
         run: |
-          echo "ARM_ACCESS_KEY=$(az storage account keys list --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --account-name ${{secrets.AZURE_TF_STATE_ACCOUNT}} --query '[0].value' --output tsv)" >> $GITHUB_ENV
+          export ARM_ACCESS_KEY=$(az storage account keys list --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --account-name frelanceterraformsa --query '[0].value' --output tsv)
+          echo "ARM_ACCESS_KEY=$ARM_ACCESS_KEY" >> $GITHUB_ENV
 
       - name: Terraform Init
         run: terraform init
