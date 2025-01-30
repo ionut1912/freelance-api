@@ -21,15 +21,12 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
 
-      - name: Terraform Init (Ensure Remote State is Loaded)
-        run: terraform init -upgrade
-        working-directory: terraform
 
-      - name: Terraform Refresh (Sync State with Azure)
+      - name: Terraform Refresh
         run: terraform refresh
         working-directory: terraform
 
-      - name: Terraform Plan (Check What Needs to Change)
+      - name: Terraform Plan
         run: terraform plan -out=tfplan
         working-directory: terraform
 
