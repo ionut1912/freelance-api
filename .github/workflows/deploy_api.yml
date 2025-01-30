@@ -21,11 +21,14 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
 
+      - name: Retrieve Storage Account Key
+        run: echo "ARM_ACCESS_KEY=$(az storage account keys list --resource-group ${{secrets.AZURE_RESOURCE_GROUP}} --account-name ${{secrets.AZURE_TF_STATE_ACCOUNT}} --query '[0].value' --output tsv)" >> $GITHUB_ENV
+
       - name: Terraform Init
         run: terraform init
         working-directory: terraform
 
-      - name: Terraform Apply 
+      - name: Terraform Apply
         run: terraform apply -auto-approve
         working-directory: terraform
 
