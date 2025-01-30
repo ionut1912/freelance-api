@@ -5,6 +5,7 @@ using Azure.Security.KeyVault.Secrets;
 using Frelance.Application.Repositories;
 using Frelance.Infrastructure.Context;
 using Frelance.Infrastructure.Entities;
+using Frelance.Infrastructure.Extensions;
 using Frelance.Infrastructure.Mappings;
 using Frelance.Infrastructure.Services;
 using Frelance.Infrastructure.Settings;
@@ -15,7 +16,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-
 namespace Frelance.Infrastructure;
 
 public static class DependencyInjection
@@ -29,57 +29,22 @@ public static class DependencyInjection
 
         var databaseSettings = new DatabaseSettings();
         configuration.GetSection("DatabaseSettings").Bind(databaseSettings);
-
-        var keyVaultUrl = configuration["AzureKeyVault:VaultUrl"];
         var connectionStringSecret = configuration["AzureKeyVault:ConnectionStringSecretName"];
-        var jwtSecretName = configuration["AzureKeyVault:JWTTokenSecretName"]; // Secret Name for JWT Key
-
-        if (!string.IsNullOrEmpty(keyVaultUrl))
-        {
-            try
+        var jwtSecretName = configuration["AzureKeyVault:JWTTokenSecretName"]; 
+        databaseSettings.ConnectionString = configuration.GetSecret(connectionStringSecret);
+        var jwtTokenKey= configuration.GetSecret(jwtSecretName);
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(opt =>
             {
-                var client = new SecretClient(new Uri(keyVaultUrl), new DefaultAzureCredential());
-
-                // Fetch Database Connection String
-                if (!string.IsNullOrEmpty(connectionStringSecret))
+                opt.TokenValidationParameters = new TokenValidationParameters
                 {
-                    var secret = client.GetSecret(connectionStringSecret);
-                    databaseSettings.ConnectionString = secret.Value.Value;
-                }
-
-                // Fetch JWT Token Key
-                if (!string.IsNullOrEmpty(jwtSecretName))
-                {
-                    var jwtSecret = client.GetSecret(jwtSecretName);
-                    var jwtTokenKey = jwtSecret.Value.Value;
-
-                    services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                        .AddJwtBearer(opt =>
-                        {
-                            opt.TokenValidationParameters = new TokenValidationParameters
-                            {
-                                ValidateIssuer = false,
-                                ValidateAudience = false,
-                                ValidateLifetime = true,
-                                ValidateIssuerSigningKey = true,
-                                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtTokenKey))
-                            };
-                        });
-                }
-                else
-                {
-                    throw new Exception("JWT Token Key is missing from Azure Key Vault configuration.");
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Failed to retrieve secrets from Azure Key Vault", ex);
-            }
-        }
-        else
-        {
-            throw new Exception("Azure Key Vault configuration is missing.");
-        }
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtTokenKey))
+                };
+            });
 
         services.AddDbContext<FrelanceDbContext>(options =>
             options.UseSqlServer(databaseSettings.ConnectionString));

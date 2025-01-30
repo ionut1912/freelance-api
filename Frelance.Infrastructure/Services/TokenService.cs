@@ -4,6 +4,7 @@ using System.Text;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using Frelance.Infrastructure.Entities;
+using Frelance.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -20,24 +21,8 @@ public class TokenService
         ArgumentNullException.ThrowIfNull(configuration, nameof(configuration));
         ArgumentNullException.ThrowIfNull(userManager, nameof(userManager));
         _userManager = userManager;
-        var keyVaultUrl = configuration["AzureKeyVault:VaultUrl"];
         var jwtSecretName = configuration["AzureKeyVault:JWTTokenSecretName"];
-
-        if (string.IsNullOrEmpty(keyVaultUrl) || string.IsNullOrEmpty(jwtSecretName))
-        {
-            throw new Exception("Azure Key Vault configuration for JWT secret is missing.");
-        }
-
-        try
-        {
-            var client = new SecretClient(new Uri(keyVaultUrl), new DefaultAzureCredential());
-            var secret = client.GetSecret(jwtSecretName);
-            _jwtSecretKey = secret.Value.Value;
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Failed to retrieve JWT secret key from Azure Key Vault", ex);
-        }
+        _jwtSecretKey=configuration.GetSecret(jwtSecretName);
     }
 
     public async Task<string> GenerateToken(Users user)
