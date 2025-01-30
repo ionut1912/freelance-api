@@ -5,10 +5,8 @@ using Frelance.Web.Modules;
 using Microsoft.OpenApi.Models;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
-using System;
 
 var builder = WebApplication.CreateBuilder(args);
-
 var configuration = builder.Configuration;
 
 // Add services to the container.
@@ -70,22 +68,13 @@ app.AddTasksEndpoints();
 app.AddTimeLogsEndpoints();
 app.AddUserEndpoints();
 
-// Fetch secrets from Azure Key Vault
 var keyVaultUrl = configuration["AzureKeyVault:VaultUrl"];
 var connectionStringSecretName = configuration["AzureKeyVault:ConnectionStringSecretName"];
 var jwtTokenSecretName = configuration["AzureKeyVault:JWTTokenSecretName"];
 
 if (!string.IsNullOrEmpty(keyVaultUrl) && !string.IsNullOrEmpty(connectionStringSecretName) && !string.IsNullOrEmpty(jwtTokenSecretName))
 {
-    var credential = new DefaultAzureCredential(new DefaultAzureCredentialOptions
-    {
-        ExcludeEnvironmentCredential = true,
-        ExcludeManagedIdentityCredential = app.Environment.IsDevelopment(),
-        ExcludeVisualStudioCredential = false,
-        ExcludeAzureCliCredential = false,
-        ExcludeInteractiveBrowserCredential = true
-    });
-
+    var credential = new ManagedIdentityCredential();
     var client = new SecretClient(new Uri(keyVaultUrl), credential);
 
     try
