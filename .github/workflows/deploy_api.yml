@@ -21,41 +21,20 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
 
-      - name: Create Storage Account (If Not Exists)
-        run: |
-          export AZURE_LOCATION="West Europe"  # CHANGE LOCATION TO AN ALLOWED REGION
+      - name: Terraform Init (Ensure Remote State is Loaded)
+        run: terraform init -upgrade
+        working-directory: terraform
 
-          echo "Using location: '$AZURE_LOCATION'"
+      - name: Terraform Refresh (Sync State with Azure)
+        run: terraform refresh
+        working-directory: terraform
 
-          # Check if Storage Account exists
-          if ! az storage account show --name frelanceterraformsa --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} &>/dev/null; then
-            echo "Creating Storage Account in '$AZURE_LOCATION'..."
-            az storage account create \
-              --name frelanceterraformsa \
-              --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-              --location "$AZURE_LOCATION" \
-              --sku Standard_LRS \
-              --kind StorageV2 \
-              --min-tls-version TLS1_2  # FIX: Enforce TLS 1.2
-            
-            az storage container create \
-              --name terraform-state \
-              --account-name frelanceterraformsa
-          else
-            echo "Storage Account already exists."
-          fi
-
-      - name: Retrieve Storage Account Key
-        run: |
-          export ARM_ACCESS_KEY=$(az storage account keys list --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --account-name frelanceterraformsa --query '[0].value' --output tsv)
-          echo "ARM_ACCESS_KEY=$ARM_ACCESS_KEY" >> $GITHUB_ENV
-
-      - name: Terraform Init
-        run: terraform init
+      - name: Terraform Plan (Check What Needs to Change)
+        run: terraform plan -out=tfplan
         working-directory: terraform
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve tfplan
         working-directory: terraform
 
       - name: Log in to Azure Container Registry
