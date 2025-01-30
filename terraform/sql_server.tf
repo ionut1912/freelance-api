@@ -11,6 +11,6 @@ resource "azurerm_mssql_database" "sql_database" {
   name            = "frelance-db"
   server_id       = azurerm_mssql_server.sql_server.id
   sku_name        = var.sql_sku_name
-  max_size_gb     = 5
+  max_size_gb     = 2
   zone_redundant  = false
 }

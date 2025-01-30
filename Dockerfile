@@ -1,9 +1,9 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-COPY ["Frelance.sln", "./"]
+COPY ["Frelance.API.sln", "./"]
 COPY ["Frelance.Application/Frelance.Application.csproj", "Frelance.Application/"]
-COPY ["Frelance.Contract/Frelance.Contract.csproj", "Frelance.Contract/"]
+COPY ["Frelance.Contracts/Frelance.Contracts.csproj", "Frelance.Contracts/"]
 COPY ["Frelance.Infrastructure/Frelance.Infrastructure.csproj", "Frelance.Infrastructure/"]
 COPY ["Frelance.Web/Frelance.Web.csproj", "Frelance.Web/"]
 
