@@ -72,7 +72,7 @@ app.AddUserEndpoints();
 var keyVaultUrl = app.Configuration["AzureKeyVault:VaultUrl"];
 if (!string.IsNullOrEmpty(keyVaultUrl))
 {
-    var credential = new DefaultAzureCredential();
+    var credential = new ManagedIdentityCredential();
     var client = new SecretClient(new Uri(keyVaultUrl), credential);
 
     try
