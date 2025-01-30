@@ -9,6 +9,8 @@ using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var configuration = builder.Configuration;
+
 // Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -43,7 +45,7 @@ builder.Services.AddCors();
 builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddApplication();
-builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddInfrastructure(configuration);
 builder.Services.AddExceptionHandler<ExceptionHandler>();
 
 var app = builder.Build();
@@ -69,28 +71,39 @@ app.AddTimeLogsEndpoints();
 app.AddUserEndpoints();
 
 // Fetch secrets from Azure Key Vault
-var keyVaultUrl = Environment.GetEnvironmentVariable("KEY_VAULT_URL");
-if (!string.IsNullOrEmpty(keyVaultUrl))
+var keyVaultUrl = configuration["AzureKeyVault:VaultUrl"];
+var connectionStringSecretName = configuration["AzureKeyVault:ConnectionStringSecretName"];
+var jwtTokenSecretName = configuration["AzureKeyVault:JWTTokenSecretName"];
+
+if (!string.IsNullOrEmpty(keyVaultUrl) && !string.IsNullOrEmpty(connectionStringSecretName) && !string.IsNullOrEmpty(jwtTokenSecretName))
 {
-    var credential = new ManagedIdentityCredential();
+    var credential = new DefaultAzureCredential(new DefaultAzureCredentialOptions
+    {
+        ExcludeEnvironmentCredential = true,
+        ExcludeManagedIdentityCredential = app.Environment.IsDevelopment(),
+        ExcludeVisualStudioCredential = false,
+        ExcludeAzureCliCredential = false,
+        ExcludeInteractiveBrowserCredential = true
+    });
+
     var client = new SecretClient(new Uri(keyVaultUrl), credential);
 
     try
     {
-        var connectionStringSecret = client.GetSecret("db-connection-string");
-        var jwtTokenSecret = client.GetSecret("jwt-token-key");
+        var connectionStringSecret = client.GetSecret(connectionStringSecretName);
+        var jwtTokenSecret = client.GetSecret(jwtTokenSecretName);
 
-        app.Configuration["DatabaseSettings:ConnectionString"] = connectionStringSecret.Value.Value;
-        app.Configuration["JWTTokenKey"] = jwtTokenSecret.Value.Value;
+        builder.Configuration["DatabaseSettings:ConnectionString"] = connectionStringSecret.Value.Value;
+        builder.Configuration["JWTTokenKey"] = jwtTokenSecret.Value.Value;
     }
     catch (Exception ex)
     {
-        throw new Exception("Failed to retrieve secrets from Azure Key Vault", ex);
+        Console.WriteLine($"❌ Error: Failed to retrieve secrets from Azure Key Vault. {ex.Message}");
     }
 }
 else
 {
-    throw new Exception("Azure Key Vault URL environment variable is missing.");
+    Console.WriteLine("⚠ Warning: Azure Key Vault configuration is missing from appsettings.json. Using local secrets.");
 }
 
 app.Run();
