@@ -29,6 +29,14 @@ jobs:
         run: terraform refresh
         working-directory: terraform
 
+      - name: Import Existing Key Vault Resources (If Needed)
+        run: |
+          terraform import -allow-missing azurerm_key_vault_secret.jwt_token_key "https://frelance-api-keyvault.vault.azure.net/secrets/jwt-token-key" || true
+          terraform import -allow-missing azurerm_key_vault_secret.sql_admin_username "https://frelance-api-keyvault.vault.azure.net/secrets/sql-admin-username" || true
+          terraform import -allow-missing azurerm_key_vault_secret.sql_admin_password "https://frelance-api-keyvault.vault.azure.net/secrets/sql-admin-password" || true
+          terraform import -allow-missing azurerm_key_vault_access_policy.user_access "/subscriptions/***/resourceGroups/frelance-api/providers/Microsoft.KeyVault/vaults/frelance-api-keyvault/objectId/fe4c5ebe-84a4-4bea-9a09-57fbfe9b0bcb" || true
+        working-directory: terraform
+
       - name: Terraform Plan
         run: terraform plan -out=tfplan
         working-directory: terraform
