@@ -1,9 +1,17 @@
+resource "azurerm_service_plan" "app_service_plan" {
+  name                = "frelance-app-service-plan"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  sku_name            = var.app_service_plan_sku # Ensure this variable is set correctly
+  os_type             = "Linux"
+}
+
 resource "azurerm_linux_web_app" "app_service" {
   name                = "frelance-api"
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
   service_plan_id     = azurerm_service_plan.app_service_plan.id
-  https_only          = true  
+  https_only          = true
 
   identity {
     type = "SystemAssigned"
@@ -21,7 +29,7 @@ resource "azurerm_linux_web_app" "app_service" {
 
   app_settings = {
     "DATABASE_CONNECTION_STRING"          = azurerm_key_vault_secret.db_connection_string.value
-    "JWT_TOKEN_KEY"                        = azurerm_key_vault_secret.jwt_token_key.value
+    "JWT_TOKEN_KEY"                       = azurerm_key_vault_secret.jwt_token_key.value
     "DOCKER_REGISTRY_SERVER_URL"          = "https://${azurerm_container_registry.acr.login_server}"
     "DOCKER_REGISTRY_SERVER_USERNAME"     = azurerm_container_registry.acr.admin_username
     "DOCKER_REGISTRY_SERVER_PASSWORD"     = azurerm_container_registry.acr.admin_password
