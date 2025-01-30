@@ -18,11 +18,18 @@ jobs:
           az login --use-device-code
           az account set --subscription ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DCC19E65B4AF4106B1ED3942B9CDF939 }}
 
-      - name: Verify and Import Existing Azure Resources
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: terraform
+
+      - name: Import Existing Azure Resources Before Terraform Apply
         run: |
-          set -e  # Fail fast on errors
-          
-          echo "Checking existing Azure resources before Terraform execution..."
+          set -e  # Exit if any command fails
+
+          echo "Checking for existing Azure resources before applying Terraform..."
 
           function check_and_import() {
             RESOURCE_NAME=$1
@@ -38,18 +45,22 @@ jobs:
             else
               echo "❌ $RESOURCE_NAME does not exist. Terraform will create it."
             fi
-          }
+          })
+          if az group show --name frelance-api --query "id" -o tsv >/dev/null 2>&1; then
+            echo "✅ Resource Group exists."
+            if ! terraform state list | grep -q "azurerm_resource_group.main"; then
+              echo "🔄 Importing Resource Group into Terraform..."
+              terraform import azurerm_resource_group.main /subscriptions/${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DCC19E65B4AF4106B1ED3942B9CDF939 }}/resourceGroups/frelance-api || true
+            fi
+          else
+            echo "❌ Resource Group does not exist. Terraform will create it."
+          fi
 
-          # Check and import necessary resources
+          # Import other resources if they exist
           check_and_import "frelance-api" "webapp" "azurerm_linux_web_app.app_service"
           check_and_import "frelanceacr" "acr" "azurerm_container_registry.acr"
           check_and_import "frelance-api-keyvault" "keyvault" "azurerm_key_vault.keyvault"
 
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v3
-
-      - name: Terraform Init
-        run: terraform init
         working-directory: terraform
 
       - name: Terraform Plan
