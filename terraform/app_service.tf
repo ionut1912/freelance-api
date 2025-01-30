@@ -24,6 +24,7 @@ resource "azurerm_linux_web_app" "app_service" {
 
   app_settings = {
     "DATABASE_CONNECTION_STRING"          = azurerm_key_vault_secret.db_connection_string.value
+    "JWT_TOKEN_KEY"                        = azurerm_key_vault_secret.jwt_token_key.value  # Pass JWT Key
     "DOCKER_REGISTRY_SERVER_URL"          = "https://${azurerm_container_registry.acr.login_server}"
     "DOCKER_REGISTRY_SERVER_USERNAME"     = azurerm_container_registry.acr.admin_username
     "DOCKER_REGISTRY_SERVER_PASSWORD"     = azurerm_container_registry.acr.admin_password

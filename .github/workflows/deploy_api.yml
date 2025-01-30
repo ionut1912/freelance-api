@@ -45,7 +45,7 @@ jobs:
             else
               echo "❌ $RESOURCE_NAME does not exist. Terraform will create it."
             fi
-          })
+          }
           if az group show --name frelance-api --query "id" -o tsv >/dev/null 2>&1; then
             echo "✅ Resource Group exists."
             if ! terraform state list | grep -q "azurerm_resource_group.main"; then
