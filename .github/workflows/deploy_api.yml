@@ -8,20 +8,51 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Azure CLI Login with Subscription and Tenant
-        run: |
-          az login --identity || az login --tenant ${{ secrets.AZUREAPPSERVICE_TENANTID_67961ACA542E4BEF9AD59E35B49AA714 }}
-          az account set --subscription ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DCC19E65B4AF4106B1ED3942B9CDF939 }}
+      - name: Login to Azure manually
+        run: az login --use-device-code
 
-      - name: Verify Azure Authentication
-        run: az account show
+      - name: Set Azure subscription
+        run: az account set --subscription ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DCC19E65B4AF4106B1ED3942B9CDF939 }}
+
+      - name: Verify and Import Existing Azure Resources
+        run: |
+          echo "Checking if Azure resources exist before creating them..."
+
+          # Resource Group
+          if az group show --name frelance-api --query "id" -o tsv >/dev/null 2>&1; then
+            echo "✅ Resource Group exists."
+          else
+            echo "❌ Resource Group does not exist. Terraform will create it."
+          fi
+
+          # App Service
+          if az webapp show --name frelance-api --resource-group frelance-api --query "id" -o tsv >/dev/null 2>&1; then
+            echo "✅ Web App exists. Importing into Terraform..."
+            terraform import azurerm_linux_web_app.app_service /subscriptions/${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DCC19E65B4AF4106B1ED3942B9CDF939 }}/resourceGroups/frelance-api/providers/Microsoft.Web/sites/frelance-api || true
+          else
+            echo "❌ Web App does not exist. Terraform will create it."
+          fi
+
+          # Container Registry
+          if az acr show --name frelanceacr --query "id" -o tsv >/dev/null 2>&1; then
+            echo "✅ Container Registry exists. Importing into Terraform..."
+            terraform import azurerm_container_registry.acr /subscriptions/${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DCC19E65B4AF4106B1ED3942B9CDF939 }}/resourceGroups/frelance-api/providers/Microsoft.ContainerRegistry/registries/frelanceacr || true
+          else
+            echo "❌ Container Registry does not exist. Terraform will create it."
+          fi
+
+          # Key Vault
+          if az keyvault show --name frelance-api-keyvault --query "id" -o tsv >/dev/null 2>&1; then
+            echo "✅ Key Vault exists. Importing into Terraform..."
+            terraform import azurerm_key_vault.keyvault /subscriptions/${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DCC19E65B4AF4106B1ED3942B9CDF939 }}/resourceGroups/frelance-api/providers/Microsoft.KeyVault/vaults/frelance-api-keyvault || true
+          else
+            echo "❌ Key Vault does not exist. Terraform will create it."
+          fi
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
@@ -30,8 +61,8 @@ jobs:
         run: terraform init
         working-directory: terraform
 
-      - name: Terraform Apply
-        run: terraform apply -auto-approve
+      - name: Terraform Apply (Create Only If Not Exists)
+        run: terraform apply -auto-approve -replace=false
         working-directory: terraform
 
       - name: Log in to Azure Container Registry
