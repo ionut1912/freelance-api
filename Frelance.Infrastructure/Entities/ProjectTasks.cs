@@ -9,7 +9,7 @@ public class ProjectTasks
     public Projects Projects { get; set; }
     public string Title { get; set; }
     public string Description { get; set; }
-    public List<TimeLogs> TimeLogs { get; set; } = new List<TimeLogs>();
+    public List<TimeLogs> TimeLogs { get; set; } = [];
     public int UserId { get; set; }
     public Users Users { get; set; }
     public ProjectTaskStatus Status { get; set; }
