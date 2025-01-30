@@ -6,3 +6,7 @@ riderModule.iml
 .idea
 Frelance.API.sln.DotSettings.user
 .DS_STORE
+terraform/.terraform/providers/registry.terraform.io/hashicorp/azurerm/3.117.0/darwin_arm64/terraform-provider-azurerm_v3.117.0_x5
+terraform/terraform.tfstate.backup
+terraform/.terraform/providers/registry.terraform.io/hashicorp/azurerm/3.117.0/darwin_arm64/LICENSE.txt
+terraform/.terraform.lock.hcl
