@@ -6,6 +6,12 @@ resource "azurerm_key_vault" "keyvault" {
   tenant_id           = "5c384fed-84cc-44a6-b34a-b060bf102a6e"
 }
 
+resource "azurerm_key_vault_secret" "jwt_token_key" {
+  name         = "jwt-token-key"
+  value        = "this is a secret key" 
+  key_vault_id = azurerm_key_vault.keyvault.id
+}
+
 resource "azurerm_key_vault_access_policy" "user_access" {
   key_vault_id = azurerm_key_vault.keyvault.id
   tenant_id    = "5c384fed-84cc-44a6-b34a-b060bf102a6e"
