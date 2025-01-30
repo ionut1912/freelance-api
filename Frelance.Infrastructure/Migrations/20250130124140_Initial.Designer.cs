@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Frelance.Infrastructure.Migrations
 {
     [DbContext(typeof(FrelanceDbContext))]
-    [Migration("20241120132408_AddRoles")]
-    partial class AddRoles
+    [Migration("20250130124140_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,7 +34,6 @@ namespace Frelance.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Priority")
@@ -43,14 +42,13 @@ namespace Frelance.Infrastructure.Migrations
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ProjectsId")
+                    b.Property<int?>("ProjectsId")
                         .HasColumnType("int");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserId")
@@ -83,15 +81,12 @@ namespace Frelance.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Technologies")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserId")
@@ -99,8 +94,7 @@ namespace Frelance.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("Projects");
                 });
@@ -144,14 +138,8 @@ namespace Frelance.Infrastructure.Migrations
                         new
                         {
                             Id = 2,
-                            Name = "Cleint",
-                            NormalizedName = "CLEINT"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "Admin",
-                            NormalizedName = "ADMIN"
+                            Name = "Client",
+                            NormalizedName = "CLIENT"
                         });
                 });
 
@@ -365,9 +353,7 @@ namespace Frelance.Infrastructure.Migrations
                 {
                     b.HasOne("Frelance.Infrastructure.Entities.Projects", "Projects")
                         .WithMany("Tasks")
-                        .HasForeignKey("ProjectsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ProjectsId");
 
                     b.HasOne("Frelance.Infrastructure.Entities.Users", "Users")
                         .WithMany("Tasks")
@@ -383,8 +369,8 @@ namespace Frelance.Infrastructure.Migrations
             modelBuilder.Entity("Frelance.Infrastructure.Entities.Projects", b =>
                 {
                     b.HasOne("Frelance.Infrastructure.Entities.Users", "User")
-                        .WithOne("Projects")
-                        .HasForeignKey("Frelance.Infrastructure.Entities.Projects", "UserId")
+                        .WithMany("Projects")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
@@ -473,8 +459,7 @@ namespace Frelance.Infrastructure.Migrations
 
             modelBuilder.Entity("Frelance.Infrastructure.Entities.Users", b =>
                 {
-                    b.Navigation("Projects")
-                        .IsRequired();
+                    b.Navigation("Projects");
 
                     b.Navigation("Tasks");
 
