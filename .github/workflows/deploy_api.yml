@@ -13,46 +13,37 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Login to Azure manually
-        run: az login --use-device-code
-
-      - name: Set Azure subscription
-        run: az account set --subscription ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DCC19E65B4AF4106B1ED3942B9CDF939 }}
+      - name: Login to Azure
+        run: |
+          az login --use-device-code
+          az account set --subscription ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DCC19E65B4AF4106B1ED3942B9CDF939 }}
 
       - name: Verify and Import Existing Azure Resources
         run: |
-          echo "Checking if Azure resources exist before creating them..."
+          set -e  # Fail fast on errors
+          
+          echo "Checking existing Azure resources before Terraform execution..."
 
-          # Resource Group
-          if az group show --name frelance-api --query "id" -o tsv >/dev/null 2>&1; then
-            echo "✅ Resource Group exists."
-          else
-            echo "❌ Resource Group does not exist. Terraform will create it."
-          fi
+          function check_and_import() {
+            RESOURCE_NAME=$1
+            RESOURCE_TYPE=$2
+            RESOURCE_PATH=$3
 
-          # App Service
-          if az webapp show --name frelance-api --resource-group frelance-api --query "id" -o tsv >/dev/null 2>&1; then
-            echo "✅ Web App exists. Importing into Terraform..."
-            terraform import azurerm_linux_web_app.app_service /subscriptions/${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DCC19E65B4AF4106B1ED3942B9CDF939 }}/resourceGroups/frelance-api/providers/Microsoft.Web/sites/frelance-api || true
-          else
-            echo "❌ Web App does not exist. Terraform will create it."
-          fi
+            if az $RESOURCE_TYPE show --name "$RESOURCE_NAME" --resource-group frelance-api --query "id" -o tsv >/dev/null 2>&1; then
+              echo "✅ $RESOURCE_NAME exists."
+              if ! terraform state list | grep -q "$RESOURCE_PATH"; then
+                echo "🔄 Importing $RESOURCE_NAME into Terraform..."
+                terraform import $RESOURCE_PATH || true
+              fi
+            else
+              echo "❌ $RESOURCE_NAME does not exist. Terraform will create it."
+            fi
+          }
 
-          # Container Registry
-          if az acr show --name frelanceacr --query "id" -o tsv >/dev/null 2>&1; then
-            echo "✅ Container Registry exists. Importing into Terraform..."
-            terraform import azurerm_container_registry.acr /subscriptions/${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DCC19E65B4AF4106B1ED3942B9CDF939 }}/resourceGroups/frelance-api/providers/Microsoft.ContainerRegistry/registries/frelanceacr || true
-          else
-            echo "❌ Container Registry does not exist. Terraform will create it."
-          fi
-
-          # Key Vault
-          if az keyvault show --name frelance-api-keyvault --query "id" -o tsv >/dev/null 2>&1; then
-            echo "✅ Key Vault exists. Importing into Terraform..."
-            terraform import azurerm_key_vault.keyvault /subscriptions/${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DCC19E65B4AF4106B1ED3942B9CDF939 }}/resourceGroups/frelance-api/providers/Microsoft.KeyVault/vaults/frelance-api-keyvault || true
-          else
-            echo "❌ Key Vault does not exist. Terraform will create it."
-          fi
+          # Check and import necessary resources
+          check_and_import "frelance-api" "webapp" "azurerm_linux_web_app.app_service"
+          check_and_import "frelanceacr" "acr" "azurerm_container_registry.acr"
+          check_and_import "frelance-api-keyvault" "keyvault" "azurerm_key_vault.keyvault"
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
@@ -61,11 +52,15 @@ jobs:
         run: terraform init
         working-directory: terraform
 
-      - name: Terraform Plan (Check Before Apply)
-        run: terraform plan -out=tfplan
+      - name: Terraform Plan
+        id: tf_plan
+        run: |
+          terraform plan -out=tfplan > plan.log
+          cat plan.log | grep "No changes" && echo "No changes detected." && exit 0 || true
         working-directory: terraform
 
       - name: Terraform Apply (Only If Changes Exist)
+        if: steps.tf_plan.outputs.stdout != 'No changes detected.'
         run: terraform apply -auto-approve tfplan
         working-directory: terraform
 
