@@ -23,8 +23,7 @@ jobs:
 
       - name: Create Storage Account (If Not Exists)
         run: |
-          AZURE_LOCATION="${{ secrets.AZURE_LOCATION }}"
-
+          export AZURE_LOCATION="${{ secrets.AZURE_LOCATION }}"
           if ! az storage account show --name frelanceterraformsa --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} &>/dev/null; then
             echo "Creating Storage Account..."
             az storage account create \
