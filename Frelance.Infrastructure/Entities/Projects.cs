@@ -8,7 +8,7 @@ public class Projects
     public string Description { get; set; }
     public DateTime Deadline { get; set; }
     public List<string> Technologies { get; set; } = [];
-    public List<ProjectTasks> Tasks { get; set; } = new List<ProjectTasks>();
+    public List<ProjectTasks> Tasks { get; set; } = [];
     public int UserId { get; set; }
     public Users User { get; set; }
     public float Budget { get; set; }
