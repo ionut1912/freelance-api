@@ -69,7 +69,7 @@ app.AddTimeLogsEndpoints();
 app.AddUserEndpoints();
 
 // Fetch secrets from Azure Key Vault
-var keyVaultUrl = app.Configuration["AzureKeyVault:VaultUrl"];
+var keyVaultUrl = Environment.GetEnvironmentVariable("KEY_VAULT_URL");
 if (!string.IsNullOrEmpty(keyVaultUrl))
 {
     var credential = new ManagedIdentityCredential();
@@ -77,28 +77,11 @@ if (!string.IsNullOrEmpty(keyVaultUrl))
 
     try
     {
-        var connectionStringSecretName = app.Configuration["AzureKeyVault:ConnectionStringSecretName"];
-        var jwtTokenSecretName = app.Configuration["AzureKeyVault:JWTTokenSecretName"];
+        var connectionStringSecret = client.GetSecret("db-connection-string");
+        var jwtTokenSecret = client.GetSecret("jwt-token-key");
 
-        if (!string.IsNullOrEmpty(connectionStringSecretName))
-        {
-            var connectionStringSecret = client.GetSecret(connectionStringSecretName);
-            app.Configuration["DatabaseSettings:ConnectionString"] = connectionStringSecret.Value.Value;
-        }
-        else
-        {
-            throw new Exception("ConnectionStringSecretName is missing from Azure Key Vault configuration.");
-        }
-
-        if (!string.IsNullOrEmpty(jwtTokenSecretName))
-        {
-            var jwtTokenSecret = client.GetSecret(jwtTokenSecretName);
-            app.Configuration["JWTTokenKey"] = jwtTokenSecret.Value.Value;
-        }
-        else
-        {
-            throw new Exception("JWTTokenSecretName is missing from Azure Key Vault configuration.");
-        }
+        app.Configuration["DatabaseSettings:ConnectionString"] = connectionStringSecret.Value.Value;
+        app.Configuration["JWTTokenKey"] = jwtTokenSecret.Value.Value;
     }
     catch (Exception ex)
     {
@@ -107,7 +90,7 @@ if (!string.IsNullOrEmpty(keyVaultUrl))
 }
 else
 {
-    throw new Exception("Azure Key Vault configuration is missing.");
+    throw new Exception("Azure Key Vault URL environment variable is missing.");
 }
 
 app.Run();
