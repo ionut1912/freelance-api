@@ -3,7 +3,7 @@ terraform {
     resource_group_name  = "terraform-tf-state"
     storage_account_name = "terraformdara"
     container_name       = "terraform-data"
-    key                 = "terraform.tfstate"
+    key                  = "terraform.tfstate"
   }
 
   required_providers {
