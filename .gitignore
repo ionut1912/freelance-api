@@ -10,5 +10,6 @@ terraform/.terraform/providers/registry.terraform.io/hashicorp/azurerm/3.117.0/d
 terraform/terraform.tfstate.backup
 terraform/.terraform/providers/registry.terraform.io/hashicorp/azurerm/3.117.0/darwin_arm64/LICENSE.txt
 terraform/.terraform.lock.hcl
-terraform/terraform.tfstate
 terraform/.terraform.tfstate.lock.info
+terraform/.terraform/terraform.tfstate
+terraform/terraform.tfstate
