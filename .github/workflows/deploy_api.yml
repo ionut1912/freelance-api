@@ -78,5 +78,9 @@ jobs:
           docker tag frelance-api frelanceacr.azurecr.io/frelance-api:latest
           docker push frelanceacr.azurecr.io/frelance-api:latest
 
-      - name: Restart Azure Web App
-        run: az webapp restart --name frelance-api --resource-group frelance-api
+      - name: Deploy Latest Docker Image to Azure App Service
+        run: |
+          az webapp config container set --name frelance-api --resource-group frelance-api \
+            --docker-custom-image-name frelanceacr.azurecr.io/frelance-api:latest
+
+          az webapp restart --name frelance-api --resource-group frelance-api
