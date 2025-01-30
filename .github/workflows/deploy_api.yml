@@ -61,8 +61,12 @@ jobs:
         run: terraform init
         working-directory: terraform
 
-      - name: Terraform Apply (Create Only If Not Exists)
-        run: terraform apply -auto-approve -replace=false
+      - name: Terraform Plan (Check Before Apply)
+        run: terraform plan -out=tfplan
+        working-directory: terraform
+
+      - name: Terraform Apply (Only If Changes Exist)
+        run: terraform apply -auto-approve tfplan
         working-directory: terraform
 
       - name: Log in to Azure Container Registry
