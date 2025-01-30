@@ -33,7 +33,7 @@ jobs:
       - name: Terraform Init (No Backend) - Create Storage Account
         if: env.STORAGE_EXISTS == 'false'
         run: |
-          terraform init -backend=false
+          terraform init
           terraform apply -auto-approve -target=azurerm_storage_account.terraform_storage -target=azurerm_storage_container.terraform_state
         working-directory: terraform
 
