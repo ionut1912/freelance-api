@@ -16,5 +16,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/publish .
 
+ENV AZURE_ACCESS_TOKEN=${AZURE_ACCESS_TOKEN}
+
 EXPOSE 80
 ENTRYPOINT ["dotnet", "Frelance.Web.dll"]

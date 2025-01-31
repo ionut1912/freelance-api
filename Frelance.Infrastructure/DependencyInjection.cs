@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 namespace Frelance.Infrastructure;
 
@@ -26,49 +27,60 @@ public static class DependencyInjection
         var config = TypeAdapterConfig.GlobalSettings;
         config.Scan(Assembly.GetExecutingAssembly());
         services.AddSingleton(config);
+        var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
+        var logger = loggerFactory.CreateLogger("Startup");
 
         var databaseSettings = new DatabaseSettings();
         configuration.GetSection("DatabaseSettings").Bind(databaseSettings);
         var connectionStringSecret = configuration["AzureKeyVault:ConnectionStringSecretName"];
-        var jwtSecretName = configuration["AzureKeyVault:JWTTokenSecretName"]; 
-        databaseSettings.ConnectionString = configuration.GetSecret(connectionStringSecret);
-        var jwtTokenKey= configuration.GetSecret(jwtSecretName);
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(opt =>
-            {
-                opt.TokenValidationParameters = new TokenValidationParameters
+        var jwtSecretName = configuration["AzureKeyVault:JWTTokenSecretName"];
+        try
+        {
+            databaseSettings.ConnectionString = configuration.GetSecret(connectionStringSecret);
+            var jwtTokenKey = configuration.GetSecret(jwtSecretName);
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(opt =>
                 {
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtTokenKey))
-                };
+                    opt.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtTokenKey))
+                    };
+                });
+
+            services.AddDbContext<FrelanceDbContext>(options =>
+                options.UseSqlServer(databaseSettings.ConnectionString));
+
+            services.Configure<DatabaseSettings>(configuration.GetSection("DatabaseSettings"));
+
+            services.AddScoped<IProjectRepository, ProjectRepository>();
+            services.AddScoped<ITaskRepository, TaskRepository>();
+            services.AddScoped<ITimeLogRepository, TimeLogRepository>();
+            services.AddScoped<IAccountRepository, AccountRepository>();
+            services.AddIdentityCore<Users>(opt => opt.User.RequireUniqueEmail = true)
+                .AddRoles<Roles>()
+                .AddEntityFrameworkStores<FrelanceDbContext>()
+                .AddTokenProvider<DataProtectorTokenProvider<Users>>(TokenOptions.DefaultProvider);
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("ClientRole", policy => policy.RequireRole("Client"));
+                options.AddPolicy("FrelancerRole", policy => policy.RequireRole("Frelancer"));
             });
 
-        services.AddDbContext<FrelanceDbContext>(options =>
-            options.UseSqlServer(databaseSettings.ConnectionString));
-
-        services.Configure<DatabaseSettings>(configuration.GetSection("DatabaseSettings"));
-
-        services.AddScoped<IProjectRepository, ProjectRepository>();
-        services.AddScoped<ITaskRepository, TaskRepository>();
-        services.AddScoped<ITimeLogRepository, TimeLogRepository>();
-        services.AddScoped<IAccountRepository, AccountRepository>();
-        services.AddIdentityCore<Users>(opt => opt.User.RequireUniqueEmail = true)
-            .AddRoles<Roles>()
-            .AddEntityFrameworkStores<FrelanceDbContext>()
-            .AddTokenProvider<DataProtectorTokenProvider<Users>>(TokenOptions.DefaultProvider);
-        
-        services.AddAuthorization(options =>
+            services.AddScoped<TokenService>();
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
+            services.AddTransient<IUserAccessor, UserAccessor>();
+            logger.LogInformation("Infrastructure services configured successfully.");
+        }
+        catch (Exception ex)
         {
-            options.AddPolicy("ClientRole", policy => policy.RequireRole("Client"));
-            options.AddPolicy("FrelancerRole", policy => policy.RequireRole("Frelancer"));
-        });
-
-        services.AddScoped<TokenService>();
-        services.AddTransient<IUnitOfWork, UnitOfWork>();
-        services.AddTransient<IUserAccessor, UserAccessor>();
+            logger.LogError($"Error configuring infrastructure: {ex.Message}");
+            throw;
+        }
 
         return services;
     }
