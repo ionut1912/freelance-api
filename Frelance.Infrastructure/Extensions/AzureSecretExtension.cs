@@ -26,7 +26,11 @@ public static class AzureSecretExtension
 
         try
         {
-            var credential = new ManagedIdentityCredential();
+            var credential = new DefaultAzureCredential(new DefaultAzureCredentialOptions
+            {
+                ExcludeInteractiveBrowserCredential = true
+            });
+
             var client = new SecretClient(new Uri(keyVaultUrl), credential);
             logger.LogInformation($"Key vault url is {keyVaultUrl}");
             if (!string.IsNullOrEmpty(secretName))
@@ -54,22 +58,3 @@ public static class AzureSecretExtension
     }
 }
 
-public class TokenCredential : Azure.Core.TokenCredential
-{
-    private readonly string _accessToken;
-
-    public TokenCredential(string accessToken)
-    {
-        _accessToken = accessToken;
-    }
-
-    public override AccessToken GetToken(TokenRequestContext requestContext, CancellationToken cancellationToken)
-    {
-        return new AccessToken(_accessToken, DateTimeOffset.UtcNow.AddHours(1));
-    }
-
-    public override ValueTask<AccessToken> GetTokenAsync(TokenRequestContext requestContext, CancellationToken cancellationToken)
-    {
-        return new ValueTask<AccessToken>(new AccessToken(_accessToken, DateTimeOffset.UtcNow.AddHours(1)));
-    }
-}

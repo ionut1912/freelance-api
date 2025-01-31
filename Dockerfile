@@ -14,7 +14,7 @@ RUN dotnet restore "Frelance.Web/Frelance.Web.csproj"
 
 # Copy everything and build
 COPY . .
-RUN dotnet publish "Frelance.Web/Frelance.Web.csproj" -c Release -o /app/publish --no-restore
+RUN dotnet publish "Frelance.Web/Frelance.Web.csproj" -c Release -o /app/publish 
 
 # Runtime Stage
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
