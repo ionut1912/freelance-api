@@ -15,7 +15,7 @@ public static class AzureSecretExtension
     public static string GetSecret(this IConfiguration configuration, string secretName)
     {
         var secretValue = string.Empty;
-        var keyVaultUrl = configuration["AzureKeyVault:VaultUrl"];
+        var keyVaultUrl = configuration["AzureKeyVault__VaultUrl"];
         var accessToken = Environment.GetEnvironmentVariable("AZURE_ACCESS_TOKEN");
 
         var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());

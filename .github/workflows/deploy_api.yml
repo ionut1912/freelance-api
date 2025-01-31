@@ -45,5 +45,4 @@ jobs:
         run: |
           az webapp config container set --name frelance-api --resource-group frelance-api \
             --docker-custom-image-name frelanceacr.azurecr.io/frelance-api:latest
-
           az webapp restart --name frelance-api --resource-group frelance-api
