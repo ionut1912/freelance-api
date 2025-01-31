@@ -17,6 +17,7 @@ jobs:
         run: |
           az login --use-device-code
           az account set --subscription ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DCC19E65B4AF4106B1ED3942B9CDF939 }}
+
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
 
@@ -33,11 +34,12 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build  -t frelance-api .
-          docker tag frelance-api frelanceacr.azurecr.io/frelance-api:latest
+          docker build -t frelanceacr.azurecr.io/frelance-api:latest .
           docker push frelanceacr.azurecr.io/frelance-api:latest
+
       - name: Deploy Latest Docker Image to Azure App Service
         run: |
           az webapp config container set --name frelance-api --resource-group frelance-api \
-            --docker-custom-image-name frelanceacr.azurecr.io/frelance-api:latest
+            --container-image-name frelanceacr.azurecr.io/frelance-api:latest
+
           az webapp restart --name frelance-api --resource-group frelance-api
