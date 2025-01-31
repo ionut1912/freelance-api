@@ -9,7 +9,7 @@ resource "azurerm_key_vault" "keyvault" {
 resource "azurerm_key_vault_access_policy" "app_service_access" {
   key_vault_id = azurerm_key_vault.keyvault.id
   tenant_id    = azurerm_key_vault.keyvault.tenant_id
-  object_id    = azurerm_linux_web_app.app_service.identity[0].principal_id
+  object_id    = "68921ae4-ac2f-41d1-bc8b-ef4a9d77791f"
 
   secret_permissions = [
     "Get",
