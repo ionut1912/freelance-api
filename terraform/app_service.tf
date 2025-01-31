@@ -1,3 +1,15 @@
+resource "azurerm_service_plan" "app_service_plan" {
+  name                = "frelance-app-service-plan"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  sku_name            = var.app_service_plan_sku
+  os_type             = "Linux"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
 resource "azurerm_linux_web_app" "app_service" {
   name                = "frelance-api"
   resource_group_name = azurerm_resource_group.main.name
