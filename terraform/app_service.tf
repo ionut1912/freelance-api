@@ -32,13 +32,16 @@ resource "azurerm_linux_web_app" "app_service" {
   }
 
   app_settings = {
-    "DATABASE_CONNECTION_STRING"      = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.db_connection_string.id})"
-    "JWT_TOKEN_KEY"                   = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.jwt_token_key.id})"
-    "AZURE_AUTHORITY_HOST"            = "https://login.microsoftonline.com/"
-    "AZURE_IDENTITY_DISABLE_IMDS"     = "0"
-    "DOCKER_REGISTRY_SERVER_URL"      = "https://${azurerm_container_registry.acr.login_server}"
-    "DOCKER_REGISTRY_SERVER_USERNAME" = azurerm_container_registry.acr.admin_username
-    "DOCKER_REGISTRY_SERVER_PASSWORD" = azurerm_container_registry.acr.admin_password
-    "WEBSITES_CONTAINER_START_TIME_LIMIT" = "600" 
+    "AzureKeyVault:VaultUrl"                   = "https://${azurerm_key_vault.main.vault_uri}"
+    "AzureKeyVault:ConnectionStringSecretName" = "DB_CONNECTION_STRING_SECRET_NAME"
+    "AzureKeyVault:JWTTokenSecretName"         = "JWT_TOKEN_SECRET_NAME"
+    "DATABASE_CONNECTION_STRING"               = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.db_connection_string.id})"
+    "JWT_TOKEN_KEY"                            = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.jwt_token_key.id})"
+    "AZURE_AUTHORITY_HOST"                     = "https://login.microsoftonline.com/"
+    "AZURE_IDENTITY_DISABLE_IMDS"              = "0"
+    "DOCKER_REGISTRY_SERVER_URL"               = "https://${azurerm_container_registry.acr.login_server}"
+    "DOCKER_REGISTRY_SERVER_USERNAME"          = azurerm_container_registry.acr.admin_username
+    "DOCKER_REGISTRY_SERVER_PASSWORD"          = azurerm_container_registry.acr.admin_password
+    "WEBSITES_CONTAINER_START_TIME_LIMIT"      = "600"
   }
 }

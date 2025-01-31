@@ -48,7 +48,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddExceptionHandler<ExceptionHandler>();
-
+builder.Logging.AddConsole();
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
