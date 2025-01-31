@@ -16,8 +16,6 @@ public static class AzureSecretExtension
     {
         var secretValue = string.Empty;
         var keyVaultUrl = configuration["AzureKeyVault__VaultUrl"];
-        var accessToken = Environment.GetEnvironmentVariable("AZURE_ACCESS_TOKEN");
-
         var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
         var logger = loggerFactory.CreateLogger("AzureSecretExtension");
 
@@ -29,21 +27,9 @@ public static class AzureSecretExtension
         try
         {
             SecretClient client;
-
-            if (!string.IsNullOrEmpty(accessToken))
-            {
-                // Use the manually passed Azure CLI access token inside Docker
-                var credential = new TokenCredential(accessToken);
-                client = new SecretClient(new Uri(keyVaultUrl), credential);
-                logger.LogInformation("Using manually provided AZURE_ACCESS_TOKEN.");
-            }
-            else
-            {
-                var credential = new DefaultAzureCredential();
-                client = new SecretClient(new Uri(keyVaultUrl), credential);
-                logger.LogInformation("Using DefaultAzureCredential.");
-            }
-
+            var credential = new DefaultAzureCredential();
+            client = new SecretClient(new Uri(keyVaultUrl), credential);
+            logger.LogInformation($"Key vault url is {keyVaultUrl}");
             if (!string.IsNullOrEmpty(secretName))
             {
                 secretValue = client.GetSecret(secretName).Value.Value;
