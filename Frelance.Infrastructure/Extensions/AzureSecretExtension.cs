@@ -24,7 +24,7 @@ public static class AzureSecretExtension
 
         try
         {
-            var credential = new ManagedIdentityCredential();
+            var credential = new DefaultAzureCredential();
             var client = new SecretClient(new Uri(keyVaultUrl), credential);
 
             if (!string.IsNullOrEmpty(secretName))
