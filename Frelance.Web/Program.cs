@@ -6,6 +6,13 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var port = Environment.GetEnvironmentVariable("PORT") ?? "80";
+
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ListenAnyIP(int.Parse(port));
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -41,9 +48,9 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddExceptionHandler<ExceptionHandler>();
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -62,4 +69,6 @@ app.AddProjectsEndpoints();
 app.AddTasksEndpoints();
 app.AddTimeLogsEndpoints();
 app.AddUserEndpoints();
+app.Urls.Add("http://0.0.0.0:80");
+
 app.Run();
