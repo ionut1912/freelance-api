@@ -38,8 +38,15 @@ jobs:
           docker tag frelance-api frelanceacr.azurecr.io/frelance-api:latest
           docker push frelanceacr.azurecr.io/frelance-api:latest
 
+      - name: Set Environment Variables in Azure
+        run: |
+          az webapp config appsettings set --name frelance-api --resource-group frelance-api \
+            --settings PORT=80 ASPNETCORE_URLS=http://+:80 WEBSITES_CONTAINER_START_TIME_LIMIT=900
+
       - name: Deploy Latest Docker Image to Azure App Service
         run: |
           az webapp config container set --name frelance-api --resource-group frelance-api \
             --docker-custom-image-name frelanceacr.azurecr.io/frelance-api:latest
-          az webapp restart --name frelance-api --resource-group frelance-api
+
+      - name: Restart Azure App Service
+        run: az webapp restart --name frelance-api --resource-group frelance-api

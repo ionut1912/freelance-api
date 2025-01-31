@@ -7,37 +7,35 @@ using Azure.Security.KeyVault.Secrets;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-
 namespace Frelance.Infrastructure.Extensions;
 
 public static class AzureSecretExtension
 {
     public static string GetSecret(this IConfiguration configuration, string secretName)
     {
-        var secretValue = string.Empty;
         var keyVaultUrl = configuration["AzureKeyVault__VaultUrl"];
-        var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
-        var logger = loggerFactory.CreateLogger("AzureSecretExtension");
-
         if (string.IsNullOrEmpty(keyVaultUrl))
         {
             throw new Exception("Azure Key Vault URL is missing from configuration.");
         }
 
+        var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
+        var logger = loggerFactory.CreateLogger("AzureSecretExtension");
+
         try
         {
-            var credential = new ManagedIdentityCredential();
-
+            var credential = new DefaultAzureCredential();
             var client = new SecretClient(new Uri(keyVaultUrl), credential);
-            logger.LogInformation($"Key vault url is {keyVaultUrl}");
+
             if (!string.IsNullOrEmpty(secretName))
             {
-                secretValue = client.GetSecret(secretName).Value.Value;
+                var secret = client.GetSecret(secretName);
                 logger.LogInformation($"Successfully retrieved secret: {secretName}");
+                return secret.Value.Value;
             }
             else
             {
-                throw new Exception($"{secretName} is missing from Azure Key Vault configuration.");
+                throw new Exception($"Secret name '{secretName}' is missing.");
             }
         }
         catch (AuthenticationFailedException authEx)
@@ -50,8 +48,5 @@ public static class AzureSecretExtension
             logger.LogError($"Failed to retrieve secret '{secretName}': {ex.Message}");
             throw new Exception("Failed to retrieve secrets from Azure Key Vault", ex);
         }
-
-        return secretValue;
     }
 }
-
