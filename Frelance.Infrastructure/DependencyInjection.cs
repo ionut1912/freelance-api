@@ -29,15 +29,21 @@ public static class DependencyInjection
         services.AddSingleton(config);
         var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
         var logger = loggerFactory.CreateLogger("Startup");
-
         var databaseSettings = new DatabaseSettings();
         configuration.GetSection("DatabaseSettings").Bind(databaseSettings);
+        var keyVaultUrl = configuration["AzureKeyVault:VaultUrl"];
         var connectionStringSecret = configuration["AzureKeyVault:ConnectionStringSecretName"];
         var jwtSecretName = configuration["AzureKeyVault:JWTTokenSecretName"];
+        if (string.IsNullOrEmpty(keyVaultUrl))
+        {
+            throw new Exception("Azure Key Vault URL is missing in configuration.");
+        }
         try
         {
-            databaseSettings.ConnectionString = configuration.GetSecret(connectionStringSecret);
-            var jwtTokenKey = configuration.GetSecret(jwtSecretName);
+            var credential = new DefaultAzureCredential();
+            var secretClient = new SecretClient(new Uri(keyVaultUrl), credential);
+            databaseSettings.ConnectionString = secretClient.GetSecret(connectionStringSecret).Value.Value;
+            var jwtTokenKey = secretClient.GetSecret(jwtSecretName).Value.Value;
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(opt =>
                 {
