@@ -9,9 +9,12 @@ COPY ["Frelance.Contracts/Frelance.Contracts.csproj", "Frelance.Contracts/"]
 COPY ["Frelance.Infrastructure/Frelance.Infrastructure.csproj", "Frelance.Infrastructure/"]
 COPY ["Frelance.Web/Frelance.Web.csproj", "Frelance.Web/"]
 
+# Restore dependencies
+RUN dotnet restore "Frelance.Web/Frelance.Web.csproj"
+
 # Copy everything and build
 COPY . .
-RUN dotnet publish "Frelance.Web/Frelance.Web.csproj" -c Release -o /app/publish 
+RUN dotnet publish "Frelance.Web/Frelance.Web.csproj" -c Release -o /app/publish --no-restore
 
 # Runtime Stage
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
@@ -24,6 +27,8 @@ EXPOSE 80
 # Ensure ASP.NET Core listens on the correct port
 ENV ASPNETCORE_URLS=http://+:80
 
+# Pass Azure Access Token from environment variables
+ENV AZURE_ACCESS_TOKEN=${AZURE_ACCESS_TOKEN}
 
 # Start the application
 ENTRYPOINT ["dotnet", "Frelance.Web.dll"]
