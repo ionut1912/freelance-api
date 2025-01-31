@@ -32,8 +32,9 @@ public static class DependencyInjection
 
         var databaseSettings = new DatabaseSettings();
         configuration.GetSection("DatabaseSettings").Bind(databaseSettings);
-        var connectionStringSecret = configuration["AzureKeyVault:ConnectionStringSecretName"];
-        var jwtSecretName = configuration["AzureKeyVault:JWTTokenSecretName"];
+        var connectionStringSecret = configuration["AzureKeyVault__ConnectionStringSecretName"];
+        var jwtSecretName = configuration["AzureKeyVault__JWTTokenSecretName"];
+
         try
         {
             databaseSettings.ConnectionString = configuration.GetSecret(connectionStringSecret);
