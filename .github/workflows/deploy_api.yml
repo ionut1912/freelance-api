@@ -18,19 +18,14 @@ jobs:
           az login --use-device-code
           az account set --subscription ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DCC19E65B4AF4106B1ED3942B9CDF939 }}
 
+      - name: Get Azure Key Vault Access Token
+        run: echo "AZURE_ACCESS_TOKEN=$(az account get-access-token --resource https://vault.azure.net --query accessToken -o tsv)" >> $GITHUB_ENV
+
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
         run: terraform init
-        working-directory: terraform
-
-      - name: Terraform Validate
-        run: terraform validate
-        working-directory: terraform
-
-      - name: Terraform Plan
-        run: terraform plan
         working-directory: terraform
 
       - name: Terraform Apply
@@ -42,12 +37,11 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build -t frelanceacr.azurecr.io/frelance-api:latest .
+          docker build --build-arg AZURE_ACCESS_TOKEN=${{ env.AZURE_ACCESS_TOKEN }} -t frelance-api .
+          docker tag frelance-api frelanceacr.azurecr.io/frelance-api:latest
           docker push frelanceacr.azurecr.io/frelance-api:latest
-
       - name: Deploy Latest Docker Image to Azure App Service
         run: |
           az webapp config container set --name frelance-api --resource-group frelance-api \
-            --container-image-name frelanceacr.azurecr.io/frelance-api:latest
-
+            --docker-custom-image-name frelanceacr.azurecr.io/frelance-api:latest
           az webapp restart --name frelance-api --resource-group frelance-api
