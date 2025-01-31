@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Frelance.Infrastructure.Entities;
+using Frelance.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -19,18 +20,8 @@ public class TokenService
         ArgumentNullException.ThrowIfNull(userManager, nameof(userManager));
         _userManager = userManager;
 
-        var jwtSecretName = configuration["AzureKeyVault:JWTTokenSecretName"];
-        if (string.IsNullOrEmpty(jwtSecretName))
-        {
-            throw new Exception("JWTTokenSecretName is missing from configuration.");
-        }
-
-        _jwtSecretKey = configuration["JWTTokenKey"];
-
-        if (string.IsNullOrEmpty(_jwtSecretKey))
-        {
-            throw new Exception("JWT Token Key is missing. Ensure it is loaded from Azure Key Vault.");
-        }
+        var jwtSecretName = configuration["AzureKeyVault__JWTTokenSecretName"];
+        _jwtSecretKey = configuration.GetSecret(jwtSecretName);
     }
 
     public async Task<string> GenerateToken(Users user)
