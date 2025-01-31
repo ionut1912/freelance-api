@@ -1,6 +1,7 @@
 # Build Stage
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
+ARG AZURE_ACCESS_TOKEN
 
 # Copy solution and projects
 COPY ["Frelance.API.sln", "./"]
@@ -27,8 +28,9 @@ EXPOSE 80
 # Ensure ASP.NET Core listens on the correct port
 ENV ASPNETCORE_URLS=http://+:80
 
-# Pass Azure Access Token from environment variables
-ENV AZURE_ACCESS_TOKEN=${AZURE_ACCESS_TOKEN}
+ENV AZURE_ACCESS_TOKEN=$AZURE_ACCESS_TOKEN
+ENV DOTNET_GCServer=0
+ENV COMPlus_gcServer=0
 
 # Start the application
 ENTRYPOINT ["dotnet", "Frelance.Web.dll"]
