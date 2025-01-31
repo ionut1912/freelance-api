@@ -21,12 +21,11 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/publish .
 
-# Expose port 80 explicitly
-EXPOSE 80
+# Expose port (Use Azure Dynamic Port)
+ENV ASPNETCORE_URLS=http://+:${PORT}
 
-# Ensure ASP.NET Core listens on the correct port
-ENV ASPNETCORE_URLS=http://+:80
-
+# Logging for Azure
+ENV DOTNET_USE_POLLING_FILE_WATCHER=1
 ENV DOTNET_GCServer=0
 ENV COMPlus_gcServer=0
 
