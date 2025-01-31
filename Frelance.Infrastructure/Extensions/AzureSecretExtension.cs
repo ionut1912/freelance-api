@@ -26,10 +26,7 @@ public static class AzureSecretExtension
 
         try
         {
-            var credential = new DefaultAzureCredential(new DefaultAzureCredentialOptions
-            {
-                ExcludeInteractiveBrowserCredential = true
-            });
+            var credential = new ManagedIdentityCredential();
 
             var client = new SecretClient(new Uri(keyVaultUrl), credential);
             logger.LogInformation($"Key vault url is {keyVaultUrl}");
