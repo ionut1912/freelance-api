@@ -40,9 +40,6 @@ jobs:
       - name: Push Docker image to ACR
         run: docker push frelanceacr.azurecr.io/frelance-api:latest
 
-      - name: Apply Database Migrations
-        run: docker run --rm frelanceacr.azurecr.io/frelance-api:latest dotnet ef database update
-
       - name: Deploy Docker image to Azure App Service
         uses: azure/webapps-deploy@v2
         with:
