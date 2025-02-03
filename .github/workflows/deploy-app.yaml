@@ -1,4 +1,4 @@
-name: Deploy to Azure (Terraform & Docker Device Login)
+name: Deploy to Azure (Terraform & Docker with Managed Identity)
 
 on:
   push:
@@ -12,10 +12,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Login to Azure CLI via Device Login
+      - name: Login to Azure using Managed Identity
         uses: azure/login@v2
         with:
-          auth-type: device
+          auth-type: identity
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_AB944E37EFA44601B9D2DCFFE6BA8C22 }}
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
