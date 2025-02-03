@@ -63,21 +63,7 @@ public static class DependencyInjection
 
             logger.LogInformation("JWT token key retrieved successfully. (Value not displayed for security)");
 
-            // Ensure Database Connection is Set Before UseSqlServer
-            services.AddDbContext<FrelanceDbContext>((serviceProvider, options) =>
-            {
-                var dbSettings = serviceProvider.GetRequiredService<IConfiguration>()
-                                                .GetSection("DatabaseSettings")
-                                                .Get<DatabaseSettings>();
-
-                if (string.IsNullOrEmpty(dbSettings?.ConnectionString))
-                {
-                    throw new InvalidOperationException("Database connection string is missing or not set.");
-                }
-
-                options.UseSqlServer(dbSettings.ConnectionString);
-            });
-
+            services.AddDbContext<FrelanceDbContext>(options=>options.UseSqlServer(databaseSettings.ConnectionString));
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(opt =>
                 {
