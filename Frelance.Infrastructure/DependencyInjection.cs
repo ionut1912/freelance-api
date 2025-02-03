@@ -37,8 +37,26 @@ public static class DependencyInjection
 
         try
         {
-            databaseSettings.ConnectionString = configuration.GetSecret(connectionStringSecret);
+            if (string.IsNullOrEmpty(connectionStringSecret))
+            {
+                throw new InvalidOperationException("AzureKeyVault__ConnectionStringSecretName is not configured.");
+            }
+            if (string.IsNullOrEmpty(jwtSecretName))
+            {
+                throw new InvalidOperationException("AzureKeyVault__JWTTokenSecretName is not configured.");
+            }
+            var connectionString = configuration.GetSecret(connectionStringSecret);
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                throw new InvalidOperationException($"The secret '{connectionStringSecret}' returned an empty connection string.");
+            }
+            databaseSettings.ConnectionString = connectionString;
+
             var jwtTokenKey = configuration.GetSecret(jwtSecretName);
+            if (string.IsNullOrEmpty(jwtTokenKey))
+            {
+                throw new InvalidOperationException($"The secret '{jwtSecretName}' returned an empty JWT token key.");
+            }
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(opt =>
                 {
