@@ -5,9 +5,9 @@ on:
     branches:
       - master
 
-permissions: 
-  id-token: write   
-  contents: read  
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   build-and-deploy:
@@ -23,7 +23,6 @@ jobs:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_AB944E37EFA44601B9D2DCFFE6BA8C22 }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_67961ACA542E4BEF9AD59E35B49AA714 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DCC19E65B4AF4106B1ED3942B9CDF939 }}
-          enable-AzPSSession: true 
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
@@ -36,7 +35,7 @@ jobs:
         run: terraform apply -auto-approve
         working-directory: terraform
 
-      - name: Log in to Azure Container Registry
+      - name: Log in to Azure Container Registry (ACR)
         run: az acr login --name frelanceacr
 
       - name: Build and push Docker image
@@ -44,13 +43,23 @@ jobs:
           docker build -t frelance-api .
           docker tag frelance-api frelanceacr.azurecr.io/frelance-api:latest
           docker push frelanceacr.azurecr.io/frelance-api:latest
+
+      - name: Assign Managed Identity to Azure App Service for ACR Access
+        run: |
+          az webapp identity assign --name frelance-api --resource-group frelance-api
+          az role assignment create --assignee ${{ secrets.AZUREAPPSERVICE_CLIENTID_AB944E37EFA44601B9D2DCFFE6BA8C22 }} \
+            --scope /subscriptions/${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DCC19E65B4AF4106B1ED3942B9CDF939 }}/resourceGroups/frelance-api/providers/Microsoft.ContainerRegistry/registries/frelanceacr \
+            --role "AcrPull"
+
       - name: Set Environment Variables in Azure
         run: |
           az webapp config appsettings set --name frelance-api --resource-group frelance-api \
             --settings PORT=80 ASPNETCORE_URLS=http://+:80 WEBSITES_CONTAINER_START_TIME_LIMIT=900
+
       - name: Deploy Latest Docker Image to Azure App Service
         run: |
           az webapp config container set --name frelance-api --resource-group frelance-api \
             --docker-custom-image-name frelanceacr.azurecr.io/frelance-api:latest
+
       - name: Restart Azure App Service
         run: az webapp restart --name frelance-api --resource-group frelance-api
