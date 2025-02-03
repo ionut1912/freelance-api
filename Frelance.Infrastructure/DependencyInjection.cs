@@ -29,15 +29,14 @@ public static class DependencyInjection
         services.AddSingleton(config);
         var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
         var logger = loggerFactory.CreateLogger("Startup");
-
         var databaseSettings = new DatabaseSettings();
         configuration.GetSection("DatabaseSettings").Bind(databaseSettings);
-        var connectionStringSecret = configuration["AzureKeyVault__ConnectionStringSecretName"];
+        var connectionStringSecretName = configuration["AzureKeyVault__ConnectionStringSecretName"];
         var jwtSecretName = configuration["AzureKeyVault__JWTTokenSecretName"];
 
         try
         {
-            if (string.IsNullOrEmpty(connectionStringSecret))
+            if (string.IsNullOrEmpty(connectionStringSecretName))
             {
                 throw new InvalidOperationException("AzureKeyVault__ConnectionStringSecretName is not configured.");
             }
@@ -45,17 +44,24 @@ public static class DependencyInjection
             {
                 throw new InvalidOperationException("AzureKeyVault__JWTTokenSecretName is not configured.");
             }
-            var connectionString = configuration.GetSecret(connectionStringSecret);
+            var connectionString = configuration.GetSecret(connectionStringSecretName);
             if (string.IsNullOrEmpty(connectionString))
             {
-                throw new InvalidOperationException($"The secret '{connectionStringSecret}' returned an empty connection string.");
+                throw new InvalidOperationException($"The secret '{connectionStringSecretName}' returned an empty connection string.");
+            }
+            else
+            {
+                logger.LogInformation("Connection string retrieved successfully. (Value not displayed for security)");
             }
             databaseSettings.ConnectionString = connectionString;
-
             var jwtTokenKey = configuration.GetSecret(jwtSecretName);
             if (string.IsNullOrEmpty(jwtTokenKey))
             {
                 throw new InvalidOperationException($"The secret '{jwtSecretName}' returned an empty JWT token key.");
+            }
+            else
+            {
+                logger.LogInformation("JWT token key retrieved successfully. (Value not displayed for security)");
             }
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(opt =>
@@ -69,12 +75,8 @@ public static class DependencyInjection
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtTokenKey))
                     };
                 });
-
             services.AddDbContext<FrelanceDbContext>(options =>
                 options.UseSqlServer(databaseSettings.ConnectionString));
-
-            services.Configure<DatabaseSettings>(configuration.GetSection("DatabaseSettings"));
-
             services.AddScoped<IProjectRepository, ProjectRepository>();
             services.AddScoped<ITaskRepository, TaskRepository>();
             services.AddScoped<ITimeLogRepository, TimeLogRepository>();
@@ -83,13 +85,11 @@ public static class DependencyInjection
                 .AddRoles<Roles>()
                 .AddEntityFrameworkStores<FrelanceDbContext>()
                 .AddTokenProvider<DataProtectorTokenProvider<Users>>(TokenOptions.DefaultProvider);
-
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("ClientRole", policy => policy.RequireRole("Client"));
                 options.AddPolicy("FrelancerRole", policy => policy.RequireRole("Frelancer"));
             });
-
             services.AddScoped<TokenService>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddTransient<IUserAccessor, UserAccessor>();
