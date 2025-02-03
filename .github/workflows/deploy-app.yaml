@@ -1,4 +1,4 @@
-name: Deploy to Azure (Terraform & Docker)
+name: Deploy to Azure (Terraform & Docker Device Login)
 
 on:
   push:
@@ -11,6 +11,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Login to Azure CLI via Device Login
+        uses: azure/login@v2
+        with:
+          auth-type: device
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
