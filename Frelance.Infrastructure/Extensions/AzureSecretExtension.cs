@@ -1,9 +1,6 @@
 using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Azure.Core;
-using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
+using Azure.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -29,7 +26,13 @@ public static class AzureSecretExtension
 
             if (!string.IsNullOrEmpty(secretName))
             {
+                logger.LogInformation($"Fetching secret: {secretName} from {keyVaultUrl}");
                 var secret = client.GetSecret(secretName);
+                if (secret?.Value?.Value == null || string.IsNullOrEmpty(secret.Value.Value))
+                {
+                    logger.LogError($"Secret '{secretName}' is empty.");
+                    throw new Exception($"Secret '{secretName}' retrieved from Azure Key Vault is empty.");
+                }
                 logger.LogInformation($"Successfully retrieved secret: {secretName}");
                 return secret.Value.Value;
             }
@@ -46,7 +49,7 @@ public static class AzureSecretExtension
         catch (Exception ex)
         {
             logger.LogError($"Failed to retrieve secret '{secretName}': {ex.Message}");
-            throw new Exception("Failed to retrieve secrets from Azure Key Vault", ex);
+            throw new Exception($"Failed to retrieve secret '{secretName}'", ex);
         }
     }
 }

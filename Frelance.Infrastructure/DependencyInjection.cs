@@ -40,29 +40,44 @@ public static class DependencyInjection
             {
                 throw new InvalidOperationException("AzureKeyVault__ConnectionStringSecretName is not configured.");
             }
+            
             if (string.IsNullOrEmpty(jwtSecretName))
             {
                 throw new InvalidOperationException("AzureKeyVault__JWTTokenSecretName is not configured.");
             }
+
             var connectionString = configuration.GetSecret(connectionStringSecretName);
             if (string.IsNullOrEmpty(connectionString))
             {
                 throw new InvalidOperationException($"The secret '{connectionStringSecretName}' returned an empty connection string.");
             }
-            else
-            {
-                logger.LogInformation("Connection string retrieved successfully. (Value not displayed for security)");
-            }
+
+            logger.LogInformation("Connection string retrieved successfully. (Value not displayed for security)");
             databaseSettings.ConnectionString = connectionString;
+
             var jwtTokenKey = configuration.GetSecret(jwtSecretName);
             if (string.IsNullOrEmpty(jwtTokenKey))
             {
                 throw new InvalidOperationException($"The secret '{jwtSecretName}' returned an empty JWT token key.");
             }
-            else
+
+            logger.LogInformation("JWT token key retrieved successfully. (Value not displayed for security)");
+
+            // Ensure Database Connection is Set Before UseSqlServer
+            services.AddDbContext<FrelanceDbContext>((serviceProvider, options) =>
             {
-                logger.LogInformation("JWT token key retrieved successfully. (Value not displayed for security)");
-            }
+                var dbSettings = serviceProvider.GetRequiredService<IConfiguration>()
+                                                .GetSection("DatabaseSettings")
+                                                .Get<DatabaseSettings>();
+
+                if (string.IsNullOrEmpty(dbSettings?.ConnectionString))
+                {
+                    throw new InvalidOperationException("Database connection string is missing or not set.");
+                }
+
+                options.UseSqlServer(dbSettings.ConnectionString);
+            });
+
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(opt =>
                 {
@@ -75,24 +90,27 @@ public static class DependencyInjection
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtTokenKey))
                     };
                 });
-            services.AddDbContext<FrelanceDbContext>(options =>
-                options.UseSqlServer(databaseSettings.ConnectionString));
+
             services.AddScoped<IProjectRepository, ProjectRepository>();
             services.AddScoped<ITaskRepository, TaskRepository>();
             services.AddScoped<ITimeLogRepository, TimeLogRepository>();
             services.AddScoped<IAccountRepository, AccountRepository>();
+
             services.AddIdentityCore<Users>(opt => opt.User.RequireUniqueEmail = true)
                 .AddRoles<Roles>()
                 .AddEntityFrameworkStores<FrelanceDbContext>()
                 .AddTokenProvider<DataProtectorTokenProvider<Users>>(TokenOptions.DefaultProvider);
+
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("ClientRole", policy => policy.RequireRole("Client"));
                 options.AddPolicy("FrelancerRole", policy => policy.RequireRole("Frelancer"));
             });
+
             services.AddScoped<TokenService>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddTransient<IUserAccessor, UserAccessor>();
+
             logger.LogInformation("Infrastructure services configured successfully.");
         }
         catch (Exception ex)
