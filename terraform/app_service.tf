@@ -32,7 +32,7 @@ resource "azurerm_linux_web_app" "app_service" {
   }
 
   app_settings = {
-    "AzureKeyVault__VaultUrl"                   = azurerm_key_vault.keyvault.name
+    "AzureKeyVault__VaultUrl"                   = azurerm_key_vault.keyvault.vault_uri
     "AzureKeyVault__ConnectionStringSecretName" = "db-connection-string"
     "AzureKeyVault__JWTTokenSecretName"         = "jwt-token-key"
     "AZURE_AUTHORITY_HOST"                      = "https://login.microsoftonline.com/"
