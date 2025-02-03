@@ -1,4 +1,4 @@
-name: Deploy to Azure (Terraform & Docker with Managed Identity)
+name: Deploy to Azure (Terraform & Docker via Publish Profile)
 
 on:
   push:
@@ -11,13 +11,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Login to Azure using Managed Identity
-        uses: azure/login@v2
-        with:
-          auth-type: identity
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DCC19E65B4AF4106B1ED3942B9CDF939 }}
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_AB944E37EFA44601B9D2DCFFE6BA8C22}}
+      - name: Manually Login to Azure
+        run: |
+          az login --use-device-code
+          az account set --subscription ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DCC19E65B4AF4106B1ED3942B9CDF939 }}
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
