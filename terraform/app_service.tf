@@ -35,12 +35,12 @@ resource "azurerm_linux_web_app" "app_service" {
     "AzureKeyVault__VaultUrl"                   = "https://frelance-api-keyvault.vault.azure.net/"
     "AzureKeyVault__ConnectionStringSecretName" = "db-connection-string"
     "AzureKeyVault__JWTTokenSecretName"         = "jwt-token-key"
-    "AZURE_AUTHORITY_HOST"                     = "https://login.microsoftonline.com/"
-    "AZURE_IDENTITY_DISABLE_IMDS"              = "0"
-    "DOCKER_REGISTRY_SERVER_URL"               = "https://${azurerm_container_registry.acr.login_server}"
-    "DOCKER_REGISTRY_SERVER_USERNAME"          = azurerm_container_registry.acr.admin_username
-    "DOCKER_REGISTRY_SERVER_PASSWORD"          = azurerm_container_registry.acr.admin_password
-    "WEBSITES_CONTAINER_START_TIME_LIMIT"      = "900"
-    "PORT"                                     = "80"
+    "AZURE_AUTHORITY_HOST"                      = "https://login.microsoftonline.com/"
+    "AZURE_IDENTITY_DISABLE_IMDS"               = "0"
+    "DOCKER_REGISTRY_SERVER_URL"                = "https://${azurerm_container_registry.acr.login_server}"
+    "DOCKER_REGISTRY_SERVER_USERNAME"           = azurerm_container_registry.acr.admin_username
+    "DOCKER_REGISTRY_SERVER_PASSWORD"           = azurerm_container_registry.acr.admin_password
+    "WEBSITES_CONTAINER_START_TIME_LIMIT"       = "900"
+    "PORT"                                      = "80"
   }
 }
