@@ -27,6 +27,10 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve
         working-directory: terraform
+        
+      - name: Check SQL Firewall Rules
+        run: |
+          az sql server firewall-rule list --resource-group <your_resource_group> --server frelance-db
 
       - name: Docker login to ACR
         run: echo "${{ secrets.ACR_PASSWORD }}" | docker login frelanceacr.azurecr.io -u ${{ secrets.ACR_USERNAME }} --password-stdin
@@ -46,3 +50,6 @@ jobs:
           app-name: frelance-api
           images: frelanceacr.azurecr.io/frelance-api:latest
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+
+      - name: Restart Azure App Service
+        run: az webapp restart --name frelance-api --resource-group frelance-api
