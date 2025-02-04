@@ -12,6 +12,8 @@ public class CreateTimeLogCommandHandler:IRequestHandler<CreateTimeLogCommand,Un
 
     public CreateTimeLogCommandHandler(ITimeLogRepository timeLogRepository, IUnitOfWork unitOfWork)
     {
+        ArgumentNullException.ThrowIfNull(timeLogRepository, nameof(timeLogRepository));
+        ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));
         _timeLogRepository = timeLogRepository;
         _unitOfWork = unitOfWork;
     }

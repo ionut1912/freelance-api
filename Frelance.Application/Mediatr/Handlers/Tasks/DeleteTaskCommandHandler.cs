@@ -11,6 +11,8 @@ public class DeleteTaskCommandHandler:IRequestHandler<DeleteTaskCommand,Unit>
 
     public DeleteTaskCommandHandler(ITaskRepository taskRepository, IUnitOfWork unitOfWork)
     {
+        ArgumentNullException.ThrowIfNull(taskRepository, nameof(taskRepository));
+        ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));
         _taskRepository = taskRepository;
         _unitOfWork = unitOfWork;
     }

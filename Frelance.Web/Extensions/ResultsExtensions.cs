@@ -7,7 +7,7 @@ public static class ResultsExtensions
         int pageSize, int pageNumber, int totalItems, 
         int totalPages, IEnumerable<object> items)
     {
-        ArgumentNullException.ThrowIfNull(resultExtensions);
+        ArgumentNullException.ThrowIfNull(resultExtensions,nameof(resultExtensions));
         return new PaginationResult(pageSize, pageNumber, totalItems, totalPages, items);
     }
 }

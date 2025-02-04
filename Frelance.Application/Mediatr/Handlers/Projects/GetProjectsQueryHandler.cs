@@ -12,6 +12,7 @@ public class GetProjectsQueryHandler:IRequestHandler<GetProjectsQuery,PaginatedL
 
     public GetProjectsQueryHandler(IProjectRepository projectRepository)
     {
+        ArgumentNullException.ThrowIfNull(projectRepository,nameof(projectRepository));
         _projectRepository = projectRepository;   
     }
 

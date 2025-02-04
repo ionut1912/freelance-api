@@ -12,6 +12,8 @@ public class CreateTaskCommandHandler:IRequestHandler<CreateTaskCommand,Unit>
 
     public CreateTaskCommandHandler(ITaskRepository taskRepository, IUnitOfWork unitOfWork)
     {
+        ArgumentNullException.ThrowIfNull(taskRepository, nameof(taskRepository));
+        ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));
         _taskRepository = taskRepository;
         _unitOfWork = unitOfWork;
     }

@@ -22,8 +22,8 @@ public class ProjectRepository:IProjectRepository
     public ProjectRepository(FrelanceDbContext context, IUserAccessor userAccessor)
     {
         ArgumentNullException.ThrowIfNull(context,nameof(context));
-        _context = context;
         ArgumentNullException.ThrowIfNull(userAccessor,nameof(userAccessor));
+        _context = context;
         _userAccessor = userAccessor;
     }
     public async Task AddProjectAsync(CreateProjectCommand createProjectCommand, CancellationToken cancellationToken)

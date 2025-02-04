@@ -9,6 +9,7 @@ public class UnitOfWork:IUnitOfWork
 
     public UnitOfWork(FrelanceDbContext context)
     {
+        ArgumentNullException.ThrowIfNull(context, nameof(context));
         _context = context;
     }
     public async Task SaveChangesAsync(CancellationToken cancellationToken = default)

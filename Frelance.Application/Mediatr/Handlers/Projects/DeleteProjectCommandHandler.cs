@@ -11,6 +11,8 @@ public class DeleteProjectCommandHandler:IRequestHandler<DeleteProjectCommand,Un
 
     public DeleteProjectCommandHandler(IProjectRepository projectRepository, IUnitOfWork unitOfWork)
     {
+        ArgumentNullException.ThrowIfNull(projectRepository, nameof(projectRepository));
+        ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));
         _projectRepository = projectRepository;
         _unitOfWork = unitOfWork;
         

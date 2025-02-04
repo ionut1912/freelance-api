@@ -8,14 +8,15 @@ namespace Frelance.Application.Mediatr.Handlers.Tasks;
 
 public class GetTaskByIdQueryHandler:IRequestHandler<GetTaskByIdQuery,GetTaskByIdResponse>
 {
-    private readonly ITaskRepository _repository;
+    private readonly ITaskRepository _taskRepository;
 
-    public GetTaskByIdQueryHandler(ITaskRepository repository)
+    public GetTaskByIdQueryHandler(ITaskRepository taskRepository)
     {
-        _repository = repository;
+        ArgumentNullException.ThrowIfNull(taskRepository, nameof(taskRepository));
+        _taskRepository = taskRepository;
     }
     public async Task<GetTaskByIdResponse> Handle(GetTaskByIdQuery request, CancellationToken cancellationToken)
     {
-        return await _repository.GetTaskByIdAsync(request,cancellationToken);
+        return await _taskRepository.GetTaskByIdAsync(request,cancellationToken);
     }
 }
