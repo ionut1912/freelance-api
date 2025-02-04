@@ -29,7 +29,7 @@ resource "azurerm_key_vault_access_policy" "app_service_access" {
 
 resource "azurerm_key_vault_secret" "jwt_token_key" {
   name         = "jwt-token-key"
-  value        = "this is a secret key"
+  value        = "this is a secret key and needs to be a long string"
   key_vault_id = azurerm_key_vault.keyvault.id
 }
 
