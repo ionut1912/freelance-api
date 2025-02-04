@@ -11,6 +11,7 @@ public class GetProjectByIdQueryHandler:IRequestHandler<GetProjectByIdQuery,GetP
 
     public GetProjectByIdQueryHandler(IProjectRepository projectRepository)
     {
+        ArgumentNullException.ThrowIfNull(projectRepository, nameof(projectRepository));
         _projectRepository = projectRepository;
     }
     public async Task<GetProjectByIdResponse> Handle(GetProjectByIdQuery request, CancellationToken cancellationToken)

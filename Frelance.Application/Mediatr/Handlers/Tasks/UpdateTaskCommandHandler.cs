@@ -12,6 +12,8 @@ public class UpdateTaskCommandHandler:IRequestHandler<UpdateTaskCommand,Unit>
 
     public UpdateTaskCommandHandler(ITaskRepository taskRepository, IUnitOfWork unitOfWork)
     {
+        ArgumentNullException.ThrowIfNull(taskRepository, nameof(taskRepository));
+        ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));
         _taskRepository = taskRepository;
         _unitOfWork = unitOfWork;
     }

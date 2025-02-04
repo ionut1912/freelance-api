@@ -12,6 +12,7 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
 
     public ValidationBehavior(IEnumerable<IValidator<TRequest>> validators)
     {
+        ArgumentNullException.ThrowIfNull(validators, nameof(validators));
         _validators = validators;
     }
     

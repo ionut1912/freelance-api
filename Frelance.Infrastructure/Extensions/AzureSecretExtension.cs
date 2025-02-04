@@ -8,7 +8,7 @@ namespace Frelance.Infrastructure.Extensions;
 
 public static class AzureSecretExtension
 {
-    public static string GetSecret(this IConfiguration configuration, string secretName)
+    public static string GetSecret(this IConfiguration configuration, string secretName,string secretKey)
     {
         var keyVaultUrl = configuration["AzureKeyVault__VaultUrl"];
         if (string.IsNullOrEmpty(keyVaultUrl))
@@ -38,7 +38,9 @@ public static class AzureSecretExtension
             }
             else
             {
-                throw new Exception($"Secret name '{secretName}' is missing.");
+
+                throw new InvalidOperationException($"{secretKey} is not configured.");
+                
             }
         }
         catch (AuthenticationFailedException authEx)

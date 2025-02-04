@@ -11,6 +11,8 @@ public class DeleteTimeLogCommandHandler:IRequestHandler<DeleteTimeLogCommand,Un
 
     public DeleteTimeLogCommandHandler(ITimeLogRepository timeLogRepository, IUnitOfWork unitOfWork)
     {
+        ArgumentNullException.ThrowIfNull(timeLogRepository,nameof(timeLogRepository));
+        ArgumentNullException.ThrowIfNull(unitOfWork,nameof(unitOfWork));
         _timeLogRepository = timeLogRepository;
         _unitOfWork = unitOfWork;
     }

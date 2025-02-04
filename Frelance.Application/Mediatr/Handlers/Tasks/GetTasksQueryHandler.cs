@@ -9,14 +9,15 @@ namespace Frelance.Application.Mediatr.Handlers.Tasks;
 
 public class GetTasksQueryHandler : IRequestHandler<GetTasksQuery, PaginatedList<TaskDto>>
 {
-    private readonly ITaskRepository _repository;
+    private readonly ITaskRepository _taskRepository;
 
-    public GetTasksQueryHandler(ITaskRepository repository)
+    public GetTasksQueryHandler(ITaskRepository taskRepository)
     {
-        _repository = repository;
+        ArgumentNullException.ThrowIfNull(taskRepository, nameof(taskRepository));
+        _taskRepository = taskRepository;
     }
     public async Task<PaginatedList<TaskDto>> Handle(GetTasksQuery request, CancellationToken cancellationToken)
     {
-        return await _repository.GetTasksAsync(request,cancellationToken);
+        return await _taskRepository.GetTasksAsync(request,cancellationToken);
     }
 }

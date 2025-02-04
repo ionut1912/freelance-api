@@ -21,8 +21,8 @@ public class TimeLogRepository:ITimeLogRepository
     public TimeLogRepository(FrelanceDbContext dbContext,IUserAccessor userAccessor)
     {
         ArgumentNullException.ThrowIfNull(dbContext, nameof(dbContext));
-        _context = dbContext;
         ArgumentNullException.ThrowIfNull(userAccessor, nameof(userAccessor));
+        _context = dbContext;
         _userAccessor = userAccessor;
     }
     public async Task AddTimeLogAsync(CreateTimeLogCommand createTimeLogCommand, CancellationToken cancellationToken)
