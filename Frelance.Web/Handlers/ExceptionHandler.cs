@@ -24,7 +24,7 @@ public class ExceptionHandler : IExceptionHandler
             CustomValidationException => CreateProblemDetails(StatusCodes.Status400BadRequest,
                 "Validation error", "One or more validation errors occurred"),
             _ => CreateProblemDetails(StatusCodes.Status500InternalServerError,
-                "Internal Server Error", exception.ToString())
+                "Internal Server Error", "An unexpected error occurred")
         };
 
         if (exception is CustomValidationException customValidationException)
