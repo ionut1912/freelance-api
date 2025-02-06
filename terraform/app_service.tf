@@ -22,24 +22,19 @@ resource "azurerm_linux_web_app" "app_service" {
   }
 
   site_config {
-    always_on        = false
-    app_command_line = ""
-
-    application_stack {
-      docker_image_name = "${azurerm_container_registry.acr.login_server}/freelance-client:latest"
-    }
+    always_on                               = false
+    container_registry_use_managed_identity = true
   }
 
   app_settings = {
+    "DOCKER_CUSTOM_IMAGE_NAME"                  = "${azurerm_container_registry.acr.login_server}/frelance-api:latest"
     "AzureKeyVault__VaultUrl"                   = azurerm_key_vault.keyvault.vault_uri
     "AzureKeyVault__ConnectionStringSecretName" = "db-connection-string"
     "AzureKeyVault__JWTTokenSecretName"         = "jwt-token-key"
     "AZURE_AUTHORITY_HOST"                      = "https://login.microsoftonline.com/"
     "AZURE_IDENTITY_DISABLE_IMDS"               = "0"
-    "DOCKER_REGISTRY_SERVER_URL"                = "https://${azurerm_container_registry.acr.login_server}"
-    "DOCKER_REGISTRY_SERVER_USERNAME"           = azurerm_container_registry.acr.admin_username
-    "DOCKER_REGISTRY_SERVER_PASSWORD"           = azurerm_container_registry.acr.admin_password
     "WEBSITES_CONTAINER_START_TIME_LIMIT"       = "900"
     "PORT"                                      = "80"
+    "WEBSITES_PORT"                             = "80"
   }
 }
