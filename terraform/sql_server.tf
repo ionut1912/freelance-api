@@ -15,11 +15,10 @@ resource "azurerm_mssql_database" "sql_database" {
   zone_redundant = false
 }
 
-resource "azurerm_sql_firewall_rule" "allow_all" {
-  name                = "AllowAllIPs"
-  resource_group_name = azurerm_mssql_server.sql_server.resource_group_name
-  server_name         = azurerm_mssql_server.sql_server.name
-  start_ip_address    = "0.0.0.0"
-  end_ip_address      = "255.255.255.255"
+resource "azurerm_mssql_firewall_rule" "allow_all" {
+  name             = "AllowAllIPs"
+  server_id        = azurerm_mssql_server.sql_server.id
+  start_ip_address = "0.0.0.0"
+  end_ip_address   = "255.255.255.255"
 }
 
