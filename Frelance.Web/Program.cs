@@ -54,7 +54,7 @@ if (app.Environment.IsDevelopment())
 app.UseExceptionHandler(_ => { });
 app.UseCors(opt =>
 {
-    opt.AllowAnyHeader().AllowAnyMethod().AllowCredentials();
+    opt.WithOrigins("http://localhost:4200").AllowAnyHeader().AllowAnyMethod().AllowCredentials();
 });
 app.UseHttpsRedirection();
 app.UseAuthentication();

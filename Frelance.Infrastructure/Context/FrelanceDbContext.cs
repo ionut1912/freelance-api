@@ -41,7 +41,7 @@ namespace Frelance.Infrastructure.Context
 
             builder.Entity<Roles>()
                 .HasData(
-                    new Roles { Id = 1, Name = "Frelancer", NormalizedName = "FRELANCER" },
+                    new Roles { Id = 1, Name = "Freelancer", NormalizedName = "FREELANCER" },
                     new Roles { Id = 2, Name = "Client", NormalizedName = "CLIENT" }
                 );
         }
