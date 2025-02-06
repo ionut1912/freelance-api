@@ -26,8 +26,7 @@ resource "azurerm_linux_web_app" "app_service" {
     app_command_line = ""
 
     application_stack {
-      docker_image     = "${azurerm_container_registry.acr.login_server}/frelance-api"
-      docker_image_tag = "latest"
+      docker_image_name = "${azurerm_container_registry.acr.login_server}/freelance-client:latest"
     }
   }
 
