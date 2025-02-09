@@ -4,6 +4,7 @@ using Frelance.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Frelance.Infrastructure.Migrations
 {
     [DbContext(typeof(FrelanceDbContext))]
-    partial class FrelanceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250209104756_UpdateUserEntity")]
+    partial class UpdateUserEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -182,7 +185,12 @@ namespace Frelance.Infrastructure.Migrations
                     b.Property<string>("ProgrammingLanguage")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("UsersId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UsersId");
 
                     b.ToTable("Skills");
 
@@ -442,21 +450,6 @@ namespace Frelance.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("SkiillsUsers", b =>
-                {
-                    b.Property<int>("SkillsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UsersId")
-                        .HasColumnType("int");
-
-                    b.HasKey("SkillsId", "UsersId");
-
-                    b.HasIndex("UsersId");
-
-                    b.ToTable("SkiillsUsers");
-                });
-
             modelBuilder.Entity("Frelance.Infrastructure.Entities.ProjectTasks", b =>
                 {
                     b.HasOne("Frelance.Infrastructure.Entities.Projects", "Projects")
@@ -483,6 +476,13 @@ namespace Frelance.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Frelance.Infrastructure.Entities.Skiills", b =>
+                {
+                    b.HasOne("Frelance.Infrastructure.Entities.Users", null)
+                        .WithMany("Skills")
+                        .HasForeignKey("UsersId");
                 });
 
             modelBuilder.Entity("Frelance.Infrastructure.Entities.TimeLogs", b =>
@@ -564,21 +564,6 @@ namespace Frelance.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SkiillsUsers", b =>
-                {
-                    b.HasOne("Frelance.Infrastructure.Entities.Skiills", null)
-                        .WithMany()
-                        .HasForeignKey("SkillsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Frelance.Infrastructure.Entities.Users", null)
-                        .WithMany()
-                        .HasForeignKey("UsersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Frelance.Infrastructure.Entities.ProjectTasks", b =>
                 {
                     b.Navigation("TimeLogs");
@@ -592,6 +577,8 @@ namespace Frelance.Infrastructure.Migrations
             modelBuilder.Entity("Frelance.Infrastructure.Entities.Users", b =>
                 {
                     b.Navigation("Projects");
+
+                    b.Navigation("Skills");
 
                     b.Navigation("Tasks");
 
