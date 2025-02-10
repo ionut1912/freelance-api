@@ -11,13 +11,13 @@ resource "azurerm_storage_account" "storage" {
 }
 
 resource "azurerm_storage_container" "user_images" {
-  name                  = "userimages"
+  name                  = "userprofileimages"
   storage_account_id    = azurerm_storage_account.storage.id
   container_access_type = "blob"
 }
 
 resource "azurerm_storage_container" "invoices" {
-  name                  = "invoices"
+  name                  = "invoicescontainer"
   storage_account_id    = azurerm_storage_account.storage.id
   container_access_type = "blob"
 }
