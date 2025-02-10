@@ -9,3 +9,15 @@ resource "azurerm_storage_account" "storage" {
     environment = "dev"
   }
 }
+
+resource "azurerm_storage_container" "user_images" {
+  name                  = "userimages"
+  storage_account_name  = azurerm_storage_account.storage.name
+  container_access_type = "blob"
+}
+
+resource "azurerm_storage_container" "invoices" {
+  name                  = "invoices"
+  storage_account_name  = azurerm_storage_account.storage.name
+  container_access_type = "blob"
+}
