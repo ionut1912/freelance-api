@@ -27,7 +27,7 @@ public class FileUploadOperationFilter : IOperationFilter
         };
     }
 
-    private OpenApiSchema GenerateMultipartSchema(OperationFilterContext context)
+    private static OpenApiSchema GenerateMultipartSchema(OperationFilterContext context)
     {
         var schema = new OpenApiSchema
         {
