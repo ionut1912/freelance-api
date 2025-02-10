@@ -40,7 +40,7 @@ public class TaskRepository : ITaskRepository
 
         var freelancerProfile = await _context.FreelancerProfiles
                                         .AsNoTracking()
-                                        .Include(x=>x.Users)
+                                        .Include(x => x.Users)
                                         .FirstOrDefaultAsync(x => x.Users.UserName == _userAccessor.GetUsername(), cancellationToken);
 
         var task = createTaskCommand.Adapt<ProjectTasks>();

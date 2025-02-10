@@ -23,6 +23,6 @@ public static class UserModule
             var result = await mediator.Send(command, ct);
             return Results.Ok(result);
         }).WithTags("Users");
-        
+
     }
 }

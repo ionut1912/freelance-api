@@ -109,6 +109,9 @@ namespace Frelance.Infrastructure.Migrations
                     b.Property<int>("ClientId")
                         .HasColumnType("int");
 
+                    b.Property<string>("ContractFileUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateOnly>("EndDate")
                         .HasColumnType("date");
 
@@ -202,6 +205,9 @@ namespace Frelance.Infrastructure.Migrations
 
                     b.Property<int>("FreelancerId")
                         .HasColumnType("int");
+
+                    b.Property<string>("InvoiceFileUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");

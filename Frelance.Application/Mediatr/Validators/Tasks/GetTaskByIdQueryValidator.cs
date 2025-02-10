@@ -3,7 +3,7 @@ using Frelance.Application.Mediatr.Queries.Tasks;
 
 namespace Frelance.Application.Mediatr.Validators.Tasks;
 
-public class GetTaskByIdQueryValidator:AbstractValidator<GetTaskByIdQuery>
+public class GetTaskByIdQueryValidator : AbstractValidator<GetTaskByIdQuery>
 {
     public GetTaskByIdQueryValidator()
     {
