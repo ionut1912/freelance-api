@@ -29,8 +29,12 @@ public class ProjectRepository:IProjectRepository
     public async Task AddProjectAsync(CreateProjectCommand createProjectCommand, CancellationToken cancellationToken)
     {
         var project = createProjectCommand.Adapt<Projects>();
-        var user = await _context.Users.FirstOrDefaultAsync(x=>x.UserName== _userAccessor.GetUsername(),cancellationToken);
-        project.User = user;
+        var freelancerProfile = await _context.FreelancerProfiles
+                                                .AsNoTracking()
+                                                .Include(x=>x.Users)
+                                                .FirstOrDefaultAsync(x=>x.Users.UserName== _userAccessor.GetUsername(),cancellationToken);
+        
+        project.FreelancerProfiles = freelancerProfile;
         await _context.Projects.AddAsync(project,cancellationToken);
     }
 
