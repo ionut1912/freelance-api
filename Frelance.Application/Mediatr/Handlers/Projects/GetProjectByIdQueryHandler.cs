@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.Projects;
 
-public class GetProjectByIdQueryHandler:IRequestHandler<GetProjectByIdQuery,GetProjectByIdResponse>
+public class GetProjectByIdQueryHandler : IRequestHandler<GetProjectByIdQuery, GetProjectByIdResponse>
 {
     private readonly IProjectRepository _projectRepository;
 
@@ -16,6 +16,6 @@ public class GetProjectByIdQueryHandler:IRequestHandler<GetProjectByIdQuery,GetP
     }
     public async Task<GetProjectByIdResponse> Handle(GetProjectByIdQuery request, CancellationToken cancellationToken)
     {
-        return await _projectRepository.FindProjectByIdAsync(request,cancellationToken);
+        return await _projectRepository.FindProjectByIdAsync(request, cancellationToken);
     }
 }

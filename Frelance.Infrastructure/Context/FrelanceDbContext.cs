@@ -8,7 +8,7 @@ namespace Frelance.Infrastructure.Context
 {
     public class FrelanceDbContext : IdentityDbContext<Users, Roles, int>
     {
-        public FrelanceDbContext(DbContextOptions<FrelanceDbContext> options) 
+        public FrelanceDbContext(DbContextOptions<FrelanceDbContext> options)
             : base(options)
         {
         }

@@ -3,7 +3,7 @@ using Frelance.Infrastructure.Context;
 
 namespace Frelance.Infrastructure.Services;
 
-public class UnitOfWork:IUnitOfWork
+public class UnitOfWork : IUnitOfWork
 {
     private readonly FrelanceDbContext _context;
 

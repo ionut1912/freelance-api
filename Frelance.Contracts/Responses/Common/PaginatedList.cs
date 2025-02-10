@@ -10,7 +10,7 @@ public class PaginatedList<T>
         TotalCount = count;
         Items = items;
     }
-    
+
     public int TotalPages { get; set; }
     public int PageSize { get; set; }
     public int TotalCount { get; set; }

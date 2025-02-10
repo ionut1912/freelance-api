@@ -28,6 +28,9 @@ jobs:
         run: terraform apply -auto-approve
         working-directory: terraform
 
+      - name: C# Format Check
+        run: dotnet tool install -g dotnet-format && dotnet format --verify-no-changes
+
       - name: Docker login to ACR
         run: az acr login --name frelanceacr
 
