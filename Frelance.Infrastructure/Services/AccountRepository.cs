@@ -43,7 +43,7 @@ public class AccountRepository : IAccountRepository
         {
             modelState.AddModelError("Email", "email is already taken");
         }
-
+        GenerateException(modelState);
         var user = new Users
         {
             Email = createUserCommand.RegisterDto.Email,

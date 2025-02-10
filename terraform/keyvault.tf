@@ -75,3 +75,9 @@ resource "azurerm_key_vault_secret" "db_connection_string" {
   value        = "Server=tcp:${azurerm_mssql_server.sql_server.fully_qualified_domain_name},1433;Database=${azurerm_mssql_database.sql_database.name};User ID=${azurerm_key_vault_secret.sql_admin_username.value};Password=${azurerm_key_vault_secret.sql_admin_password.value};Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
   key_vault_id = azurerm_key_vault.keyvault.id
 }
+
+resource "azurerm_key_vault_secret" "storage_connection_string" {
+  name         = "storage-connection-string"
+  value        = "DefaultEndpointsProtocol=https;AccountName=usersprofiles;AccountKey=${var.storage_account_access_key};EndpointSuffix=core.windows.net"
+  key_vault_id = azurerm_key_vault.keyvault.id
+}

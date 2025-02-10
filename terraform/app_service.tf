@@ -30,6 +30,7 @@ resource "azurerm_linux_web_app" "app_service" {
     "DOCKER_CUSTOM_IMAGE_NAME"                  = "${azurerm_container_registry.acr.login_server}/frelance-api:latest"
     "AzureKeyVault__VaultUrl"                   = azurerm_key_vault.keyvault.vault_uri
     "AzureKeyVault__ConnectionStringSecretName" = "db-connection-string"
+    "AzureKeyVault__StorageConnectionString"    = "storage-connection-string",
     "AzureKeyVault__JWTTokenSecretName"         = "jwt-token-key"
     "AZURE_AUTHORITY_HOST"                      = "https://login.microsoftonline.com/"
     "AZURE_IDENTITY_DISABLE_IMDS"               = "0"
