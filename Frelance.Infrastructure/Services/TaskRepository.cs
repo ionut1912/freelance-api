@@ -38,13 +38,15 @@ public class TaskRepository : ITaskRepository
             throw new NotFoundException($"{nameof(Projects)} with {nameof(Projects.Title)}: '{createTaskCommand.ProjectTitle}' does not exist");
         }
 
-        var user = await _context.Users.AsNoTracking()
-            .FirstOrDefaultAsync(x => x.UserName == _userAccessor.GetUsername(), cancellationToken);
+        var freelancerProfile = await _context.FreelancerProfiles
+                                        .AsNoTracking()
+                                        .Include(x=>x.Users)
+                                        .FirstOrDefaultAsync(x => x.Users.UserName == _userAccessor.GetUsername(), cancellationToken);
 
         var task = createTaskCommand.Adapt<ProjectTasks>();
         task.ProjectId = taskProject.Id;
-        task.Status = ProjectTaskStatus.ToDo;
-        task.Users = user;
+        task.Status = ProjectTaskStatus.ToDo.ToString();
+        task.FreelancerProfiles = freelancerProfile;
         await _context.Tasks.AddAsync(task, cancellationToken);
     }
 
@@ -60,7 +62,7 @@ public class TaskRepository : ITaskRepository
 
         projectTaskToUpdate.Title = updateTaskCommand.Title;
         projectTaskToUpdate.Description = updateTaskCommand.Description;
-        projectTaskToUpdate.Status = updateTaskCommand.Status;
+        projectTaskToUpdate.Status = updateTaskCommand.Status.ToString();
         projectTaskToUpdate.Priority = updateTaskCommand.Priority;
 
         _context.Tasks.Update(projectTaskToUpdate);

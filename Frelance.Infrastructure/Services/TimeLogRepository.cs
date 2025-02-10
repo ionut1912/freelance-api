@@ -36,8 +36,12 @@ public class TimeLogRepository:ITimeLogRepository
         var timeLog = createTimeLogCommand.Adapt<TimeLogs>();
         timeLog.TaskId = timeLogTask.Id;
         timeLog.TotalHours = createTimeLogCommand.EndTime.Hour - createTimeLogCommand.StartTime.Hour;
-        var user=await _context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.UserName == _userAccessor.GetUsername(), cancellationToken);
-        timeLog.User = user;
+        var freelancerProfile=await _context.FreelancerProfiles
+                                      .AsNoTracking()
+                                      .Include(x=>x.Users)
+                                      .FirstOrDefaultAsync(x => x.Users.UserName == _userAccessor.GetUsername(), cancellationToken);
+        
+        timeLog.FreelancerProfiles = freelancerProfile;
         await _context.TimeLogs.AddAsync(timeLog, cancellationToken);
     }
 
