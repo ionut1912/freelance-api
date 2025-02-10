@@ -4,15 +4,15 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.Projects;
 
-public class UpdateProjectCommandHandler:IRequestHandler<UpdateProjectCommand,Unit>
+public class UpdateProjectCommandHandler : IRequestHandler<UpdateProjectCommand, Unit>
 {
     private readonly IProjectRepository _projectRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public UpdateProjectCommandHandler(IProjectRepository projectRepository, IUnitOfWork unitOfWork)
     {
-        ArgumentNullException.ThrowIfNull(projectRepository,nameof(projectRepository));
-        ArgumentNullException.ThrowIfNull(unitOfWork,nameof(unitOfWork));
+        ArgumentNullException.ThrowIfNull(projectRepository, nameof(projectRepository));
+        ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));
         _projectRepository = projectRepository;
         _unitOfWork = unitOfWork;
     }

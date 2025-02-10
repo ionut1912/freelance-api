@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.Tasks;
 
-public class DeleteTaskCommandHandler:IRequestHandler<DeleteTaskCommand,Unit>
+public class DeleteTaskCommandHandler : IRequestHandler<DeleteTaskCommand, Unit>
 {
     private readonly ITaskRepository _taskRepository;
     private readonly IUnitOfWork _unitOfWork;

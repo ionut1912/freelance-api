@@ -9,7 +9,7 @@ public class PaginationParams
         get => _pageSize;
         set => _pageSize = value > MaximumPageSize ? MaximumPageSize : value;
     }
-    
+
     private int _pageSize = 10;
     private const int MaximumPageSize = 100;
 }

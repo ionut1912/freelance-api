@@ -1,5 +1,5 @@
 namespace Frelance.Infrastructure.Entities;
 
-public class ClientProfiles:BaseUserProfile
+public class ClientProfiles : BaseUserProfile
 {
 }

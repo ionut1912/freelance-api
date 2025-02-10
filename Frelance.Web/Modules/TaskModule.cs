@@ -11,43 +11,43 @@ namespace Frelance.Web.Modules;
 
 public static class TaskModule
 {
-      public static void AddTasksEndpoints(this IEndpointRouteBuilder app)
+    public static void AddTasksEndpoints(this IEndpointRouteBuilder app)
+    {
+        app.MapGet("/api/tasks", async (IMediator mediator, [FromQuery] int pageSize, [FromQuery] int pageNumber, CancellationToken ct) =>
         {
-            app.MapGet("/api/tasks", async (IMediator mediator, [FromQuery] int pageSize, [FromQuery] int pageNumber, CancellationToken ct) =>
-            {
-                var paginatedProjectDtos = await mediator.Send(new GetTasksQuery
-                    (new PaginationParams {PageSize = pageSize, PageNumber = pageNumber}), ct);
-                return Results.Extensions.OkPaginationResult(paginatedProjectDtos.PageSize, paginatedProjectDtos.CurrentPage,
-                    paginatedProjectDtos.TotalCount, paginatedProjectDtos.TotalPages, paginatedProjectDtos.Items);
-            }).WithTags("Tasks");
-    
-            app.MapGet("/api/tasks/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
-            {
-                var task = await mediator.Send(new GetTaskByIdQuery(id), ct);
-                return Results.Ok(task);
-            }).WithTags("Tasks");
-    
-            app.MapPost("/api/tasks", async (IMediator mediator, CreateProjectTaskRequest createProjectTaskRequest,
-                CancellationToken ct) =>
-            {
-                var command = createProjectTaskRequest.Adapt<CreateTaskCommand>();
-                var result = await mediator.Send(command, ct);
-                return Results.Ok(result);
-            }).WithTags("Tasks");
-    
-            app.MapPut("/api/tasks/{id}", async (IMediator mediator, int id,
-                UpdateProjectTaskRequest updateTaskRequest, CancellationToken ct) =>
-            {
-                var command = updateTaskRequest.Adapt<UpdateTaskCommand>() with { Id = id };
-                var result = await mediator.Send(command, ct);
-                return Results.Ok(result);
-            }).WithTags("Tasks");
-    
-            app.MapDelete("/api/task/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
-            {
-                var command = new DeleteTaskCommand(id);
-                var result = await mediator.Send(command, ct);
-                return Results.Ok(result);
-            }).WithTags("Tasks");
-        }
+            var paginatedProjectDtos = await mediator.Send(new GetTasksQuery
+                (new PaginationParams { PageSize = pageSize, PageNumber = pageNumber }), ct);
+            return Results.Extensions.OkPaginationResult(paginatedProjectDtos.PageSize, paginatedProjectDtos.CurrentPage,
+                paginatedProjectDtos.TotalCount, paginatedProjectDtos.TotalPages, paginatedProjectDtos.Items);
+        }).WithTags("Tasks");
+
+        app.MapGet("/api/tasks/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
+        {
+            var task = await mediator.Send(new GetTaskByIdQuery(id), ct);
+            return Results.Ok(task);
+        }).WithTags("Tasks");
+
+        app.MapPost("/api/tasks", async (IMediator mediator, CreateProjectTaskRequest createProjectTaskRequest,
+            CancellationToken ct) =>
+        {
+            var command = createProjectTaskRequest.Adapt<CreateTaskCommand>();
+            var result = await mediator.Send(command, ct);
+            return Results.Ok(result);
+        }).WithTags("Tasks");
+
+        app.MapPut("/api/tasks/{id}", async (IMediator mediator, int id,
+            UpdateProjectTaskRequest updateTaskRequest, CancellationToken ct) =>
+        {
+            var command = updateTaskRequest.Adapt<UpdateTaskCommand>() with { Id = id };
+            var result = await mediator.Send(command, ct);
+            return Results.Ok(result);
+        }).WithTags("Tasks");
+
+        app.MapDelete("/api/task/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
+        {
+            var command = new DeleteTaskCommand(id);
+            var result = await mediator.Send(command, ct);
+            return Results.Ok(result);
+        }).WithTags("Tasks");
+    }
 }

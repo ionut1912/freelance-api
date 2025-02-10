@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Frelance.Infrastructure.Entities;
 
-public class Users:IdentityUser<int>
+public class Users : IdentityUser<int>
 {
     public FreelancerProfiles FreelancerProfiles { get; set; }
     public ClientProfiles ClientProfiles { get; set; }

@@ -42,8 +42,8 @@ public class AccountRepository : IAccountRepository
         if (existingUserByEmail != null)
         {
             modelState.AddModelError("Email", "email is already taken");
-        } 
-        
+        }
+
         var user = new Users
         {
             Email = createUserCommand.RegisterDto.Email,
@@ -53,7 +53,7 @@ public class AccountRepository : IAccountRepository
         var result = await _userManager.CreateAsync(user, createUserCommand.RegisterDto.Password);
         if (!result.Succeeded)
         {
-            AddErrorToModelState(result,modelState);
+            AddErrorToModelState(result, modelState);
         }
         GenerateException(modelState);
 
@@ -63,9 +63,9 @@ public class AccountRepository : IAccountRepository
 
     public async Task<UserDto> LoginAsync(LoginDto loginDto, CancellationToken cancellationToken)
     {
-        var modelState=new ModelStateDictionary();
+        var modelState = new ModelStateDictionary();
         var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.Username, cancellationToken);
-        if (user is null )
+        if (user is null)
         {
             modelState.AddModelError("Username", "username is already taken");
         }
@@ -74,9 +74,9 @@ public class AccountRepository : IAccountRepository
         {
             modelState.AddModelError("Password", "password is invalid");
         }
-        
+
         GenerateException(modelState);
-        
+
         return new UserDto(user!.PhoneNumber, await _tokenService.GenerateToken(user), user.UserName, user.Email);
     }
 
@@ -93,10 +93,10 @@ public class AccountRepository : IAccountRepository
         if (modelState.IsValid) return;
         var validationErrors = modelState
             .Where(kvp => kvp.Value.Errors.Count > 0)
-            .SelectMany(kvp => kvp.Value.Errors.Select(error => new ValidationError 
-            { 
-                Property = kvp.Key, 
-                ErrorMessage = error.ErrorMessage 
+            .SelectMany(kvp => kvp.Value.Errors.Select(error => new ValidationError
+            {
+                Property = kvp.Key,
+                ErrorMessage = error.ErrorMessage
             }))
             .ToList();
         throw new CustomValidationException(validationErrors);

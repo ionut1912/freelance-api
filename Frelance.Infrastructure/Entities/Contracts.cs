@@ -11,5 +11,6 @@ public class Contracts
     public FreelancerProfiles Freelancer { get; set; }
     public DateOnly StartDate { get; set; }
     public DateOnly EndDate { get; set; }
-    public int Amount{get;set;}
+    public int Amount { get; set; }
+    public string ContractFileUrl { get; set; }
 }

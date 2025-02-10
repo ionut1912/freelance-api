@@ -15,7 +15,7 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
         ArgumentNullException.ThrowIfNull(validators, nameof(validators));
         _validators = validators;
     }
-    
+
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
@@ -32,7 +32,7 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
                 ErrorMessage = x.ErrorMessage
             }).ToList();
 
-        if (failures.Count>0)
+        if (failures.Count > 0)
         {
             throw new CustomValidationException(failures);
         }
