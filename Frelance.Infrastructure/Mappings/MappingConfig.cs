@@ -1,3 +1,4 @@
+using Frelance.Application.Mediatr.Commands.ClientProfiles;
 using Frelance.Application.Mediatr.Commands.Projects;
 using Frelance.Application.Mediatr.Commands.Tasks;
 using Frelance.Application.Mediatr.Commands.TimeLogs;
