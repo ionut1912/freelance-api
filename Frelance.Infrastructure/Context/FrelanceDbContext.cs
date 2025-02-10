@@ -28,7 +28,7 @@ public class FrelanceDbContext : IdentityDbContext<Users, Roles, int>
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-        
+
         builder.Entity<ProjectTasks>()
             .HasOne(u => u.FreelancerProfiles)
             .WithMany(u => u.Tasks)
@@ -130,7 +130,7 @@ public class FrelanceDbContext : IdentityDbContext<Users, Roles, int>
                 new Skiills { Id = 5, ProgrammingLanguage = "Python", Area = "Backend" },
                 new Skiills { Id = 6, ProgrammingLanguage = "Java", Area = "Backend" }
             );
-        
+
         var dateOnlyConverter = new ValueConverter<DateOnly, DateTime>(
             d => d.ToDateTime(TimeOnly.MinValue),
             d => DateOnly.FromDateTime(d));
@@ -150,7 +150,7 @@ public class FrelanceDbContext : IdentityDbContext<Users, Roles, int>
         builder.Entity<TimeLogs>()
             .Property(t => t.Date)
             .HasConversion(dateOnlyConverter);
-        
+
         builder.Entity<Entities.Contracts>()
             .Property(c => c.Amount)
             .HasPrecision(18, 2);
@@ -166,7 +166,7 @@ public class FrelanceDbContext : IdentityDbContext<Users, Roles, int>
         builder.Entity<Proposals>()
             .Property(p => p.ProposedBudget)
             .HasPrecision(18, 2);
-        
+
         var stringListComparer = new ValueComparer<List<string>>(
             (c1, c2) => c1.SequenceEqual(c2),
             c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
@@ -178,7 +178,7 @@ public class FrelanceDbContext : IdentityDbContext<Users, Roles, int>
                 v => string.Join(',', v),
                 v => v.Split(',', System.StringSplitOptions.RemoveEmptyEntries).ToList())
             .Metadata.SetValueComparer(stringListComparer);
-        
+
         builder.Entity<FreelancerProfiles>()
             .Property(fp => fp.ForeignLanguages)
             .HasConversion(
@@ -188,7 +188,7 @@ public class FrelanceDbContext : IdentityDbContext<Users, Roles, int>
                 (c1, c2) => c1.SequenceEqual(c2),
                 c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
                 c => c.ToList()));
-        
+
         builder.Entity<FreelancerProfiles>()
             .HasOne(fp => fp.Addresses)
             .WithOne()
