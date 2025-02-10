@@ -42,7 +42,6 @@ public class AccountRepository : IAccountRepository
         if (existingUserByEmail != null)
         {
             modelState.AddModelError("Email", "email is already taken");
-<<<<<<< HEAD
         }
         GenerateException(modelState);
         var user = new Users
