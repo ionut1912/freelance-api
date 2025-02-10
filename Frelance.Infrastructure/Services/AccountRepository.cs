@@ -30,7 +30,7 @@ public class AccountRepository : IAccountRepository
 
     public async Task RegisterAsync(CreateUserCommand createUserCommand)
     {
-        var modelState = createUserCommand.ModelStateDictionary;
+        var modelState = new ModelStateDictionary();
 
         var existingUserByName = await _userManager.FindByNameAsync(createUserCommand.RegisterDto.Username);
         if (existingUserByName != null)
@@ -42,21 +42,9 @@ public class AccountRepository : IAccountRepository
         if (existingUserByEmail != null)
         {
             modelState.AddModelError("Email", "email is already taken");
+<<<<<<< HEAD
         }
-
-        if (!modelState.IsValid)
-        {
-            var validationErrors = modelState
-                .Where(kvp => kvp.Value.Errors.Count > 0)
-                .SelectMany(kvp => kvp.Value.Errors.Select(error => new ValidationError
-                {
-                    Property = kvp.Key,
-                    ErrorMessage = error.ErrorMessage
-                }))
-                .ToList();
-            throw new CustomValidationException(validationErrors);
-        }
-
+        GenerateException(modelState);
         var user = new Users
         {
             Email = createUserCommand.RegisterDto.Email,
@@ -66,19 +54,31 @@ public class AccountRepository : IAccountRepository
         var result = await _userManager.CreateAsync(user, createUserCommand.RegisterDto.Password);
         if (!result.Succeeded)
         {
-            AddErrorToModelState(result, createUserCommand.ModelStateDictionary);
+            AddErrorToModelState(result, modelState);
         }
+        GenerateException(modelState);
+
+
         await _userManager.AddToRoleAsync(user, createUserCommand.RegisterDto.Role);
     }
 
     public async Task<UserDto> LoginAsync(LoginDto loginDto, CancellationToken cancellationToken)
     {
+        var modelState = new ModelStateDictionary();
         var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.Username, cancellationToken);
-        if (user is null || !await _userManager.CheckPasswordAsync(user, loginDto.Password))
+        if (user is null)
         {
-            throw new Exception("User not found or password is incorrect");
+            modelState.AddModelError("Username", "username is already taken");
         }
-        return new UserDto(user.PhoneNumber, await _tokenService.GenerateToken(user), user.UserName, user.Email);
+
+        if (!await _userManager.CheckPasswordAsync(user!, loginDto.Password))
+        {
+            modelState.AddModelError("Password", "password is invalid");
+        }
+
+        GenerateException(modelState);
+
+        return new UserDto(user!.PhoneNumber, await _tokenService.GenerateToken(user), user.UserName, user.Email);
     }
 
     private static void AddErrorToModelState(IdentityResult result, ModelStateDictionary modelState)
@@ -86,7 +86,20 @@ public class AccountRepository : IAccountRepository
         foreach (var error in result.Errors)
         {
             modelState.AddModelError(error.Code, error.Description);
-            throw new Exception(error.Description);
         }
+    }
+
+    private static void GenerateException(ModelStateDictionary modelState)
+    {
+        if (modelState.IsValid) return;
+        var validationErrors = modelState
+            .Where(kvp => kvp.Value.Errors.Count > 0)
+            .SelectMany(kvp => kvp.Value.Errors.Select(error => new ValidationError
+            {
+                Property = kvp.Key,
+                ErrorMessage = error.ErrorMessage
+            }))
+            .ToList();
+        throw new CustomValidationException(validationErrors);
     }
 }

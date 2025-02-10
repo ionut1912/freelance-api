@@ -12,7 +12,7 @@ public static class UserModule
         app.MapPost("/api/register", async (IMediator mediator, RegisterDto registerDto,
             CancellationToken ct) =>
         {
-            var command = new CreateUserCommand(registerDto, new ModelStateDictionary());
+            var command = new CreateUserCommand(registerDto);
             var result = await mediator.Send(command, ct);
             return Results.Ok(result);
         }).WithTags("Users");

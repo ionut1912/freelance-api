@@ -4,6 +4,7 @@ using Frelance.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Frelance.Infrastructure.Migrations
 {
     [DbContext(typeof(FrelanceDbContext))]
-    partial class FrelanceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250209105656_Add relationship")]
+    partial class Addrelationship
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,22 +25,7 @@ namespace Frelance.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("FreelancerProfilesSkiills", b =>
-                {
-                    b.Property<int>("FreelancerProfilesId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SkillsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("FreelancerProfilesId", "SkillsId");
-
-                    b.HasIndex("SkillsId");
-
-                    b.ToTable("FreelancerProfilesSkiills");
-                });
-
-            modelBuilder.Entity("Frelance.Infrastructure.Entities.Addresses", b =>
+            modelBuilder.Entity("Frelance.Infrastructure.Entities.Address", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -65,158 +53,6 @@ namespace Frelance.Infrastructure.Migrations
                     b.ToTable("Addresses");
                 });
 
-            modelBuilder.Entity("Frelance.Infrastructure.Entities.ClientProfiles", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("AddressesId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Bio")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ProfileImageUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AddressesId");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("ClientProfiles");
-                });
-
-            modelBuilder.Entity("Frelance.Infrastructure.Entities.Contracts", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Amount")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ClientId")
-                        .HasColumnType("int");
-
-                    b.Property<DateOnly>("EndDate")
-                        .HasColumnType("date");
-
-                    b.Property<int>("FreelancerId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProjectId")
-                        .HasColumnType("int");
-
-                    b.Property<DateOnly>("StartDate")
-                        .HasColumnType("date");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ClientId");
-
-                    b.HasIndex("FreelancerId");
-
-                    b.HasIndex("ProjectId");
-
-                    b.ToTable("Contracts");
-                });
-
-            modelBuilder.Entity("Frelance.Infrastructure.Entities.FreelancerProfiles", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("AddressesId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Bio")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Currency")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Experience")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ForeignLanguages")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsAvailable")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("PortofolioUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ProfileImageUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Rate")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Rating")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AddressesId");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("FreelancerProfiles");
-                });
-
-            modelBuilder.Entity("Frelance.Infrastructure.Entities.Invoices", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Amount")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ClientId")
-                        .HasColumnType("int");
-
-                    b.Property<DateOnly>("Date")
-                        .HasColumnType("date");
-
-                    b.Property<int>("FreelancerId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProjectId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ClientId");
-
-                    b.HasIndex("FreelancerId");
-
-                    b.HasIndex("ProjectId");
-
-                    b.ToTable("Invoices");
-                });
-
             modelBuilder.Entity("Frelance.Infrastructure.Entities.ProjectTasks", b =>
                 {
                     b.Property<int>("Id")
@@ -228,9 +64,6 @@ namespace Frelance.Infrastructure.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("FreelancerProfileId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Priority")
                         .HasColumnType("int");
 
@@ -240,17 +73,20 @@ namespace Frelance.Infrastructure.Migrations
                     b.Property<int?>("ProjectsId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("FreelancerProfileId");
-
                     b.HasIndex("ProjectsId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Tasks");
                 });
@@ -275,73 +111,20 @@ namespace Frelance.Infrastructure.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("FreelancerProfileId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Technologies")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("FreelancerProfileId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Projects");
-                });
-
-            modelBuilder.Entity("Frelance.Infrastructure.Entities.Proposals", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ProjectId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProposedBudget")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProposerId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProjectId");
-
-                    b.HasIndex("ProposerId");
-
-                    b.ToTable("Proposals");
-                });
-
-            modelBuilder.Entity("Frelance.Infrastructure.Entities.Reviews", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ReviewText")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ReviewerId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReviewerId");
-
-                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("Frelance.Infrastructure.Entities.Roles", b =>
@@ -459,9 +242,6 @@ namespace Frelance.Infrastructure.Migrations
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("FreelancerProfileId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
 
@@ -471,11 +251,14 @@ namespace Frelance.Infrastructure.Migrations
                     b.Property<int>("TotalHours")
                         .HasColumnType("int");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("FreelancerProfileId");
-
                     b.HasIndex("TaskId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("TimeLogs");
                 });
@@ -491,6 +274,9 @@ namespace Frelance.Infrastructure.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<int?>("AddressId")
+                        .HasColumnType("int");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
@@ -500,6 +286,12 @@ namespace Frelance.Infrastructure.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ForeignLanguages")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsAvailable")
                         .HasColumnType("bit");
 
                     b.Property<bool>("LockoutEnabled")
@@ -536,6 +328,8 @@ namespace Frelance.Infrastructure.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AddressId");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -651,184 +445,75 @@ namespace Frelance.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("FreelancerProfilesSkiills", b =>
+            modelBuilder.Entity("SkiillsUsers", b =>
                 {
-                    b.HasOne("Frelance.Infrastructure.Entities.FreelancerProfiles", null)
-                        .WithMany()
-                        .HasForeignKey("FreelancerProfilesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<int>("SkillsId")
+                        .HasColumnType("int");
 
-                    b.HasOne("Frelance.Infrastructure.Entities.Skiills", null)
-                        .WithMany()
-                        .HasForeignKey("SkillsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
+                    b.Property<int>("UsersId")
+                        .HasColumnType("int");
 
-            modelBuilder.Entity("Frelance.Infrastructure.Entities.ClientProfiles", b =>
-                {
-                    b.HasOne("Frelance.Infrastructure.Entities.Addresses", "Addresses")
-                        .WithMany()
-                        .HasForeignKey("AddressesId");
+                    b.HasKey("SkillsId", "UsersId");
 
-                    b.HasOne("Frelance.Infrastructure.Entities.Users", "Users")
-                        .WithOne("ClientProfiles")
-                        .HasForeignKey("Frelance.Infrastructure.Entities.ClientProfiles", "UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                    b.HasIndex("UsersId");
 
-                    b.Navigation("Addresses");
-
-                    b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("Frelance.Infrastructure.Entities.Contracts", b =>
-                {
-                    b.HasOne("Frelance.Infrastructure.Entities.ClientProfiles", "Client")
-                        .WithMany("Contracts")
-                        .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Frelance.Infrastructure.Entities.FreelancerProfiles", "Freelancer")
-                        .WithMany("Contracts")
-                        .HasForeignKey("FreelancerId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Frelance.Infrastructure.Entities.Projects", "Project")
-                        .WithMany("Contracts")
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Client");
-
-                    b.Navigation("Freelancer");
-
-                    b.Navigation("Project");
-                });
-
-            modelBuilder.Entity("Frelance.Infrastructure.Entities.FreelancerProfiles", b =>
-                {
-                    b.HasOne("Frelance.Infrastructure.Entities.Addresses", "Addresses")
-                        .WithMany()
-                        .HasForeignKey("AddressesId");
-
-                    b.HasOne("Frelance.Infrastructure.Entities.Users", "Users")
-                        .WithOne("FreelancerProfiles")
-                        .HasForeignKey("Frelance.Infrastructure.Entities.FreelancerProfiles", "UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Addresses");
-
-                    b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("Frelance.Infrastructure.Entities.Invoices", b =>
-                {
-                    b.HasOne("Frelance.Infrastructure.Entities.ClientProfiles", "Client")
-                        .WithMany("Invoices")
-                        .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Frelance.Infrastructure.Entities.FreelancerProfiles", "Freelancer")
-                        .WithMany("Invoices")
-                        .HasForeignKey("FreelancerId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Frelance.Infrastructure.Entities.Projects", "Project")
-                        .WithMany("Invoices")
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Client");
-
-                    b.Navigation("Freelancer");
-
-                    b.Navigation("Project");
+                    b.ToTable("SkiillsUsers");
                 });
 
             modelBuilder.Entity("Frelance.Infrastructure.Entities.ProjectTasks", b =>
                 {
-                    b.HasOne("Frelance.Infrastructure.Entities.FreelancerProfiles", "FreelancerProfiles")
-                        .WithMany("Tasks")
-                        .HasForeignKey("FreelancerProfileId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.HasOne("Frelance.Infrastructure.Entities.Projects", "Projects")
                         .WithMany("Tasks")
                         .HasForeignKey("ProjectsId");
 
-                    b.Navigation("FreelancerProfiles");
+                    b.HasOne("Frelance.Infrastructure.Entities.Users", "Users")
+                        .WithMany("Tasks")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.Navigation("Projects");
+
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("Frelance.Infrastructure.Entities.Projects", b =>
                 {
-                    b.HasOne("Frelance.Infrastructure.Entities.FreelancerProfiles", "FreelancerProfiles")
+                    b.HasOne("Frelance.Infrastructure.Entities.Users", "User")
                         .WithMany("Projects")
-                        .HasForeignKey("FreelancerProfileId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("FreelancerProfiles");
-                });
-
-            modelBuilder.Entity("Frelance.Infrastructure.Entities.Proposals", b =>
-                {
-                    b.HasOne("Frelance.Infrastructure.Entities.Projects", "Project")
-                        .WithMany("Proposals")
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Frelance.Infrastructure.Entities.Users", "Proposer")
-                        .WithMany("Proposals")
-                        .HasForeignKey("ProposerId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Project");
-
-                    b.Navigation("Proposer");
-                });
-
-            modelBuilder.Entity("Frelance.Infrastructure.Entities.Reviews", b =>
-                {
-                    b.HasOne("Frelance.Infrastructure.Entities.Users", "Reviewer")
-                        .WithMany("Reviews")
-                        .HasForeignKey("ReviewerId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Reviewer");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Frelance.Infrastructure.Entities.TimeLogs", b =>
                 {
-                    b.HasOne("Frelance.Infrastructure.Entities.FreelancerProfiles", "FreelancerProfiles")
-                        .WithMany("TimeLogs")
-                        .HasForeignKey("FreelancerProfileId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.HasOne("Frelance.Infrastructure.Entities.ProjectTasks", "Task")
                         .WithMany("TimeLogs")
                         .HasForeignKey("TaskId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("FreelancerProfiles");
+                    b.HasOne("Frelance.Infrastructure.Entities.Users", "User")
+                        .WithMany("TimeLogs")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.Navigation("Task");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Frelance.Infrastructure.Entities.Users", b =>
+                {
+                    b.HasOne("Frelance.Infrastructure.Entities.Address", "Address")
+                        .WithMany()
+                        .HasForeignKey("AddressId");
+
+                    b.Navigation("Address");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -882,24 +567,19 @@ namespace Frelance.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Frelance.Infrastructure.Entities.ClientProfiles", b =>
+            modelBuilder.Entity("SkiillsUsers", b =>
                 {
-                    b.Navigation("Contracts");
+                    b.HasOne("Frelance.Infrastructure.Entities.Skiills", null)
+                        .WithMany()
+                        .HasForeignKey("SkillsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("Invoices");
-                });
-
-            modelBuilder.Entity("Frelance.Infrastructure.Entities.FreelancerProfiles", b =>
-                {
-                    b.Navigation("Contracts");
-
-                    b.Navigation("Invoices");
-
-                    b.Navigation("Projects");
-
-                    b.Navigation("Tasks");
-
-                    b.Navigation("TimeLogs");
+                    b.HasOne("Frelance.Infrastructure.Entities.Users", null)
+                        .WithMany()
+                        .HasForeignKey("UsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Frelance.Infrastructure.Entities.ProjectTasks", b =>
@@ -909,24 +589,16 @@ namespace Frelance.Infrastructure.Migrations
 
             modelBuilder.Entity("Frelance.Infrastructure.Entities.Projects", b =>
                 {
-                    b.Navigation("Contracts");
-
-                    b.Navigation("Invoices");
-
-                    b.Navigation("Proposals");
-
                     b.Navigation("Tasks");
                 });
 
             modelBuilder.Entity("Frelance.Infrastructure.Entities.Users", b =>
                 {
-                    b.Navigation("ClientProfiles");
+                    b.Navigation("Projects");
 
-                    b.Navigation("FreelancerProfiles");
+                    b.Navigation("Tasks");
 
-                    b.Navigation("Proposals");
-
-                    b.Navigation("Reviews");
+                    b.Navigation("TimeLogs");
                 });
 #pragma warning restore 612, 618
         }

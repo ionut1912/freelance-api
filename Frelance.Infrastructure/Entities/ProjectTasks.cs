@@ -10,8 +10,8 @@ public class ProjectTasks
     public string Title { get; set; }
     public string Description { get; set; }
     public List<TimeLogs> TimeLogs { get; set; } = [];
-    public int UserId { get; set; }
-    public Users Users { get; set; }
-    public ProjectTaskStatus Status { get; set; }
+    public int FreelancerProfileId { get; set; }
+    public FreelancerProfiles FreelancerProfiles { get; set; }
+    public string Status { get; set; }
     public Priority Priority { get; set; }
 }
