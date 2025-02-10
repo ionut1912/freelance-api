@@ -20,6 +20,10 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
 
+      - name: Check Terraform Formatting
+        run: terraform fmt -check
+        working-directory: terraform
+
       - name: Terraform Init
         run: terraform init
         working-directory: terraform
