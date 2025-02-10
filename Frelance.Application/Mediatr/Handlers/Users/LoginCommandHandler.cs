@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.Users;
 
-public class LoginCommandHandler: IRequestHandler<LoginCommand,UserDto>
+public class LoginCommandHandler : IRequestHandler<LoginCommand, UserDto>
 {
     private readonly IAccountRepository _accountRepository;
 
@@ -16,6 +16,6 @@ public class LoginCommandHandler: IRequestHandler<LoginCommand,UserDto>
     }
     public async Task<UserDto> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
-       return await _accountRepository.LoginAsync(request.LoginDto,cancellationToken);
+        return await _accountRepository.LoginAsync(request.LoginDto, cancellationToken);
     }
 }

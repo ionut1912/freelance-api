@@ -3,11 +3,11 @@ using System.Text.Json;
 namespace Frelance.Web.Extensions;
 public static class ResultsExtensions
 {
-    public static IResult OkPaginationResult(this IResultExtensions resultExtensions, 
-        int pageSize, int pageNumber, int totalItems, 
+    public static IResult OkPaginationResult(this IResultExtensions resultExtensions,
+        int pageSize, int pageNumber, int totalItems,
         int totalPages, IEnumerable<object> items)
     {
-        ArgumentNullException.ThrowIfNull(resultExtensions,nameof(resultExtensions));
+        ArgumentNullException.ThrowIfNull(resultExtensions, nameof(resultExtensions));
         return new PaginationResult(pageSize, pageNumber, totalItems, totalPages, items);
     }
 }
@@ -29,7 +29,7 @@ public class PaginationResult(
             totalItems,
             totalPages
         };
-        
+
         httpContext.Response.Headers.Append("X-Pagination", JsonSerializer.Serialize(header));
         httpContext.Response.Headers.Append("Access-Control-Expose-Headers", "X-Pagination");
         httpContext.Response.StatusCode = StatusCodes.Status200OK;

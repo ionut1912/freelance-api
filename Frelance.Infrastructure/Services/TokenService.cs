@@ -21,7 +21,7 @@ public class TokenService
         _userManager = userManager;
 
         var jwtSecretName = configuration["AzureKeyVault__JWTTokenSecretName"];
-        _jwtSecretKey = configuration.GetSecret(jwtSecretName,"AzureKeyVault__JWTTokenSecretName");
+        _jwtSecretKey = configuration.GetSecret(jwtSecretName, "AzureKeyVault__JWTTokenSecretName");
     }
 
     public async Task<string> GenerateToken(Users user)

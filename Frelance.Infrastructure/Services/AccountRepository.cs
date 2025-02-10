@@ -48,10 +48,10 @@ public class AccountRepository : IAccountRepository
         {
             var validationErrors = modelState
                 .Where(kvp => kvp.Value.Errors.Count > 0)
-                .SelectMany(kvp => kvp.Value.Errors.Select(error => new ValidationError 
-                { 
-                    Property = kvp.Key, 
-                    ErrorMessage = error.ErrorMessage 
+                .SelectMany(kvp => kvp.Value.Errors.Select(error => new ValidationError
+                {
+                    Property = kvp.Key,
+                    ErrorMessage = error.ErrorMessage
                 }))
                 .ToList();
             throw new CustomValidationException(validationErrors);

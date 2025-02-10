@@ -4,13 +4,13 @@ using Microsoft.AspNetCore.Http;
 
 namespace Frelance.Infrastructure.Services;
 
-public class UserAccessor:IUserAccessor
+public class UserAccessor : IUserAccessor
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     public UserAccessor(IHttpContextAccessor httpContextAccessor)
     {
-        ArgumentNullException.ThrowIfNull(httpContextAccessor,nameof(httpContextAccessor));
+        ArgumentNullException.ThrowIfNull(httpContextAccessor, nameof(httpContextAccessor));
         _httpContextAccessor = httpContextAccessor;
     }
     public string GetUsername()

@@ -13,12 +13,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Frelance.Infrastructure.Services;
 
-public class TimeLogRepository:ITimeLogRepository
+public class TimeLogRepository : ITimeLogRepository
 {
     private readonly FrelanceDbContext _context;
     private readonly IUserAccessor _userAccessor;
 
-    public TimeLogRepository(FrelanceDbContext dbContext,IUserAccessor userAccessor)
+    public TimeLogRepository(FrelanceDbContext dbContext, IUserAccessor userAccessor)
     {
         ArgumentNullException.ThrowIfNull(dbContext, nameof(dbContext));
         ArgumentNullException.ThrowIfNull(userAccessor, nameof(userAccessor));
@@ -27,7 +27,7 @@ public class TimeLogRepository:ITimeLogRepository
     }
     public async Task AddTimeLogAsync(CreateTimeLogCommand createTimeLogCommand, CancellationToken cancellationToken)
     {
-        var timeLogTask=await _context.Tasks.AsNoTracking().FirstOrDefaultAsync(x=>x.Title==createTimeLogCommand.TaskTitle, cancellationToken);
+        var timeLogTask = await _context.Tasks.AsNoTracking().FirstOrDefaultAsync(x => x.Title == createTimeLogCommand.TaskTitle, cancellationToken);
         if (timeLogTask is null)
         {
             throw new NotFoundException($"{nameof(ProjectTasks)} with {nameof(ProjectTasks.Title)} : '{createTimeLogCommand.TaskTitle}' does not exist");
@@ -36,19 +36,19 @@ public class TimeLogRepository:ITimeLogRepository
         var timeLog = createTimeLogCommand.Adapt<TimeLogs>();
         timeLog.TaskId = timeLogTask.Id;
         timeLog.TotalHours = createTimeLogCommand.EndTime.Hour - createTimeLogCommand.StartTime.Hour;
-        var user=await _context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.UserName == _userAccessor.GetUsername(), cancellationToken);
+        var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.UserName == _userAccessor.GetUsername(), cancellationToken);
         timeLog.User = user;
         await _context.TimeLogs.AddAsync(timeLog, cancellationToken);
     }
 
     public async Task UpdateTimeLogAsync(UpdateTimeLogCommand updateTimeLogCommand, CancellationToken cancellationToken)
     {
-        var timeLogTask=await _context.Tasks.AsNoTracking().FirstOrDefaultAsync(x=>x.Title==updateTimeLogCommand.TaskTitle, cancellationToken);
+        var timeLogTask = await _context.Tasks.AsNoTracking().FirstOrDefaultAsync(x => x.Title == updateTimeLogCommand.TaskTitle, cancellationToken);
         if (timeLogTask is null)
         {
             throw new NotFoundException($"{nameof(ProjectTasks)} with {nameof(ProjectTasks.Title)} : '{updateTimeLogCommand.TaskTitle}' does not exist");
         }
-        var timeLogToUpdate=await _context.TimeLogs.AsNoTracking().FirstOrDefaultAsync(x=>x.Id==updateTimeLogCommand.Id, cancellationToken);
+        var timeLogToUpdate = await _context.TimeLogs.AsNoTracking().FirstOrDefaultAsync(x => x.Id == updateTimeLogCommand.Id, cancellationToken);
         if (timeLogToUpdate is null)
         {
             throw new NotFoundException($"{nameof(TimeLogs)} with {nameof(TimeLogs.Id)} : '{updateTimeLogCommand.Id}' does not exist");
@@ -58,15 +58,15 @@ public class TimeLogRepository:ITimeLogRepository
         timeLogToUpdate.StartTime = updateTimeLogCommand.StartTime;
         if (timeLogToUpdate.Date == updateTimeLogCommand.Date)
         {
-            timeLogToUpdate.TotalHours=timeLogToUpdate.TotalHours+updateTimeLogCommand.TotalHours;
+            timeLogToUpdate.TotalHours = timeLogToUpdate.TotalHours + updateTimeLogCommand.TotalHours;
         }
-        timeLogToUpdate.TotalHours=updateTimeLogCommand.EndTime.Hour-updateTimeLogCommand.StartTime.Hour;
+        timeLogToUpdate.TotalHours = updateTimeLogCommand.EndTime.Hour - updateTimeLogCommand.StartTime.Hour;
         _context.TimeLogs.Update(timeLogToUpdate);
     }
 
     public async Task DeleteTimeLogAsync(DeleteTimeLogCommand deleteTimeLogCommand, CancellationToken cancellationToken)
     {
-        var timeLogToRemove=await _context.TimeLogs.AsNoTracking().FirstOrDefaultAsync(x=>x.Id==deleteTimeLogCommand.Id, cancellationToken);
+        var timeLogToRemove = await _context.TimeLogs.AsNoTracking().FirstOrDefaultAsync(x => x.Id == deleteTimeLogCommand.Id, cancellationToken);
         if (timeLogToRemove is null)
         {
             throw new NotFoundException($"{nameof(TimeLogs)} with {nameof(TimeLogs.Id)} : '{deleteTimeLogCommand.Id}' does not exist");
@@ -76,7 +76,7 @@ public class TimeLogRepository:ITimeLogRepository
 
     public async Task<GetTimeLogByIdResponse> GetTimeLogByIdAsync(GetTimeLogByIdQuery getTimeLogByIdQuery, CancellationToken cancellationToken)
     {
-        var timeLog= await _context.TimeLogs.AsNoTracking().FirstOrDefaultAsync(x=>x.Id == getTimeLogByIdQuery.Id,cancellationToken);
+        var timeLog = await _context.TimeLogs.AsNoTracking().FirstOrDefaultAsync(x => x.Id == getTimeLogByIdQuery.Id, cancellationToken);
         if (timeLog is null)
         {
             throw new NotFoundException($"{nameof(TimeLogs)} with {nameof(TimeLogs.Id)} : '{getTimeLogByIdQuery.Id}' does not exist");
@@ -87,6 +87,6 @@ public class TimeLogRepository:ITimeLogRepository
     public async Task<PaginatedList<TimeLogDto>> GetTimeLogsAsync(GetTimeLogsQuery getTimeLogsQuery, CancellationToken cancellationToken)
     {
         var timeLogsQuery = _context.TimeLogs.ProjectToType<TimeLogDto>().AsQueryable();
-        return await CollectionHelper<TimeLogDto>.ToPaginatedList(timeLogsQuery,getTimeLogsQuery.PaginationParams.PageNumber,getTimeLogsQuery.PaginationParams.PageSize);
+        return await CollectionHelper<TimeLogDto>.ToPaginatedList(timeLogsQuery, getTimeLogsQuery.PaginationParams.PageNumber, getTimeLogsQuery.PaginationParams.PageSize);
     }
 }

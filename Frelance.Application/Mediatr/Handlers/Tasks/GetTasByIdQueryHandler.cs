@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.Tasks;
 
-public class GetTaskByIdQueryHandler:IRequestHandler<GetTaskByIdQuery,GetTaskByIdResponse>
+public class GetTaskByIdQueryHandler : IRequestHandler<GetTaskByIdQuery, GetTaskByIdResponse>
 {
     private readonly ITaskRepository _taskRepository;
 
@@ -17,6 +17,6 @@ public class GetTaskByIdQueryHandler:IRequestHandler<GetTaskByIdQuery,GetTaskByI
     }
     public async Task<GetTaskByIdResponse> Handle(GetTaskByIdQuery request, CancellationToken cancellationToken)
     {
-        return await _taskRepository.GetTaskByIdAsync(request,cancellationToken);
+        return await _taskRepository.GetTaskByIdAsync(request, cancellationToken);
     }
 }

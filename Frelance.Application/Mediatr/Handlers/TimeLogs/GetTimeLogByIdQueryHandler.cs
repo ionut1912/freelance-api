@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.TimeLogs;
 
-public class GetTimeLogByIdQueryHandler:IRequestHandler<GetTimeLogByIdQuery, GetTimeLogByIdResponse>
+public class GetTimeLogByIdQueryHandler : IRequestHandler<GetTimeLogByIdQuery, GetTimeLogByIdResponse>
 {
     private readonly ITimeLogRepository _timeLogRepository;
 

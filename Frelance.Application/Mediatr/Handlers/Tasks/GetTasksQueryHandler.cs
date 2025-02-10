@@ -18,6 +18,6 @@ public class GetTasksQueryHandler : IRequestHandler<GetTasksQuery, PaginatedList
     }
     public async Task<PaginatedList<TaskDto>> Handle(GetTasksQuery request, CancellationToken cancellationToken)
     {
-        return await _taskRepository.GetTasksAsync(request,cancellationToken);
+        return await _taskRepository.GetTasksAsync(request, cancellationToken);
     }
 }

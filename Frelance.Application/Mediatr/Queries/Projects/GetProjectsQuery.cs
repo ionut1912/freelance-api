@@ -5,4 +5,4 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Queries.Projects;
 
-public record GetProjectsQuery(PaginationParams PaginationParams):IRequest<PaginatedList<ProjectDto>>;
+public record GetProjectsQuery(PaginationParams PaginationParams) : IRequest<PaginatedList<ProjectDto>>;

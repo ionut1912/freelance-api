@@ -4,11 +4,11 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.TimeLogs;
 
-public class CreateTimeLogCommandHandler:IRequestHandler<CreateTimeLogCommand,Unit>
+public class CreateTimeLogCommandHandler : IRequestHandler<CreateTimeLogCommand, Unit>
 {
     private readonly ITimeLogRepository _timeLogRepository;
     private readonly IUnitOfWork _unitOfWork;
-    
+
 
     public CreateTimeLogCommandHandler(ITimeLogRepository timeLogRepository, IUnitOfWork unitOfWork)
     {

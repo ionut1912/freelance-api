@@ -5,10 +5,10 @@ using MediatR;
 namespace Frelance.Application.Mediatr.Handlers.Tasks;
 
 
-public class CreateTaskCommandHandler:IRequestHandler<CreateTaskCommand,Unit>
+public class CreateTaskCommandHandler : IRequestHandler<CreateTaskCommand, Unit>
 {
     private readonly ITaskRepository _taskRepository;
-    private readonly  IUnitOfWork _unitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
 
     public CreateTaskCommandHandler(ITaskRepository taskRepository, IUnitOfWork unitOfWork)
     {

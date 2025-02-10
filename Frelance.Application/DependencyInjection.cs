@@ -14,11 +14,7 @@ public static class DependencyInjection
             cf.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
             cf.AddOpenBehavior(typeof(ValidationBehavior<,>));
         });
-        
-
-
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
-
         return services;
     }
 }
