@@ -4,7 +4,8 @@ namespace Frelance.Infrastructure.Entities;
 
 public class Users : IdentityUser<int>
 {
-    public List<Projects> Projects { get; set; }
-    public List<ProjectTasks> Tasks { get; set; } = new List<ProjectTasks>();
-    public List<TimeLogs> TimeLogs { get; set; } = new List<TimeLogs>();
+    public FreelancerProfiles FreelancerProfiles { get; set; }
+    public ClientProfiles ClientProfiles { get; set; }
+    public List<Reviews> Reviews { get; set; } = [];
+    public List<Proposals> Proposals { get; set; } = [];
 }
