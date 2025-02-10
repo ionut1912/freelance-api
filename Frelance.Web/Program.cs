@@ -48,10 +48,7 @@ app.UseSwaggerUI();
 app.UseExceptionHandler(_ => { });
 app.UseCors(opt =>
 {
-    opt.WithOrigins("http://localhost:4200", "https://freelance-client.azurewebsites.net")
-       .AllowAnyHeader()
-       .AllowAnyMethod()
-       .AllowCredentials();
+    opt.WithOrigins("http://localhost:4200", "https://freelance-client.azurewebsites.net").AllowAnyHeader().AllowAnyMethod().AllowCredentials();
 });
 app.UseHttpsRedirection();
 app.UseAuthentication();
