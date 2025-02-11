@@ -1,0 +1,13 @@
+# Use UTF-8 encoding
+charset = utf-8
+
+# Define max line length (e.g., 100 characters)
+dotnet_diagnostic.IDE0055.severity = warning
+max_line_length = 100
+
+# Enforce wrapping behavior
+csharp_indent_braces = false
+csharp_new_line_before_open_brace = all
+
+# Ensure formatting applies
+csharp_prefer_braces = true:suggestion
