@@ -28,7 +28,7 @@ public class ClientProfileRepository : IClientProfileRepository
         _blobService = blobService;
         _userAccessor = userAccessor;
     }
-    
+
     public async Task AddClientProfileAsync(AddClientProfileCommand clientProfileCommand, CancellationToken cancellationToken)
     {
         var user = await _dbContext.Users
@@ -75,9 +75,9 @@ public class ClientProfileRepository : IClientProfileRepository
 
     public async Task<PaginatedList<ClientProfileDto>> GetClientProfilesAsync(GetClientProfilesQuery clientProfilesQuery, CancellationToken cancellationToken)
     {
-        var clientProfileQueryable =  _dbContext.ClientProfiles.ProjectToType<ClientProfileDto>().AsQueryable();
-        return await CollectionHelper<ClientProfileDto>.ToPaginatedList(clientProfileQueryable, 
-                                                                        clientProfilesQuery.PaginationParams.PageNumber, 
+        var clientProfileQueryable = _dbContext.ClientProfiles.ProjectToType<ClientProfileDto>().AsQueryable();
+        return await CollectionHelper<ClientProfileDto>.ToPaginatedList(clientProfileQueryable,
+                                                                        clientProfilesQuery.PaginationParams.PageNumber,
                                                                         clientProfilesQuery.PaginationParams.PageSize);
     }
 }
