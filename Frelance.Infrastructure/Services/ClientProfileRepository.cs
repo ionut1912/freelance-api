@@ -112,7 +112,7 @@ public class ClientProfileRepository : IClientProfileRepository
 
     public async Task DeleteClientProfileAsync(DeleteClientProfileCommand clientProfileCommand, CancellationToken cancellationToken)
     {
-        var clientToDelete = await _dbContext.ClientProfiles.FirstOrDefaultAsync(x => x.Id == clientProfileCommand.Id,cancellationToken);
+        var clientToDelete = await _dbContext.ClientProfiles.FirstOrDefaultAsync(x => x.Id == clientProfileCommand.Id, cancellationToken);
         if (clientToDelete is null)
         {
             throw new NotFoundException($"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Id)} : '{clientProfileCommand.Id}' does not exist");
