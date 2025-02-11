@@ -15,7 +15,7 @@ namespace Frelance.Web.Modules
     {
         public static void AddClientProfilesEndpoints(this IEndpointRouteBuilder app)
         {
-            var createClientProfileEndpoint = app.MapPost("/api/clientprofiles",
+            var createClientProfileEndpoint = app.MapPost("/api/clientProfiles",
                     async (IMediator mediator, [FromForm] CreateClientProfileRequest uploadDto, CancellationToken ct) =>
                     {
                         var address = new AddressDto(
@@ -46,8 +46,23 @@ namespace Frelance.Web.Modules
                     paginatedClientProfiles.TotalCount, paginatedClientProfiles.TotalPages, paginatedClientProfiles.Items);
             }).WithTags("ClientProfiles").
             RequireAuthorization("ClientRole");
+            var updateClientProfileEndpoint = app.MapPut("/api/clientProfiles/{id}", async (IMediator mediator, int id,
+                [FromForm] UpdateClientProfileRequest updateClientProfileRequest, CancellationToken ct) =>
+                {
+                    var command = new UpdateClientProfileCommand(id, updateClientProfileRequest.AddressCountry, updateClientProfileRequest.AddressStreet, updateClientProfileRequest.AddressStreet, updateClientProfileRequest.AddressCity, updateClientProfileRequest.AddressZip, updateClientProfileRequest.Bio, updateClientProfileRequest.ProfileImage);
+                    var result = await mediator.Send(command, ct);
+                    return Results.Ok(result);
+                }).WithTags("ClientProfiles").
+                RequireAuthorization("ClientRole");
+            app.MapDelete("/api/clientProfiles/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
+            {
+                var command = new DeleteClientProfileCommand(id);
+                var result = await mediator.Send(command, ct);
+                return Results.Ok(result);
+            }).WithTags("ClientProfiles").
+            RequireAuthorization("ClientRole");
             createClientProfileEndpoint.RemoveAntiforgery();
-
+            updateClientProfileEndpoint.RemoveAntiforgery();
         }
 
         private static void RemoveAntiforgery(this RouteHandlerBuilder builder)

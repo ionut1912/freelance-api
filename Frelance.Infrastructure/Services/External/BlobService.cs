@@ -9,32 +9,49 @@ namespace Frelance.Infrastructure.Services.External;
 
 public class BlobService : IBlobService
 {
-    private readonly IConfiguration _configuration;
+    private readonly BlobServiceClient _blobServiceClient;
 
     public BlobService(IConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(configuration);
-        _configuration = configuration;
+        _blobServiceClient = new BlobServiceClient(configuration.GetSecret("storage-connection-string", "AzureKeyVault__StorageConnectionString"));
     }
     public async Task<string> UploadBlobAsync(string containerName, string blobName, IFormFile blobFile)
     {
-        BlobServiceClient blobServiceClient =
-            new BlobServiceClient(_configuration.GetSecret("storage-connection-string", "AzureKeyVault__StorageConnectionString"));
-        BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(containerName);
+        var containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
         await containerClient.CreateIfNotExistsAsync(PublicAccessType.Blob);
 
         await foreach (var blobItem in containerClient.GetBlobsAsync())
         {
-            BlobClient existingBlob = containerClient.GetBlobClient(blobItem.Name);
+            var existingBlob = containerClient.GetBlobClient(blobItem.Name);
             return existingBlob.Uri.ToString();
         }
 
-        BlobClient blobClient = containerClient.GetBlobClient(blobName);
+        var blobClient = containerClient.GetBlobClient(blobName);
         await using (var stream = blobFile.OpenReadStream())
         {
             await blobClient.UploadAsync(stream, true);
         }
 
         return blobClient.Uri.ToString();
+    }
+
+    public async Task DeleteBlobAsync(string containerName)
+    {
+        try
+        {
+            var containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
+            await foreach (var blobItem in containerClient.GetBlobsAsync())
+            {
+                var blobClient = containerClient.GetBlobClient(blobItem.Name);
+                await blobClient.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots);
+            }
+
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 }

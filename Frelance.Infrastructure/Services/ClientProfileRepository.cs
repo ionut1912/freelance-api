@@ -80,4 +80,44 @@ public class ClientProfileRepository : IClientProfileRepository
                                                                         clientProfilesQuery.PaginationParams.PageNumber,
                                                                         clientProfilesQuery.PaginationParams.PageSize);
     }
+
+    public async Task UpdateClientProfileAsync(UpdateClientProfileCommand clientProfileCommand, CancellationToken cancellationToken)
+    {
+        var clientToUpdate = await _dbContext.ClientProfiles.AsNoTracking().Include(x => x.Addresses).Include(x => x.Users).FirstOrDefaultAsync(x => x.Id == clientProfileCommand.Id, cancellationToken);
+        if (clientToUpdate is null)
+        {
+            throw new NotFoundException($"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Id)} : '{clientProfileCommand.Id}' does not exist");
+        }
+
+        if (clientProfileCommand.ProfileImage is not null)
+        {
+            await _blobService.DeleteBlobAsync("userimagescontainer");
+            clientToUpdate.ProfileImageUrl = await _blobService.UploadBlobAsync("userimagescontainer",
+                $"{clientToUpdate.Users.Id}/{clientProfileCommand.ProfileImage.FileName}",
+                clientProfileCommand.ProfileImage);
+        }
+
+        if (clientProfileCommand.AddressCity is not null)
+        {
+            var address = new Addresses(clientProfileCommand.AddressCountry, clientProfileCommand.AddressCity,
+                clientProfileCommand.AddressStreet, clientProfileCommand.AddressStreetNumber,
+                clientProfileCommand.AddressZip);
+            await _dbContext.Addresses.AddAsync(address, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+            clientToUpdate.AddressId = address.Id;
+        }
+        clientToUpdate.Bio = clientProfileCommand.Bio;
+        _dbContext.ClientProfiles.Update(clientToUpdate);
+    }
+
+    public async Task DeleteClientProfileAsync(DeleteClientProfileCommand clientProfileCommand, CancellationToken cancellationToken)
+    {
+        var clientToDelete = await _dbContext.ClientProfiles.FirstOrDefaultAsync(x => x.Id == clientProfileCommand.Id,cancellationToken);
+        if (clientToDelete is null)
+        {
+            throw new NotFoundException($"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Id)} : '{clientProfileCommand.Id}' does not exist");
+        }
+        _dbContext.ClientProfiles.Remove(clientToDelete);
+        await _blobService.DeleteBlobAsync("userimagescontainer");
+    }
 }

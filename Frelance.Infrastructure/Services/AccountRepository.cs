@@ -75,6 +75,11 @@ public class AccountRepository : IAccountRepository
             modelState.AddModelError("Password", "password is invalid");
         }
 
+        if (user.Email != loginDto.Email)
+        {
+            modelState.AddModelError("Email", "email is not valid");
+        }
+
         GenerateException(modelState);
 
         return new UserDto(user!.PhoneNumber, await _tokenService.GenerateToken(user), user.UserName, user.Email);
