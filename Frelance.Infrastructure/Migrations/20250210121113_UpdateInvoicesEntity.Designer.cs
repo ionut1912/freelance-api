@@ -4,6 +4,7 @@ using Frelance.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Frelance.Infrastructure.Migrations
 {
     [DbContext(typeof(FrelanceDbContext))]
-    partial class FrelanceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250210121113_UpdateInvoicesEntity")]
+    partial class UpdateInvoicesEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -73,7 +76,7 @@ namespace Frelance.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AddressId")
+                    b.Property<int?>("AddressesId")
                         .HasColumnType("int");
 
                     b.Property<string>("Bio")
@@ -87,8 +90,7 @@ namespace Frelance.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AddressId")
-                        .IsUnique();
+                    b.HasIndex("AddressesId");
 
                     b.HasIndex("UserId")
                         .IsUnique();
@@ -104,18 +106,14 @@ namespace Frelance.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("Amount")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("Amount")
+                        .HasColumnType("int");
 
                     b.Property<int>("ClientId")
                         .HasColumnType("int");
 
-                    b.Property<string>("ContractFileUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("EndDate")
+                        .HasColumnType("date");
 
                     b.Property<int>("FreelancerId")
                         .HasColumnType("int");
@@ -123,8 +121,8 @@ namespace Frelance.Infrastructure.Migrations
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("StartDate")
+                        .HasColumnType("date");
 
                     b.HasKey("Id");
 
@@ -145,7 +143,7 @@ namespace Frelance.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AddressId")
+                    b.Property<int?>("AddressesId")
                         .HasColumnType("int");
 
                     b.Property<string>("Bio")
@@ -180,8 +178,7 @@ namespace Frelance.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AddressId")
-                        .IsUnique();
+                    b.HasIndex("AddressesId");
 
                     b.HasIndex("UserId")
                         .IsUnique();
@@ -197,15 +194,14 @@ namespace Frelance.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("Amount")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("Amount")
+                        .HasColumnType("int");
 
                     b.Property<int>("ClientId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
 
                     b.Property<int>("FreelancerId")
                         .HasColumnType("int");
@@ -273,9 +269,8 @@ namespace Frelance.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("Budget")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<float>("Budget")
+                        .HasColumnType("real");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -316,9 +311,8 @@ namespace Frelance.Infrastructure.Migrations
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("ProposedBudget")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("ProposedBudget")
+                        .HasColumnType("int");
 
                     b.Property<int>("ProposerId")
                         .HasColumnType("int");
@@ -465,8 +459,8 @@ namespace Frelance.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
 
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("datetime2");
@@ -681,10 +675,8 @@ namespace Frelance.Infrastructure.Migrations
             modelBuilder.Entity("Frelance.Infrastructure.Entities.ClientProfiles", b =>
                 {
                     b.HasOne("Frelance.Infrastructure.Entities.Addresses", "Addresses")
-                        .WithOne()
-                        .HasForeignKey("Frelance.Infrastructure.Entities.ClientProfiles", "AddressId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany()
+                        .HasForeignKey("AddressesId");
 
                     b.HasOne("Frelance.Infrastructure.Entities.Users", "Users")
                         .WithOne("ClientProfiles")
@@ -727,10 +719,8 @@ namespace Frelance.Infrastructure.Migrations
             modelBuilder.Entity("Frelance.Infrastructure.Entities.FreelancerProfiles", b =>
                 {
                     b.HasOne("Frelance.Infrastructure.Entities.Addresses", "Addresses")
-                        .WithOne()
-                        .HasForeignKey("Frelance.Infrastructure.Entities.FreelancerProfiles", "AddressId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany()
+                        .HasForeignKey("AddressesId");
 
                     b.HasOne("Frelance.Infrastructure.Entities.Users", "Users")
                         .WithOne("FreelancerProfiles")

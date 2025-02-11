@@ -4,6 +4,6 @@ public class Reviews
 {
     public int Id { get; set; }
     public int ReviewerId { get; set; }
-    public Users Reviewer { get; set; }
-    public string ReviewText { get; set; }
+    public required Users Reviewer { get; set; }
+    public required string ReviewText { get; set; }
 }
