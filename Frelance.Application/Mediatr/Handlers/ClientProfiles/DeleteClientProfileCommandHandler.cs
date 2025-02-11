@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.ClientProfiles;
 
-public class DeleteClientProfileCommandHandler:IRequestHandler<DeleteClientProfileCommand, Unit>
+public class DeleteClientProfileCommandHandler : IRequestHandler<DeleteClientProfileCommand, Unit>
 {
     private readonly IClientProfileRepository _clientProfileRepository;
     private readonly IUnitOfWork _unitOfWork;
