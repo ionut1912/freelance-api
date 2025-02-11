@@ -36,7 +36,7 @@ public class FileUploadOperationFilter : IOperationFilter
         {
             Type = "object",
             Properties = context.ApiDescription.ParameterDescriptions
-                .Where(p => p.ModelMetadata?.ModelType != null) 
+                .Where(p => p.ModelMetadata?.ModelType != null)
                 .ToDictionary(
                     p => p.Name!,
                     p => p.ModelMetadata!.ModelType == typeof(IFormFile)

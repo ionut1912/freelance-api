@@ -5,4 +5,4 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Queries.ClientProfiles;
 
-public record GetClientProfilesQuery(PaginationParams PaginationParams):IRequest<PaginatedList<ClientProfileDto>>;
+public record GetClientProfilesQuery(PaginationParams PaginationParams) : IRequest<PaginatedList<ClientProfileDto>>;

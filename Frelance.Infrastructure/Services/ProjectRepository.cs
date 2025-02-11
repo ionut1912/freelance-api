@@ -76,8 +76,8 @@ public class ProjectRepository : IProjectRepository
     public async Task<PaginatedList<ProjectDto>> FindProjectsAsync(GetProjectsQuery getProjectsQuery, CancellationToken cancellationToken)
     {
         var projectQuery = _context.Projects.ProjectToType<ProjectDto>().AsQueryable();
-        return await CollectionHelper<ProjectDto>.ToPaginatedList(projectQuery, 
-                                                                  getProjectsQuery.PaginationParams.PageNumber, 
+        return await CollectionHelper<ProjectDto>.ToPaginatedList(projectQuery,
+                                                                  getProjectsQuery.PaginationParams.PageNumber,
                                                                   getProjectsQuery.PaginationParams.PageSize);
     }
 }
