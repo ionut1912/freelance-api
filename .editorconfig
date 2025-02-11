@@ -1,13 +1,36 @@
-# Use UTF-8 encoding
+root = true
 charset = utf-8
-
-# Define max line length (e.g., 100 characters)
 dotnet_diagnostic.IDE0055.severity = warning
 max_line_length = 100
-
-# Enforce wrapping behavior
 csharp_indent_braces = false
 csharp_new_line_before_open_brace = all
-
-# Ensure formatting applies
 csharp_prefer_braces = true:suggestion
+csharp_style_expression_bodied_methods = true:suggestion
+csharp_style_expression_bodied_operators = true:suggestion
+csharp_style_expression_bodied_constructors = true:suggestion
+csharp_style_expression_bodied_accessors = true:suggestion
+csharp_style_namespace_declarations = true:suggestion
+csharp_style_namespace_declarations = file_scoped:suggestion
+csharp_style_nullable_analysis = enable
+csharp_style_collection_expression = true:suggestion
+csharp_style_readonly_struct = true:suggestion
+csharp_style_readonly_fields = true:suggestion
+csharp_style_readonly_properties = true:suggestion
+csharp_style_implicit_object_creation_when_type_is_apparent = true:suggestion
+csharp_style_readonly_struct = true:suggestion
+csharp_style_prefer_required_members = true:suggestion
+csharp_style_prefer_raw_string_literals = true:suggestion
+csharp_style_primary_constructors = true:suggestion
+csharp_style_prefer_simple_default_expression = true:suggestion
+csharp_style_pattern_matching_over_as_with_null_check = true:suggestion
+csharp_style_prefer_switch_expression = true:suggestion
+csharp_style_prefer_record_struct = true:suggestion
+csharp_style_prefer_readonly_record_struct = true:suggestion
+csharp_style_var_for_built_in_types = true:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+dotnet_style_parentheses_in_arithmetic_binary_operators = false:suggestion
+dotnet_style_parentheses_in_relational_binary_operators = false:suggestion
+dotnet_style_parentheses_in_other_binary_operators = false:suggestion
+dotnet_remove_unused_imports = true
+insert_final_newline = true
+trim_trailing_whitespace = true
