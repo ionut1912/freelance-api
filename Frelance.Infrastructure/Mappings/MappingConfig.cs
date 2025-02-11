@@ -5,6 +5,7 @@ using Frelance.Application.Mediatr.Commands.Tasks;
 using Frelance.Application.Mediatr.Commands.TimeLogs;
 using Frelance.Application.Mediatr.Commands.Users;
 using Frelance.Contracts.Dtos;
+using Frelance.Contracts.Requests.ClientProfile;
 using Frelance.Contracts.Requests.Projects;
 using Frelance.Contracts.Requests.ProjectTasks;
 using Frelance.Contracts.Requests.TimeLogs;
@@ -82,6 +83,8 @@ namespace Frelance.Infrastructure.Mappings
                 .Map(dest => dest.ProfileImageUrl, src => src.ProfileImageUrl)
                 .Map(dest => dest.Contracts, src => src.Contracts.Adapt<List<ContractsDto>>())
                 .Map(dest => dest.Invoices, src => src.Invoices.Adapt<List<InvoicesDto>>());
+
+
         }
     }
 }
