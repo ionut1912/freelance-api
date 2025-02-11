@@ -1,15 +1,18 @@
-using Microsoft.AspNetCore.Http;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using System.Linq;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+
+namespace Frelance.Web;
 
 public class FileUploadOperationFilter : IOperationFilter
 {
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
         var fileParameters = context.ApiDescription.ParameterDescriptions
-            .Where(p => p.ModelMetadata?.ModelType == typeof(IFormFile) ||
-                        p.ModelMetadata?.ModelType == typeof(IFormFileCollection))
+            .Where(p => p.ModelMetadata?.ModelType != null &&
+                        (p.ModelMetadata.ModelType == typeof(IFormFile) ||
+                         p.ModelMetadata.ModelType == typeof(IFormFileCollection)))
             .ToList();
 
         if (!fileParameters.Any())
@@ -33,9 +36,10 @@ public class FileUploadOperationFilter : IOperationFilter
         {
             Type = "object",
             Properties = context.ApiDescription.ParameterDescriptions
+                .Where(p => p.ModelMetadata?.ModelType != null) 
                 .ToDictionary(
-                    p => p.Name,
-                    p => p.ModelMetadata?.ModelType == typeof(IFormFile)
+                    p => p.Name!,
+                    p => p.ModelMetadata!.ModelType == typeof(IFormFile)
                         ? new OpenApiSchema { Type = "string", Format = "binary" }
                         : context.SchemaGenerator.GenerateSchema(p.ModelMetadata.ModelType, context.SchemaRepository)
                 )

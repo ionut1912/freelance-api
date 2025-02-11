@@ -1,6 +1,6 @@
-using Frelance.Contracts.Responses.Tasks;
+using Frelance.Contracts.Dtos;
 using MediatR;
 
 namespace Frelance.Application.Mediatr.Queries.Tasks;
 
-public record GetTaskByIdQuery(int Id) : IRequest<GetTaskByIdResponse>;
+public record GetTaskByIdQuery(int Id) : IRequest<TaskDto>;

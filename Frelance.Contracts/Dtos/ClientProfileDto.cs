@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.Http;
 namespace Frelance.Contracts.Dtos;
 
 public record ClientProfileDto(
-    string AddressCountry,
-    string AddressStreet,
-    string AddressStreetNumber,
-    string AddressCity,
-    string AddressZip,
+    int Id,
+    UserClientDto User,
+    AddressDto Address,
     string Bio,
-    IFormFile ProfileImage);
+    string ProfileImageUrl,
+    List<ContractsDto> Contracts,
+    List<InvoicesDto> Invoices);

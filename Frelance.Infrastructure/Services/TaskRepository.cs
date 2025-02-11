@@ -6,7 +6,6 @@ using Frelance.Contracts.Dtos;
 using Frelance.Contracts.Enums;
 using Frelance.Contracts.Exceptions;
 using Frelance.Contracts.Responses.Common;
-using Frelance.Contracts.Responses.Tasks;
 using Frelance.Infrastructure.Context;
 using Frelance.Infrastructure.Entities;
 using Mapster;
@@ -46,6 +45,7 @@ public class TaskRepository : ITaskRepository
         var task = createTaskCommand.Adapt<ProjectTasks>();
         task.ProjectId = taskProject.Id;
         task.Status = ProjectTaskStatus.ToDo.ToString();
+        task.Priority = createTaskCommand.Priority.ToString();
         task.FreelancerProfiles = freelancerProfile;
         await _context.Tasks.AddAsync(task, cancellationToken);
     }
@@ -63,7 +63,7 @@ public class TaskRepository : ITaskRepository
         projectTaskToUpdate.Title = updateTaskCommand.Title;
         projectTaskToUpdate.Description = updateTaskCommand.Description;
         projectTaskToUpdate.Status = updateTaskCommand.Status.ToString();
-        projectTaskToUpdate.Priority = updateTaskCommand.Priority;
+        projectTaskToUpdate.Priority = updateTaskCommand.Priority.ToString();
 
         _context.Tasks.Update(projectTaskToUpdate);
     }
@@ -81,7 +81,7 @@ public class TaskRepository : ITaskRepository
         _context.Tasks.Remove(projectTaskToDelete);
     }
 
-    public async Task<GetTaskByIdResponse> GetTaskByIdAsync(GetTaskByIdQuery getTaskByIdQuery, CancellationToken cancellationToken)
+    public async Task<TaskDto> GetTaskByIdAsync(GetTaskByIdQuery getTaskByIdQuery, CancellationToken cancellationToken)
     {
         var task = await _context.Tasks.AsNoTracking()
             .Include(x => x.Projects)
@@ -93,7 +93,7 @@ public class TaskRepository : ITaskRepository
             throw new NotFoundException($"{nameof(ProjectTasks)} with {nameof(ProjectTasks.Id)}: '{getTaskByIdQuery.Id}' does not exist");
         }
 
-        return task.Adapt<GetTaskByIdResponse>();
+        return task.Adapt<TaskDto>();
     }
 
     public async Task<PaginatedList<TaskDto>> GetTasksAsync(GetTasksQuery getTasksQuery, CancellationToken cancellationToken)

@@ -1,5 +1,6 @@
 using Frelance.Application;
 using Frelance.Infrastructure;
+using Frelance.Web;
 using Frelance.Web.Handlers;
 using Frelance.Web.Modules;
 using Microsoft.OpenApi.Models;

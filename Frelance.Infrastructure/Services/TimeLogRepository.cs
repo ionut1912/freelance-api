@@ -5,7 +5,6 @@ using Frelance.Application.Repositories;
 using Frelance.Contracts.Dtos;
 using Frelance.Contracts.Exceptions;
 using Frelance.Contracts.Responses.Common;
-using Frelance.Contracts.Responses.TimeLogs;
 using Frelance.Infrastructure.Context;
 using Frelance.Infrastructure.Entities;
 using Mapster;
@@ -78,14 +77,14 @@ public class TimeLogRepository : ITimeLogRepository
         _context.TimeLogs.Remove(timeLogToRemove);
     }
 
-    public async Task<GetTimeLogByIdResponse> GetTimeLogByIdAsync(GetTimeLogByIdQuery getTimeLogByIdQuery, CancellationToken cancellationToken)
+    public async Task<TimeLogDto> GetTimeLogByIdAsync(GetTimeLogByIdQuery getTimeLogByIdQuery, CancellationToken cancellationToken)
     {
         var timeLog = await _context.TimeLogs.AsNoTracking().FirstOrDefaultAsync(x => x.Id == getTimeLogByIdQuery.Id, cancellationToken);
         if (timeLog is null)
         {
             throw new NotFoundException($"{nameof(TimeLogs)} with {nameof(TimeLogs.Id)} : '{getTimeLogByIdQuery.Id}' does not exist");
         }
-        return timeLog.Adapt<GetTimeLogByIdResponse>();
+        return timeLog.Adapt<TimeLogDto>();
     }
 
     public async Task<PaginatedList<TimeLogDto>> GetTimeLogsAsync(GetTimeLogsQuery getTimeLogsQuery, CancellationToken cancellationToken)

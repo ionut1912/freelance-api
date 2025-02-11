@@ -2,14 +2,14 @@
 
 public class PaginationParams
 {
-    public int PageNumber { get; set; } = 1;
+    public int PageNumber { get; init; } = 1;
 
     public int PageSize
     {
         get => _pageSize;
-        set => _pageSize = value > MaximumPageSize ? MaximumPageSize : value;
+        init => _pageSize = value > MaximumPageSize ? MaximumPageSize : value;
     }
 
-    private int _pageSize = 10;
+    private readonly int _pageSize = 10;
     private const int MaximumPageSize = 100;
 }
