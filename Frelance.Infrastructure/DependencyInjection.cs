@@ -3,11 +3,14 @@ using System.Text;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using Frelance.Application.Repositories;
+using Frelance.Application.Repositories.External;
+using Frelance.Contracts.Dtos;
 using Frelance.Infrastructure.Context;
 using Frelance.Infrastructure.Entities;
 using Frelance.Infrastructure.Extensions;
 using Frelance.Infrastructure.Mappings;
 using Frelance.Infrastructure.Services;
+using Frelance.Infrastructure.Services.External;
 using Frelance.Infrastructure.Settings;
 using Mapster;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -71,6 +74,9 @@ public static class DependencyInjection
             services.AddScoped<ITaskRepository, TaskRepository>();
             services.AddScoped<ITimeLogRepository, TimeLogRepository>();
             services.AddScoped<IAccountRepository, AccountRepository>();
+            services.AddScoped<ISkillsRepository, SkillRepository>();
+            services.AddScoped<IBlobService, BlobService>();
+            services.AddScoped<IClientProfileRepository, ClientProfileRepository>();
 
             services.AddIdentityCore<Users>(opt => opt.User.RequireUniqueEmail = true)
                 .AddRoles<Roles>()

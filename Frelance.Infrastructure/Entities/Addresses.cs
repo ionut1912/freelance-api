@@ -3,9 +3,9 @@
 public class Addresses
 {
     public int Id { get; set; }
-    public string Country { get; set; }
-    public string City { get; set; }
-    public string Street { get; set; }
-    public string StreetNumber { get; set; }
-    public string ZipCode { get; set; }
+    public required string Country { get; set; }
+    public required string City { get; set; }
+    public required string Street { get; set; }
+    public required string StreetNumber { get; set; }
+    public required string ZipCode { get; set; }
 }

@@ -1,3 +1,4 @@
+using Frelance.Application.Mediatr.Commands.ClientProfiles;
 using Frelance.Application.Mediatr.Commands.Projects;
 using Frelance.Application.Mediatr.Commands.Tasks;
 using Frelance.Application.Mediatr.Commands.TimeLogs;
@@ -31,6 +32,24 @@ public class MappingConfig
         TypeAdapterConfig<UpdateProjectRequest, UpdateProjectCommand>.NewConfig().Map(dest => dest, src => src);
         TypeAdapterConfig<Projects, GetProjectByIdResponse>.NewConfig()
             .Map(dest => dest.Project, src => src);
+
+        TypeAdapterConfig<PaginatedList<TaskDto>, GetTasksResponse>.NewConfig().Map(dest => dest.Results, src => src);
+        TypeAdapterConfig<CreateProjectTaskRequest, CreateTaskCommand>.NewConfig().Map(dest => dest, src => src);
+        TypeAdapterConfig<UpdateProjectTaskRequest, UpdateTaskCommand>.NewConfig().Map(dest => dest, src => src);
+        TypeAdapterConfig<ProjectTasks, GetTaskByIdResponse>.NewConfig().Map(dest => dest.Task, src => src);
+
+        TypeAdapterConfig<PaginatedList<TimeLogDto>, GetTimeLogsResponse>.NewConfig().Map(dest => dest.Results, src => src);
+        TypeAdapterConfig<CreateTimeLogRequest, CreateTimeLogCommand>.NewConfig().Map(dest => dest, src => src);
+        TypeAdapterConfig<UpdateTimeLogRequest, UpdateTimeLogCommand>.NewConfig().Map(dest => dest, src => src);
+        TypeAdapterConfig<TimeLogs, GetTimeLogByIdResponse>.NewConfig().Map(dest => dest.TimeLog, src => src);
+
+        TypeAdapterConfig<List<Skiills>, List<SkillDto>>.NewConfig().Map(dest => dest, src => src);
+
+        TypeAdapterConfig<Addresses, AddressDto>.NewConfig().Map(dest => dest, src => src);
+        TypeAdapterConfig<ClientProfiles, AddClientProfileCommand>.NewConfig()
+            .Map(dest => dest.Address, src => src.Addresses)
+            .Map(dest => dest.Bio, src => src.Bio);
+        TypeAdapterConfig<ClientProfileDto, AddClientProfileCommand>.NewConfig().Map(src => src, dest => dest);
 
         TypeAdapterConfig<PaginatedList<TaskDto>, GetTasksResponse>.NewConfig().Map(dest => dest.Results, src => src);
         TypeAdapterConfig<CreateProjectTaskRequest, CreateTaskCommand>.NewConfig().Map(dest => dest, src => src);
