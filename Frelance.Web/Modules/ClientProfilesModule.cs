@@ -1,5 +1,7 @@
 using Frelance.Application.Mediatr.Commands.ClientProfiles;
+using Frelance.Application.Mediatr.Queries.ClientProfiles;
 using Frelance.Contracts.Dtos;
+using Frelance.Contracts.Requests.ClientProfile;
 using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -11,8 +13,8 @@ namespace Frelance.Web.Modules
     {
         public static void AddClientProfilesEndpoints(this IEndpointRouteBuilder app)
         {
-            var endpoint = app.MapPost("/api/clientprofiles",
-                    async (IMediator mediator, [FromForm] ClientProfileDto uploadDto, CancellationToken ct) =>
+            var createClientProfileEndpoint = app.MapPost("/api/clientprofiles",
+                    async (IMediator mediator, [FromForm] CreateClientProfileRequest uploadDto, CancellationToken ct) =>
                     {
                         var address = new AddressDto(
                             uploadDto.AddressCountry,
@@ -28,19 +30,30 @@ namespace Frelance.Web.Modules
                 .WithTags("ClientProfiles")
                 .RequireAuthorization("ClientRole")
                 .WithMetadata(new IgnoreAntiforgeryTokenAttribute());
-
-            // Remove antiforgery metadata from the endpoint.
-            endpoint.Add(builder =>
+            app.MapGet("/api/clientProfiles/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
             {
-                var antiforgeryMetadata = builder.Metadata
-                    .Where(m => m is IAntiforgeryMetadata)
-                    .ToList();
+                var clientProfile = await mediator.Send(new GetClientProfileByIdQuery(id), ct);
+                return Results.Ok(clientProfile);
+            }).WithTags("ClientProfiles").
+            RequireAuthorization("ClientRole");
+            createClientProfileEndpoint.RemoveAntiforgery();
 
-                foreach (var item in antiforgeryMetadata)
-                {
-                    builder.Metadata.Remove(item);
-                }
-            });
+        }
+
+        private static void RemoveAntiforgery(this RouteHandlerBuilder builder)
+        {
+            builder.Add(builder =>
+                     {
+                         var antiforgeryMetadata = builder.Metadata
+                             .Where(m => m is IAntiforgeryMetadata)
+                             .ToList();
+
+                         foreach (var item in antiforgeryMetadata)
+                         {
+                             builder.Metadata.Remove(item);
+                         }
+                     });
+
         }
     }
 }

@@ -6,7 +6,6 @@ using Frelance.Application.Repositories;
 using Frelance.Contracts.Dtos;
 using Frelance.Contracts.Exceptions;
 using Frelance.Contracts.Responses.Common;
-using Frelance.Contracts.Responses.Projects;
 using Frelance.Infrastructure.Context;
 using Frelance.Infrastructure.Entities;
 using Mapster;
@@ -63,7 +62,7 @@ public class ProjectRepository : IProjectRepository
         _context.Projects.Remove(projectToDelete);
     }
 
-    public async Task<GetProjectByIdResponse> FindProjectByIdAsync(GetProjectByIdQuery getProjectByIdQuery, CancellationToken cancellationToken)
+    public async Task<ProjectDto> FindProjectByIdAsync(GetProjectByIdQuery getProjectByIdQuery, CancellationToken cancellationToken)
     {
         var project = await _context.Projects.AsNoTracking().Include(x => x.Tasks).FirstOrDefaultAsync(x => x.Id == getProjectByIdQuery.Id, cancellationToken);
         if (project is null)
@@ -71,12 +70,14 @@ public class ProjectRepository : IProjectRepository
             throw new NotFoundException($"{nameof(Projects)} with {nameof(Projects.Id)} : '{getProjectByIdQuery.Id}' does not exist");
         }
 
-        return project.Adapt<GetProjectByIdResponse>();
+        return project.Adapt<ProjectDto>();
     }
 
     public async Task<PaginatedList<ProjectDto>> FindProjectsAsync(GetProjectsQuery getProjectsQuery, CancellationToken cancellationToken)
     {
         var projectQuery = _context.Projects.ProjectToType<ProjectDto>().AsQueryable();
-        return await CollectionHelper<ProjectDto>.ToPaginatedList(projectQuery, getProjectsQuery.PaginationParams.PageNumber, getProjectsQuery.PaginationParams.PageSize);
+        return await CollectionHelper<ProjectDto>.ToPaginatedList(projectQuery, 
+                                                                  getProjectsQuery.PaginationParams.PageNumber, 
+                                                                  getProjectsQuery.PaginationParams.PageSize);
     }
 }

@@ -16,13 +16,18 @@ public class BlobService : IBlobService
         ArgumentNullException.ThrowIfNull(configuration);
         _configuration = configuration;
     }
-
     public async Task<string> UploadBlobAsync(string containerName, string blobName, IFormFile blobFile)
     {
         BlobServiceClient blobServiceClient =
             new BlobServiceClient(_configuration.GetSecret("storage-connection-string", "AzureKeyVault__StorageConnectionString"));
         BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(containerName);
         await containerClient.CreateIfNotExistsAsync(PublicAccessType.Blob);
+
+        await foreach (var blobItem in containerClient.GetBlobsAsync())
+        {
+            BlobClient existingBlob = containerClient.GetBlobClient(blobItem.Name);
+            return existingBlob.Uri.ToString();
+        }
 
         BlobClient blobClient = containerClient.GetBlobClient(blobName);
         await using (var stream = blobFile.OpenReadStream())

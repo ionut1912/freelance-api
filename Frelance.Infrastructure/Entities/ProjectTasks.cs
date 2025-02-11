@@ -13,5 +13,5 @@ public class ProjectTasks
     public int FreelancerProfileId { get; set; }
     public required FreelancerProfiles FreelancerProfiles { get; set; }
     public required string Status { get; set; }
-    public Priority Priority { get; set; }
+    public string Priority { get; set; }
 }
