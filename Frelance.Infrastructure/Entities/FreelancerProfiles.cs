@@ -10,7 +10,7 @@ public class FreelancerProfiles : BaseUserProfile
     public bool IsAvailable { get; set; }
     public string Experience { get; set; }
     public int Rate { get; set; }
-    public  string Currency { get; set; }
+    public string Currency { get; set; }
     public int Rating { get; set; }
-    public  string PortofolioUrl { get; set; }
+    public string PortofolioUrl { get; set; }
 }
