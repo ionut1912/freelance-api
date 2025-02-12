@@ -5,4 +5,4 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Queries.FreelancerProfiles;
 
-public record GetFreelancerProfilesQuery(PaginationParams PaginationParams):IRequest<PaginatedList<FreelancerProfileDto>>;
+public record GetFreelancerProfilesQuery(PaginationParams PaginationParams) : IRequest<PaginatedList<FreelancerProfileDto>>;

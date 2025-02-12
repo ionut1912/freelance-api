@@ -80,7 +80,7 @@ namespace Frelance.Infrastructure.Mappings
                     src.Users.PhoneNumber,
                     src.Users.Reviews.Adapt<List<ReviewsDto>>(),
                     src.Users.Proposals.Adapt<List<ProposalsDto>>()))
-                .Map(dest=>dest.Address,src=>src.Addresses.Adapt<AddressDto>())
+                .Map(dest => dest.Address, src => src.Addresses.Adapt<AddressDto>())
                 .Map(dest => dest.Bio, src => src.Bio)
                 .Map(dest => dest.ProfileImageUrl, src => src.ProfileImageUrl)
                 .Map(dest => dest.Contracts, src => src.Contracts.Adapt<List<ContractsDto>>())
@@ -108,7 +108,7 @@ namespace Frelance.Infrastructure.Mappings
                     src.Users.PhoneNumber,
                     src.Users.Reviews.Adapt<List<ReviewsDto>>(),
                     src.Users.Proposals.Adapt<List<ProposalsDto>>()))
-                .Map(dest=>dest.AddressDto, src=>src.Addresses.Adapt<AddressDto>())
+                .Map(dest => dest.AddressDto, src => src.Addresses.Adapt<AddressDto>())
                 .Map(dest => dest.Bio, src => src.Bio)
                 .Map(dest => dest.ProfileImageUrl, src => src.ProfileImageUrl)
                 .Map(dest => dest.ContractsDto, src => src.Contracts.Adapt<List<ContractsDto>>())
@@ -123,10 +123,10 @@ namespace Frelance.Infrastructure.Mappings
                 .Map(dest => dest.Currency, src => src.Currency)
                 .Map(dest => dest.Rating, src => src.Rating)
                 .Map(dest => dest.PortfolioUrl, src => src.PortfolioUrl);
-            
-                TypeAdapterConfig<Skiills,SkillDto>
-                    .NewConfig()
-                    .Map(dest => dest, src => src);
+
+            TypeAdapterConfig<Skiills, SkillDto>
+                .NewConfig()
+                .Map(dest => dest, src => src);
 
         }
     }

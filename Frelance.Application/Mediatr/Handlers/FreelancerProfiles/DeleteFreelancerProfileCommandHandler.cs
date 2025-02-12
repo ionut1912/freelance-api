@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.FreelancerProfiles;
 
-public class DeleteFreelancerProfileCommandHandler:IRequestHandler<DeleteFreelancerProfileCommand, Unit>
+public class DeleteFreelancerProfileCommandHandler : IRequestHandler<DeleteFreelancerProfileCommand, Unit>
 {
     private readonly IFreelancerProfileRepository _repository;
     private readonly IUnitOfWork _unitOfWork;

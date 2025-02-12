@@ -17,7 +17,7 @@ public static class FreelancerProfilesModule
     public static void AddFreelancerProfilesEndpoints(this IEndpointRouteBuilder app)
     {
         var createFreelancerProfileEndpoint = app.MapPost("/api/freelancerProfiles",
-                async (IMediator mediator,  [FromForm]CreateFreelancerProfileRequest createFreelancerProfileRequest, CancellationToken ct) =>
+                async (IMediator mediator, [FromForm] CreateFreelancerProfileRequest createFreelancerProfileRequest, CancellationToken ct) =>
                 {
                     var address = new AddressRequest(
                         createFreelancerProfileRequest.AddressCountry,
@@ -25,7 +25,7 @@ public static class FreelancerProfilesModule
                         createFreelancerProfileRequest.AddressStreet,
                         createFreelancerProfileRequest.AddressStreetNumber,
                         createFreelancerProfileRequest.AddressZip);
-                    var skills=new List<SkillRequest>();
+                    var skills = new List<SkillRequest>();
                     if (createFreelancerProfileRequest is { ProgrammingLanguages: not null, Areas: not null })
                     {
                         var count = Math.Min(createFreelancerProfileRequest.ProgrammingLanguages.Count, createFreelancerProfileRequest.Areas.Count);
@@ -34,7 +34,7 @@ public static class FreelancerProfilesModule
                             skills.Add(new SkillRequest(createFreelancerProfileRequest.ProgrammingLanguages[i], createFreelancerProfileRequest.Areas[i]));
                         }
                     }
-                    var command = new AddFreelancerProfileCommand(address, createFreelancerProfileRequest.Bio, createFreelancerProfileRequest.ProfileImage,skills,createFreelancerProfileRequest.ForeignLanguages,createFreelancerProfileRequest.Experience,createFreelancerProfileRequest.Rate,createFreelancerProfileRequest.Currency,createFreelancerProfileRequest.Rating,createFreelancerProfileRequest.PortfolioUrl);
+                    var command = new AddFreelancerProfileCommand(address, createFreelancerProfileRequest.Bio, createFreelancerProfileRequest.ProfileImage, skills, createFreelancerProfileRequest.ForeignLanguages, createFreelancerProfileRequest.Experience, createFreelancerProfileRequest.Rate, createFreelancerProfileRequest.Currency, createFreelancerProfileRequest.Rating, createFreelancerProfileRequest.PortfolioUrl);
                     var result = await mediator.Send(command, ct);
                     return Results.Ok(result);
                 })
@@ -65,7 +65,7 @@ public static class FreelancerProfilesModule
                     updateFreelancerProfileRequest.AddressStreet,
                     updateFreelancerProfileRequest.AddressStreetNumber,
                     updateFreelancerProfileRequest.AddressZip);
-                var skills=new List<SkillRequest>();
+                var skills = new List<SkillRequest>();
                 if (updateFreelancerProfileRequest is { ProgrammingLanguages: not null, Areas: not null })
                 {
                     var count = Math.Min(updateFreelancerProfileRequest.ProgrammingLanguages.Count, updateFreelancerProfileRequest.Areas.Count);
@@ -74,7 +74,7 @@ public static class FreelancerProfilesModule
                         skills.Add(new SkillRequest(updateFreelancerProfileRequest.ProgrammingLanguages[i], updateFreelancerProfileRequest.Areas[i]));
                     }
                 }
-                var command = new UpdateFreelancerProfileCommand(id, address, updateFreelancerProfileRequest.Bio, updateFreelancerProfileRequest.ProfileImage,skills,updateFreelancerProfileRequest.ForeignLanguages,updateFreelancerProfileRequest.Experience,updateFreelancerProfileRequest.Rate,updateFreelancerProfileRequest.Currency,updateFreelancerProfileRequest.Rating,updateFreelancerProfileRequest.PortfolioUrl);
+                var command = new UpdateFreelancerProfileCommand(id, address, updateFreelancerProfileRequest.Bio, updateFreelancerProfileRequest.ProfileImage, skills, updateFreelancerProfileRequest.ForeignLanguages, updateFreelancerProfileRequest.Experience, updateFreelancerProfileRequest.Rate, updateFreelancerProfileRequest.Currency, updateFreelancerProfileRequest.Rating, updateFreelancerProfileRequest.PortfolioUrl);
                 var result = await mediator.Send(command, ct);
                 return Results.Ok(result);
             }).WithTags("FreelancerProfiles").

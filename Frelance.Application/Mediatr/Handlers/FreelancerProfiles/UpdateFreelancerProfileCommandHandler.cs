@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.FreelancerProfiles;
 
-public class UpdateFreelancerProfileCommandHandler:IRequestHandler<UpdateFreelancerProfileCommand, Unit>
+public class UpdateFreelancerProfileCommandHandler : IRequestHandler<UpdateFreelancerProfileCommand, Unit>
 {
     private readonly IFreelancerProfileRepository _repository;
     private readonly IUnitOfWork _unitOfWork;
@@ -16,7 +16,7 @@ public class UpdateFreelancerProfileCommandHandler:IRequestHandler<UpdateFreelan
         _repository = repository;
         _unitOfWork = unitOfWork;
     }
-    
+
     public async Task<Unit> Handle(UpdateFreelancerProfileCommand request, CancellationToken cancellationToken)
     {
         await _repository.UpdateFreelancerProfileAsync(request, cancellationToken);

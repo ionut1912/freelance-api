@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.FreelancerProfiles;
 
-public class GetFreelancerProfilesQueryHandler:IRequestHandler<GetFreelancerProfilesQuery,PaginatedList<FreelancerProfileDto>>
+public class GetFreelancerProfilesQueryHandler : IRequestHandler<GetFreelancerProfilesQuery, PaginatedList<FreelancerProfileDto>>
 {
     private readonly IFreelancerProfileRepository _freelancerProfileRepository;
 
@@ -16,6 +16,6 @@ public class GetFreelancerProfilesQueryHandler:IRequestHandler<GetFreelancerProf
     }
     public async Task<PaginatedList<FreelancerProfileDto>> Handle(GetFreelancerProfilesQuery request, CancellationToken cancellationToken)
     {
-       return await _freelancerProfileRepository.GetAllFreelancerProfilesAsync(request, cancellationToken);
+        return await _freelancerProfileRepository.GetAllFreelancerProfilesAsync(request, cancellationToken);
     }
 }
