@@ -1,6 +1,7 @@
 using Frelance.Application.Mediatr.Commands.ClientProfiles;
 using Frelance.Application.Mediatr.Queries.ClientProfiles;
 using Frelance.Contracts.Dtos;
+using Frelance.Contracts.Requests.Address;
 using Frelance.Contracts.Requests.ClientProfile;
 using Frelance.Contracts.Requests.Common;
 using Frelance.Web.Extensions;
@@ -18,7 +19,7 @@ namespace Frelance.Web.Modules
             var createClientProfileEndpoint = app.MapPost("/api/clientProfiles",
                     async (IMediator mediator, [FromForm] CreateClientProfileRequest uploadDto, CancellationToken ct) =>
                     {
-                        var address = new AddressDto(
+                        var address = new AddressRequest(
                             uploadDto.AddressCountry,
                             uploadDto.AddressCity,
                             uploadDto.AddressStreet,
@@ -49,7 +50,13 @@ namespace Frelance.Web.Modules
             var updateClientProfileEndpoint = app.MapPut("/api/clientProfiles/{id}", async (IMediator mediator, int id,
                 [FromForm] UpdateClientProfileRequest updateClientProfileRequest, CancellationToken ct) =>
                 {
-                    var command = new UpdateClientProfileCommand(id, updateClientProfileRequest.AddressCountry, updateClientProfileRequest.AddressStreet, updateClientProfileRequest.AddressStreet, updateClientProfileRequest.AddressCity, updateClientProfileRequest.AddressZip, updateClientProfileRequest.Bio, updateClientProfileRequest.ProfileImage);
+                    var address = new AddressRequest(
+                        updateClientProfileRequest.AddressCountry,
+                        updateClientProfileRequest.AddressCity,
+                        updateClientProfileRequest.AddressStreet,
+                        updateClientProfileRequest.AddressStreetNumber,
+                        updateClientProfileRequest.AddressZip);
+                    var command = new UpdateClientProfileCommand(id, address, updateClientProfileRequest.Bio, updateClientProfileRequest.ProfileImage);
                     var result = await mediator.Send(command, ct);
                     return Results.Ok(result);
                 }).WithTags("ClientProfiles").
@@ -65,20 +72,5 @@ namespace Frelance.Web.Modules
             updateClientProfileEndpoint.RemoveAntiforgery();
         }
 
-        private static void RemoveAntiforgery(this RouteHandlerBuilder builder)
-        {
-            builder.Add(builder =>
-                     {
-                         var antiforgeryMetadata = builder.Metadata
-                             .Where(m => m is IAntiforgeryMetadata)
-                             .ToList();
-
-                         foreach (var item in antiforgeryMetadata)
-                         {
-                             builder.Metadata.Remove(item);
-                         }
-                     });
-
-        }
     }
 }

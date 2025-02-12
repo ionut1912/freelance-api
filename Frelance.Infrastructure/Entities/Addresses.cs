@@ -17,4 +17,14 @@ public class Addresses
         StreetNumber = streetNumber;
         ZipCode = zipCode;
     }
+    
+    public Addresses(int id,string country, string city, string street, string streetNumber, string zipCode)
+    {
+        Id = id;
+        Country = country;
+        City = city;
+        Street = street;
+        StreetNumber = streetNumber;
+        ZipCode = zipCode;
+    }
 }

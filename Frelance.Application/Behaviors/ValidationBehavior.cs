@@ -26,11 +26,9 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
 
         var failures = validationResults.Where(x => !x.IsValid)
             .SelectMany(x => x.Errors)
-            .Select(x => new ValidationError
-            {
-                Property = x.PropertyName,
-                ErrorMessage = x.ErrorMessage
-            }).ToList();
+            .Select(x => new ValidationError(x.PropertyName, x.ErrorMessage))
+            .ToList();
+
 
         if (failures.Count > 0)
         {

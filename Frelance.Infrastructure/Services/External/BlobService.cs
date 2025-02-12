@@ -36,17 +36,16 @@ public class BlobService : IBlobService
         return blobClient.Uri.ToString();
     }
 
-    public async Task DeleteBlobAsync(string containerName)
+    public async Task DeleteBlobAsync(string containerName, string folderName)
     {
         try
         {
             var containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
-            await foreach (var blobItem in containerClient.GetBlobsAsync())
+            await foreach (var blobItem in containerClient.GetBlobsAsync(prefix: folderName + "/"))
             {
                 var blobClient = containerClient.GetBlobClient(blobItem.Name);
                 await blobClient.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots);
             }
-
         }
         catch (Exception e)
         {
@@ -54,4 +53,5 @@ public class BlobService : IBlobService
             throw;
         }
     }
+    
 }

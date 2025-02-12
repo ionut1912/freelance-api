@@ -3,6 +3,7 @@ using Frelance.Infrastructure;
 using Frelance.Web;
 using Frelance.Web.Handlers;
 using Frelance.Web.Modules;
+using Frelance.Web.SwaggerFilters;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,11 +31,12 @@ builder.Services.AddSwaggerGen(options =>
                     Id = "Bearer"
                 }
             },
-            []
+            new string[] {}
         }
     });
     options.OperationFilter<FileUploadOperationFilter>();
 });
+
 builder.Services.AddCors();
 builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
@@ -60,4 +62,5 @@ app.AddTimeLogsEndpoints();
 app.AddUserEndpoints();
 app.AddSkillsEndpoint();
 app.AddClientProfilesEndpoints();
+app.AddFreelancerProfilesEndpoints();
 app.Run();

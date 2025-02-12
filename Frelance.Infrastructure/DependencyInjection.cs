@@ -77,6 +77,7 @@ public static class DependencyInjection
             services.AddScoped<ISkillsRepository, SkillRepository>();
             services.AddScoped<IBlobService, BlobService>();
             services.AddScoped<IClientProfileRepository, ClientProfileRepository>();
+            services.AddScoped<IFreelancerProfileRepository, FreelancerProfileRepository>();
 
             services.AddIdentityCore<Users>(opt => opt.User.RequireUniqueEmail = true)
                 .AddRoles<Roles>()
@@ -86,7 +87,7 @@ public static class DependencyInjection
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("ClientRole", policy => policy.RequireRole("Client"));
-                options.AddPolicy("FrelancerRole", policy => policy.RequireRole("Frelancer"));
+                options.AddPolicy("FreelancerRole", policy => policy.RequireRole("Freelancer"));
             });
 
             services.AddScoped<TokenService>();

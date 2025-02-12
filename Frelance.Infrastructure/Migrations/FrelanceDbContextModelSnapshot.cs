@@ -166,7 +166,7 @@ namespace Frelance.Infrastructure.Migrations
                     b.Property<bool>("IsAvailable")
                         .HasColumnType("bit");
 
-                    b.Property<string>("PortofolioUrl")
+                    b.Property<string>("PortfolioUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProfileImageUrl")
