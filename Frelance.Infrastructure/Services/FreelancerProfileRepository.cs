@@ -76,7 +76,7 @@ namespace Frelance.Infrastructure.Services
                 .Include(fp => fp.Invoices)
                     .ThenInclude(i => i.Project)
                 .Include(fp => fp.Skills)
-                .Include(x=>x.Addresses)
+                .Include(x => x.Addresses)
                 .FirstOrDefaultAsync(fp => fp.Id == query.Id, cancellationToken);
 
             if (profile == null)
@@ -99,91 +99,91 @@ namespace Frelance.Infrastructure.Services
                 query.PaginationParams.PageSize);
         }
 
-public async Task UpdateFreelancerProfileAsync(UpdateFreelancerProfileCommand command, CancellationToken cancellationToken)
-{
-    var freelancerProfile = await _dbContext.FreelancerProfiles
-        .Include(fp => fp.Addresses)
-        .Include(fp => fp.Skills)
-        .FirstOrDefaultAsync(fp => fp.Id == command.Id, cancellationToken);
-    if (freelancerProfile == null)
-    {
-        throw new NotFoundException($"{nameof(FreelancerProfiles)} with {nameof(FreelancerProfiles.Id)}: '{command.Id}' does not exist");
-    }
+        public async Task UpdateFreelancerProfileAsync(UpdateFreelancerProfileCommand command, CancellationToken cancellationToken)
+        {
+            var freelancerProfile = await _dbContext.FreelancerProfiles
+                .Include(fp => fp.Addresses)
+                .Include(fp => fp.Skills)
+                .FirstOrDefaultAsync(fp => fp.Id == command.Id, cancellationToken);
+            if (freelancerProfile == null)
+            {
+                throw new NotFoundException($"{nameof(FreelancerProfiles)} with {nameof(FreelancerProfiles.Id)}: '{command.Id}' does not exist");
+            }
 
-    if (command.ProfileImage is not null)
-    {
-        await _blobService.DeleteBlobAsync(StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(),freelancerProfile.UserId.ToString());
-        freelancerProfile.ProfileImageUrl = await _blobService.UploadBlobAsync(
-            StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(),
-            $"{freelancerProfile.UserId}/{command.ProfileImage.FileName}",
-            command.ProfileImage);
-    }
+            if (command.ProfileImage is not null)
+            {
+                await _blobService.DeleteBlobAsync(StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(), freelancerProfile.UserId.ToString());
+                freelancerProfile.ProfileImageUrl = await _blobService.UploadBlobAsync(
+                    StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(),
+                    $"{freelancerProfile.UserId}/{command.ProfileImage.FileName}",
+                    command.ProfileImage);
+            }
 
-    if (command.Address is not null)
-    {
-        var updatedAddress = new Addresses(
-            freelancerProfile.Addresses.Id,
-            command.Address.Country,
-            command.Address.City,
-            command.Address.Street,
-            command.Address.StreetNumber,
-            command.Address.ZipCode);
+            if (command.Address is not null)
+            {
+                var updatedAddress = new Addresses(
+                    freelancerProfile.Addresses.Id,
+                    command.Address.Country,
+                    command.Address.City,
+                    command.Address.Street,
+                    command.Address.StreetNumber,
+                    command.Address.ZipCode);
 
-        _dbContext.Entry(freelancerProfile.Addresses).CurrentValues.SetValues(updatedAddress);
-        freelancerProfile.AddressId = updatedAddress.Id;
-        await _dbContext.SaveChangesAsync(cancellationToken);
-    }
+                _dbContext.Entry(freelancerProfile.Addresses).CurrentValues.SetValues(updatedAddress);
+                freelancerProfile.AddressId = updatedAddress.Id;
+                await _dbContext.SaveChangesAsync(cancellationToken);
+            }
 
-    freelancerProfile.Bio = command.Bio;
+            freelancerProfile.Bio = command.Bio;
 
-    var skillsInDb = await _dbContext.Skills.AsNoTracking().ToListAsync(cancellationToken);
-    ValidateSkills(skillsInDb, command.Skills);
+            var skillsInDb = await _dbContext.Skills.AsNoTracking().ToListAsync(cancellationToken);
+            ValidateSkills(skillsInDb, command.Skills);
 
-    var existingSkillLanguages = freelancerProfile.Skills.Select(s => s.ProgrammingLanguage)
-        .ToHashSet(StringComparer.OrdinalIgnoreCase);
-    var newSkills = command.Skills
-        .Select(s => s.Adapt<Skiills>())
-        .Where(s => !existingSkillLanguages.Contains(s.ProgrammingLanguage))
-        .ToList();
+            var existingSkillLanguages = freelancerProfile.Skills.Select(s => s.ProgrammingLanguage)
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+            var newSkills = command.Skills
+                .Select(s => s.Adapt<Skiills>())
+                .Where(s => !existingSkillLanguages.Contains(s.ProgrammingLanguage))
+                .ToList();
 
-    foreach (var newSkill in newSkills)
-    {
-        freelancerProfile.Skills.Add(newSkill);
-    }
+            foreach (var newSkill in newSkills)
+            {
+                freelancerProfile.Skills.Add(newSkill);
+            }
 
-    foreach (var foreignLanguage in command.ForeignLanguages.Where(foreignLanguage => !freelancerProfile.ForeignLanguages.Contains(foreignLanguage)))
-    {
-        freelancerProfile.ForeignLanguages.Add(foreignLanguage);
-    }
+            foreach (var foreignLanguage in command.ForeignLanguages.Where(foreignLanguage => !freelancerProfile.ForeignLanguages.Contains(foreignLanguage)))
+            {
+                freelancerProfile.ForeignLanguages.Add(foreignLanguage);
+            }
 
-    freelancerProfile.Experience = command.Experience;
-    freelancerProfile.Rate = command.Rate;
-    freelancerProfile.Currency = command.Currency;
-    freelancerProfile.Rating = command.Rating;
-    freelancerProfile.PortfolioUrl = command.PortfolioUrl;
-    
-    _dbContext.FreelancerProfiles.Update(freelancerProfile);
-}
+            freelancerProfile.Experience = command.Experience;
+            freelancerProfile.Rate = command.Rate;
+            freelancerProfile.Currency = command.Currency;
+            freelancerProfile.Rating = command.Rating;
+            freelancerProfile.PortfolioUrl = command.PortfolioUrl;
 
-public async Task DeleteFreelancerProfileAsync(DeleteFreelancerProfileCommand deleteFreelancerProfileCommand,
-    CancellationToken cancellationToken)
-{
-    var freelancerToDelete = await _dbContext.FreelancerProfiles
-        .AsNoTracking()
-        .FirstOrDefaultAsync(x => x.Id == deleteFreelancerProfileCommand.Id, cancellationToken);
-    if (freelancerToDelete is null)
-    {
-        throw new NotFoundException(
-            $"{nameof(FreelancerProfiles)} with {nameof(FreelancerProfiles.Id)} : '{deleteFreelancerProfileCommand.Id}' does not exist");
-    }
+            _dbContext.FreelancerProfiles.Update(freelancerProfile);
+        }
 
-    await _blobService.DeleteBlobAsync(StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(),
-        freelancerToDelete.UserId.ToString());
-    _dbContext.FreelancerProfiles.Remove(freelancerToDelete);
-}
+        public async Task DeleteFreelancerProfileAsync(DeleteFreelancerProfileCommand deleteFreelancerProfileCommand,
+            CancellationToken cancellationToken)
+        {
+            var freelancerToDelete = await _dbContext.FreelancerProfiles
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == deleteFreelancerProfileCommand.Id, cancellationToken);
+            if (freelancerToDelete is null)
+            {
+                throw new NotFoundException(
+                    $"{nameof(FreelancerProfiles)} with {nameof(FreelancerProfiles.Id)} : '{deleteFreelancerProfileCommand.Id}' does not exist");
+            }
+
+            await _blobService.DeleteBlobAsync(StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(),
+                freelancerToDelete.UserId.ToString());
+            _dbContext.FreelancerProfiles.Remove(freelancerToDelete);
+        }
 
 
-private static void ValidateSkills(List<Skiills> skills, List<SkillRequest> skillRequests)
+        private static void ValidateSkills(List<Skiills> skills, List<SkillRequest> skillRequests)
         {
             var missingSkill = skillRequests.Any(req =>
                 !skills.Any(dbSkill =>

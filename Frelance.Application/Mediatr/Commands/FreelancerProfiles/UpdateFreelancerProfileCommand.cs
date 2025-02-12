@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 namespace Frelance.Application.Mediatr.Commands.FreelancerProfiles;
 
 public record UpdateFreelancerProfileCommand(
-    int Id,    
+    int Id,
     AddressRequest Address,
     string Bio,
     IFormFile ProfileImage,
@@ -16,4 +16,4 @@ public record UpdateFreelancerProfileCommand(
     int Rate,
     string Currency,
     int Rating,
-    string PortfolioUrl):IRequest<Unit>;
+    string PortfolioUrl) : IRequest<Unit>;

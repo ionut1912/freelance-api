@@ -15,11 +15,11 @@ public class CreateFreelancerProfileRequest
     public string AddressZip { get; set; }
     public string Bio { get; set; }
     public IFormFile ProfileImage { get; set; }
-    
+
     public List<string> ProgrammingLanguages { get; set; }
-    
-    public List<string> Areas{get;set;}
-    
+
+    public List<string> Areas { get; set; }
+
     public List<string> ForeignLanguages { get; set; }
     public string Experience { get; set; }
     public int Rate { get; set; }

@@ -112,13 +112,13 @@ public class FrelanceDbContext : IdentityDbContext<Users, Roles, int>
             .WithMany(x => x.Invoices)
             .HasForeignKey(x => x.FreelancerId)
             .OnDelete(DeleteBehavior.NoAction);
-        
+
         builder.Entity<Roles>()
             .HasData(
                 new Roles { Id = 1, Name = "Freelancer", NormalizedName = "FREELANCER" },
                 new Roles { Id = 2, Name = "Client", NormalizedName = "CLIENT" }
             );
-        
+
         builder.Entity<Skiills>()
             .HasData(
                 new Skiills { Id = 1, ProgrammingLanguage = ".NET", Area = "Backend" },

@@ -85,9 +85,9 @@ public class ClientProfileRepository : IClientProfileRepository
     {
         var clientToUpdate = await _dbContext.ClientProfiles
                                                          .AsNoTracking()
-                                                         .Include(x=>x.Addresses)
+                                                         .Include(x => x.Addresses)
                                                          .FirstOrDefaultAsync(x => x.Id == clientProfileCommand.Id, cancellationToken);
-        
+
         if (clientToUpdate is null)
         {
             throw new NotFoundException($"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Id)} : '{clientProfileCommand.Id}' does not exist");
@@ -95,7 +95,7 @@ public class ClientProfileRepository : IClientProfileRepository
 
         if (clientProfileCommand.ProfileImage is not null)
         {
-            await _blobService.DeleteBlobAsync(StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(),clientToUpdate.UserId.ToString());
+            await _blobService.DeleteBlobAsync(StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(), clientToUpdate.UserId.ToString());
             clientToUpdate.ProfileImageUrl = await _blobService.UploadBlobAsync(StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(),
                 $"{clientToUpdate.UserId}/{clientProfileCommand.ProfileImage.FileName}",
                 clientProfileCommand.ProfileImage);
@@ -103,7 +103,7 @@ public class ClientProfileRepository : IClientProfileRepository
 
         if (clientProfileCommand.AddressRequest is not null)
         {
-            var address = new Addresses(clientToUpdate.Addresses.Id,clientProfileCommand.AddressRequest.Country, clientProfileCommand.AddressRequest.City,
+            var address = new Addresses(clientToUpdate.Addresses.Id, clientProfileCommand.AddressRequest.Country, clientProfileCommand.AddressRequest.City,
                 clientProfileCommand.AddressRequest.StreetNumber, clientProfileCommand.AddressRequest.StreetNumber,
                 clientProfileCommand.AddressRequest.ZipCode);
             _dbContext.Entry(clientToUpdate.Addresses).CurrentValues.SetValues(address);
@@ -123,8 +123,8 @@ public class ClientProfileRepository : IClientProfileRepository
         {
             throw new NotFoundException($"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Id)} : '{clientProfileCommand.Id}' does not exist");
         }
-        
-        await _blobService.DeleteBlobAsync(StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(),clientToDelete.UserId.ToString());
+
+        await _blobService.DeleteBlobAsync(StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(), clientToDelete.UserId.ToString());
         _dbContext.ClientProfiles.Remove(clientToDelete);
     }
 }
