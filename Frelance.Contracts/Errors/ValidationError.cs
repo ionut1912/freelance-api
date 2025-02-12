@@ -1,7 +1,6 @@
-﻿namespace Frelance.Contracts.Errors;
-
-public class ValidationError
+﻿namespace Frelance.Contracts.Errors
 {
-    public string Property { get; set; }
-    public string ErrorMessage { get; set; }
+    public record ValidationError(string Property, string ErrorMessage)
+    {
+    }
 }

@@ -1,9 +1,7 @@
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
 
-namespace Frelance.Web;
+namespace Frelance.Web.SwaggerFilters;
 
 public class FileUploadOperationFilter : IOperationFilter
 {

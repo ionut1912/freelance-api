@@ -67,7 +67,7 @@ public class AccountRepository : IAccountRepository
         var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.Username, cancellationToken);
         if (user is null)
         {
-            modelState.AddModelError("Username", "username is already taken");
+            modelState.AddModelError("Username", "username is invalid");
         }
 
         if (!await _userManager.CheckPasswordAsync(user!, loginDto.Password))
@@ -77,7 +77,7 @@ public class AccountRepository : IAccountRepository
 
         if (user.Email != loginDto.Email)
         {
-            modelState.AddModelError("Email", "email is not valid");
+            modelState.AddModelError("Email", "email is invalid");
         }
 
         GenerateException(modelState);
@@ -98,11 +98,7 @@ public class AccountRepository : IAccountRepository
         if (modelState.IsValid) return;
         var validationErrors = modelState
             .Where(kvp => kvp.Value.Errors.Count > 0)
-            .SelectMany(kvp => kvp.Value.Errors.Select(error => new ValidationError
-            {
-                Property = kvp.Key,
-                ErrorMessage = error.ErrorMessage
-            }))
+            .SelectMany(kvp => kvp.Value.Errors.Select(error => new ValidationError(kvp.Key, error.ErrorMessage)))
             .ToList();
         throw new CustomValidationException(validationErrors);
     }

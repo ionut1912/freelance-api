@@ -4,6 +4,7 @@ using Frelance.Application.Mediatr.Queries.ClientProfiles;
 using Frelance.Application.Repositories;
 using Frelance.Application.Repositories.External;
 using Frelance.Contracts.Dtos;
+using Frelance.Contracts.Enums;
 using Frelance.Contracts.Exceptions;
 using Frelance.Contracts.Responses.Common;
 using Frelance.Infrastructure.Context;
@@ -31,7 +32,7 @@ public class ClientProfileRepository : IClientProfileRepository
 
     public async Task AddClientProfileAsync(AddClientProfileCommand clientProfileCommand, CancellationToken cancellationToken)
     {
-        var user = await _dbContext.Users
+        var user = await _dbContext.Users.AsNoTracking()
             .FirstOrDefaultAsync(x => x.UserName == _userAccessor.GetUsername(), cancellationToken);
         if (user == null)
         {
@@ -43,7 +44,7 @@ public class ClientProfileRepository : IClientProfileRepository
         var clientProfile = clientProfileCommand.Adapt<ClientProfiles>();
         clientProfile.Users = user;
         clientProfile.AddressId = address.Id;
-        var profileImageUrl = await _blobService.UploadBlobAsync("userimagescontainer",
+        var profileImageUrl = await _blobService.UploadBlobAsync(StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(),
             $"{user.Id}/{clientProfileCommand.ProfileImage.FileName}", clientProfileCommand.ProfileImage);
         clientProfile.ProfileImageUrl = profileImageUrl;
         await _dbContext.ClientProfiles.AddAsync(clientProfile, cancellationToken);
@@ -58,7 +59,6 @@ public class ClientProfileRepository : IClientProfileRepository
             .Include(cp => cp.Users)
             .ThenInclude(u => u.Proposals)
             .ThenInclude(p => p.Project)
-            .Include(cp => cp.Addresses)
             .Include(cp => cp.Contracts)
             .ThenInclude(c => c.Project)
             .Include(cp => cp.Invoices)
@@ -83,7 +83,11 @@ public class ClientProfileRepository : IClientProfileRepository
 
     public async Task UpdateClientProfileAsync(UpdateClientProfileCommand clientProfileCommand, CancellationToken cancellationToken)
     {
-        var clientToUpdate = await _dbContext.ClientProfiles.AsNoTracking().Include(x => x.Addresses).Include(x => x.Users).FirstOrDefaultAsync(x => x.Id == clientProfileCommand.Id, cancellationToken);
+        var clientToUpdate = await _dbContext.ClientProfiles
+                                                         .AsNoTracking()
+                                                         .Include(x=>x.Addresses)
+                                                         .FirstOrDefaultAsync(x => x.Id == clientProfileCommand.Id, cancellationToken);
+        
         if (clientToUpdate is null)
         {
             throw new NotFoundException($"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Id)} : '{clientProfileCommand.Id}' does not exist");
@@ -91,20 +95,20 @@ public class ClientProfileRepository : IClientProfileRepository
 
         if (clientProfileCommand.ProfileImage is not null)
         {
-            await _blobService.DeleteBlobAsync("userimagescontainer");
-            clientToUpdate.ProfileImageUrl = await _blobService.UploadBlobAsync("userimagescontainer",
-                $"{clientToUpdate.Users.Id}/{clientProfileCommand.ProfileImage.FileName}",
+            await _blobService.DeleteBlobAsync(StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(),clientToUpdate.UserId.ToString());
+            clientToUpdate.ProfileImageUrl = await _blobService.UploadBlobAsync(StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(),
+                $"{clientToUpdate.UserId}/{clientProfileCommand.ProfileImage.FileName}",
                 clientProfileCommand.ProfileImage);
         }
 
-        if (clientProfileCommand.AddressCity is not null)
+        if (clientProfileCommand.AddressRequest is not null)
         {
-            var address = new Addresses(clientProfileCommand.AddressCountry, clientProfileCommand.AddressCity,
-                clientProfileCommand.AddressStreet, clientProfileCommand.AddressStreetNumber,
-                clientProfileCommand.AddressZip);
-            await _dbContext.Addresses.AddAsync(address, cancellationToken);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            var address = new Addresses(clientToUpdate.Addresses.Id,clientProfileCommand.AddressRequest.Country, clientProfileCommand.AddressRequest.City,
+                clientProfileCommand.AddressRequest.StreetNumber, clientProfileCommand.AddressRequest.StreetNumber,
+                clientProfileCommand.AddressRequest.ZipCode);
+            _dbContext.Entry(clientToUpdate.Addresses).CurrentValues.SetValues(address);
             clientToUpdate.AddressId = address.Id;
+            await _dbContext.SaveChangesAsync(cancellationToken);
         }
         clientToUpdate.Bio = clientProfileCommand.Bio;
         _dbContext.ClientProfiles.Update(clientToUpdate);
@@ -112,12 +116,15 @@ public class ClientProfileRepository : IClientProfileRepository
 
     public async Task DeleteClientProfileAsync(DeleteClientProfileCommand clientProfileCommand, CancellationToken cancellationToken)
     {
-        var clientToDelete = await _dbContext.ClientProfiles.FirstOrDefaultAsync(x => x.Id == clientProfileCommand.Id, cancellationToken);
+        var clientToDelete = await _dbContext.ClientProfiles
+                                                        .AsNoTracking()
+                                                        .FirstOrDefaultAsync(x => x.Id == clientProfileCommand.Id, cancellationToken);
         if (clientToDelete is null)
         {
             throw new NotFoundException($"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Id)} : '{clientProfileCommand.Id}' does not exist");
         }
+        
+        await _blobService.DeleteBlobAsync(StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(),clientToDelete.UserId.ToString());
         _dbContext.ClientProfiles.Remove(clientToDelete);
-        await _blobService.DeleteBlobAsync("userimagescontainer");
     }
 }

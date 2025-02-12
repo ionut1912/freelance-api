@@ -1,13 +1,15 @@
-using System.Collections.Generic;
+
 using Frelance.Application.Mediatr.Commands.ClientProfiles;
+using Frelance.Application.Mediatr.Commands.FreelancerProfiles;
 using Frelance.Application.Mediatr.Commands.Projects;
 using Frelance.Application.Mediatr.Commands.Tasks;
 using Frelance.Application.Mediatr.Commands.TimeLogs;
 using Frelance.Application.Mediatr.Commands.Users;
 using Frelance.Contracts.Dtos;
-using Frelance.Contracts.Requests.ClientProfile;
+using Frelance.Contracts.Requests.Address;
 using Frelance.Contracts.Requests.Projects;
 using Frelance.Contracts.Requests.ProjectTasks;
+using Frelance.Contracts.Requests.Skills;
 using Frelance.Contracts.Requests.TimeLogs;
 using Frelance.Infrastructure.Entities;
 using Mapster;
@@ -57,12 +59,12 @@ namespace Frelance.Infrastructure.Mappings
                 .NewConfig()
                 .Map(dest => dest, src => src);
 
-            TypeAdapterConfig<Addresses, AddressDto>
+            TypeAdapterConfig<AddressRequest, Addresses>
                 .NewConfig()
-                .Map(dest => dest, src => src);
+                .ConstructUsing(src => new Addresses(src.Country, src.City, src.Street, src.StreetNumber, src.ZipCode));
+
             TypeAdapterConfig<ClientProfiles, AddClientProfileCommand>
                 .NewConfig()
-                .Map(dest => dest.Address, src => src.Addresses)
                 .Map(dest => dest.Bio, src => src.Bio);
             TypeAdapterConfig<ClientProfileDto, AddClientProfileCommand>
                 .NewConfig()
@@ -78,12 +80,53 @@ namespace Frelance.Infrastructure.Mappings
                     src.Users.PhoneNumber,
                     src.Users.Reviews.Adapt<List<ReviewsDto>>(),
                     src.Users.Proposals.Adapt<List<ProposalsDto>>()))
-                .Map(dest => dest.Address, src => src.Addresses.Adapt<AddressDto>())
+                .Map(dest=>dest.Address,src=>src.Addresses.Adapt<AddressDto>())
                 .Map(dest => dest.Bio, src => src.Bio)
                 .Map(dest => dest.ProfileImageUrl, src => src.ProfileImageUrl)
                 .Map(dest => dest.Contracts, src => src.Contracts.Adapt<List<ContractsDto>>())
                 .Map(dest => dest.Invoices, src => src.Invoices.Adapt<List<InvoicesDto>>());
 
+            TypeAdapterConfig<FreelancerProfiles, AddFreelancerProfileCommand>
+                .NewConfig()
+                .Map(dest => dest, src => src);
+
+            TypeAdapterConfig<FreelancerProfiles, FreelancerProfileDto>
+                .NewConfig()
+                .Map(dest => dest, src => src);
+
+            TypeAdapterConfig<List<Skiills>, List<SkillRequest>>
+                .NewConfig()
+                .Map(dest => dest, src => src);
+
+            TypeAdapterConfig<FreelancerProfiles, FreelancerProfileDto>
+                .NewConfig()
+                .Map(dest => dest.Id, src => src.Id)
+                .Map(dest => dest.UserClientDto, src => new UserClientDto(
+                    src.Users.Id,
+                    src.Users.UserName,
+                    src.Users.Email,
+                    src.Users.PhoneNumber,
+                    src.Users.Reviews.Adapt<List<ReviewsDto>>(),
+                    src.Users.Proposals.Adapt<List<ProposalsDto>>()))
+                .Map(dest=>dest.AddressDto, src=>src.Addresses.Adapt<AddressDto>())
+                .Map(dest => dest.Bio, src => src.Bio)
+                .Map(dest => dest.ProfileImageUrl, src => src.ProfileImageUrl)
+                .Map(dest => dest.ContractsDto, src => src.Contracts.Adapt<List<ContractsDto>>())
+                .Map(dest => dest.InvoicesDto, src => src.Invoices.Adapt<List<InvoicesDto>>())
+                .Map(dest => dest.ProjectDtos, src => src.Projects.Adapt<List<ProjectDto>>())
+                .Map(dest => dest.TaskDtos, src => src.Tasks.Adapt<List<TaskDto>>())
+                .Map(dest => dest.SkillDtos, src => src.Skills.Adapt<List<SkillDto>>())
+                .Map(dest => dest.ForeignLanguages, src => src.ForeignLanguages)
+                .Map(dest => dest.IsAvailable, src => src.IsAvailable)
+                .Map(dest => dest.Experience, src => src.Experience)
+                .Map(dest => dest.Rate, src => src.Rate)
+                .Map(dest => dest.Currency, src => src.Currency)
+                .Map(dest => dest.Rating, src => src.Rating)
+                .Map(dest => dest.PortfolioUrl, src => src.PortfolioUrl);
+            
+                TypeAdapterConfig<Skiills,SkillDto>
+                    .NewConfig()
+                    .Map(dest => dest, src => src);
 
         }
     }
