@@ -7,10 +7,10 @@ public class CreateTaskCommandValidator : AbstractValidator<CreateTaskCommand>
 {
     public CreateTaskCommandValidator()
     {
-        RuleFor(x => x.ProjectTitle).NotEmpty().MaximumLength(50);
-        RuleFor(x => x.Title).NotEmpty().MaximumLength(50);
-        RuleFor(x => x.Description).NotEmpty().MaximumLength(500);
-        RuleFor(x => x.Priority).NotEmpty();
+        RuleFor(x => x.CreateProjectTaskRequest.ProjectTitle).NotEmpty().MaximumLength(50);
+        RuleFor(x => x.CreateProjectTaskRequest.Title).NotEmpty().MaximumLength(50);
+        RuleFor(x => x.CreateProjectTaskRequest.Description).NotEmpty().MaximumLength(500);
+        RuleFor(x => x.CreateProjectTaskRequest.Priority).NotEmpty();
 
     }
 

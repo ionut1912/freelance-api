@@ -9,5 +9,4 @@ public record ClientProfileDto(
     string Bio,
     string ProfileImageUrl,
     List<ContractsDto> Contracts,
-    List<InvoicesDto> Invoices,
-    List<ProjectDto> Projects);
+    List<InvoicesDto> Invoices);

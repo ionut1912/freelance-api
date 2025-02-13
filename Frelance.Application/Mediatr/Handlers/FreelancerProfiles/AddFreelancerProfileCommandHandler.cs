@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.FreelancerProfiles;
 
-public class AddFreelancerProfileCommandHandler : IRequestHandler<AddFreelancerProfileCommand, Unit>
+public class AddFreelancerProfileCommandHandler : IRequestHandler<CreateFreelancerProfileCommand, Unit>
 {
     private readonly IFreelancerProfileRepository _repository;
     private readonly IUnitOfWork _unitOfWork;
@@ -17,7 +17,7 @@ public class AddFreelancerProfileCommandHandler : IRequestHandler<AddFreelancerP
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Unit> Handle(AddFreelancerProfileCommand request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(CreateFreelancerProfileCommand request, CancellationToken cancellationToken)
     {
         await _repository.AddFreelancerProfileAsync(request, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);

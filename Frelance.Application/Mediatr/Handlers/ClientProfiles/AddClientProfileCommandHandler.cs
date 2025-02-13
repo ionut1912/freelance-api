@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.ClientProfiles;
 
-public class AddClientProfileCommandHandler : IRequestHandler<AddClientProfileCommand, Unit>
+public class AddClientProfileCommandHandler : IRequestHandler<CreateClientProfileCommand, Unit>
 {
     private readonly IClientProfileRepository _clientProfileRepository;
     private readonly IUnitOfWork _unitOfWork;
@@ -17,7 +17,7 @@ public class AddClientProfileCommandHandler : IRequestHandler<AddClientProfileCo
         _clientProfileRepository = clientProfileRepository;
         _unitOfWork = unitOfWork;
     }
-    public async Task<Unit> Handle(AddClientProfileCommand request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(CreateClientProfileCommand request, CancellationToken cancellationToken)
     {
         await _clientProfileRepository.AddClientProfileAsync(request, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);

@@ -8,8 +8,8 @@ public class UpdateTaskCommandValidator : AbstractValidator<UpdateTaskCommand>
     public UpdateTaskCommandValidator()
     {
         RuleFor(x => x.Id).NotEmpty();
-        RuleFor(x => x.Title).MaximumLength(50);
-        RuleFor(x => x.Description).MaximumLength(500);
+        RuleFor(x => x.UpdateProjectTaskRequest.Title).MaximumLength(50);
+        RuleFor(x => x.UpdateProjectTaskRequest.Description).MaximumLength(500);
     }
 
 }

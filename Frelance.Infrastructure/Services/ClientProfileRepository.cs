@@ -30,7 +30,7 @@ public class ClientProfileRepository : IClientProfileRepository
         _userAccessor = userAccessor;
     }
 
-    public async Task AddClientProfileAsync(AddClientProfileCommand clientProfileCommand, CancellationToken cancellationToken)
+    public async Task AddClientProfileAsync(CreateClientProfileCommand clientProfileCommand, CancellationToken cancellationToken)
     {
         var user = await _dbContext.Users.AsNoTracking()
             .FirstOrDefaultAsync(x => x.UserName == _userAccessor.GetUsername(), cancellationToken);
@@ -38,14 +38,16 @@ public class ClientProfileRepository : IClientProfileRepository
         {
             throw new InvalidOperationException("User not found.");
         }
-        var address = clientProfileCommand.Address.Adapt<Addresses>();
+
+        var address = new Addresses(clientProfileCommand.CreateClientProfileRequest.AddressCountry,
+            clientProfileCommand.CreateClientProfileRequest.AddressCity,clientProfileCommand.CreateClientProfileRequest.AddressStreet,clientProfileCommand.CreateClientProfileRequest.AddressStreetNumber,clientProfileCommand.CreateClientProfileRequest.AddressZip);
         await _dbContext.Addresses.AddAsync(address, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
         var clientProfile = clientProfileCommand.Adapt<ClientProfiles>();
         clientProfile.UserId = user.Id;
         clientProfile.AddressId = address.Id;
         var profileImageUrl = await _blobService.UploadBlobAsync(StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(),
-            $"{user.Id}/{clientProfileCommand.ProfileImage.FileName}", clientProfileCommand.ProfileImage);
+            $"{user.Id}/{clientProfileCommand.CreateClientProfileRequest.ProfileImage.FileName}", clientProfileCommand.CreateClientProfileRequest.ProfileImage);
         clientProfile.ProfileImageUrl = profileImageUrl;
         await _dbContext.ClientProfiles.AddAsync(clientProfile, cancellationToken);
     }
@@ -58,7 +60,6 @@ public class ClientProfileRepository : IClientProfileRepository
             .ThenInclude(u => u.Reviews)
             .Include(cp => cp.Users)
             .ThenInclude(u => u.Proposals)
-            .ThenInclude(p => p.Project)
             .Include(cp => cp.Contracts)
             .ThenInclude(c => c.Project)
             .Include(cp => cp.Invoices)
@@ -93,24 +94,24 @@ public class ClientProfileRepository : IClientProfileRepository
             throw new NotFoundException($"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Id)} : '{clientProfileCommand.Id}' does not exist");
         }
 
-        if (clientProfileCommand.ProfileImage is not null)
+        if (clientProfileCommand.UpdateClientProfileRequest.ProfileImage is not null)
         {
             await _blobService.DeleteBlobAsync(StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(), clientToUpdate.UserId.ToString());
             clientToUpdate.ProfileImageUrl = await _blobService.UploadBlobAsync(StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(),
-                $"{clientToUpdate.UserId}/{clientProfileCommand.ProfileImage.FileName}",
-                clientProfileCommand.ProfileImage);
+                $"{clientToUpdate.UserId}/{clientProfileCommand.UpdateClientProfileRequest.ProfileImage.FileName}",
+                clientProfileCommand.UpdateClientProfileRequest.ProfileImage);
         }
 
-        if (clientProfileCommand.AddressRequest is not null)
+        if (clientProfileCommand.UpdateClientProfileRequest.AddressCity is not null)
         {
-            var address = new Addresses(clientToUpdate.Addresses.Id, clientProfileCommand.AddressRequest.Country, clientProfileCommand.AddressRequest.City,
-                clientProfileCommand.AddressRequest.StreetNumber, clientProfileCommand.AddressRequest.StreetNumber,
-                clientProfileCommand.AddressRequest.ZipCode);
+            var address = new Addresses(clientToUpdate.Addresses.Id, clientProfileCommand.UpdateClientProfileRequest.AddressCountry, clientProfileCommand.UpdateClientProfileRequest.AddressCity,
+                clientProfileCommand.UpdateClientProfileRequest.AddressStreet, clientProfileCommand.UpdateClientProfileRequest.AddressStreetNumber,
+                clientProfileCommand.UpdateClientProfileRequest.AddressZip);
             _dbContext.Entry(clientToUpdate.Addresses).CurrentValues.SetValues(address);
             clientToUpdate.AddressId = address.Id;
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
-        clientToUpdate.Bio = clientProfileCommand.Bio;
+        clientToUpdate.Bio = clientProfileCommand.UpdateClientProfileRequest.Bio;
         _dbContext.ClientProfiles.Update(clientToUpdate);
     }
 

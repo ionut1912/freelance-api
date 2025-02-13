@@ -37,19 +37,15 @@ namespace Frelance.Infrastructure.Mappings
                 .Map(dest => dest, src => src);
 
             TypeAdapterConfig<Projects, ProjectDto>
-           .NewConfig()
-           .Map(dest => dest.Id, src => src.Id)
-           .Map(dest => dest.Title, src => src.Title)
-           .Map(dest => dest.Description, src => src.Description)
-           .Map(dest => dest.CreatedAt, src => src.CreatedAt)
-           .Map(dest => dest.Deadline, src => src.Deadline)
-           .Map(dest => dest.Technologies, src => src.Technologies)
-           .Map(dest => dest.Budget, src => src.Budget)
-           .Map(dest => dest.Tasks, src => src.Tasks.Adapt<List<TaskDto>>())
-           .Map(dest => dest.ClientProfileDto, src => src.ClientProfiles.Adapt<ClientProfileDto>())
-           .Map(dest => dest.Proposals, src => src.Proposals.Adapt<List<ProposalsDto>>())
-           .Map(dest => dest.Contracts, src => src.Contracts.Adapt<List<ContractsDto>>())
-           .Map(dest => dest.Invoices, src => src.Invoices.Adapt<List<InvoicesDto>>());
+                .NewConfig()
+                .Map(dest => dest.Id, src => src.Id)
+                .Map(dest => dest.Title, src => src.Title)
+                .Map(dest => dest.Description, src => src.Description)
+                .Map(dest => dest.CreatedAt, src => src.CreatedAt)
+                .Map(dest => dest.Deadline, src => src.Deadline)
+                .Map(dest => dest.Technologies, src => src.Technologies)
+                .Map(dest => dest.Budget, src => src.Budget)
+                .Map(dest => dest.Tasks, src => src.Tasks.Adapt<List<TaskDto>>());
 
             TypeAdapterConfig<CreateProjectTaskRequest, CreateTaskCommand>
                        .NewConfig()
@@ -87,12 +83,9 @@ namespace Frelance.Infrastructure.Mappings
             TypeAdapterConfig<AddressRequest, Addresses>
                        .NewConfig()
                        .ConstructUsing(src => new Addresses(src.Country, src.City, src.Street, src.StreetNumber, src.ZipCode));
+            
 
-            TypeAdapterConfig<ClientProfiles, AddClientProfileCommand>
-                       .NewConfig()
-                       .Map(dest => dest.Bio, src => src.Bio);
-
-            TypeAdapterConfig<ClientProfileDto, AddClientProfileCommand>
+            TypeAdapterConfig<ClientProfileDto, CreateClientProfileCommand>
                        .NewConfig()
                        .Map(src => src, dest => dest);
 
@@ -106,14 +99,13 @@ namespace Frelance.Infrastructure.Mappings
                            src.Users.PhoneNumber,
                            src.Users.Reviews.Adapt<List<ReviewsDto>>(),
                            src.Users.Proposals.Adapt<List<ProposalsDto>>()))
-                       .Map(dest => dest.Projects, src => src.Projects.Adapt<ProjectDto>())
                        .Map(dest => dest.Address, src => src.Addresses.Adapt<AddressDto>())
                        .Map(dest => dest.Bio, src => src.Bio)
                        .Map(dest => dest.ProfileImageUrl, src => src.ProfileImageUrl)
                        .Map(dest => dest.Contracts, src => src.Contracts.Adapt<List<ContractsDto>>())
                        .Map(dest => dest.Invoices, src => src.Invoices.Adapt<List<InvoicesDto>>());
 
-            TypeAdapterConfig<FreelancerProfiles, AddFreelancerProfileCommand>
+            TypeAdapterConfig<FreelancerProfiles, CreateFreelancerProfileCommand>
                        .NewConfig()
                        .Map(dest => dest, src => src);
 
@@ -138,8 +130,6 @@ namespace Frelance.Infrastructure.Mappings
                        .Map(dest => dest.AddressDto, src => src.Addresses.Adapt<AddressDto>())
                        .Map(dest => dest.Bio, src => src.Bio)
                        .Map(dest => dest.ProfileImageUrl, src => src.ProfileImageUrl)
-                       .Map(dest => dest.ContractsDto, src => src.Contracts.Adapt<List<ContractsDto>>())
-                       .Map(dest => dest.InvoicesDto, src => src.Invoices.Adapt<List<InvoicesDto>>())
                        .Map(dest => dest.TaskDtos, src => src.Tasks.Adapt<List<TaskDto>>())
                        .Map(dest => dest.SkillDtos, src => src.Skills.Adapt<List<SkillDto>>())
                        .Map(dest => dest.ForeignLanguages, src => src.ForeignLanguages)
@@ -158,11 +148,11 @@ namespace Frelance.Infrastructure.Mappings
                        .NewConfig()
                        .Map(dest => dest.Id, src => src.Id)
                        .Map(dest => dest.Project, src => src.Project.Adapt<ProjectDto>())
-                       .Map(dest => dest.Client, src => src.Client.Adapt<ClientProfileDto>())
-                       .Map(dest => dest.Freelancer, src => src.Freelancer.Adapt<FreelancerProfileDto>())
                        .Map(dest => dest.StartDate, src => src.StartDate)
                        .Map(dest => dest.EndDate, src => src.EndDate)
                        .Map(dest => dest.Amount, src => src.Amount)
+                       .Map(dest=>dest.FreelancerName,src=>src.Freelancer.Users.UserName)
+                       .Map(dest=>dest.ClientName,src=>src.Client.Users.UserName)
                        .Map(dest => dest.ContractFileUrl, src => src.ContractFileUrl)
                        .Map(dest => dest.Status, src => src.Status);
 

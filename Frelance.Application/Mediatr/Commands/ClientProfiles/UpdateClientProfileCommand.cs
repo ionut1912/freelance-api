@@ -1,11 +1,10 @@
 using Frelance.Contracts.Requests.Address;
+using Frelance.Contracts.Requests.ClientProfile;
+using Frelance.Contracts.Requests.Contracts;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 
 namespace Frelance.Application.Mediatr.Commands.ClientProfiles;
 
 public record UpdateClientProfileCommand(
-    int Id,
-    AddressRequest AddressRequest,
-    string Bio,
-    IFormFile ProfileImage) : IRequest<Unit>;
+    int Id, UpdateClientProfileRequest UpdateClientProfileRequest) : IRequest<Unit>;

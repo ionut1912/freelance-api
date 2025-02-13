@@ -35,12 +35,6 @@ public class FrelanceDbContext : IdentityDbContext<Users, Roles, int>
             .HasForeignKey(u => u.FreelancerProfileId)
             .OnDelete(DeleteBehavior.NoAction);
 
-        builder.Entity<Projects>()
-            .HasOne(x => x.ClientProfiles)
-            .WithMany(u => u.Projects)
-            .HasForeignKey(x => x.ClientProfileId)
-            .OnDelete(DeleteBehavior.NoAction);
-
         builder.Entity<FreelancerProfiles>()
             .HasOne(x => x.Users)
             .WithOne(x => x.FreelancerProfiles)

@@ -17,15 +17,9 @@ namespace Frelance.Web.Modules
         public static void AddClientProfilesEndpoints(this IEndpointRouteBuilder app)
         {
             var createClientProfileEndpoint = app.MapPost("/api/clientProfiles",
-                    async (IMediator mediator, [FromForm] CreateClientProfileRequest uploadDto, CancellationToken ct) =>
+                    async (IMediator mediator, [FromForm] CreateClientProfileRequest createClientProfileRequest, CancellationToken ct) =>
                     {
-                        var address = new AddressRequest(
-                            uploadDto.AddressCountry,
-                            uploadDto.AddressCity,
-                            uploadDto.AddressStreet,
-                            uploadDto.AddressStreetNumber,
-                            uploadDto.AddressZip);
-                        var command = new AddClientProfileCommand(address, uploadDto.Bio, uploadDto.ProfileImage);
+                        var command = new CreateClientProfileCommand(createClientProfileRequest);
                         var result = await mediator.Send(command, ct);
                         return Results.Ok(result);
                     })
@@ -50,13 +44,7 @@ namespace Frelance.Web.Modules
             var updateClientProfileEndpoint = app.MapPut("/api/clientProfiles/{id}", async (IMediator mediator, int id,
                 [FromForm] UpdateClientProfileRequest updateClientProfileRequest, CancellationToken ct) =>
                 {
-                    var address = new AddressRequest(
-                        updateClientProfileRequest.AddressCountry,
-                        updateClientProfileRequest.AddressCity,
-                        updateClientProfileRequest.AddressStreet,
-                        updateClientProfileRequest.AddressStreetNumber,
-                        updateClientProfileRequest.AddressZip);
-                    var command = new UpdateClientProfileCommand(id, address, updateClientProfileRequest.Bio, updateClientProfileRequest.ProfileImage);
+                    var command = new UpdateClientProfileCommand(id, updateClientProfileRequest);
                     var result = await mediator.Send(command, ct);
                     return Results.Ok(result);
                 }).WithTags("ClientProfiles").

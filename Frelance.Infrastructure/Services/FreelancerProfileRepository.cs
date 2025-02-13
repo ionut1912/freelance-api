@@ -32,7 +32,7 @@ namespace Frelance.Infrastructure.Services
             _userAccessor = userAccessor;
         }
 
-        public async Task AddFreelancerProfileAsync(AddFreelancerProfileCommand command, CancellationToken cancellationToken)
+        public async Task AddFreelancerProfileAsync(CreateFreelancerProfileCommand command, CancellationToken cancellationToken)
         {
             var user = await _dbContext.Users
                 .AsNoTracking()
@@ -42,7 +42,7 @@ namespace Frelance.Infrastructure.Services
                 throw new InvalidOperationException("User not found.");
             }
 
-            var address = command.Address.Adapt<Addresses>();
+            var address = new Addresses(command.CreateFreelancerProfileRequest.AddressCountry, command.CreateFreelancerProfileRequest.AddressCity, command.CreateFreelancerProfileRequest.AddressStreet,command.CreateFreelancerProfileRequest.AddressStreetNumber,command.CreateFreelancerProfileRequest.AddressZip);
             await _dbContext.Addresses.AddAsync(address, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
 
@@ -51,12 +51,21 @@ namespace Frelance.Infrastructure.Services
             freelancerProfile.AddressId = address.Id;
             freelancerProfile.ProfileImageUrl = await _blobService.UploadBlobAsync(
                 StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(),
-                $"{user.Id}/{command.ProfileImage.FileName}",
-                command.ProfileImage);
+                $"{user.Id}/{command.CreateFreelancerProfileRequest.ProfileImage.FileName}",
+                command.CreateFreelancerProfileRequest.ProfileImage);
 
             var skillsInDb = await _dbContext.Skills.AsNoTracking().ToListAsync(cancellationToken);
-            ValidateSkills(skillsInDb, command.Skills);
-            freelancerProfile.Skills = command.Skills.Adapt<List<Skiills>>();
+            var skills = new List<SkillRequest>();
+            if (command.CreateFreelancerProfileRequest is { ProgrammingLanguages: not null, Areas: not null })
+            {
+                var count = Math.Min(command.CreateFreelancerProfileRequest.ProgrammingLanguages.Count, command.CreateFreelancerProfileRequest.Areas.Count);
+                for (var i = 0; i < count; i++)
+                {
+                    skills.Add(new SkillRequest(command.CreateFreelancerProfileRequest.ProgrammingLanguages[i], command.CreateFreelancerProfileRequest.Areas[i]));
+                }
+            }
+            ValidateSkills(skillsInDb, skills);
+            freelancerProfile.Skills = skills.Adapt<List<Skiills>>();
             freelancerProfile.IsAvailable = true;
 
             await _dbContext.FreelancerProfiles.AddAsync(freelancerProfile, cancellationToken);
@@ -110,38 +119,46 @@ namespace Frelance.Infrastructure.Services
                 throw new NotFoundException($"{nameof(FreelancerProfiles)} with {nameof(FreelancerProfiles.Id)}: '{command.Id}' does not exist");
             }
 
-            if (command.ProfileImage is not null)
+            if (command.UpdateFreelancerProfileRequest.ProfileImage is not null)
             {
                 await _blobService.DeleteBlobAsync(StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(), freelancerProfile.UserId.ToString());
                 freelancerProfile.ProfileImageUrl = await _blobService.UploadBlobAsync(
                     StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(),
-                    $"{freelancerProfile.UserId}/{command.ProfileImage.FileName}",
-                    command.ProfileImage);
+                    $"{freelancerProfile.UserId}/{command.UpdateFreelancerProfileRequest.ProfileImage.FileName}",
+                    command.UpdateFreelancerProfileRequest.ProfileImage);
             }
 
-            if (command.Address is not null)
+            if (command.UpdateFreelancerProfileRequest.AddressCity is not null)
             {
                 var updatedAddress = new Addresses(
                     freelancerProfile.Addresses.Id,
-                    command.Address.Country,
-                    command.Address.City,
-                    command.Address.Street,
-                    command.Address.StreetNumber,
-                    command.Address.ZipCode);
+                    command.UpdateFreelancerProfileRequest.AddressCountry,
+                    command.UpdateFreelancerProfileRequest.AddressCity,
+                    command.UpdateFreelancerProfileRequest.AddressStreet,
+                    command.UpdateFreelancerProfileRequest.AddressStreetNumber,
+                    command.UpdateFreelancerProfileRequest.AddressZip);
 
                 _dbContext.Entry(freelancerProfile.Addresses).CurrentValues.SetValues(updatedAddress);
                 freelancerProfile.AddressId = updatedAddress.Id;
                 await _dbContext.SaveChangesAsync(cancellationToken);
             }
 
-            freelancerProfile.Bio = command.Bio;
-
+            freelancerProfile.Bio = command.UpdateFreelancerProfileRequest.Bio;
+            var skills = new List<SkillRequest>();
+            if (command.UpdateFreelancerProfileRequest is { ProgrammingLanguages: not null, Areas: not null })
+            {
+                var count = Math.Min(command.UpdateFreelancerProfileRequest.ProgrammingLanguages.Count, command.UpdateFreelancerProfileRequest.Areas.Count);
+                for (var i = 0; i < count; i++)
+                {
+                    skills.Add(new SkillRequest(command.UpdateFreelancerProfileRequest.ProgrammingLanguages[i], command.UpdateFreelancerProfileRequest.Areas[i]));
+                }
+            }
             var skillsInDb = await _dbContext.Skills.AsNoTracking().ToListAsync(cancellationToken);
-            ValidateSkills(skillsInDb, command.Skills);
+            ValidateSkills(skillsInDb, skills);
 
             var existingSkillLanguages = freelancerProfile.Skills.Select(s => s.ProgrammingLanguage)
                 .ToHashSet(StringComparer.OrdinalIgnoreCase);
-            var newSkills = command.Skills
+            var newSkills = skills
                 .Select(s => s.Adapt<Skiills>())
                 .Where(s => !existingSkillLanguages.Contains(s.ProgrammingLanguage))
                 .ToList();
@@ -151,16 +168,16 @@ namespace Frelance.Infrastructure.Services
                 freelancerProfile.Skills.Add(newSkill);
             }
 
-            foreach (var foreignLanguage in command.ForeignLanguages.Where(foreignLanguage => !freelancerProfile.ForeignLanguages.Contains(foreignLanguage)))
+            foreach (var foreignLanguage in command.UpdateFreelancerProfileRequest.ForeignLanguages.Where(foreignLanguage => !freelancerProfile.ForeignLanguages.Contains(foreignLanguage)))
             {
                 freelancerProfile.ForeignLanguages.Add(foreignLanguage);
             }
 
-            freelancerProfile.Experience = command.Experience;
-            freelancerProfile.Rate = command.Rate;
-            freelancerProfile.Currency = command.Currency;
-            freelancerProfile.Rating = command.Rating;
-            freelancerProfile.PortfolioUrl = command.PortfolioUrl;
+            freelancerProfile.Experience = command.UpdateFreelancerProfileRequest.Experience;
+            freelancerProfile.Rate = command.UpdateFreelancerProfileRequest.Rate;
+            freelancerProfile.Currency = command.UpdateFreelancerProfileRequest.Currency;
+            freelancerProfile.Rating = command.UpdateFreelancerProfileRequest.Rating;
+            freelancerProfile.PortfolioUrl = command.UpdateFreelancerProfileRequest.PortfolioUrl;
 
             _dbContext.FreelancerProfiles.Update(freelancerProfile);
         }
