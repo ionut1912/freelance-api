@@ -42,7 +42,7 @@ namespace Frelance.Infrastructure.Services
                 throw new InvalidOperationException("User not found.");
             }
 
-            var address = new Addresses(command.CreateFreelancerProfileRequest.AddressCountry, command.CreateFreelancerProfileRequest.AddressCity, command.CreateFreelancerProfileRequest.AddressStreet,command.CreateFreelancerProfileRequest.AddressStreetNumber,command.CreateFreelancerProfileRequest.AddressZip);
+            var address = new Addresses(command.CreateFreelancerProfileRequest.AddressCountry, command.CreateFreelancerProfileRequest.AddressCity, command.CreateFreelancerProfileRequest.AddressStreet, command.CreateFreelancerProfileRequest.AddressStreetNumber, command.CreateFreelancerProfileRequest.AddressZip);
             await _dbContext.Addresses.AddAsync(address, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
 

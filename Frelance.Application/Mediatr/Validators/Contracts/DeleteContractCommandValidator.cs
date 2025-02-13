@@ -3,7 +3,7 @@ using Frelance.Application.Mediatr.Commands.Contracts;
 
 namespace Frelance.Application.Mediatr.Validators.Contracts;
 
-public class DeleteContractCommandValidator:AbstractValidator<DeleteContractCommand>
+public class DeleteContractCommandValidator : AbstractValidator<DeleteContractCommand>
 {
     public DeleteContractCommandValidator()
     {
