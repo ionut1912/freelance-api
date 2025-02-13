@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.Contracts;
 
-public class UpdateContractCommandHandler:IRequestHandler<UpdateContractCommand, Unit>
+public class UpdateContractCommandHandler : IRequestHandler<UpdateContractCommand, Unit>
 {
     private readonly IContractRepository _contractRepository;
     private readonly IUnitOfWork _unitOfWork;
@@ -15,13 +15,13 @@ public class UpdateContractCommandHandler:IRequestHandler<UpdateContractCommand,
         ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));
         _contractRepository = contractRepository;
         _unitOfWork = unitOfWork;
-        
+
     }
 
 
     public async Task<Unit> Handle(UpdateContractCommand request, CancellationToken cancellationToken)
     {
-        await _contractRepository.UpdateContractAsync(request,cancellationToken);
+        await _contractRepository.UpdateContractAsync(request, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;
     }

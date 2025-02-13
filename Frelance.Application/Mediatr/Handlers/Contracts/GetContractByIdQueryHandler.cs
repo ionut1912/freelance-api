@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.Contracts;
 
-public class GetContractByIdQueryHandler:IRequestHandler<GetContractByIdQuery, ContractsDto>
+public class GetContractByIdQueryHandler : IRequestHandler<GetContractByIdQuery, ContractsDto>
 {
     private readonly IContractRepository _contractRepository;
 
@@ -14,9 +14,9 @@ public class GetContractByIdQueryHandler:IRequestHandler<GetContractByIdQuery, C
         ArgumentNullException.ThrowIfNull(contractRepository, nameof(contractRepository));
         _contractRepository = contractRepository;
     }
-    
+
     public async Task<ContractsDto> Handle(GetContractByIdQuery request, CancellationToken cancellationToken)
     {
-        return await _contractRepository.GetContractByIdAsync(request,cancellationToken);
+        return await _contractRepository.GetContractByIdAsync(request, cancellationToken);
     }
 }

@@ -14,13 +14,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Frelance.Infrastructure.Services;
 
-public class ContractRepository:IContractRepository
+public class ContractRepository : IContractRepository
 {
     private readonly IBlobService _blobService;
     private readonly FrelanceDbContext _dbContext;
     private readonly IUserAccessor _userAccessor;
 
-    public ContractRepository(IBlobService blobService, FrelanceDbContext dbContext,IUserAccessor userAccessor)
+    public ContractRepository(IBlobService blobService, FrelanceDbContext dbContext, IUserAccessor userAccessor)
     {
         ArgumentNullException.ThrowIfNull(blobService, nameof(blobService));
         ArgumentNullException.ThrowIfNull(dbContext, nameof(dbContext));
@@ -29,8 +29,8 @@ public class ContractRepository:IContractRepository
         _dbContext = dbContext;
         _userAccessor = userAccessor;
     }
-    
-    public  async Task AddContractAsync(CreateContractCommand createContractCommand, CancellationToken cancellationToken)
+
+    public async Task AddContractAsync(CreateContractCommand createContractCommand, CancellationToken cancellationToken)
     {
         var freelancer = await _dbContext.FreelancerProfiles
             .AsNoTracking()
@@ -40,7 +40,7 @@ public class ContractRepository:IContractRepository
         {
             throw new NotFoundException($"{nameof(FreelancerProfiles)} with {nameof(FreelancerProfiles.Users.UserName)}: {createContractCommand.CreateContractRequest.FreelancerName} doe not exist.");
         }
-        var client= await _dbContext.ClientProfiles
+        var client = await _dbContext.ClientProfiles
             .AsNoTracking()
             .Include(x => x.Users)
             .FirstOrDefaultAsync(x => x.Users.UserName == _userAccessor.GetUsername(), cancellationToken);
@@ -48,7 +48,7 @@ public class ContractRepository:IContractRepository
         {
             throw new NotFoundException($"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Users.UserName)}: {_userAccessor.GetUsername()} doe not exist.");
         }
-        var project=await _dbContext.Projects.FirstOrDefaultAsync(x=>x.Title==createContractCommand.CreateContractRequest.ProjectName,cancellationToken);
+        var project = await _dbContext.Projects.FirstOrDefaultAsync(x => x.Title == createContractCommand.CreateContractRequest.ProjectName, cancellationToken);
         if (project is null)
         {
             throw new NotFoundException(
@@ -71,7 +71,7 @@ public class ContractRepository:IContractRepository
         await _dbContext.Contracts.AddAsync(contract, cancellationToken);
     }
 
-    public  async Task<ContractsDto> GetContractByIdAsync(GetContractByIdQuery query, CancellationToken cancellationToken)
+    public async Task<ContractsDto> GetContractByIdAsync(GetContractByIdQuery query, CancellationToken cancellationToken)
     {
         var contract = await _dbContext.Contracts
             .AsNoTracking()
@@ -101,10 +101,10 @@ public class ContractRepository:IContractRepository
 
     public async Task UpdateContractAsync(UpdateContractCommand updateContractCommand, CancellationToken cancellationToken)
     {
-        var contract=await _dbContext.Contracts.
+        var contract = await _dbContext.Contracts.
                             AsNoTracking()
                             .Include(x => x.Project)
-                            .FirstOrDefaultAsync(x=>x.Id == updateContractCommand.Id, cancellationToken);
+                            .FirstOrDefaultAsync(x => x.Id == updateContractCommand.Id, cancellationToken);
         if (contract is null)
         {
             throw new NotFoundException($"nameof(Entities.Contracts) with {nameof(Entities.Contracts.Id)}: {updateContractCommand.Id} doe not exist.");
@@ -119,7 +119,7 @@ public class ContractRepository:IContractRepository
                     $"{contract.Project.Id}/{updateContractCommand.UpdateContractRequest.ContractFile.FileName}",
                     updateContractCommand.UpdateContractRequest.ContractFile);
         }
-        contract.EndDate=updateContractCommand.UpdateContractRequest.EndDate;
+        contract.EndDate = updateContractCommand.UpdateContractRequest.EndDate;
         contract.Amount = updateContractCommand.UpdateContractRequest.Amount;
         contract.Status = "Modified";
         _dbContext.Contracts.Update(contract);
@@ -129,7 +129,7 @@ public class ContractRepository:IContractRepository
     {
         var contractToDelete = await _dbContext.Contracts
             .AsNoTracking()
-            .Include(x=>x.Project)
+            .Include(x => x.Project)
             .FirstOrDefaultAsync(x => x.Id == deleteContractCommand.Id, cancellationToken);
         if (contractToDelete is null)
         {

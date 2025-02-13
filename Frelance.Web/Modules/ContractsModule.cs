@@ -58,5 +58,5 @@ public static class ContractsModule
         createContractEndpoint.RemoveAntiforgery();
         updateContractEndpoint.RemoveAntiforgery();
     }
-    
+
 }

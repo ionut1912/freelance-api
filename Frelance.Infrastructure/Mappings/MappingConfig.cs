@@ -83,7 +83,7 @@ namespace Frelance.Infrastructure.Mappings
             TypeAdapterConfig<AddressRequest, Addresses>
                        .NewConfig()
                        .ConstructUsing(src => new Addresses(src.Country, src.City, src.Street, src.StreetNumber, src.ZipCode));
-            
+
 
             TypeAdapterConfig<ClientProfileDto, CreateClientProfileCommand>
                        .NewConfig()
@@ -151,8 +151,8 @@ namespace Frelance.Infrastructure.Mappings
                        .Map(dest => dest.StartDate, src => src.StartDate)
                        .Map(dest => dest.EndDate, src => src.EndDate)
                        .Map(dest => dest.Amount, src => src.Amount)
-                       .Map(dest=>dest.FreelancerName,src=>src.Freelancer.Users.UserName)
-                       .Map(dest=>dest.ClientName,src=>src.Client.Users.UserName)
+                       .Map(dest => dest.FreelancerName, src => src.Freelancer.Users.UserName)
+                       .Map(dest => dest.ClientName, src => src.Client.Users.UserName)
                        .Map(dest => dest.ContractFileUrl, src => src.ContractFileUrl)
                        .Map(dest => dest.Status, src => src.Status);
 

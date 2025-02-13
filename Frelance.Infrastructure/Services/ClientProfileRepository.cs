@@ -40,7 +40,7 @@ public class ClientProfileRepository : IClientProfileRepository
         }
 
         var address = new Addresses(clientProfileCommand.CreateClientProfileRequest.AddressCountry,
-            clientProfileCommand.CreateClientProfileRequest.AddressCity,clientProfileCommand.CreateClientProfileRequest.AddressStreet,clientProfileCommand.CreateClientProfileRequest.AddressStreetNumber,clientProfileCommand.CreateClientProfileRequest.AddressZip);
+            clientProfileCommand.CreateClientProfileRequest.AddressCity, clientProfileCommand.CreateClientProfileRequest.AddressStreet, clientProfileCommand.CreateClientProfileRequest.AddressStreetNumber, clientProfileCommand.CreateClientProfileRequest.AddressZip);
         await _dbContext.Addresses.AddAsync(address, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
         var clientProfile = clientProfileCommand.Adapt<ClientProfiles>();
