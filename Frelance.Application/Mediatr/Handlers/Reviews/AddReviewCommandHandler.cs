@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.Reviews;
 
-public class AddReviewCommandHandler : IRequestHandler<AddReviewCommand, Unit>
+public class AddReviewCommandHandler : IRequestHandler<CreateReviewCommand, Unit>
 {
     private readonly IReviewRepository _repository;
     private readonly IUnitOfWork _unitOfWork;
@@ -17,7 +17,7 @@ public class AddReviewCommandHandler : IRequestHandler<AddReviewCommand, Unit>
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Unit> Handle(AddReviewCommand request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(CreateReviewCommand request, CancellationToken cancellationToken)
     {
         await _repository.AddReviewAsync(request, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);

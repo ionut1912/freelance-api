@@ -6,8 +6,6 @@ public record FreelancerProfileDto(
     AddressDto AddressDto,
     string Bio,
     string ProfileImageUrl,
-    List<ContractsDto> ContractsDto,
-    List<InvoicesDto> InvoicesDto,
     List<TaskDto> TaskDtos,
     List<SkillDto> SkillDtos,
     List<string> ForeignLanguages,

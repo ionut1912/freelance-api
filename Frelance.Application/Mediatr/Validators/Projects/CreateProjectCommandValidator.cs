@@ -7,10 +7,10 @@ public class CreateProjectCommandValidator : AbstractValidator<CreateProjectComm
 {
     public CreateProjectCommandValidator()
     {
-        RuleFor(x => x.Title).NotEmpty().MaximumLength(40);
-        RuleFor(x => x.Description).NotEmpty().MaximumLength(500);
-        RuleFor(x => x.Deadline).NotEmpty();
-        RuleFor(x => x.Technologies).NotEmpty();
-        RuleFor(x => x.Budget).NotEmpty().GreaterThan(0);
+        RuleFor(x => x.CreateProjectRequest.Title).NotEmpty().MaximumLength(40);
+        RuleFor(x => x.CreateProjectRequest.Description).NotEmpty().MaximumLength(500);
+        RuleFor(x => x.CreateProjectRequest.Deadline).NotEmpty();
+        RuleFor(x => x.CreateProjectRequest.Technologies).NotEmpty();
+        RuleFor(x => x.CreateProjectRequest.Budget).NotEmpty().GreaterThan(0);
     }
 }

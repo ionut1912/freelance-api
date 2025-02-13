@@ -13,10 +13,10 @@ public static class ReviewsModule
 {
     public static void AddReviewsEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/reviews", async (IMediator mediator, AddReviewRequest addReviewRequest,
+        app.MapPost("/api/reviews", async (IMediator mediator, CreateReviewRequest addReviewRequest,
             CancellationToken ct) =>
         {
-            var command = new AddReviewCommand(addReviewRequest.ReviewText);
+            var command = new CreateReviewCommand(addReviewRequest);
             var result = await mediator.Send(command, ct);
             return Results.Ok(result);
         }).WithTags("Reviews")
@@ -39,7 +39,7 @@ public static class ReviewsModule
         app.MapPut("/api/reviews/{id}", async (IMediator mediator, int id,
                 UpdateReviewRequest updateReviewRequest, CancellationToken ct) =>
             {
-                var command = new UpdateReviewCommand(id, updateReviewRequest.ReviewText);
+                var command = new UpdateReviewCommand(id, updateReviewRequest);
                 var result = await mediator.Send(command, ct);
                 return Results.Ok(result);
             }).WithTags("Reviews")

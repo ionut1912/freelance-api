@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Frelance.Contracts.Requests.FreelancerProfiles;
 
-public class CreateFreelancerProfileRequest
+public class CreateFreelancerProfieRequest
 {
     public string AddressCountry { get; set; }
     public string AddressStreet { get; set; }

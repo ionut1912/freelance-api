@@ -7,7 +7,7 @@ namespace Frelance.Application.Repositories;
 
 public interface IFreelancerProfileRepository
 {
-    Task AddFreelancerProfileAsync(AddFreelancerProfileCommand addFreelancerProfileCommand, CancellationToken cancellationToken);
+    Task AddFreelancerProfileAsync(CreateFreelancerProfileCommand createFreelancerProfileCommand, CancellationToken cancellationToken);
     Task<FreelancerProfileDto> GetFreelancerProfileByIdAsync(GetFreelancerProfileByIdQuery getFreelancerProfileByIdQuery, CancellationToken cancellationToken);
     Task<PaginatedList<FreelancerProfileDto>> GetAllFreelancerProfilesAsync(GetFreelancerProfilesQuery getFreelancerProfilesQuery, CancellationToken cancellationToken);
     Task UpdateFreelancerProfileAsync(UpdateFreelancerProfileCommand updateFreelancerProfileCommand, CancellationToken cancellationToken);

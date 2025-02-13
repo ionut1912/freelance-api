@@ -1,5 +1,6 @@
+using Frelance.Contracts.Requests.Projects;
 using MediatR;
 
 namespace Frelance.Application.Mediatr.Commands.Projects;
 
-public record CreateProjectCommand(string Title, string Description, DateTime Deadline, List<string> Technologies, float Budget) : IRequest<Unit>;
+public record CreateProjectCommand(CreateProjectRequest CreateProjectRequest) : IRequest<Unit>;

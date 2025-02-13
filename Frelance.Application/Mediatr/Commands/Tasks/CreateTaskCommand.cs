@@ -1,6 +1,7 @@
 using Frelance.Contracts.Enums;
+using Frelance.Contracts.Requests.ProjectTasks;
 using MediatR;
 
 namespace Frelance.Application.Mediatr.Commands.Tasks;
 
-public record CreateTaskCommand(string ProjectTitle, string Title, string Description, Priority Priority) : IRequest<Unit>;
+public record CreateTaskCommand(CreateProjectTaskRequest CreateProjectTaskRequest) : IRequest<Unit>;

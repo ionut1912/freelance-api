@@ -7,7 +7,7 @@ namespace Frelance.Application.Repositories;
 
 public interface IReviewRepository
 {
-    Task AddReviewAsync(AddReviewCommand addReviewCommand, CancellationToken cancellationToken);
+    Task AddReviewAsync(CreateReviewCommand createReviewCommand, CancellationToken cancellationToken);
     Task<ReviewsDto> GetReviewsByIdAsync(GetReviewByIdQuery id, CancellationToken cancellationToken);
     Task<PaginatedList<ReviewsDto>> GetReviewsAsync(GetReviewsQuery query, CancellationToken cancellationToken);
     Task UpdateReviewAsync(UpdateReviewCommand updateReviewCommand, CancellationToken cancellationToken);

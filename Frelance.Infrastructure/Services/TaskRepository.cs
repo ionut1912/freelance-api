@@ -29,12 +29,12 @@ public class TaskRepository : ITaskRepository
     public async Task AddTaskAsync(CreateTaskCommand createTaskCommand, CancellationToken cancellationToken)
     {
         var taskProject = await _context.Projects.AsNoTracking()
-            .Where(x => x.Title == createTaskCommand.ProjectTitle)
+            .Where(x => x.Title == createTaskCommand.CreateProjectTaskRequest.ProjectTitle)
             .FirstOrDefaultAsync(cancellationToken);
 
         if (taskProject is null)
         {
-            throw new NotFoundException($"{nameof(Projects)} with {nameof(Projects.Title)}: '{createTaskCommand.ProjectTitle}' does not exist");
+            throw new NotFoundException($"{nameof(Projects)} with {nameof(Projects.Title)}: '{createTaskCommand.CreateProjectTaskRequest.ProjectTitle}' does not exist");
         }
 
         var freelancerProfile = await _context.FreelancerProfiles
@@ -45,7 +45,7 @@ public class TaskRepository : ITaskRepository
         var task = createTaskCommand.Adapt<ProjectTasks>();
         task.ProjectId = taskProject.Id;
         task.Status = ProjectTaskStatus.ToDo.ToString();
-        task.Priority = createTaskCommand.Priority.ToString();
+        task.Priority = createTaskCommand.CreateProjectTaskRequest.Priority;
         task.FreelancerProfiles = freelancerProfile;
         await _context.Tasks.AddAsync(task, cancellationToken);
     }
@@ -60,10 +60,10 @@ public class TaskRepository : ITaskRepository
             throw new NotFoundException($"{nameof(ProjectTasks)} with {nameof(ProjectTasks.Id)}: '{updateTaskCommand.Id}' does not exist");
         }
 
-        projectTaskToUpdate.Title = updateTaskCommand.Title;
-        projectTaskToUpdate.Description = updateTaskCommand.Description;
-        projectTaskToUpdate.Status = updateTaskCommand.Status.ToString();
-        projectTaskToUpdate.Priority = updateTaskCommand.Priority.ToString();
+        projectTaskToUpdate.Title = updateTaskCommand.UpdateProjectTaskRequest.Title;
+        projectTaskToUpdate.Description = updateTaskCommand.UpdateProjectTaskRequest.Description;
+        projectTaskToUpdate.Status = updateTaskCommand.UpdateProjectTaskRequest.Status;
+        projectTaskToUpdate.Priority = updateTaskCommand.UpdateProjectTaskRequest.Priority;
 
         _context.Tasks.Update(projectTaskToUpdate);
     }
