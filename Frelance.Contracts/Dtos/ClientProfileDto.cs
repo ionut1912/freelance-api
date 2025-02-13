@@ -4,9 +4,10 @@ namespace Frelance.Contracts.Dtos;
 
 public record ClientProfileDto(
     int Id,
-    UserClientDto User,
+    UserProfileDto User,
     AddressDto Address,
     string Bio,
     string ProfileImageUrl,
     List<ContractsDto> Contracts,
-    List<InvoicesDto> Invoices);
+    List<InvoicesDto> Invoices,
+    List<ProjectDto> Projects);

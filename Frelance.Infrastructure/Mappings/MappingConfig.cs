@@ -21,95 +21,120 @@ namespace Frelance.Infrastructure.Mappings
         public static void Configure()
         {
             TypeAdapterConfig<CreateProjectCommand, Projects>.NewConfig();
+            
             TypeAdapterConfig<CreateTaskCommand, ProjectTasks>.NewConfig();
+            
             TypeAdapterConfig<CreateTimeLogCommand, TimeLogs>.NewConfig();
+            
             TypeAdapterConfig<CreateUserCommand, Users>.NewConfig();
 
             TypeAdapterConfig<CreateProjectRequest, CreateProjectCommand>
                 .NewConfig()
                 .Map(dest => dest, src => src);
+            
             TypeAdapterConfig<UpdateProjectRequest, UpdateProjectCommand>
                 .NewConfig()
                 .Map(dest => dest, src => src);
-            TypeAdapterConfig<Projects, ProjectDto>
+            
+     TypeAdapterConfig<Projects, ProjectDto>
+    .NewConfig()
+    .Map(dest => dest.Id, src => src.Id)
+    .Map(dest => dest.Title, src => src.Title)
+    .Map(dest => dest.Description, src => src.Description)
+    .Map(dest => dest.CreatedAt, src => src.CreatedAt)
+    .Map(dest => dest.Deadline, src => src.Deadline)
+    .Map(dest => dest.Technologies, src => src.Technologies)
+    .Map(dest => dest.Budget, src => src.Budget)
+    .Map(dest => dest.Tasks, src => src.Tasks.Adapt<List<TaskDto>>())
+    .Map(dest => dest.ClientProfileDto, src => src.ClientProfiles.Adapt<ClientProfileDto>())
+    .Map(dest => dest.Proposals, src => src.Proposals.Adapt<List<ProposalsDto>>())
+    .Map(dest => dest.Contracts, src => src.Contracts.Adapt<List<ContractsDto>>())
+    .Map(dest => dest.Invoices, src => src.Invoices.Adapt<List<InvoicesDto>>());
+     
+     TypeAdapterConfig<CreateProjectTaskRequest, CreateTaskCommand>
+                .NewConfig()
+                .Map(dest => dest, src => src);
+     
+     TypeAdapterConfig<UpdateProjectTaskRequest, UpdateTaskCommand>
+                .NewConfig()
+                .Map(dest => dest, src => src);
+     
+     TypeAdapterConfig<ProjectTasks, TaskDto>
+                .NewConfig()
+                .Map(dest => dest.Id, src => src.Id)
+                .Map(dest => dest.Title, src => src.Title)
+                .Map(dest => dest.Description, src => src.Description)
+                .Map(dest=>dest.ProjectTaskStatus, src => src.Status)
+                .Map(dest=>dest.Priority, src => src.Priority)
+                .Map(dest=>dest.TimeLogs, src => src.TimeLogs.Adapt<List<TimeLogDto>>());
+
+     TypeAdapterConfig<CreateTimeLogRequest, CreateTimeLogCommand>
+                .NewConfig()
+                .Map(dest => dest, src => src);
+     
+     TypeAdapterConfig<UpdateTimeLogRequest, UpdateTimeLogCommand>
+                .NewConfig()
+                .Map(dest => dest, src => src);
+     
+     TypeAdapterConfig<TimeLogs, TimeLogDto>
                 .NewConfig()
                 .Map(dest => dest, src => src);
 
-            TypeAdapterConfig<CreateProjectTaskRequest, CreateTaskCommand>
-                .NewConfig()
-                .Map(dest => dest, src => src);
-            TypeAdapterConfig<UpdateProjectTaskRequest, UpdateTaskCommand>
-                .NewConfig()
-                .Map(dest => dest, src => src);
-            TypeAdapterConfig<ProjectTasks, TaskDto>
+     TypeAdapterConfig<List<Skiills>, List<SkillDto>>
                 .NewConfig()
                 .Map(dest => dest, src => src);
 
-            TypeAdapterConfig<CreateTimeLogRequest, CreateTimeLogCommand>
-                .NewConfig()
-                .Map(dest => dest, src => src);
-            TypeAdapterConfig<UpdateTimeLogRequest, UpdateTimeLogCommand>
-                .NewConfig()
-                .Map(dest => dest, src => src);
-            TypeAdapterConfig<TimeLogs, TimeLogDto>
-                .NewConfig()
-                .Map(dest => dest, src => src);
-
-            TypeAdapterConfig<List<Skiills>, List<SkillDto>>
-                .NewConfig()
-                .Map(dest => dest, src => src);
-
-            TypeAdapterConfig<AddressRequest, Addresses>
+     TypeAdapterConfig<AddressRequest, Addresses>
                 .NewConfig()
                 .ConstructUsing(src => new Addresses(src.Country, src.City, src.Street, src.StreetNumber, src.ZipCode));
 
-            TypeAdapterConfig<ClientProfiles, AddClientProfileCommand>
+     TypeAdapterConfig<ClientProfiles, AddClientProfileCommand>
                 .NewConfig()
                 .Map(dest => dest.Bio, src => src.Bio);
-            TypeAdapterConfig<ClientProfileDto, AddClientProfileCommand>
+     
+     TypeAdapterConfig<ClientProfileDto, AddClientProfileCommand>
                 .NewConfig()
                 .Map(src => src, dest => dest);
 
-            TypeAdapterConfig<ClientProfiles, ClientProfileDto>
+     TypeAdapterConfig<ClientProfiles, ClientProfileDto>
                 .NewConfig()
                 .Map(dest => dest.Id, src => src.Id)
-                .Map(dest => dest.User, src => new UserClientDto(
+                .Map(dest => dest.User, src => new UserProfileDto(
                     src.Users.Id,
                     src.Users.UserName,
                     src.Users.Email,
                     src.Users.PhoneNumber,
                     src.Users.Reviews.Adapt<List<ReviewsDto>>(),
-                    src.Users.Proposals.Adapt<List<ProposalsDto>>(),
-                    src.Projects.Adapt<List<ProjectDto>>()))
+                    src.Users.Proposals.Adapt<List<ProposalsDto>>()))
+                .Map(dest=>dest.Projects,src=>src.Projects.Adapt<ProjectDto>())
                 .Map(dest => dest.Address, src => src.Addresses.Adapt<AddressDto>())
                 .Map(dest => dest.Bio, src => src.Bio)
                 .Map(dest => dest.ProfileImageUrl, src => src.ProfileImageUrl)
                 .Map(dest => dest.Contracts, src => src.Contracts.Adapt<List<ContractsDto>>())
                 .Map(dest => dest.Invoices, src => src.Invoices.Adapt<List<InvoicesDto>>());
 
-            TypeAdapterConfig<FreelancerProfiles, AddFreelancerProfileCommand>
+     TypeAdapterConfig<FreelancerProfiles, AddFreelancerProfileCommand>
                 .NewConfig()
                 .Map(dest => dest, src => src);
 
-            TypeAdapterConfig<FreelancerProfiles, FreelancerProfileDto>
+     TypeAdapterConfig<FreelancerProfiles, FreelancerProfileDto>
                 .NewConfig()
                 .Map(dest => dest, src => src);
 
-            TypeAdapterConfig<List<Skiills>, List<SkillRequest>>
+     TypeAdapterConfig<List<Skiills>, List<SkillRequest>>
                 .NewConfig()
                 .Map(dest => dest, src => src);
 
-            TypeAdapterConfig<FreelancerProfiles, FreelancerProfileDto>
+     TypeAdapterConfig<FreelancerProfiles, FreelancerProfileDto>
                 .NewConfig()
                 .Map(dest => dest.Id, src => src.Id)
-                .Map(dest => dest.UserClientDto, src => new UserClientDto(
+                .Map(dest => dest.UserProfileDto, src => new UserProfileDto(
                     src.Users.Id,
                     src.Users.UserName,
                     src.Users.Email,
                     src.Users.PhoneNumber,
                     src.Users.Reviews.Adapt<List<ReviewsDto>>(),
-                    src.Users.Proposals.Adapt<List<ProposalsDto>>(),
-                    src.Projects.Adapt<List<ProjectDto>>()))
+                    src.Users.Proposals.Adapt<List<ProposalsDto>>()))
                 .Map(dest => dest.AddressDto, src => src.Addresses.Adapt<AddressDto>())
                 .Map(dest => dest.Bio, src => src.Bio)
                 .Map(dest => dest.ProfileImageUrl, src => src.ProfileImageUrl)
@@ -125,45 +150,59 @@ namespace Frelance.Infrastructure.Mappings
                 .Map(dest => dest.Rating, src => src.Rating)
                 .Map(dest => dest.PortfolioUrl, src => src.PortfolioUrl);
 
-            TypeAdapterConfig<Skiills, SkillDto>
+     TypeAdapterConfig<Skiills, SkillDto>
                 .NewConfig()
                 .Map(dest => dest, src => src);
 
-            TypeAdapterConfig<Entities.Contracts, ContractsDto>
+     TypeAdapterConfig<Entities.Contracts, ContractsDto>
                 .NewConfig()
                 .Map(dest => dest.Id, src => src.Id)
                 .Map(dest => dest.Project, src => src.Project.Adapt<ProjectDto>())
-                .Map(dest => dest.ClientId, src => src.ClientId)
-                .Map(dest => dest.FreelancerId, src => src.FreelancerId)
+                .Map(dest => dest.Client, src => src.Client.Adapt<ClientProfileDto>())
+                .Map(dest => dest.Freelancer, src => src.Freelancer.Adapt<FreelancerProfileDto>())
                 .Map(dest => dest.StartDate, src => src.StartDate)
                 .Map(dest => dest.EndDate, src => src.EndDate)
                 .Map(dest => dest.Amount, src => src.Amount)
                 .Map(dest => dest.ContractFileUrl, src => src.ContractFileUrl)
                 .Map(dest => dest.Status, src => src.Status);
 
-            TypeAdapterConfig<Invoices, InvoicesDto>
+     TypeAdapterConfig<Invoices, InvoicesDto>
                 .NewConfig()
                 .Map(dest => dest.Id, src => src.Id)
                 .Map(dest => dest.Project, src => src.Project.Adapt<ProjectDto>())
-                .Map(dest => dest.ClientId, src => src.ClientId)
-                .Map(dest => dest.FreelancerId, src => src.FreelancerId)
+                .Map(dest => dest.Client, src => src.Client.Adapt<ClientProfileDto>())
+                .Map(dest => dest.Freelancer, src => src.Freelancer.Adapt<FreelancerProfileDto>())
                 .Map(dest => dest.Date, src => src.Date)
                 .Map(dest => dest.Amount, src => src.Amount)
                 .Map(dest => dest.InvoiceFileUrl, src => src.InvoiceFileUrl)
                 .Map(dest => dest.Status, src => src.Status);
 
-            TypeAdapterConfig<Proposals, ProposalsDto>
+     TypeAdapterConfig<Proposals, ProposalsDto>
                 .NewConfig()
                 .Map(dest => dest.Id, src => src.Id)
                 .Map(dest => dest.Project, src => src.Project.Adapt<ProjectDto>())
-                .Map(dest => dest.ProposerId, src => src.ProposerId)
+                .Map(dest => dest.Proposer, src => src.Proposer.Adapt<UserProfileDto>())
                 .Map(dest => dest.ProposedBudget, src => src.ProposedBudget)
                 .Map(dest => dest.Status, src => src.Status)
                 .Map(dest => dest.CreatedAt, src => src.CreatedAt);
 
-            TypeAdapterConfig<Reviews, ReviewsDto>
+     TypeAdapterConfig<Reviews, ReviewsDto>
                 .NewConfig()
                 .Map(dest => dest, src => src);
+            
+     TypeAdapterConfig<Addresses,AddressDto>
+                .NewConfig()
+                .Map(dest => dest, src => src);
+
+     TypeAdapterConfig<Users, UserProfileDto>
+         .NewConfig()
+         .Map(dest => dest.Id, src => src.Id)
+         .Map(dest => dest.Username, src => src.UserName)
+         .Map(dest => dest.Email, src => src.Email)
+         .Map(dest => dest.PhoneNumber, src => src.PhoneNumber)
+         .Map(dest => dest.Reviews, src => src.Reviews.Adapt<List<ReviewsDto>>())
+         .Map(dest => dest.Proposals, src => src.Proposals.Adapt<List<ProposalsDto>>());
+
 
         }
     }

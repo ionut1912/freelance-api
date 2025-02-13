@@ -4,6 +4,7 @@ using Frelance.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Frelance.Infrastructure.Migrations
 {
     [DbContext(typeof(FrelanceDbContext))]
-    partial class FrelanceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250213073958_MakeFrelancerOptionalForProjects")]
+    partial class MakeFrelancerOptionalForProjects
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -295,6 +298,9 @@ namespace Frelance.Infrastructure.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("FreelancerProfileId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Technologies")
                         .HasColumnType("nvarchar(max)");
 
@@ -304,6 +310,8 @@ namespace Frelance.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ClientProfileId");
+
+                    b.HasIndex("FreelancerProfileId");
 
                     b.ToTable("Projects");
                 });
@@ -480,9 +488,6 @@ namespace Frelance.Infrastructure.Migrations
                     b.Property<int>("FreelancerProfileId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("FreelancerProfilesId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
 
@@ -494,7 +499,7 @@ namespace Frelance.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FreelancerProfilesId");
+                    b.HasIndex("FreelancerProfileId");
 
                     b.HasIndex("TaskId");
 
@@ -804,7 +809,14 @@ namespace Frelance.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("Frelance.Infrastructure.Entities.FreelancerProfiles", "FreelancerProfiles")
+                        .WithMany("Projects")
+                        .HasForeignKey("FreelancerProfileId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.Navigation("ClientProfiles");
+
+                    b.Navigation("FreelancerProfiles");
                 });
 
             modelBuilder.Entity("Frelance.Infrastructure.Entities.Proposals", b =>
@@ -840,8 +852,10 @@ namespace Frelance.Infrastructure.Migrations
             modelBuilder.Entity("Frelance.Infrastructure.Entities.TimeLogs", b =>
                 {
                     b.HasOne("Frelance.Infrastructure.Entities.FreelancerProfiles", "FreelancerProfiles")
-                        .WithMany()
-                        .HasForeignKey("FreelancerProfilesId");
+                        .WithMany("TimeLogs")
+                        .HasForeignKey("FreelancerProfileId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.HasOne("Frelance.Infrastructure.Entities.ProjectTasks", "Task")
                         .WithMany("TimeLogs")
@@ -920,7 +934,11 @@ namespace Frelance.Infrastructure.Migrations
 
                     b.Navigation("Invoices");
 
+                    b.Navigation("Projects");
+
                     b.Navigation("Tasks");
+
+                    b.Navigation("TimeLogs");
                 });
 
             modelBuilder.Entity("Frelance.Infrastructure.Entities.ProjectTasks", b =>
