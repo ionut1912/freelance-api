@@ -2,4 +2,4 @@
 
 namespace Frelance.Contracts.Dtos;
 
-public record TaskDto(int Id, string Title, string Description, ProjectTaskStatus ProjectTaskStatus, Priority Priority, List<TimeLogDto> TimeLogs);
+public record TaskDto(int Id, string Title, string Description, string ProjectTaskStatus, string Priority, List<TimeLogDto> TimeLogs);

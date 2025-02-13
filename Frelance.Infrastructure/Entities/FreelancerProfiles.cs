@@ -3,7 +3,6 @@ namespace Frelance.Infrastructure.Entities;
 public class FreelancerProfiles : BaseUserProfile
 {
     public List<ProjectTasks> Tasks { get; set; } = [];
-    public List<TimeLogs> TimeLogs { get; set; } = [];
     public List<Skiills> Skills { get; set; } = [];
     public List<string> ForeignLanguages { get; set; } = [];
     public bool IsAvailable { get; set; }

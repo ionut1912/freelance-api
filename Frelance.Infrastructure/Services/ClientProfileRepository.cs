@@ -42,7 +42,7 @@ public class ClientProfileRepository : IClientProfileRepository
         await _dbContext.Addresses.AddAsync(address, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
         var clientProfile = clientProfileCommand.Adapt<ClientProfiles>();
-        clientProfile.Users = user;
+        clientProfile.UserId = user.Id;
         clientProfile.AddressId = address.Id;
         var profileImageUrl = await _blobService.UploadBlobAsync(StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(),
             $"{user.Id}/{clientProfileCommand.ProfileImage.FileName}", clientProfileCommand.ProfileImage);

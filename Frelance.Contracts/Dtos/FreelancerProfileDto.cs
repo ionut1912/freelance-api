@@ -2,7 +2,7 @@ namespace Frelance.Contracts.Dtos;
 
 public record FreelancerProfileDto(
     int Id,
-    UserClientDto UserClientDto,
+    UserProfileDto UserProfileDto,
     AddressDto AddressDto,
     string Bio,
     string ProfileImageUrl,

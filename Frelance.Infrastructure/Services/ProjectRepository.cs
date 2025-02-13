@@ -27,13 +27,12 @@ public class ProjectRepository : IProjectRepository
     }
     public async Task AddProjectAsync(CreateProjectCommand createProjectCommand, CancellationToken cancellationToken)
     {
+        var clientProfile= await _context.ClientProfiles
+                                          .AsNoTracking()
+                                          .Include(x=>x.Users)
+                                          .FirstOrDefaultAsync(x=>x.Users.UserName==_userAccessor.GetUsername(), cancellationToken);
         var project = createProjectCommand.Adapt<Projects>();
-        var freelancerProfile = await _context.FreelancerProfiles
-                                                .AsNoTracking()
-                                                .Include(x => x.Users)
-                                                .FirstOrDefaultAsync(x => x.Users.UserName == _userAccessor.GetUsername(), cancellationToken);
-
-        project.FreelancerProfiles = freelancerProfile;
+        project.ClientProfileId = clientProfile.Id;
         await _context.Projects.AddAsync(project, cancellationToken);
     }
 
@@ -64,7 +63,17 @@ public class ProjectRepository : IProjectRepository
 
     public async Task<ProjectDto> FindProjectByIdAsync(GetProjectByIdQuery getProjectByIdQuery, CancellationToken cancellationToken)
     {
-        var project = await _context.Projects.AsNoTracking().Include(x => x.Tasks).FirstOrDefaultAsync(x => x.Id == getProjectByIdQuery.Id, cancellationToken);
+        var project = await _context.Projects
+                                            .AsNoTracking()
+                                            .Include(x => x.Tasks)
+                                            .Include(x=>x.ClientProfiles)
+                                            .ThenInclude(x=>x.Users)
+                                            .Include(x=>x.ClientProfiles)
+                                            .ThenInclude(x=>x.Addresses)
+                                            .Include(x=>x.Proposals)
+                                            .Include(x=>x.Contracts)
+                                            .Include(x=>x.Invoices)
+                                            .FirstOrDefaultAsync(x => x.Id == getProjectByIdQuery.Id, cancellationToken);
         if (project is null)
         {
             throw new NotFoundException($"{nameof(Projects)} with {nameof(Projects.Id)} : '{getProjectByIdQuery.Id}' does not exist");
@@ -75,9 +84,25 @@ public class ProjectRepository : IProjectRepository
 
     public async Task<PaginatedList<ProjectDto>> FindProjectsAsync(GetProjectsQuery getProjectsQuery, CancellationToken cancellationToken)
     {
-        var projectQuery = _context.Projects.ProjectToType<ProjectDto>().AsQueryable();
-        return await CollectionHelper<ProjectDto>.ToPaginatedList(projectQuery,
-                                                                  getProjectsQuery.PaginationParams.PageNumber,
-                                                                  getProjectsQuery.PaginationParams.PageSize);
+        var projectQuery = _context.Projects
+            .AsNoTracking()
+            .Include(p => p.ClientProfiles)
+            .ThenInclude(x=>x.Users)
+            .Include(x => x.ClientProfiles)
+            .ThenInclude(x=>x.Addresses)
+            .Include(x=>x.Tasks)
+            .Include(x=>x.Invoices)
+            .Include(x=>x.Contracts)
+            .Include(x=>x.Proposals)
+            .ProjectToType<ProjectDto>();
+
+        var count = await projectQuery.CountAsync(cancellationToken);
+        var items = await projectQuery
+            .Skip((getProjectsQuery.PaginationParams.PageNumber - 1) * getProjectsQuery.PaginationParams.PageSize)
+            .Take(getProjectsQuery.PaginationParams.PageSize)
+            .ToListAsync(cancellationToken);
+
+        return new PaginatedList<ProjectDto>(items, count, getProjectsQuery.PaginationParams.PageNumber, getProjectsQuery.PaginationParams.PageSize);
     }
+
 }
