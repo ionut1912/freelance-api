@@ -2,7 +2,6 @@ namespace Frelance.Infrastructure.Entities;
 
 public class FreelancerProfiles : BaseUserProfile
 {
-    public List<Projects> Projects { get; set; } = [];
     public List<ProjectTasks> Tasks { get; set; } = [];
     public List<TimeLogs> TimeLogs { get; set; } = [];
     public List<Skiills> Skills { get; set; } = [];
@@ -13,4 +12,5 @@ public class FreelancerProfiles : BaseUserProfile
     public string Currency { get; set; }
     public int Rating { get; set; }
     public string PortfolioUrl { get; set; }
+    
 }

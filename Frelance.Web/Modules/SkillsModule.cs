@@ -15,7 +15,8 @@ public static class SkillsModule
             {
                 var skills = await mediator.Send(new GetSkillsQuery());
                 return Results.Ok(skills);
-            }).WithTags("Skills");
+            }).WithTags("Skills")
+            .RequireAuthorization();
 
 
     }
