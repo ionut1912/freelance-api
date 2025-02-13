@@ -3,7 +3,7 @@ using Frelance.Application.Mediatr.Commands.Reviews;
 
 namespace Frelance.Application.Mediatr.Validators.Reviews;
 
-public class DeleteReviewCommandValidator:AbstractValidator<DeleteReviewCommand>
+public class DeleteReviewCommandValidator : AbstractValidator<DeleteReviewCommand>
 {
     public DeleteReviewCommandValidator()
     {

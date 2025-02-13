@@ -12,5 +12,5 @@ public class BaseUserProfile
     public List<Contracts> Contracts { get; set; } = [];
     public List<Invoices> Invoices { get; set; } = [];
     public List<Projects> Projects { get; set; } = [];
-    
+
 }

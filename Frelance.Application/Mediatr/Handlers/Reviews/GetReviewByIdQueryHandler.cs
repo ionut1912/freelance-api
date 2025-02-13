@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.Reviews;
 
-public class GetReviewByIdQueryHandler:IRequestHandler<GetReviewByIdQuery,ReviewsDto>
+public class GetReviewByIdQueryHandler : IRequestHandler<GetReviewByIdQuery, ReviewsDto>
 {
     private readonly IReviewRepository _repository;
 
@@ -14,7 +14,7 @@ public class GetReviewByIdQueryHandler:IRequestHandler<GetReviewByIdQuery,Review
         ArgumentNullException.ThrowIfNull(repository, nameof(repository));
         _repository = repository;
     }
-    
+
     public async Task<ReviewsDto> Handle(GetReviewByIdQuery request, CancellationToken cancellationToken)
     {
         return await _repository.GetReviewsByIdAsync(request, cancellationToken);

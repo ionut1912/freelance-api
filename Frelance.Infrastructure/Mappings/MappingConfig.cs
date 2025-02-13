@@ -124,7 +124,7 @@ namespace Frelance.Infrastructure.Mappings
                 .Map(dest => dest.Currency, src => src.Currency)
                 .Map(dest => dest.Rating, src => src.Rating)
                 .Map(dest => dest.PortfolioUrl, src => src.PortfolioUrl);
-            
+
             TypeAdapterConfig<Skiills, SkillDto>
                 .NewConfig()
                 .Map(dest => dest, src => src);
@@ -151,15 +151,15 @@ namespace Frelance.Infrastructure.Mappings
                 .Map(dest => dest.Amount, src => src.Amount)
                 .Map(dest => dest.InvoiceFileUrl, src => src.InvoiceFileUrl)
                 .Map(dest => dest.Status, src => src.Status);
-            
+
             TypeAdapterConfig<Proposals, ProposalsDto>
                 .NewConfig()
-                .Map(dest=> dest.Id, src => src.Id)
-                .Map(dest=> dest.Project, src => src.Project.Adapt<ProjectDto>())
-                .Map(dest=>dest.ProposerId, src => src.ProposerId)
-                .Map(dest=>dest.ProposedBudget, src => src.ProposedBudget)
-                .Map(dest=>dest.Status, src => src.Status)
-                .Map(dest=>dest.CreatedAt, src => src.CreatedAt);
+                .Map(dest => dest.Id, src => src.Id)
+                .Map(dest => dest.Project, src => src.Project.Adapt<ProjectDto>())
+                .Map(dest => dest.ProposerId, src => src.ProposerId)
+                .Map(dest => dest.ProposedBudget, src => src.ProposedBudget)
+                .Map(dest => dest.Status, src => src.Status)
+                .Map(dest => dest.CreatedAt, src => src.CreatedAt);
 
             TypeAdapterConfig<Reviews, ReviewsDto>
                 .NewConfig()
