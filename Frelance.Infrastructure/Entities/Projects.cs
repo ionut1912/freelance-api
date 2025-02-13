@@ -11,6 +11,8 @@ public class Projects
     public List<ProjectTasks> Tasks { get; set; } = new();
     public int FreelancerProfileId { get; set; }
     public FreelancerProfiles FreelancerProfiles { get; set; }
+    public int ClientProfileId { get; set; }
+    public ClientProfiles ClientProfiles { get; set; }
     public List<Proposals> Proposals { get; set; } = new();
     public List<Contracts> Contracts { get; set; } = new();
     public List<Invoices> Invoices { get; set; } = new();

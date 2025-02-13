@@ -13,40 +13,45 @@ public static class TimeLogModule
 {
     public static void AddTimeLogsEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/timelogs", async (IMediator mediator, [FromQuery] int pageSize, [FromQuery] int pageNumber, CancellationToken ct) =>
+        app.MapGet("/api/timeLogs", async (IMediator mediator, [FromQuery] int pageSize, [FromQuery] int pageNumber, CancellationToken ct) =>
         {
             var paginatedTimeLogDtos = await mediator.Send(new GetTimeLogsQuery
                 (new PaginationParams { PageSize = pageSize, PageNumber = pageNumber }), ct);
             return Results.Extensions.OkPaginationResult(paginatedTimeLogDtos.PageSize, paginatedTimeLogDtos.CurrentPage,
                 paginatedTimeLogDtos.TotalCount, paginatedTimeLogDtos.TotalPages, paginatedTimeLogDtos.Items);
-        }).WithTags("TimeLogs");
+        }).WithTags("TimeLogs")
+        .RequireAuthorization("FreelancerRole");
 
-        app.MapGet("/api/timelogs/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
+        app.MapGet("/api/timeLogs/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
         {
             var timeLog = await mediator.Send(new GetTimeLogByIdQuery(id), ct);
             return Results.Ok(timeLog);
-        }).WithTags("TimeLogs");
+        }).WithTags("TimeLogs")
+            .RequireAuthorization("FreelancerRole");
 
-        app.MapPost("/api/timelogs", async (IMediator mediator, CreateTimeLogCommand createTimeLogCommand,
+        app.MapPost("/api/timeLogs", async (IMediator mediator, CreateTimeLogCommand createTimeLogCommand,
             CancellationToken ct) =>
         {
             var result = await mediator.Send(createTimeLogCommand, ct);
             return Results.Ok(result);
-        }).WithTags("TimeLogs");
+        }).WithTags("TimeLogs")
+            .RequireAuthorization("FreelancerRole");
 
-        app.MapPut("/api/timelogs/{id}", async (IMediator mediator, int id,
+        app.MapPut("/api/timeLogs/{id}", async (IMediator mediator, int id,
             UpdateTimeLogRequest updateTimeLogRequest, CancellationToken ct) =>
         {
             var command = updateTimeLogRequest.Adapt<UpdateTimeLogCommand>() with { Id = id };
             var result = await mediator.Send(command, ct);
             return Results.Ok(result);
-        }).WithTags("TimeLogs");
+        }).WithTags("TimeLogs")
+            .RequireAuthorization("FreelancerRole");
 
-        app.MapDelete("/api/timelog/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
+        app.MapDelete("/api/timeLog/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
         {
             var command = new DeleteTimeLogCommand(id);
             var result = await mediator.Send(command, ct);
             return Results.Ok(result);
-        }).WithTags("TimeLogs");
+        }).WithTags("TimeLogs")
+            .RequireAuthorization("FreelancerRole");
     }
 }

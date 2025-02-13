@@ -1,4 +1,5 @@
-﻿using Frelance.Application.Mediatr.Commands.Tasks;
+﻿using Azure.Core;
+using Frelance.Application.Mediatr.Commands.Tasks;
 using Frelance.Application.Mediatr.Queries.Tasks;
 using Frelance.Contracts.Requests.Common;
 using Frelance.Contracts.Requests.ProjectTasks;
@@ -19,13 +20,15 @@ public static class TaskModule
                 (new PaginationParams { PageSize = pageSize, PageNumber = pageNumber }), ct);
             return Results.Extensions.OkPaginationResult(paginatedProjectDtos.PageSize, paginatedProjectDtos.CurrentPage,
                 paginatedProjectDtos.TotalCount, paginatedProjectDtos.TotalPages, paginatedProjectDtos.Items);
-        }).WithTags("Tasks");
+        }).WithTags("Tasks")
+        .RequireAuthorization();
 
         app.MapGet("/api/tasks/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
         {
             var task = await mediator.Send(new GetTaskByIdQuery(id), ct);
             return Results.Ok(task);
-        }).WithTags("Tasks");
+        }).WithTags("Tasks")
+        .RequireAuthorization();
 
         app.MapPost("/api/tasks", async (IMediator mediator, CreateProjectTaskRequest createProjectTaskRequest,
             CancellationToken ct) =>
@@ -33,7 +36,8 @@ public static class TaskModule
             var command = createProjectTaskRequest.Adapt<CreateTaskCommand>();
             var result = await mediator.Send(command, ct);
             return Results.Ok(result);
-        }).WithTags("Tasks");
+        }).WithTags("Tasks")
+            .RequireAuthorization();
 
         app.MapPut("/api/tasks/{id}", async (IMediator mediator, int id,
             UpdateProjectTaskRequest updateTaskRequest, CancellationToken ct) =>
@@ -41,13 +45,15 @@ public static class TaskModule
             var command = updateTaskRequest.Adapt<UpdateTaskCommand>() with { Id = id };
             var result = await mediator.Send(command, ct);
             return Results.Ok(result);
-        }).WithTags("Tasks");
+        }).WithTags("Tasks")
+            .RequireAuthorization();
 
         app.MapDelete("/api/task/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
         {
             var command = new DeleteTaskCommand(id);
             var result = await mediator.Send(command, ct);
             return Results.Ok(result);
-        }).WithTags("Tasks");
+        }).WithTags("Tasks")
+            .RequireAuthorization("ClientRole");
     }
 }

@@ -19,13 +19,15 @@ public static class ProjectModule
                 (new PaginationParams { PageSize = pageSize, PageNumber = pageNumber }), ct);
             return Results.Extensions.OkPaginationResult(paginatedProjectDtos.PageSize, paginatedProjectDtos.CurrentPage,
                 paginatedProjectDtos.TotalCount, paginatedProjectDtos.TotalPages, paginatedProjectDtos.Items);
-        }).WithTags("Projects");
+        }).WithTags("Projects")
+        .RequireAuthorization();
 
         app.MapGet("/api/projects/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
         {
             var project = await mediator.Send(new GetProjectByIdQuery(id), ct);
             return Results.Ok(project);
-        }).WithTags("Projects");
+        }).WithTags("Projects")
+        .RequireAuthorization();
 
         app.MapPost("/api/projects", async (IMediator mediator, CreateProjectRequest createProjectRequest,
             CancellationToken ct) =>
@@ -42,13 +44,15 @@ public static class ProjectModule
             var command = updateProjectRequest.Adapt<UpdateProjectCommand>() with { Id = id };
             var result = await mediator.Send(command, ct);
             return Results.Ok(result);
-        }).WithTags("Projects");
+        }).WithTags("Projects")
+        .RequireAuthorization("ClientRole");
 
         app.MapDelete("/api/projects/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
         {
             var command = new DeleteProjectCommand(id);
             var result = await mediator.Send(command, ct);
             return Results.Ok(result);
-        }).WithTags("Projects");
+        }).WithTags("Projects")
+        .RequireAuthorization("ClientRole");
     }
 }

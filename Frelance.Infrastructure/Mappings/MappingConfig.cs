@@ -79,7 +79,8 @@ namespace Frelance.Infrastructure.Mappings
                     src.Users.Email,
                     src.Users.PhoneNumber,
                     src.Users.Reviews.Adapt<List<ReviewsDto>>(),
-                    src.Users.Proposals.Adapt<List<ProposalsDto>>()))
+                    src.Users.Proposals.Adapt<List<ProposalsDto>>(),
+                    src.Projects.Adapt<List<ProjectDto>>()))
                 .Map(dest => dest.Address, src => src.Addresses.Adapt<AddressDto>())
                 .Map(dest => dest.Bio, src => src.Bio)
                 .Map(dest => dest.ProfileImageUrl, src => src.ProfileImageUrl)
@@ -107,13 +108,13 @@ namespace Frelance.Infrastructure.Mappings
                     src.Users.Email,
                     src.Users.PhoneNumber,
                     src.Users.Reviews.Adapt<List<ReviewsDto>>(),
-                    src.Users.Proposals.Adapt<List<ProposalsDto>>()))
+                    src.Users.Proposals.Adapt<List<ProposalsDto>>(),
+                    src.Projects.Adapt<List<ProjectDto>>()))
                 .Map(dest => dest.AddressDto, src => src.Addresses.Adapt<AddressDto>())
                 .Map(dest => dest.Bio, src => src.Bio)
                 .Map(dest => dest.ProfileImageUrl, src => src.ProfileImageUrl)
                 .Map(dest => dest.ContractsDto, src => src.Contracts.Adapt<List<ContractsDto>>())
                 .Map(dest => dest.InvoicesDto, src => src.Invoices.Adapt<List<InvoicesDto>>())
-                .Map(dest => dest.ProjectDtos, src => src.Projects.Adapt<List<ProjectDto>>())
                 .Map(dest => dest.TaskDtos, src => src.Tasks.Adapt<List<TaskDto>>())
                 .Map(dest => dest.SkillDtos, src => src.Skills.Adapt<List<SkillDto>>())
                 .Map(dest => dest.ForeignLanguages, src => src.ForeignLanguages)
@@ -123,8 +124,44 @@ namespace Frelance.Infrastructure.Mappings
                 .Map(dest => dest.Currency, src => src.Currency)
                 .Map(dest => dest.Rating, src => src.Rating)
                 .Map(dest => dest.PortfolioUrl, src => src.PortfolioUrl);
-
+            
             TypeAdapterConfig<Skiills, SkillDto>
+                .NewConfig()
+                .Map(dest => dest, src => src);
+
+            TypeAdapterConfig<Entities.Contracts, ContractsDto>
+                .NewConfig()
+                .Map(dest => dest.Id, src => src.Id)
+                .Map(dest => dest.Project, src => src.Project.Adapt<ProjectDto>())
+                .Map(dest => dest.ClientId, src => src.ClientId)
+                .Map(dest => dest.FreelancerId, src => src.FreelancerId)
+                .Map(dest => dest.StartDate, src => src.StartDate)
+                .Map(dest => dest.EndDate, src => src.EndDate)
+                .Map(dest => dest.Amount, src => src.Amount)
+                .Map(dest => dest.ContractFileUrl, src => src.ContractFileUrl)
+                .Map(dest => dest.Status, src => src.Status);
+
+            TypeAdapterConfig<Invoices, InvoicesDto>
+                .NewConfig()
+                .Map(dest => dest.Id, src => src.Id)
+                .Map(dest => dest.Project, src => src.Project.Adapt<ProjectDto>())
+                .Map(dest => dest.ClientId, src => src.ClientId)
+                .Map(dest => dest.FreelancerId, src => src.FreelancerId)
+                .Map(dest => dest.Date, src => src.Date)
+                .Map(dest => dest.Amount, src => src.Amount)
+                .Map(dest => dest.InvoiceFileUrl, src => src.InvoiceFileUrl)
+                .Map(dest => dest.Status, src => src.Status);
+            
+            TypeAdapterConfig<Proposals, ProposalsDto>
+                .NewConfig()
+                .Map(dest=> dest.Id, src => src.Id)
+                .Map(dest=> dest.Project, src => src.Project.Adapt<ProjectDto>())
+                .Map(dest=>dest.ProposerId, src => src.ProposerId)
+                .Map(dest=>dest.ProposedBudget, src => src.ProposedBudget)
+                .Map(dest=>dest.Status, src => src.Status)
+                .Map(dest=>dest.CreatedAt, src => src.CreatedAt);
+
+            TypeAdapterConfig<Reviews, ReviewsDto>
                 .NewConfig()
                 .Map(dest => dest, src => src);
 
