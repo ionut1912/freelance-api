@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Frelance.Infrastructure.Services;
 
 
-public class ReviewRepository:IReviewRepository
+public class ReviewRepository : IReviewRepository
 {
     private readonly FrelanceDbContext _context;
     private readonly IUserAccessor _userAccessor;
@@ -29,7 +29,7 @@ public class ReviewRepository:IReviewRepository
 
     public async Task AddReviewAsync(AddReviewCommand addReviewCommand, CancellationToken cancellationToken)
     {
-        var user=await _context.Users.AsNoTracking().FirstOrDefaultAsync(x=>x.UserName == _userAccessor.GetUsername(), cancellationToken);
+        var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.UserName == _userAccessor.GetUsername(), cancellationToken);
         var review = new Reviews
         {
             ReviewerId = user.Id,
@@ -38,17 +38,17 @@ public class ReviewRepository:IReviewRepository
         await _context.Reviews.AddAsync(review, cancellationToken);
     }
 
-    public  async Task<ReviewsDto> GetReviewsByIdAsync(GetReviewByIdQuery getReviewById, CancellationToken cancellationToken)
+    public async Task<ReviewsDto> GetReviewsByIdAsync(GetReviewByIdQuery getReviewById, CancellationToken cancellationToken)
     {
         var review = await _context.Reviews
                                             .AsNoTracking()
-                                            .Include(x=>x.Reviewer)
+                                            .Include(x => x.Reviewer)
                                             .FirstOrDefaultAsync(x => x.Id == getReviewById.Id, cancellationToken);
         if (review is null)
         {
             throw new NotFoundException($"{nameof(Reviews)} with {nameof(Reviews.Id)}: '{getReviewById.Id}' does not exist");
         }
-        
+
         return review.Adapt<ReviewsDto>();
     }
 

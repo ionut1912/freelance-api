@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Queries.Reviews;
 
-public record GetReviewByIdQuery(int Id):IRequest<ReviewsDto>;
+public record GetReviewByIdQuery(int Id) : IRequest<ReviewsDto>;

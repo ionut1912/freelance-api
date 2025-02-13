@@ -12,5 +12,5 @@ public class FreelancerProfiles : BaseUserProfile
     public string Currency { get; set; }
     public int Rating { get; set; }
     public string PortfolioUrl { get; set; }
-    
+
 }

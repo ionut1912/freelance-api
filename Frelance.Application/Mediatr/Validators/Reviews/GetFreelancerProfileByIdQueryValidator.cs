@@ -3,7 +3,7 @@ using Frelance.Application.Mediatr.Queries.FreelancerProfiles;
 
 namespace Frelance.Application.Mediatr.Validators.Reviews;
 
-public class GetFreelancerProfileByIdQueryValidator: AbstractValidator<GetFreelancerProfileByIdQuery>
+public class GetFreelancerProfileByIdQueryValidator : AbstractValidator<GetFreelancerProfileByIdQuery>
 {
     public GetFreelancerProfileByIdQueryValidator()
     {

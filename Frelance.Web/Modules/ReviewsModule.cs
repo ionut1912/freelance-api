@@ -27,7 +27,7 @@ public static class ReviewsModule
                 return Results.Ok(project);
             }).WithTags("Reviews")
             .RequireAuthorization();
-        
+
         app.MapGet("/api/reviews", async (IMediator mediator, [FromQuery] int pageSize, [FromQuery] int pageNumber, CancellationToken ct) =>
             {
                 var paginatedReviews = await mediator.Send(new GetReviewsQuery
@@ -52,5 +52,5 @@ public static class ReviewsModule
             }).WithTags("Reviews")
             .RequireAuthorization();
     }
-    
+
 }
