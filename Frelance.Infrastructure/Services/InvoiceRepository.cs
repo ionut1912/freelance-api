@@ -130,7 +130,7 @@ public class InvoiceRepository : IInvoiceRepository
         }
 
         invoiceToUpdate.Amount = updateInvoiceCommand.UpdateInvoiceRequest.Amount;
-        invoiceToUpdate.Status= updateInvoiceCommand.UpdateInvoiceRequest.Status;
+        invoiceToUpdate.Status = updateInvoiceCommand.UpdateInvoiceRequest.Status;
         _frelanceDbContext.Invoices.Update(invoiceToUpdate);
     }
 
@@ -143,7 +143,7 @@ public class InvoiceRepository : IInvoiceRepository
         {
             throw new NotFoundException($"{nameof(Invoices)} with {nameof(Invoices.Id)}: {deleteInvoiceCommand.Id} not found");
         }
-        await _blobService.DeleteBlobAsync(StorageContainers.INVOICESCONTAINER.ToString().ToLower(),invoiceToDelete.ProjectId.ToString());
+        await _blobService.DeleteBlobAsync(StorageContainers.INVOICESCONTAINER.ToString().ToLower(), invoiceToDelete.ProjectId.ToString());
         _frelanceDbContext.Invoices.Remove(invoiceToDelete);
     }
 }
