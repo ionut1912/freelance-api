@@ -1,7 +1,6 @@
 
 using Frelance.Contracts.Requests.Skills;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 
 
 namespace Frelance.Contracts.Requests.FreelancerProfiles;

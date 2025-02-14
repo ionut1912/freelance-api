@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using Frelance.Application.Mediatr.Commands.Tasks;
+﻿using Frelance.Application.Mediatr.Commands.Tasks;
 using Frelance.Application.Mediatr.Queries.Tasks;
 using Frelance.Contracts.Requests.Common;
 using Frelance.Contracts.Requests.ProjectTasks;

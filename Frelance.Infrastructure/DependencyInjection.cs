@@ -81,6 +81,7 @@ public static class DependencyInjection
             services.AddScoped<IReviewRepository, ReviewRepository>();
             services.AddScoped<IContractRepository, ContractRepository>();
             services.AddScoped<IInvoiceRepository, InvoiceRepository>();
+            services.AddScoped<IProposalRepository, ProposalRepository>();
 
             services.AddIdentityCore<Users>(opt => opt.User.RequireUniqueEmail = true)
                 .AddRoles<Roles>()
