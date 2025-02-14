@@ -9,7 +9,8 @@ public class Invoices
     public ClientProfiles Client { get; set; }
     public int FreelancerId { get; set; }
     public FreelancerProfiles Freelancer { get; set; }
-    public DateOnly Date { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
     public decimal Amount { get; set; }
     public string InvoiceFileUrl { get; set; }
     public string Status { get; set; }

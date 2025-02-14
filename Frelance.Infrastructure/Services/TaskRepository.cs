@@ -40,13 +40,16 @@ public class TaskRepository : ITaskRepository
         var freelancerProfile = await _context.FreelancerProfiles
                                         .AsNoTracking()
                                         .Include(x => x.Users)
-                                        .FirstOrDefaultAsync(x => x.Users.UserName == _userAccessor.GetUsername(), cancellationToken);
+                                        .FirstOrDefaultAsync(x => x.Users.UserName == createTaskCommand.CreateProjectTaskRequest.FreelancerUsername, cancellationToken);
 
         var task = createTaskCommand.Adapt<ProjectTasks>();
         task.ProjectId = taskProject.Id;
         task.Status = ProjectTaskStatus.ToDo.ToString();
         task.Priority = createTaskCommand.CreateProjectTaskRequest.Priority;
+        task.Title = createTaskCommand.CreateProjectTaskRequest.Title;
+        task.Description = createTaskCommand.CreateProjectTaskRequest.Description;
         task.FreelancerProfileId = freelancerProfile.Id;
+        task.CreatedAt = DateTime.UtcNow;
         await _context.Tasks.AddAsync(task, cancellationToken);
     }
 
@@ -64,7 +67,7 @@ public class TaskRepository : ITaskRepository
         projectTaskToUpdate.Description = updateTaskCommand.UpdateProjectTaskRequest.Description;
         projectTaskToUpdate.Status = updateTaskCommand.UpdateProjectTaskRequest.Status;
         projectTaskToUpdate.Priority = updateTaskCommand.UpdateProjectTaskRequest.Priority;
-
+        projectTaskToUpdate.UpdatedAt = DateTime.UtcNow;
         _context.Tasks.Update(projectTaskToUpdate);
     }
 
@@ -98,15 +101,17 @@ public class TaskRepository : ITaskRepository
 
     public async Task<PaginatedList<TaskDto>> GetTasksAsync(GetTasksQuery getTasksQuery, CancellationToken cancellationToken)
     {
-        var taskQuery = _context.Tasks.AsNoTracking()
-            .Include(x => x.Projects)
+        var tasksQuery = _context.Tasks
+            .AsNoTracking()
             .Include(x => x.TimeLogs)
-            .ProjectToType<TaskDto>()
-            .AsQueryable();
+            .ProjectToType<TaskDto>();
 
-        return await CollectionHelper<TaskDto>.ToPaginatedList(
-            taskQuery,
-            getTasksQuery.PaginationParams.PageNumber,
-            getTasksQuery.PaginationParams.PageSize);
+        var count = await tasksQuery.CountAsync(cancellationToken);
+        var items = await tasksQuery
+            .Skip((getTasksQuery.PaginationParams.PageNumber - 1) * getTasksQuery.PaginationParams.PageSize)
+            .Take(getTasksQuery.PaginationParams.PageSize)
+            .ToListAsync(cancellationToken);
+
+        return new PaginatedList<TaskDto>(items, count, getTasksQuery.PaginationParams.PageNumber, getTasksQuery.PaginationParams.PageSize);
     }
 }

@@ -8,4 +8,5 @@ public class Users : IdentityUser<int>
     public ClientProfiles ClientProfiles { get; set; }
     public List<Reviews> Reviews { get; set; } = [];
     public List<Proposals> Proposals { get; set; } = [];
+    public DateTime CreatedAt { get; set; }
 }

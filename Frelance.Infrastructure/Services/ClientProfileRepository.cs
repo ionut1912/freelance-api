@@ -49,6 +49,8 @@ public class ClientProfileRepository : IClientProfileRepository
         var profileImageUrl = await _blobService.UploadBlobAsync(StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(),
             $"{user.Id}/{clientProfileCommand.CreateClientProfileRequest.ProfileImage.FileName}", clientProfileCommand.CreateClientProfileRequest.ProfileImage);
         clientProfile.ProfileImageUrl = profileImageUrl;
+        clientProfile.CreatedAt = DateTime.UtcNow;
+        clientProfile.Bio= clientProfileCommand.CreateClientProfileRequest.Bio;
         await _dbContext.ClientProfiles.AddAsync(clientProfile, cancellationToken);
     }
 
@@ -76,10 +78,24 @@ public class ClientProfileRepository : IClientProfileRepository
 
     public async Task<PaginatedList<ClientProfileDto>> GetClientProfilesAsync(GetClientProfilesQuery clientProfilesQuery, CancellationToken cancellationToken)
     {
-        var clientProfileQueryable = _dbContext.ClientProfiles.ProjectToType<ClientProfileDto>().AsQueryable();
-        return await CollectionHelper<ClientProfileDto>.ToPaginatedList(clientProfileQueryable,
-                                                                        clientProfilesQuery.PaginationParams.PageNumber,
-                                                                        clientProfilesQuery.PaginationParams.PageSize);
+        var clientsQuery = _dbContext.ClientProfiles
+            .AsNoTracking()
+            .Include(x => x.Users)
+            .ThenInclude(x=>x.Reviews)
+            .Include(x => x.Users)
+            .ThenInclude(x=>x.Proposals)
+            .Include(x => x.Addresses)
+            .Include(x => x.Contracts)
+            .Include(x=>x.Invoices)
+            .ProjectToType<ClientProfileDto>();
+
+        var count = await clientsQuery.CountAsync(cancellationToken);
+        var items = await clientsQuery
+            .Skip((clientProfilesQuery.PaginationParams.PageNumber - 1) * clientProfilesQuery.PaginationParams.PageSize)
+            .Take(clientProfilesQuery.PaginationParams.PageSize)
+            .ToListAsync(cancellationToken);
+
+        return new PaginatedList<ClientProfileDto>(items, count, clientProfilesQuery.PaginationParams.PageNumber, clientProfilesQuery.PaginationParams.PageSize);
     }
 
     public async Task UpdateClientProfileAsync(UpdateClientProfileCommand clientProfileCommand, CancellationToken cancellationToken)
@@ -112,6 +128,7 @@ public class ClientProfileRepository : IClientProfileRepository
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
         clientToUpdate.Bio = clientProfileCommand.UpdateClientProfileRequest.Bio;
+        clientToUpdate.UpdatedAt = DateTime.UtcNow;
         _dbContext.ClientProfiles.Update(clientToUpdate);
     }
 

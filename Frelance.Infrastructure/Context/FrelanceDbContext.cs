@@ -24,6 +24,7 @@ public class FrelanceDbContext : IdentityDbContext<Users, Roles, int>
     public DbSet<Proposals> Proposals { get; set; }
     public DbSet<Entities.Contracts> Contracts { get; set; }
     public DbSet<Invoices> Invoices { get; set; }
+    public DbSet<FreelancerForeignLanguage> FreelancerForeignLanguage { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -35,6 +36,18 @@ public class FrelanceDbContext : IdentityDbContext<Users, Roles, int>
             .HasForeignKey(u => u.FreelancerProfileId)
             .OnDelete(DeleteBehavior.NoAction);
 
+        builder.Entity<FreelancerForeignLanguage>()
+            .HasOne(fld => fld.FreelancerProfile)
+            .WithMany(x=>x.ForeignLanguages)
+            .HasForeignKey(fld => fld.FreelancerProfileId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<ProjectTasks>()
+            .HasOne(p => p.Projects)
+            .WithMany(p => p.Tasks)
+            .HasForeignKey(p => p.ProjectId)
+            .OnDelete(DeleteBehavior.NoAction);
+        
         builder.Entity<FreelancerProfiles>()
             .HasOne(x => x.Users)
             .WithOne(x => x.FreelancerProfiles)
@@ -64,10 +77,43 @@ public class FrelanceDbContext : IdentityDbContext<Users, Roles, int>
             .WithMany(x => x.Proposals)
             .HasForeignKey(x => x.ProposerId)
             .OnDelete(DeleteBehavior.NoAction);
+        
         builder.Entity<Proposals>()
             .Property(x => x.UpdatedAt)
             .IsRequired(false);
 
+        builder.Entity<Entities.Contracts>()
+            .Property(x => x.UpdatedAt)
+            .IsRequired(false);
+        
+        builder.Entity<Invoices>()
+            .Property(x => x.UpdatedAt)
+            .IsRequired(false);
+        
+        builder.Entity<ClientProfiles>()
+            .Property(x => x.UpdatedAt)
+            .IsRequired(false);
+        
+        builder.Entity<FreelancerProfiles>()
+            .Property(x => x.UpdatedAt)
+            .IsRequired(false);
+        
+        builder.Entity<Projects>()
+            .Property(x => x.UpdatedAt)
+            .IsRequired(false);
+        
+        builder.Entity<ProjectTasks>()
+            .Property(x => x.UpdatedAt)
+            .IsRequired(false);
+        
+        builder.Entity<Reviews>()
+            .Property(x => x.UpdatedAt)
+            .IsRequired(false);
+        
+        builder.Entity<TimeLogs>()
+            .Property(x => x.UpdatedAt)
+            .IsRequired(false);
+        
         builder.Entity<Entities.Contracts>()
             .HasOne(x => x.Project)
             .WithMany(x => x.Contracts)
@@ -132,14 +178,6 @@ public class FrelanceDbContext : IdentityDbContext<Users, Roles, int>
             .Property(c => c.EndDate)
             .HasConversion(dateOnlyConverter);
 
-        builder.Entity<Invoices>()
-            .Property(i => i.Date)
-            .HasConversion(dateOnlyConverter);
-
-        builder.Entity<TimeLogs>()
-            .Property(t => t.Date)
-            .HasConversion(dateOnlyConverter);
-
         builder.Entity<Entities.Contracts>()
             .Property(c => c.Amount)
             .HasPrecision(18, 2);
@@ -147,7 +185,7 @@ public class FrelanceDbContext : IdentityDbContext<Users, Roles, int>
         builder.Entity<Invoices>()
             .Property(i => i.Amount)
             .HasPrecision(18, 2);
-
+        
         builder.Entity<Projects>()
             .Property(p => p.Budget)
             .HasPrecision(18, 2);
@@ -167,16 +205,7 @@ public class FrelanceDbContext : IdentityDbContext<Users, Roles, int>
                 v => string.Join(',', v),
                 v => v.Split(',', System.StringSplitOptions.RemoveEmptyEntries).ToList())
             .Metadata.SetValueComparer(stringListComparer);
-
-        builder.Entity<FreelancerProfiles>()
-            .Property(fp => fp.ForeignLanguages)
-            .HasConversion(
-                v => string.Join(',', v),
-                v => v.Split(',', System.StringSplitOptions.RemoveEmptyEntries).ToList())
-            .Metadata.SetValueComparer(new ValueComparer<List<string>>(
-                (c1, c2) => c1.SequenceEqual(c2),
-                c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
-                c => c.ToList()));
+        
 
         builder.Entity<FreelancerProfiles>()
             .HasOne(fp => fp.Addresses)

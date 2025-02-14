@@ -4,6 +4,7 @@ using Frelance.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Frelance.Infrastructure.Migrations
 {
     [DbContext(typeof(FrelanceDbContext))]
-    partial class FrelanceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250214104754_AddCreatedAndUpdatedAtFields")]
+    partial class AddCreatedAndUpdatedAtFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -152,27 +155,6 @@ namespace Frelance.Infrastructure.Migrations
                     b.ToTable("Contracts");
                 });
 
-            modelBuilder.Entity("Frelance.Infrastructure.Entities.FreelancerForeignLanguage", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("FreelancerProfileId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Language")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FreelancerProfileId");
-
-                    b.ToTable("FreelancerForeignLanguage");
-                });
-
             modelBuilder.Entity("Frelance.Infrastructure.Entities.FreelancerProfiles", b =>
                 {
                     b.Property<int>("Id")
@@ -194,6 +176,9 @@ namespace Frelance.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Experience")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ForeignLanguages")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsAvailable")
@@ -788,17 +773,6 @@ namespace Frelance.Infrastructure.Migrations
                     b.Navigation("Project");
                 });
 
-            modelBuilder.Entity("Frelance.Infrastructure.Entities.FreelancerForeignLanguage", b =>
-                {
-                    b.HasOne("Frelance.Infrastructure.Entities.FreelancerProfiles", "FreelancerProfile")
-                        .WithMany("ForeignLanguages")
-                        .HasForeignKey("FreelancerProfileId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("FreelancerProfile");
-                });
-
             modelBuilder.Entity("Frelance.Infrastructure.Entities.FreelancerProfiles", b =>
                 {
                     b.HasOne("Frelance.Infrastructure.Entities.Addresses", "Addresses")
@@ -972,8 +946,6 @@ namespace Frelance.Infrastructure.Migrations
             modelBuilder.Entity("Frelance.Infrastructure.Entities.FreelancerProfiles", b =>
                 {
                     b.Navigation("Contracts");
-
-                    b.Navigation("ForeignLanguages");
 
                     b.Navigation("Invoices");
 

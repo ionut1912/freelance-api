@@ -20,18 +20,19 @@ public static class TimeLogModule
             return Results.Extensions.OkPaginationResult(paginatedTimeLogDtos.PageSize, paginatedTimeLogDtos.CurrentPage,
                 paginatedTimeLogDtos.TotalCount, paginatedTimeLogDtos.TotalPages, paginatedTimeLogDtos.Items);
         }).WithTags("TimeLogs")
-        .RequireAuthorization("FreelancerRole");
+        .RequireAuthorization();
 
         app.MapGet("/api/timeLogs/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
         {
             var timeLog = await mediator.Send(new GetTimeLogByIdQuery(id), ct);
             return Results.Ok(timeLog);
         }).WithTags("TimeLogs")
-            .RequireAuthorization("FreelancerRole");
+            .RequireAuthorization();
 
-        app.MapPost("/api/timeLogs", async (IMediator mediator, CreateTimeLogCommand createTimeLogCommand,
+        app.MapPost("/api/timeLogs", async (IMediator mediator, CreateTimeLogRequest createTimeLogRequest,
             CancellationToken ct) =>
-        {
+            {
+                var createTimeLogCommand = new CreateTimeLogCommand(createTimeLogRequest);
             var result = await mediator.Send(createTimeLogCommand, ct);
             return Results.Ok(result);
         }).WithTags("TimeLogs")

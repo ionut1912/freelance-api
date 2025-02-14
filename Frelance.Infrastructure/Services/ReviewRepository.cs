@@ -34,6 +34,7 @@ public class ReviewRepository : IReviewRepository
         {
             ReviewerId = user.Id,
             ReviewText = createReviewCommand.CreateReviewRequest.ReviewText,
+            CreatedAt = DateTime.UtcNow,
         };
         await _context.Reviews.AddAsync(review, cancellationToken);
     }
@@ -54,10 +55,17 @@ public class ReviewRepository : IReviewRepository
 
     public async Task<PaginatedList<ReviewsDto>> GetReviewsAsync(GetReviewsQuery query, CancellationToken cancellationToken)
     {
-        var reviewQuery = _context.Reviews.ProjectToType<ReviewsDto>().AsQueryable();
-        return await CollectionHelper<ReviewsDto>.ToPaginatedList(reviewQuery,
-            query.PaginationParams.PageNumber,
-            query.PaginationParams.PageSize);
+        var reviewsQuery = _context.Reviews
+            .AsNoTracking()
+            .ProjectToType<ReviewsDto>();
+
+        var count = await reviewsQuery.CountAsync(cancellationToken);
+        var items = await reviewsQuery
+            .Skip((query.PaginationParams.PageNumber - 1) * query.PaginationParams.PageSize)
+            .Take(query.PaginationParams.PageSize)
+            .ToListAsync(cancellationToken);
+
+        return new PaginatedList<ReviewsDto>(items, count, query.PaginationParams.PageNumber, query.PaginationParams.PageSize);
     }
 
     public async Task UpdateReviewAsync(UpdateReviewCommand updateReviewCommand, CancellationToken cancellationToken)
@@ -68,6 +76,7 @@ public class ReviewRepository : IReviewRepository
             throw new NotFoundException($"{nameof(Reviews)} with {nameof(Reviews.Id)}: '{updateReviewCommand.Id}' does not exist");
         }
         reviewToUpdate.ReviewText = updateReviewCommand.UpdateReviewRequest.ReviewText;
+        reviewToUpdate.UpdatedAt = DateTime.UtcNow;
         _context.Reviews.Update(reviewToUpdate);
     }
 

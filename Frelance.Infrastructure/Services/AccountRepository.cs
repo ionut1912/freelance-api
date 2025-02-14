@@ -49,6 +49,7 @@ public class AccountRepository : IAccountRepository
             Email = createUserCommand.RegisterDto.Email,
             UserName = createUserCommand.RegisterDto.Username,
             PhoneNumber = createUserCommand.RegisterDto.PhoneNumber,
+            CreatedAt = DateTime.UtcNow
         };
         var result = await _userManager.CreateAsync(user, createUserCommand.RegisterDto.Password);
         if (!result.Succeeded)
@@ -82,7 +83,7 @@ public class AccountRepository : IAccountRepository
 
         GenerateException(modelState);
 
-        return new UserDto(user!.PhoneNumber, await _tokenService.GenerateToken(user), user.UserName, user.Email);
+        return new UserDto(user!.PhoneNumber, await _tokenService.GenerateToken(user), user.UserName, user.Email,user.CreatedAt);
     }
 
     private static void AddErrorToModelState(IdentityResult result, ModelStateDictionary modelState)

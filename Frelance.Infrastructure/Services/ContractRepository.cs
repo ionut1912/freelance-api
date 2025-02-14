@@ -66,7 +66,8 @@ public class ContractRepository : IContractRepository
             Status = "Signed",
             ContractFileUrl = await _blobService.UploadBlobAsync(
                 StorageContainers.CONTRACTSCONTAINER.ToString().ToLower(),
-                $"{project.Id}/{createContractCommand.CreateContractRequest.ContractFile.FileName}", createContractCommand.CreateContractRequest.ContractFile)
+                $"{project.Id}/{createContractCommand.CreateContractRequest.ContractFile.FileName}", createContractCommand.CreateContractRequest.ContractFile),
+            CreatedAt = DateTime.UtcNow
         };
         await _dbContext.Contracts.AddAsync(contract, cancellationToken);
     }
@@ -93,10 +94,22 @@ public class ContractRepository : IContractRepository
 
     public async Task<PaginatedList<ContractsDto>> GetContractsAsync(GetContractsQuery query, CancellationToken cancellationToken)
     {
-        var contractQueryable = _dbContext.Contracts.ProjectToType<ContractsDto>().AsQueryable();
-        return await CollectionHelper<ContractsDto>.ToPaginatedList(contractQueryable,
-            query.PaginationParams.PageNumber,
-            query.PaginationParams.PageSize);
+        var contractsQuery = _dbContext.Contracts
+            .AsNoTracking()
+            .Include(x => x.Client)
+            .ThenInclude(x=>x.Users)
+            .Include(x => x.Freelancer)
+            .ThenInclude(f => f.Users)
+            .Include(x => x.Project)
+            .ProjectToType<ContractsDto>();
+
+        var count = await contractsQuery.CountAsync(cancellationToken);
+        var items = await contractsQuery
+            .Skip((query.PaginationParams.PageNumber - 1) * query.PaginationParams.PageSize)
+            .Take(query.PaginationParams.PageSize)
+            .ToListAsync(cancellationToken);
+
+        return new PaginatedList<ContractsDto>(items, count, query.PaginationParams.PageNumber, query.PaginationParams.PageSize);
     }
 
     public async Task UpdateContractAsync(UpdateContractCommand updateContractCommand, CancellationToken cancellationToken)
@@ -122,6 +135,7 @@ public class ContractRepository : IContractRepository
         contract.EndDate = updateContractCommand.UpdateContractRequest.EndDate;
         contract.Amount = updateContractCommand.UpdateContractRequest.Amount;
         contract.Status = "Modified";
+        contract.UpdatedAt = DateTime.UtcNow;
         _dbContext.Contracts.Update(contract);
     }
 

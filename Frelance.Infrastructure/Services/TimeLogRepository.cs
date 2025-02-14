@@ -40,7 +40,8 @@ public class TimeLogRepository : ITimeLogRepository
                                       .Include(x => x.Users)
                                       .FirstOrDefaultAsync(x => x.Users.UserName == _userAccessor.GetUsername(), cancellationToken);
 
-        timeLog.FreelancerProfiles = freelancerProfile;
+        timeLog.FreelancerProfileId = freelancerProfile.Id;
+        timeLog.CreatedAt = DateTime.UtcNow;
         await _context.TimeLogs.AddAsync(timeLog, cancellationToken);
     }
 
@@ -59,10 +60,7 @@ public class TimeLogRepository : ITimeLogRepository
 
         timeLogToUpdate.TaskId = timeLogTask.Id;
         timeLogToUpdate.StartTime = updateTimeLogCommand.UpdateTimeLogRequest.StartTime;
-        if (timeLogToUpdate.Date == updateTimeLogCommand.UpdateTimeLogRequest.Date)
-        {
-            timeLogToUpdate.TotalHours += updateTimeLogCommand.UpdateTimeLogRequest.TotalHours;
-        }
+        timeLogToUpdate.UpdatedAt = DateTime.UtcNow;
         timeLogToUpdate.TotalHours = updateTimeLogCommand.UpdateTimeLogRequest.EndTime.Hour - updateTimeLogCommand.UpdateTimeLogRequest.StartTime.Hour;
         _context.TimeLogs.Update(timeLogToUpdate);
     }
@@ -89,7 +87,16 @@ public class TimeLogRepository : ITimeLogRepository
 
     public async Task<PaginatedList<TimeLogDto>> GetTimeLogsAsync(GetTimeLogsQuery getTimeLogsQuery, CancellationToken cancellationToken)
     {
-        var timeLogsQuery = _context.TimeLogs.ProjectToType<TimeLogDto>().AsQueryable();
-        return await CollectionHelper<TimeLogDto>.ToPaginatedList(timeLogsQuery, getTimeLogsQuery.PaginationParams.PageNumber, getTimeLogsQuery.PaginationParams.PageSize);
+        var timeLogsQuery = _context.TimeLogs
+            .AsNoTracking()
+            .ProjectToType<TimeLogDto>();
+
+        var count = await timeLogsQuery.CountAsync(cancellationToken);
+        var items = await timeLogsQuery
+            .Skip((getTimeLogsQuery.PaginationParams.PageNumber - 1) * getTimeLogsQuery.PaginationParams.PageSize)
+            .Take(getTimeLogsQuery.PaginationParams.PageSize)
+            .ToListAsync(cancellationToken);
+
+        return new PaginatedList<TimeLogDto>(items, count, getTimeLogsQuery.PaginationParams.PageNumber, getTimeLogsQuery.PaginationParams.PageSize);
     }
 }

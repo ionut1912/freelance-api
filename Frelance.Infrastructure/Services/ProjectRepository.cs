@@ -28,6 +28,7 @@ public class ProjectRepository : IProjectRepository
     public async Task AddProjectAsync(CreateProjectCommand createProjectCommand, CancellationToken cancellationToken)
     {
         var project = createProjectCommand.CreateProjectRequest.Adapt<Projects>();
+        project.CreatedAt = DateTime.UtcNow;
         await _context.Projects.AddAsync(project, cancellationToken);
     }
 
@@ -43,6 +44,7 @@ public class ProjectRepository : IProjectRepository
         projectToUpdate.Deadline = updateProjectCommand.UpdateProjectRequest.Deadline;
         projectToUpdate.Technologies = updateProjectCommand.UpdateProjectRequest.Technologies;
         projectToUpdate.Budget = updateProjectCommand.UpdateProjectRequest.Budget;
+        projectToUpdate.UpdatedAt = DateTime.UtcNow;
         _context.Projects.Update(projectToUpdate);
     }
 
