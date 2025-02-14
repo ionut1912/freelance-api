@@ -8,7 +8,7 @@ public record FreelancerProfileDto(
     string ProfileImageUrl,
     List<TaskDto> TaskDtos,
     List<SkillDto> SkillDtos,
-    List<string> ForeignLanguages,
+    List<ForeignLanguageDto> ForeignLanguages,
     bool IsAvailable,
     string Experience,
     int Rate,

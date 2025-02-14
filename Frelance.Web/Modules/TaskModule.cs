@@ -31,8 +31,8 @@ public static class TaskModule
 
         app.MapPost("/api/tasks", async (IMediator mediator, CreateProjectTaskRequest createProjectTaskRequest,
             CancellationToken ct) =>
-        {
-            var command = createProjectTaskRequest.Adapt<CreateTaskCommand>();
+            {
+                var command = new CreateTaskCommand(createProjectTaskRequest);
             var result = await mediator.Send(command, ct);
             return Results.Ok(result);
         }).WithTags("Tasks")

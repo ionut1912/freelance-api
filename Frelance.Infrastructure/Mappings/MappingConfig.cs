@@ -41,6 +41,7 @@ namespace Frelance.Infrastructure.Mappings
                 .Map(dest => dest.Title, src => src.Title)
                 .Map(dest => dest.Description, src => src.Description)
                 .Map(dest => dest.CreatedAt, src => src.CreatedAt)
+                .Map(dest => dest.UpdatedAt, src => src.UpdatedAt)
                 .Map(dest => dest.Deadline, src => src.Deadline)
                 .Map(dest => dest.Technologies, src => src.Technologies)
                 .Map(dest => dest.Budget, src => src.Budget)
@@ -61,7 +62,9 @@ namespace Frelance.Infrastructure.Mappings
                        .Map(dest => dest.Description, src => src.Description)
                        .Map(dest => dest.ProjectTaskStatus, src => src.Status)
                        .Map(dest => dest.Priority, src => src.Priority)
-                       .Map(dest => dest.TimeLogs, src => src.TimeLogs.Adapt<List<TimeLogDto>>());
+                       .Map(dest => dest.TimeLogs, src => src.TimeLogs.Adapt<List<TimeLogDto>>())
+                       .Map(dest => dest.CreatedAt, src => src.CreatedAt)
+                       .Map(dest => dest.UpdatedAt, src => src.UpdatedAt);
 
             TypeAdapterConfig<CreateTimeLogRequest, CreateTimeLogCommand>
                        .NewConfig()
@@ -92,7 +95,8 @@ namespace Frelance.Infrastructure.Mappings
                            src.Users.Email,
                            src.Users.PhoneNumber,
                            src.Users.Reviews.Adapt<List<ReviewsDto>>(),
-                           src.Users.Proposals.Adapt<List<ProposalsDto>>()))
+                           src.Users.Proposals.Adapt<List<ProposalsDto>>(),
+                           src.Users.CreatedAt))
                        .Map(dest => dest.Address, src => src.Addresses.Adapt<AddressDto>())
                        .Map(dest => dest.Bio, src => src.Bio)
                        .Map(dest => dest.ProfileImageUrl, src => src.ProfileImageUrl)
@@ -120,7 +124,8 @@ namespace Frelance.Infrastructure.Mappings
                            src.Users.Email,
                            src.Users.PhoneNumber,
                            src.Users.Reviews.Adapt<List<ReviewsDto>>(),
-                           src.Users.Proposals.Adapt<List<ProposalsDto>>()))
+                           src.Users.Proposals.Adapt<List<ProposalsDto>>(),
+                           src.Users.CreatedAt))
                        .Map(dest => dest.AddressDto, src => src.Addresses.Adapt<AddressDto>())
                        .Map(dest => dest.Bio, src => src.Bio)
                        .Map(dest => dest.ProfileImageUrl, src => src.ProfileImageUrl)
@@ -148,7 +153,9 @@ namespace Frelance.Infrastructure.Mappings
                        .Map(dest => dest.FreelancerName, src => src.Freelancer.Users.UserName)
                        .Map(dest => dest.ClientName, src => src.Client.Users.UserName)
                        .Map(dest => dest.ContractFileUrl, src => src.ContractFileUrl)
-                       .Map(dest => dest.Status, src => src.Status);
+                       .Map(dest => dest.Status, src => src.Status)
+                       .Map(dest=>dest.CreatedAt, src => src.CreatedAt)
+                       .Map(dest => dest.UpdatedAt, src => src.UpdatedAt);
 
             TypeAdapterConfig<Invoices, InvoicesDto>
                        .NewConfig()
@@ -156,7 +163,8 @@ namespace Frelance.Infrastructure.Mappings
                        .Map(dest => dest.Project, src => src.Project.Adapt<ProjectDto>())
                        .Map(dest => dest.ClientName, src => src.Client.Users.UserName)
                        .Map(dest => dest.FreelancerName, src => src.Freelancer.Users.UserName)
-                       .Map(dest => dest.Date, src => src.Date)
+                       .Map(dest => dest.CreatedAt, src => src.CreatedAt)
+                       .Map(dest => dest.UpdatedAt, src => src.UpdatedAt)
                        .Map(dest => dest.Amount, src => src.Amount)
                        .Map(dest => dest.InvoiceFileUrl, src => src.InvoiceFileUrl)
                        .Map(dest => dest.Status, src => src.Status);
@@ -168,7 +176,8 @@ namespace Frelance.Infrastructure.Mappings
                        .Map(dest => dest.Username, src => src.Proposer.UserName)
                        .Map(dest => dest.ProposedBudget, src => src.ProposedBudget)
                        .Map(dest => dest.Status, src => src.Status)
-                       .Map(dest => dest.CreatedAt, src => src.CreatedAt);
+                       .Map(dest => dest.CreatedAt, src => src.CreatedAt)
+                       .Map(dest => dest.UpdatedAt, src => src.UpdatedAt);
 
             TypeAdapterConfig<Reviews, ReviewsDto>
                        .NewConfig()
@@ -185,7 +194,8 @@ namespace Frelance.Infrastructure.Mappings
                 .Map(dest => dest.Email, src => src.Email)
                 .Map(dest => dest.PhoneNumber, src => src.PhoneNumber)
                 .Map(dest => dest.Reviews, src => src.Reviews.Adapt<List<ReviewsDto>>())
-                .Map(dest => dest.Proposals, src => src.Proposals.Adapt<List<ProposalsDto>>());
+                .Map(dest => dest.Proposals, src => src.Proposals.Adapt<List<ProposalsDto>>())
+                .Map(dest=>dest.CreatedAt, src => src.CreatedAt);
 
 
         }

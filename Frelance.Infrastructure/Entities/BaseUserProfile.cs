@@ -11,5 +11,7 @@ public class BaseUserProfile
     public string ProfileImageUrl { get; set; }
     public List<Contracts> Contracts { get; set; } = [];
     public List<Invoices> Invoices { get; set; } = [];
+    public DateTime CreatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
 
 }

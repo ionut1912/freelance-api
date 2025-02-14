@@ -70,14 +70,19 @@ public class ProposalRepository : IProposalRepository
 
     public async Task<PaginatedList<ProposalsDto>> GetProposalsAsync(GetProposalsQuery getProposalsQuery, CancellationToken cancellationToken)
     {
-        var proposalQuery = _dbContext.Proposals
-            .ProjectToType<ProposalsDto>()
-            .AsQueryable();
+        var proposalsQuery = _dbContext.Proposals
+            .AsNoTracking()
+            .Include(x => x.Proposer)
+            .Include(x => x.Project)
+            .ProjectToType<ProposalsDto>();
 
-        return await CollectionHelper<ProposalsDto>.ToPaginatedList(
-            proposalQuery,
-            getProposalsQuery.PaginationParams.PageNumber,
-            getProposalsQuery.PaginationParams.PageSize);
+        var count = await proposalsQuery.CountAsync(cancellationToken);
+        var items = await proposalsQuery
+            .Skip((getProposalsQuery.PaginationParams.PageNumber - 1) * getProposalsQuery.PaginationParams.PageSize)
+            .Take(getProposalsQuery.PaginationParams.PageSize)
+            .ToListAsync(cancellationToken);
+
+        return new PaginatedList<ProposalsDto>(items, count, getProposalsQuery.PaginationParams.PageNumber, getProposalsQuery.PaginationParams.PageSize);
     }
 
     public async Task UpdateProposalAsync(UpdateProposalCommand updateProposalCommand, CancellationToken cancellationToken)
@@ -92,6 +97,7 @@ public class ProposalRepository : IProposalRepository
         }
         proposalToUpdate.ProposedBudget = updateProposalCommand.UpdateProposalRequest.ProposedBudget;
         proposalToUpdate.Status = updateProposalCommand.UpdateProposalRequest.Status;
+        proposalToUpdate.UpdatedAt = DateTime.UtcNow;
         _dbContext.Proposals.Update(proposalToUpdate);
     }
 
@@ -105,6 +111,6 @@ public class ProposalRepository : IProposalRepository
         {
             throw new NotFoundException($"{nameof(Proposals)}  with {nameof(Proposals.Id)}:{deleteProposalCommand.Id} not found");
         }
-        _dbContext.Proposals.Remove(proposalToDelete);
+        _dbContext.Proposals.Remove(proposalToDelete); 
     }
 }

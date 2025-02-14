@@ -65,7 +65,7 @@ public class InvoiceRepository : IInvoiceRepository
             ProjectId = project.Id,
             ClientId = client.Id,
             FreelancerId = freelancer.Id,
-            Date = createInvoiceCommand.CreateInvoiceRequest.Date,
+            CreatedAt = DateTime.UtcNow,
             Amount = createInvoiceCommand.CreateInvoiceRequest.Amount,
             InvoiceFileUrl = await _blobService.UploadBlobAsync(
                 StorageContainers.INVOICESCONTAINER.ToString().ToLower(),
@@ -100,13 +100,21 @@ public class InvoiceRepository : IInvoiceRepository
     public async Task<PaginatedList<InvoicesDto>> GetInvoicesAsync(GetInvoicesQuery query, CancellationToken cancellationToken)
     {
         var invoicesQuery = _frelanceDbContext.Invoices
-            .ProjectToType<InvoicesDto>()
-            .AsQueryable();
+            .AsNoTracking()
+            .Include(x => x.Client)
+            .ThenInclude(x=>x.Users)
+            .Include(x => x.Freelancer)
+            .ThenInclude(f => f.Users)
+            .Include(x => x.Project)
+            .ProjectToType<InvoicesDto>();
 
-        return await CollectionHelper<InvoicesDto>.ToPaginatedList(
-            invoicesQuery,
-            query.PaginationParams.PageNumber,
-            query.PaginationParams.PageSize);
+        var count = await invoicesQuery.CountAsync(cancellationToken);
+        var items = await invoicesQuery
+            .Skip((query.PaginationParams.PageNumber - 1) * query.PaginationParams.PageSize)
+            .Take(query.PaginationParams.PageSize)
+            .ToListAsync(cancellationToken);
+
+        return new PaginatedList<InvoicesDto>(items, count, query.PaginationParams.PageNumber, query.PaginationParams.PageSize);
     }
 
     public async Task UpdateInvoiceAsync(UpdateInvoiceCommand updateInvoiceCommand, CancellationToken cancellationToken)
@@ -131,6 +139,7 @@ public class InvoiceRepository : IInvoiceRepository
 
         invoiceToUpdate.Amount = updateInvoiceCommand.UpdateInvoiceRequest.Amount;
         invoiceToUpdate.Status = updateInvoiceCommand.UpdateInvoiceRequest.Status;
+        invoiceToUpdate.UpdatedAt = DateTime.UtcNow;
         _frelanceDbContext.Invoices.Update(invoiceToUpdate);
     }
 
