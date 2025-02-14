@@ -111,6 +111,6 @@ public class ProposalRepository : IProposalRepository
         {
             throw new NotFoundException($"{nameof(Proposals)}  with {nameof(Proposals.Id)}:{deleteProposalCommand.Id} not found");
         }
-        _dbContext.Proposals.Remove(proposalToDelete); 
+        _dbContext.Proposals.Remove(proposalToDelete);
     }
 }

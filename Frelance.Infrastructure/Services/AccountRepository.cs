@@ -83,7 +83,7 @@ public class AccountRepository : IAccountRepository
 
         GenerateException(modelState);
 
-        return new UserDto(user!.PhoneNumber, await _tokenService.GenerateToken(user), user.UserName, user.Email,user.CreatedAt);
+        return new UserDto(user!.PhoneNumber, await _tokenService.GenerateToken(user), user.UserName, user.Email, user.CreatedAt);
     }
 
     private static void AddErrorToModelState(IdentityResult result, ModelStateDictionary modelState)

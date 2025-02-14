@@ -67,24 +67,24 @@ namespace Frelance.Infrastructure.Services
             ValidateSkills(skillsInDb, skills);
             freelancerProfile.Skills = skills.Adapt<List<Skiills>>();
             freelancerProfile.IsAvailable = true;
-            freelancerProfile.Bio= command.CreateFreelancerProfileRequest.Bio;
+            freelancerProfile.Bio = command.CreateFreelancerProfileRequest.Bio;
             freelancerProfile.CreatedAt = DateTime.UtcNow;
             var foreignLanguages = new List<FreelancerForeignLanguage>();
             await _dbContext.FreelancerProfiles.AddAsync(freelancerProfile, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
             foreach (var freelancerForeignLanguage in command.CreateFreelancerProfileRequest.ForeignLanguages.Select(language => new FreelancerForeignLanguage
-                     {
-                         Language = language,
-                         FreelancerProfileId = freelancerProfile.Id
-                    
-                     }))
+            {
+                Language = language,
+                FreelancerProfileId = freelancerProfile.Id
+
+            }))
             {
                 foreignLanguages.Add(freelancerForeignLanguage);
-                await _dbContext.FreelancerForeignLanguage.AddAsync(freelancerForeignLanguage,cancellationToken);
+                await _dbContext.FreelancerForeignLanguage.AddAsync(freelancerForeignLanguage, cancellationToken);
             }
 
             freelancerProfile.ForeignLanguages = foreignLanguages;
-            
+
             _dbContext.FreelancerProfiles.Update(freelancerProfile);
         }
 
@@ -103,8 +103,8 @@ namespace Frelance.Infrastructure.Services
                     .ThenInclude(i => i.Project)
                 .Include(fp => fp.Skills)
                 .Include(x => x.Addresses)
-                .Include(x=>x.ForeignLanguages)
-                .Include(x=>x.Tasks)
+                .Include(x => x.ForeignLanguages)
+                .Include(x => x.Tasks)
                 .FirstOrDefaultAsync(fp => fp.Id == query.Id, cancellationToken);
 
             if (profile == null)
@@ -120,14 +120,14 @@ namespace Frelance.Infrastructure.Services
             var freelancers = _dbContext.FreelancerProfiles
                 .AsNoTracking()
                 .Include(x => x.Users)
-                .ThenInclude(x=>x.Reviews)
+                .ThenInclude(x => x.Reviews)
                 .Include(x => x.Users)
-                .ThenInclude(x=>x.Proposals)
-                .ThenInclude(x=>x.Project)
+                .ThenInclude(x => x.Proposals)
+                .ThenInclude(x => x.Project)
                 .Include(x => x.Addresses)
                 .Include(f => f.Tasks)
-                .Include(x=>x.Skills)
-                .Include(x=>x.ForeignLanguages)
+                .Include(x => x.Skills)
+                .Include(x => x.ForeignLanguages)
                 .ProjectToType<FreelancerProfileDto>();
 
             var count = await freelancers.CountAsync(cancellationToken);
@@ -203,9 +203,12 @@ namespace Frelance.Infrastructure.Services
             var existingForeignLanguages = await _dbContext.FreelancerForeignLanguage.AsNoTracking()
                 .ToListAsync(cancellationToken);
 
-            
-            foreach (var foreignLanguageEntity in from foreignLanguage in command.UpdateFreelancerProfileRequest.ForeignLanguages let existingLanguage = existingForeignLanguages.FirstOrDefault(x => x.Language == foreignLanguage) where existingLanguage is null select new FreelancerForeignLanguage
-                         { Language = foreignLanguage, FreelancerProfileId = command.Id })
+
+            foreach (var foreignLanguageEntity in from foreignLanguage in command.UpdateFreelancerProfileRequest.ForeignLanguages
+                                                  let existingLanguage = existingForeignLanguages.FirstOrDefault(x => x.Language == foreignLanguage)
+                                                  where existingLanguage is null
+                                                  select new FreelancerForeignLanguage
+                                                  { Language = foreignLanguage, FreelancerProfileId = command.Id })
             {
                 freelancerProfile.ForeignLanguages.Add(foreignLanguageEntity);
                 await _dbContext.FreelancerForeignLanguage.AddAsync(foreignLanguageEntity, cancellationToken);

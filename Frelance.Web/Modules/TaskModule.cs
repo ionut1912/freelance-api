@@ -33,9 +33,9 @@ public static class TaskModule
             CancellationToken ct) =>
             {
                 var command = new CreateTaskCommand(createProjectTaskRequest);
-            var result = await mediator.Send(command, ct);
-            return Results.Ok(result);
-        }).WithTags("Tasks")
+                var result = await mediator.Send(command, ct);
+                return Results.Ok(result);
+            }).WithTags("Tasks")
             .RequireAuthorization();
 
         app.MapPut("/api/tasks/{id}", async (IMediator mediator, int id,

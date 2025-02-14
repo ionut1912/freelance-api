@@ -50,7 +50,7 @@ public class ClientProfileRepository : IClientProfileRepository
             $"{user.Id}/{clientProfileCommand.CreateClientProfileRequest.ProfileImage.FileName}", clientProfileCommand.CreateClientProfileRequest.ProfileImage);
         clientProfile.ProfileImageUrl = profileImageUrl;
         clientProfile.CreatedAt = DateTime.UtcNow;
-        clientProfile.Bio= clientProfileCommand.CreateClientProfileRequest.Bio;
+        clientProfile.Bio = clientProfileCommand.CreateClientProfileRequest.Bio;
         await _dbContext.ClientProfiles.AddAsync(clientProfile, cancellationToken);
     }
 
@@ -81,12 +81,12 @@ public class ClientProfileRepository : IClientProfileRepository
         var clientsQuery = _dbContext.ClientProfiles
             .AsNoTracking()
             .Include(x => x.Users)
-            .ThenInclude(x=>x.Reviews)
+            .ThenInclude(x => x.Reviews)
             .Include(x => x.Users)
-            .ThenInclude(x=>x.Proposals)
+            .ThenInclude(x => x.Proposals)
             .Include(x => x.Addresses)
             .Include(x => x.Contracts)
-            .Include(x=>x.Invoices)
+            .Include(x => x.Invoices)
             .ProjectToType<ClientProfileDto>();
 
         var count = await clientsQuery.CountAsync(cancellationToken);
