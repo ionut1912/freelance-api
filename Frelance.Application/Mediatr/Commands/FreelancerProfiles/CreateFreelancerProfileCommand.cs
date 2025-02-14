@@ -1,4 +1,3 @@
-using Frelance.Contracts.Requests.Address;
 using Frelance.Contracts.Requests.FreelancerProfiles;
 using Frelance.Contracts.Requests.Skills;
 using MediatR;

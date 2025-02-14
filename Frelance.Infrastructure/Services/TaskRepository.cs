@@ -46,7 +46,7 @@ public class TaskRepository : ITaskRepository
         task.ProjectId = taskProject.Id;
         task.Status = ProjectTaskStatus.ToDo.ToString();
         task.Priority = createTaskCommand.CreateProjectTaskRequest.Priority;
-        task.FreelancerProfiles = freelancerProfile;
+        task.FreelancerProfileId = freelancerProfile.Id;
         await _context.Tasks.AddAsync(task, cancellationToken);
     }
 

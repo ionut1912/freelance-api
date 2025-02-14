@@ -2,7 +2,6 @@ using Frelance.Application.Mediatr.Commands.ClientProfiles;
 using Frelance.Application.Mediatr.Commands.FreelancerProfiles;
 using Frelance.Application.Mediatr.Queries.FreelancerProfiles;
 using Frelance.Contracts.Dtos;
-using Frelance.Contracts.Requests.Address;
 using Frelance.Contracts.Requests.Common;
 using Frelance.Contracts.Requests.FreelancerProfiles;
 using Frelance.Contracts.Requests.Skills;
@@ -32,7 +31,7 @@ public static class FreelancerProfilesModule
                 var freelancerProfile = await mediator.Send(new GetFreelancerProfileByIdQuery(id), ct);
                 return Results.Ok(freelancerProfile);
             }).WithTags("FreelancerProfiles").
-            RequireAuthorization("FreelancerRole");
+            RequireAuthorization();
         app.MapGet("/api/freelancerProfiles", async (IMediator mediator, [FromQuery] int pageSize, [FromQuery] int pageNumber, CancellationToken ct) =>
             {
                 var paginatedFreelancerProfiles = await mediator.Send(new GetFreelancerProfilesQuery
@@ -40,7 +39,7 @@ public static class FreelancerProfilesModule
                 return Results.Extensions.OkPaginationResult(paginatedFreelancerProfiles.PageSize, paginatedFreelancerProfiles.CurrentPage,
                     paginatedFreelancerProfiles.TotalCount, paginatedFreelancerProfiles.TotalPages, paginatedFreelancerProfiles.Items);
             }).WithTags("FreelancerProfiles").
-            RequireAuthorization("FreelancerRole");
+            RequireAuthorization();
         var updateFreelancerProfileEndpoint = app.MapPut("/api/freelancerProfiles/{id}", async (IMediator mediator, int id,
                 [FromForm] UpdateFreelancerProfileRequest updateFreelancerProfileRequest, CancellationToken ct) =>
             {

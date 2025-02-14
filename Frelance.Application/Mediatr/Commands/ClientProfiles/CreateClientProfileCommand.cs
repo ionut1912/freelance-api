@@ -1,4 +1,3 @@
-using Frelance.Contracts.Requests.Address;
 using Frelance.Contracts.Requests.ClientProfile;
 using MediatR;
 using Microsoft.AspNetCore.Http;
