@@ -64,6 +64,9 @@ public class FrelanceDbContext : IdentityDbContext<Users, Roles, int>
             .WithMany(x => x.Proposals)
             .HasForeignKey(x => x.ProposerId)
             .OnDelete(DeleteBehavior.NoAction);
+        builder.Entity<Proposals>()
+            .Property(x => x.UpdatedAt)
+            .IsRequired(false);
 
         builder.Entity<Entities.Contracts>()
             .HasOne(x => x.Project)

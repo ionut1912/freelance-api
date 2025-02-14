@@ -14,7 +14,6 @@ namespace Frelance.Application.Mediatr.Validators.Contracts
             RuleFor(x => x.CreateContractRequest.EndDate).NotEmpty();
             RuleFor(x => x.CreateContractRequest.Amount).NotEmpty();
             RuleFor(x => x.CreateContractRequest.ContractFile).NotEmpty();
-
             RuleFor(x => x.CreateContractRequest.ContractFile)
                 .Must(file =>
                     file != null &&

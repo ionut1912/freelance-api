@@ -66,4 +66,5 @@ app.AddFreelancerProfilesEndpoints();
 app.AddReviewsEndpoints();
 app.AddContractEndpoints();
 app.AddInvoicesEndpoints();
+app.AddProposalEndpoints();
 app.Run();
