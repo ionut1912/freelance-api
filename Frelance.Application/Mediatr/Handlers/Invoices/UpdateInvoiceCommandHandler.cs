@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.Invoices;
 
-public class UpdateInvoiceCommandHandler:IRequestHandler<UpdateInvoiceCommand,Unit>
+public class UpdateInvoiceCommandHandler : IRequestHandler<UpdateInvoiceCommand, Unit>
 {
     private readonly IInvoiceRepository _invoiceRepository;
     private readonly IUnitOfWork _unitOfWork;
@@ -15,12 +15,12 @@ public class UpdateInvoiceCommandHandler:IRequestHandler<UpdateInvoiceCommand,Un
         ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));
         _invoiceRepository = invoiceRepository;
         _unitOfWork = unitOfWork;
-        
+
     }
-    
+
     public async Task<Unit> Handle(UpdateInvoiceCommand request, CancellationToken cancellationToken)
     {
-        await _invoiceRepository.UpdateInvoiceAsync(request,cancellationToken);
+        await _invoiceRepository.UpdateInvoiceAsync(request, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;
     }

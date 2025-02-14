@@ -5,4 +5,4 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Queries.Invoices;
 
-public record GetInvoicesQuery(PaginationParams PaginationParams):IRequest<PaginatedList<InvoicesDto>>;
+public record GetInvoicesQuery(PaginationParams PaginationParams) : IRequest<PaginatedList<InvoicesDto>>;
