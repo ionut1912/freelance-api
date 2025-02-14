@@ -1,8 +1,6 @@
-using Frelance.Application.Mediatr.Commands.ClientProfiles;
 using Frelance.Application.Mediatr.Commands.Contracts;
 using Frelance.Application.Mediatr.Queries.Contracts;
 using Frelance.Contracts.Dtos;
-using Frelance.Contracts.Requests.Address;
 using Frelance.Contracts.Requests.Common;
 using Frelance.Contracts.Requests.Contracts;
 using Frelance.Web.Extensions;
@@ -47,14 +45,14 @@ public static class ContractsModule
                 var result = await mediator.Send(command, ct);
                 return Results.Ok(result);
             }).WithTags("Contracts").
-            RequireAuthorization("ClientRole");
+            RequireAuthorization();
         app.MapDelete("/api/contracts/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
             {
                 var command = new DeleteContractCommand(id);
                 var result = await mediator.Send(command, ct);
                 return Results.Ok(result);
             }).WithTags("Contracts").
-            RequireAuthorization("ClientRole");
+            RequireAuthorization();
         createContractEndpoint.RemoveAntiforgery();
         updateContractEndpoint.RemoveAntiforgery();
     }

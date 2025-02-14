@@ -1,0 +1,26 @@
+using Frelance.Application.Mediatr.Commands.Invoices;
+using Frelance.Application.Repositories;
+using MediatR;
+
+namespace Frelance.Application.Mediatr.Handlers.Invoices;
+
+public class DeleteInvoiceCommandHandler:IRequestHandler<DeleteInvoiceCommand,Unit>
+{
+    private readonly IInvoiceRepository _invoiceRepository;
+    private readonly IUnitOfWork _unitOfWork;
+
+    public DeleteInvoiceCommandHandler(IInvoiceRepository invoiceRepository, IUnitOfWork unitOfWork)
+    {
+        ArgumentNullException.ThrowIfNull(invoiceRepository, nameof(invoiceRepository));
+        ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));
+        _invoiceRepository = invoiceRepository;
+        _unitOfWork = unitOfWork;
+    }
+    
+    public async Task<Unit> Handle(DeleteInvoiceCommand request, CancellationToken cancellationToken)
+    {
+        await _invoiceRepository.DeleteInvoiceAsync(request, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        return Unit.Value;
+    }
+}

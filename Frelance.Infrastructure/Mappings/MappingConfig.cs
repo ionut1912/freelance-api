@@ -6,7 +6,6 @@ using Frelance.Application.Mediatr.Commands.Tasks;
 using Frelance.Application.Mediatr.Commands.TimeLogs;
 using Frelance.Application.Mediatr.Commands.Users;
 using Frelance.Contracts.Dtos;
-using Frelance.Contracts.Requests.Address;
 using Frelance.Contracts.Requests.Projects;
 using Frelance.Contracts.Requests.ProjectTasks;
 using Frelance.Contracts.Requests.Skills;
@@ -79,11 +78,6 @@ namespace Frelance.Infrastructure.Mappings
             TypeAdapterConfig<List<Skiills>, List<SkillDto>>
                        .NewConfig()
                        .Map(dest => dest, src => src);
-
-            TypeAdapterConfig<AddressRequest, Addresses>
-                       .NewConfig()
-                       .ConstructUsing(src => new Addresses(src.Country, src.City, src.Street, src.StreetNumber, src.ZipCode));
-
 
             TypeAdapterConfig<ClientProfileDto, CreateClientProfileCommand>
                        .NewConfig()
@@ -160,8 +154,8 @@ namespace Frelance.Infrastructure.Mappings
                        .NewConfig()
                        .Map(dest => dest.Id, src => src.Id)
                        .Map(dest => dest.Project, src => src.Project.Adapt<ProjectDto>())
-                       .Map(dest => dest.Client, src => src.Client.Adapt<ClientProfileDto>())
-                       .Map(dest => dest.Freelancer, src => src.Freelancer.Adapt<FreelancerProfileDto>())
+                       .Map(dest => dest.ClientName, src => src.Client.Users.UserName)
+                       .Map(dest => dest.FreelancerName, src => src.Freelancer.Users.UserName)
                        .Map(dest => dest.Date, src => src.Date)
                        .Map(dest => dest.Amount, src => src.Amount)
                        .Map(dest => dest.InvoiceFileUrl, src => src.InvoiceFileUrl)
@@ -171,7 +165,7 @@ namespace Frelance.Infrastructure.Mappings
                        .NewConfig()
                        .Map(dest => dest.Id, src => src.Id)
                        .Map(dest => dest.Project, src => src.Project.Adapt<ProjectDto>())
-                       .Map(dest => dest.Proposer, src => src.Proposer.Adapt<UserProfileDto>())
+                       .Map(dest => dest.Username, src => src.Proposer.UserName)
                        .Map(dest => dest.ProposedBudget, src => src.ProposedBudget)
                        .Map(dest => dest.Status, src => src.Status)
                        .Map(dest => dest.CreatedAt, src => src.CreatedAt);

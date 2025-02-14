@@ -19,7 +19,6 @@ public class SkillRepository : ISkillsRepository
     public async Task<List<SkillDto>> GetSkillsAsync(CancellationToken ct = default)
     {
         var skill = await _context.Skills.ToListAsync(ct);
-        var x = skill.Adapt<List<SkillDto>>();
-        return x;
+        return skill.Adapt<List<SkillDto>>();
     }
 }
