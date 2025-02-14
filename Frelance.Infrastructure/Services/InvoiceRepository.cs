@@ -102,7 +102,7 @@ public class InvoiceRepository : IInvoiceRepository
         var invoicesQuery = _frelanceDbContext.Invoices
             .AsNoTracking()
             .Include(x => x.Client)
-            .ThenInclude(x=>x.Users)
+            .ThenInclude(x => x.Users)
             .Include(x => x.Freelancer)
             .ThenInclude(f => f.Users)
             .Include(x => x.Project)

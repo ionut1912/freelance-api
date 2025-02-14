@@ -154,7 +154,7 @@ namespace Frelance.Infrastructure.Mappings
                        .Map(dest => dest.ClientName, src => src.Client.Users.UserName)
                        .Map(dest => dest.ContractFileUrl, src => src.ContractFileUrl)
                        .Map(dest => dest.Status, src => src.Status)
-                       .Map(dest=>dest.CreatedAt, src => src.CreatedAt)
+                       .Map(dest => dest.CreatedAt, src => src.CreatedAt)
                        .Map(dest => dest.UpdatedAt, src => src.UpdatedAt);
 
             TypeAdapterConfig<Invoices, InvoicesDto>
@@ -195,7 +195,7 @@ namespace Frelance.Infrastructure.Mappings
                 .Map(dest => dest.PhoneNumber, src => src.PhoneNumber)
                 .Map(dest => dest.Reviews, src => src.Reviews.Adapt<List<ReviewsDto>>())
                 .Map(dest => dest.Proposals, src => src.Proposals.Adapt<List<ProposalsDto>>())
-                .Map(dest=>dest.CreatedAt, src => src.CreatedAt);
+                .Map(dest => dest.CreatedAt, src => src.CreatedAt);
 
 
         }

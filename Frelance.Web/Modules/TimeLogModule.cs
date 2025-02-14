@@ -33,9 +33,9 @@ public static class TimeLogModule
             CancellationToken ct) =>
             {
                 var createTimeLogCommand = new CreateTimeLogCommand(createTimeLogRequest);
-            var result = await mediator.Send(createTimeLogCommand, ct);
-            return Results.Ok(result);
-        }).WithTags("TimeLogs")
+                var result = await mediator.Send(createTimeLogCommand, ct);
+                return Results.Ok(result);
+            }).WithTags("TimeLogs")
             .RequireAuthorization("FreelancerRole");
 
         app.MapPut("/api/timeLogs/{id}", async (IMediator mediator, int id,

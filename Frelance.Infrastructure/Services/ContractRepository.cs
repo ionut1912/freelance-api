@@ -97,7 +97,7 @@ public class ContractRepository : IContractRepository
         var contractsQuery = _dbContext.Contracts
             .AsNoTracking()
             .Include(x => x.Client)
-            .ThenInclude(x=>x.Users)
+            .ThenInclude(x => x.Users)
             .Include(x => x.Freelancer)
             .ThenInclude(f => f.Users)
             .Include(x => x.Project)

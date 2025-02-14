@@ -1,3 +1,3 @@
 namespace Frelance.Contracts.Dtos;
 
-public record UserDto(string PhoneNumber, string Token, string Username, string Email,DateTime CreatedAt);
+public record UserDto(string PhoneNumber, string Token, string Username, string Email, DateTime CreatedAt);
