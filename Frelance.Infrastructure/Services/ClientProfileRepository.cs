@@ -38,7 +38,7 @@ public class ClientProfileRepository : IClientProfileRepository
         {
             throw new InvalidOperationException("User not found.");
         }
-        var clientProfile = clientProfileCommand.Adapt<ClientProfiles>();
+        var clientProfile = clientProfileCommand.CreateClientProfileRequest.Adapt<ClientProfiles>();
         await _dbContext.Addresses.AddAsync(clientProfile.Addresses, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
         clientProfile.UserId = user.Id;
@@ -107,7 +107,7 @@ public class ClientProfileRepository : IClientProfileRepository
         {
             throw new NotFoundException($"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Id)} : '{clientProfileCommand.Id}' does not exist");
         }
-        clientToUpdate = clientProfileCommand.Adapt<ClientProfiles>();
+        clientProfileCommand.UpdateClientProfileRequest.Adapt<ClientProfiles>();
         if (clientProfileCommand.UpdateClientProfileRequest.ProfileImage is not null)
         {
             await _blobService.DeleteBlobAsync(StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(), clientToUpdate.UserId.ToString());

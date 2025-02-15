@@ -40,7 +40,7 @@ public class ProposalRepository : IProposalRepository
             throw new NotFoundException($"{nameof(Projects)} with {nameof(Projects.Title)}:{createProposalCommand.CreateProposalRequest.ProjectName} not found");
         }
 
-        var proposal = createProposalCommand.Adapt<Proposals>();
+        var proposal = createProposalCommand.CreateProposalRequest.Adapt<Proposals>();
         proposal.ProjectId = project.Id;
         proposal.ProposerId = user.Id;
         proposal.Status = "Created";
@@ -91,7 +91,7 @@ public class ProposalRepository : IProposalRepository
         {
             throw new NotFoundException($"{nameof(Proposals)}  with {nameof(Proposals.Id)}:{updateProposalCommand.Id} not found");
         }
-        proposalToUpdate = updateProposalCommand.Adapt<Proposals>();
+        proposalToUpdate = updateProposalCommand.UpdateProposalRequest.Adapt<Proposals>();
         _dbContext.Proposals.Update(proposalToUpdate);
     }
 
