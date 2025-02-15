@@ -498,22 +498,22 @@ namespace Frelance.Infrastructure.Mappings
                 .Map(dest => dest.AddressDto, src => src.Addresses.Adapt<AddressDto>())
                 .Map(dest => dest.Bio, src => src.Bio)
                 .Map(dest => dest.ProfileImageUrl, src => src.ProfileImageUrl)
-                .Map(dest => dest.TaskDtos, src => src.Tasks.Adapt <List<TaskDto>>())
-                .Map(dest=>dest.SkillDtos,src=>src.Skills.Adapt<List<SkillDto>>())
-                .Map(dest=>dest.ForeignLanguages,src=>src.ForeignLanguages.Adapt<List<ForeignLanguageDto>>())
-                .Map(dest=>dest.ProjectDtos,src=>src.Projects.Adapt<List<ProjectDto>>())
-                .Map(dest=>dest.IsAvailable,src=>src.IsAvailable)
-                .Map(dest=>dest.Experience,src=>src.Experience)
-                .Map(dest=>dest.Rate,src=>src.Rate)
-                .Map(dest=>dest.Currency,src=>src.Currency)
-                .Map(dest=>dest.Rating,src=>src.Rating)
-                .Map(dest=>dest.PortfolioUrl,src=>src.PortfolioUrl);
+                .Map(dest => dest.TaskDtos, src => src.Tasks.Adapt<List<TaskDto>>())
+                .Map(dest => dest.SkillDtos, src => src.Skills.Adapt<List<SkillDto>>())
+                .Map(dest => dest.ForeignLanguages, src => src.ForeignLanguages.Adapt<List<ForeignLanguageDto>>())
+                .Map(dest => dest.ProjectDtos, src => src.Projects.Adapt<List<ProjectDto>>())
+                .Map(dest => dest.IsAvailable, src => src.IsAvailable)
+                .Map(dest => dest.Experience, src => src.Experience)
+                .Map(dest => dest.Rate, src => src.Rate)
+                .Map(dest => dest.Currency, src => src.Currency)
+                .Map(dest => dest.Rating, src => src.Rating)
+                .Map(dest => dest.PortfolioUrl, src => src.PortfolioUrl);
 
             TypeAdapterConfig<List<Skills>, List<SkillDto>>
                 .NewConfig()
                 .Map(dest => dest, src => src);
-            
-            TypeAdapterConfig<List<FreelancerForeignLanguage>,List<ForeignLanguageDto>>
+
+            TypeAdapterConfig<List<FreelancerForeignLanguage>, List<ForeignLanguageDto>>
                 .NewConfig()
                 .Map(dest => dest, src => src);
 

@@ -61,7 +61,7 @@ public class ClientProfileRepository : IClientProfileRepository
             .Include(cp => cp.Contracts)
             .Include(cp => cp.Invoices)
             .Include(x => x.Projects)
-            .Include(x=>x.Addresses)
+            .Include(x => x.Addresses)
             .FirstOrDefaultAsync(cp => cp.Id == query.Id, cancellationToken);
 
 

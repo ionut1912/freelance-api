@@ -78,12 +78,12 @@ namespace Frelance.Infrastructure.Services
             }
             catch (Exception e)
             {
-                
+
                 _dbContext.FreelancerProfiles.Remove(freelancerProfile);
                 await _dbContext.SaveChangesAsync(cancellationToken);
                 throw;
             }
-            
+
         }
 
         public async Task<FreelancerProfileDto> GetFreelancerProfileByIdAsync(GetFreelancerProfileByIdQuery query, CancellationToken cancellationToken)

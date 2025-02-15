@@ -117,12 +117,12 @@ public class ContractRepository : IContractRepository
             .Include(x => x.Freelancer)
             .ThenInclude(x => x.Projects)
             .FirstOrDefaultAsync(x => x.Id == updateContractCommand.Id, cancellationToken);
-        
+
         if (contract is null)
         {
             throw new NotFoundException($"nameof(Entities.Contracts) with {nameof(Entities.Contracts.Id)}: {updateContractCommand.Id} doe not exist.");
         }
-        
+
         updateContractCommand.UpdateContractRequest.Adapt(contract);
 
         if (updateContractCommand.UpdateContractRequest.ContractFile is not null)
@@ -148,7 +148,7 @@ public class ContractRepository : IContractRepository
         _dbContext.FreelancerProfiles.Update(contract.Freelancer);
     }
 
-    
+
 
     public async Task DeleteContractAsync(DeleteContractCommand deleteContractCommand, CancellationToken cancellationToken)
     {
