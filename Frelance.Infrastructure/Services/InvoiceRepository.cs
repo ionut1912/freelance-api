@@ -60,7 +60,7 @@ public class InvoiceRepository : IInvoiceRepository
                 $"{nameof(Projects)} with {nameof(Projects.Title)}: {createInvoiceCommand.CreateInvoiceRequest.ProjectName} not found");
         }
 
-        var invoice = createInvoiceCommand.Adapt<Invoices>();
+        var invoice = createInvoiceCommand.CreateInvoiceRequest.Adapt<Invoices>();
         invoice.ProjectId = project.Id;
         invoice.ClientId = client.Id;
         invoice.FreelancerId = freelancer.Id;
@@ -121,7 +121,7 @@ public class InvoiceRepository : IInvoiceRepository
         {
             throw new NotFoundException($"{nameof(Invoices)} with {nameof(Invoices.Id)}: {updateInvoiceCommand.Id} not found");
         }
-        invoiceToUpdate = updateInvoiceCommand.Adapt<Invoices>();
+        updateInvoiceCommand.UpdateInvoiceRequest.Adapt<Invoices>();
         if (updateInvoiceCommand.UpdateInvoiceRequest.InvoiceFile is not null)
         {
             await _blobService.DeleteBlobAsync(StorageContainers.INVOICESCONTAINER.ToString().ToLower(),

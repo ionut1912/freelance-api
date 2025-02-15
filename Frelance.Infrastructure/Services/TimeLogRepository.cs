@@ -62,7 +62,7 @@ public class TimeLogRepository : ITimeLogRepository
             throw new NotFoundException($"{nameof(TimeLogs)} with {nameof(TimeLogs.Id)} : '{updateTimeLogCommand.Id}' does not exist");
         }
 
-        timeLogToUpdate = updateTimeLogCommand.Adapt<TimeLogs>();
+        timeLogToUpdate = updateTimeLogCommand.UpdateTimeLogRequest.Adapt<TimeLogs>();
         timeLogToUpdate.TaskId = timeLogTask.Id;
         _context.TimeLogs.Update(timeLogToUpdate);
     }

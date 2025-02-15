@@ -56,7 +56,7 @@ namespace Frelance.Infrastructure.Services
                 command.CreateFreelancerProfileRequest.ProfileImage);
 
             var skillsInDb = await _dbContext.Skills.AsNoTracking().ToListAsync(cancellationToken);
-            var requestSkills = freelancerProfile.Skills?.Adapt<List<SkillRequest>>() ?? new List<SkillRequest>();
+            var requestSkills = freelancerProfile.Skills?.Adapt<List<SkillRequest>>() ?? [];
             ValidateSkills(skillsInDb, requestSkills);
 
             freelancerProfile.IsAvailable = true;

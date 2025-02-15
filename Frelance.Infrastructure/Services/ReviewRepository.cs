@@ -30,7 +30,7 @@ public class ReviewRepository : IReviewRepository
     public async Task AddReviewAsync(CreateReviewCommand createReviewCommand, CancellationToken cancellationToken)
     {
         var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.UserName == _userAccessor.GetUsername(), cancellationToken);
-        var review = createReviewCommand.Adapt<Reviews>();
+        var review = createReviewCommand.CreateReviewRequest.Adapt<Reviews>();
         review.ReviewerId = user.Id;
         await _context.Reviews.AddAsync(review, cancellationToken);
     }
@@ -71,7 +71,7 @@ public class ReviewRepository : IReviewRepository
         {
             throw new NotFoundException($"{nameof(Reviews)} with {nameof(Reviews.Id)}: '{updateReviewCommand.Id}' does not exist");
         }
-        reviewToUpdate = updateReviewCommand.Adapt<Reviews>();
+        reviewToUpdate = updateReviewCommand.UpdateReviewRequest.Adapt<Reviews>();
         _context.Reviews.Update(reviewToUpdate);
     }
 

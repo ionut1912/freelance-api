@@ -55,7 +55,7 @@ public class ContractRepository : IContractRepository
                 $"{nameof(Projects)} with {nameof(Projects.Title)}: {createContractCommand.CreateContractRequest.ProjectName} doe not exist.");
         }
 
-        var contract = createContractCommand.Adapt<Entities.Contracts>();
+        var contract = createContractCommand.CreateContractRequest.Adapt<Entities.Contracts>();
         contract.ProjectId = project.Id;
         contract.ClientId = client.Id;
         contract.FreelancerId = freelancer.Id;
