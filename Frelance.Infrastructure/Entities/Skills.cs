@@ -1,6 +1,6 @@
 ﻿namespace Frelance.Infrastructure.Entities;
 
-public class Skiills
+public class Skills
 {
     public int Id { get; set; }
     public string ProgrammingLanguage { get; set; }

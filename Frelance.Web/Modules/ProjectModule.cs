@@ -32,8 +32,7 @@ public static class ProjectModule
         app.MapPost("/api/projects", async (IMediator mediator, CreateProjectRequest createProjectRequest,
             CancellationToken ct) =>
             {
-                var command = new CreateProjectCommand(createProjectRequest);
-                var result = await mediator.Send(command, ct);
+                var result = await mediator.Send(createProjectRequest.Adapt<CreateProjectCommand>(), ct);
                 return Results.Ok(result);
             }).WithTags("Projects")
         .RequireAuthorization("ClientRole");

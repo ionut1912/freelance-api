@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Frelance.Contracts.Requests.FreelancerProfiles;
 
-public class CreateFreelancerProfieRequest
+public class CreateFreelancerProfileRequest
 {
     public string AddressCountry { get; set; }
     public string AddressStreet { get; set; }

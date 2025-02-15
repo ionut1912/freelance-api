@@ -4,6 +4,7 @@ using Frelance.Application.Mediatr.Queries.Reviews;
 using Frelance.Contracts.Requests.Common;
 using Frelance.Contracts.Requests.Reviews;
 using Frelance.Web.Extensions;
+using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,8 +17,7 @@ public static class ReviewsModule
         app.MapPost("/api/reviews", async (IMediator mediator, CreateReviewRequest addReviewRequest,
             CancellationToken ct) =>
         {
-            var command = new CreateReviewCommand(addReviewRequest);
-            var result = await mediator.Send(command, ct);
+            var result = await mediator.Send(addReviewRequest.Adapt<CreateReviewCommand>(), ct);
             return Results.Ok(result);
         }).WithTags("Reviews")
         .RequireAuthorization();
@@ -39,7 +39,7 @@ public static class ReviewsModule
         app.MapPut("/api/reviews/{id}", async (IMediator mediator, int id,
                 UpdateReviewRequest updateReviewRequest, CancellationToken ct) =>
             {
-                var command = new UpdateReviewCommand(id, updateReviewRequest);
+                var command = updateReviewRequest.Adapt<UpdateReviewCommand>() with { Id = id };
                 var result = await mediator.Send(command, ct);
                 return Results.Ok(result);
             }).WithTags("Reviews")

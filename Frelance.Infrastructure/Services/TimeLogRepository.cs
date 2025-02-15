@@ -32,7 +32,7 @@ public class TimeLogRepository : ITimeLogRepository
             throw new NotFoundException($"{nameof(ProjectTasks)} with {nameof(ProjectTasks.Title)} : '{createTimeLogCommand.CreateTimeLogRequest.TaskTitle}' does not exist");
         }
 
-        var timeLog = createTimeLogCommand.Adapt<TimeLogs>();
+        var timeLog = createTimeLogCommand.CreateTimeLogRequest.Adapt<TimeLogs>();
         timeLog.TaskId = timeLogTask.Id;
         timeLog.TotalHours = createTimeLogCommand.CreateTimeLogRequest.EndTime.Hour - createTimeLogCommand.CreateTimeLogRequest.StartTime.Hour;
         var freelancerProfile = await _context.FreelancerProfiles
@@ -41,12 +41,16 @@ public class TimeLogRepository : ITimeLogRepository
                                       .FirstOrDefaultAsync(x => x.Users.UserName == _userAccessor.GetUsername(), cancellationToken);
 
         timeLog.FreelancerProfileId = freelancerProfile.Id;
-        timeLog.CreatedAt = DateTime.UtcNow;
         await _context.TimeLogs.AddAsync(timeLog, cancellationToken);
     }
 
     public async Task UpdateTimeLogAsync(UpdateTimeLogCommand updateTimeLogCommand, CancellationToken cancellationToken)
     {
+        if (updateTimeLogCommand.UpdateTimeLogRequest.TaskTitle is null)
+        {
+            throw new NotFoundException($"{nameof(ProjectTasks)} with {nameof(ProjectTasks.Title)} : {updateTimeLogCommand.UpdateTimeLogRequest.TaskTitle} not found");
+        }
+
         var timeLogTask = await _context.Tasks.AsNoTracking().FirstOrDefaultAsync(x => x.Title == updateTimeLogCommand.UpdateTimeLogRequest.TaskTitle, cancellationToken);
         if (timeLogTask is null)
         {
@@ -58,10 +62,8 @@ public class TimeLogRepository : ITimeLogRepository
             throw new NotFoundException($"{nameof(TimeLogs)} with {nameof(TimeLogs.Id)} : '{updateTimeLogCommand.Id}' does not exist");
         }
 
+        timeLogToUpdate = updateTimeLogCommand.Adapt<TimeLogs>();
         timeLogToUpdate.TaskId = timeLogTask.Id;
-        timeLogToUpdate.StartTime = updateTimeLogCommand.UpdateTimeLogRequest.StartTime;
-        timeLogToUpdate.UpdatedAt = DateTime.UtcNow;
-        timeLogToUpdate.TotalHours = updateTimeLogCommand.UpdateTimeLogRequest.EndTime.Hour - updateTimeLogCommand.UpdateTimeLogRequest.StartTime.Hour;
         _context.TimeLogs.Update(timeLogToUpdate);
     }
 

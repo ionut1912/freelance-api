@@ -44,13 +44,9 @@ public class AccountRepository : IAccountRepository
             modelState.AddModelError("Email", "email is already taken");
         }
         GenerateException(modelState);
-        var user = new Users
-        {
-            Email = createUserCommand.RegisterDto.Email,
-            UserName = createUserCommand.RegisterDto.Username,
-            PhoneNumber = createUserCommand.RegisterDto.PhoneNumber,
-            CreatedAt = DateTime.UtcNow
-        };
+
+        var user = createUserCommand.Adapt<Users>();
+
         var result = await _userManager.CreateAsync(user, createUserCommand.RegisterDto.Password);
         if (!result.Succeeded)
         {
@@ -58,15 +54,20 @@ public class AccountRepository : IAccountRepository
         }
         GenerateException(modelState);
 
-
         await _userManager.AddToRoleAsync(user, createUserCommand.RegisterDto.Role);
     }
+
 
     public async Task<UserDto> LoginAsync(LoginDto loginDto, CancellationToken cancellationToken)
     {
         var modelState = new ModelStateDictionary();
         var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.Username, cancellationToken);
         if (user is null)
+        {
+            modelState.AddModelError("Username", "The given user data is not found");
+        }
+
+        if (user!.UserName != loginDto.Username)
         {
             modelState.AddModelError("Username", "username is invalid");
         }

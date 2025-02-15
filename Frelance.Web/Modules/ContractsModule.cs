@@ -4,6 +4,7 @@ using Frelance.Contracts.Dtos;
 using Frelance.Contracts.Requests.Common;
 using Frelance.Contracts.Requests.Contracts;
 using Frelance.Web.Extensions;
+using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,7 +17,7 @@ public static class ContractsModule
         var createContractEndpoint = app.MapPost("/api/contracts",
                 async (IMediator mediator, [FromForm] CreateContractRequest addContractRequest, CancellationToken ct) =>
                 {
-                    var command = new CreateContractCommand(addContractRequest);
+                    var command = addContractRequest.Adapt<CreateContractCommand>();
                     var result = await mediator.Send(command, ct);
                     return Results.Ok(result);
                 })
@@ -41,7 +42,7 @@ public static class ContractsModule
         var updateContractEndpoint = app.MapPut("/api/contracts/{id}", async (IMediator mediator, int id,
                 [FromForm] UpdateContractRequest updateContractRequest, CancellationToken ct) =>
             {
-                var command = new UpdateContractCommand(id, updateContractRequest);
+                var command = updateContractRequest.Adapt<UpdateContractCommand>() with { Id = id };
                 var result = await mediator.Send(command, ct);
                 return Results.Ok(result);
             }).WithTags("Contracts").

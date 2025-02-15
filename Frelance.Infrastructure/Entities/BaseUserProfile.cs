@@ -13,5 +13,6 @@ public class BaseUserProfile
     public List<Invoices> Invoices { get; set; } = [];
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
+    public List<Projects>? Projects { get; set; } = [];
 
 }

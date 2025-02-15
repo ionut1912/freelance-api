@@ -1,3 +1,7 @@
 namespace Frelance.Contracts.Requests.Reviews;
 
-public record UpdateReviewRequest(string ReviewText);
+public class UpdateReviewRequest
+{
+    public string? ReviewText { get; set; }
+
+};

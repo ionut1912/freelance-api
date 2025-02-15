@@ -55,20 +55,15 @@ public class ContractRepository : IContractRepository
                 $"{nameof(Projects)} with {nameof(Projects.Title)}: {createContractCommand.CreateContractRequest.ProjectName} doe not exist.");
         }
 
-        var contract = new Entities.Contracts
-        {
-            ProjectId = project.Id,
-            ClientId = client.Id,
-            FreelancerId = freelancer.Id,
-            StartDate = createContractCommand.CreateContractRequest.StartDate,
-            EndDate = createContractCommand.CreateContractRequest.EndDate,
-            Amount = createContractCommand.CreateContractRequest.Amount,
-            Status = "Signed",
-            ContractFileUrl = await _blobService.UploadBlobAsync(
-                StorageContainers.CONTRACTSCONTAINER.ToString().ToLower(),
-                $"{project.Id}/{createContractCommand.CreateContractRequest.ContractFile.FileName}", createContractCommand.CreateContractRequest.ContractFile),
-            CreatedAt = DateTime.UtcNow
-        };
+        var contract = createContractCommand.Adapt<Entities.Contracts>();
+        contract.ProjectId = project.Id;
+        contract.ClientId = client.Id;
+        contract.FreelancerId = freelancer.Id;
+        contract.Status = "Signed";
+        contract.ContractFileUrl = await _blobService.UploadBlobAsync(
+            StorageContainers.CONTRACTSCONTAINER.ToString().ToLower(),
+            $"{project.Id}/{createContractCommand.CreateContractRequest.ContractFile.FileName}",
+            createContractCommand.CreateContractRequest.ContractFile);
         await _dbContext.Contracts.AddAsync(contract, cancellationToken);
     }
 
@@ -114,14 +109,21 @@ public class ContractRepository : IContractRepository
 
     public async Task UpdateContractAsync(UpdateContractCommand updateContractCommand, CancellationToken cancellationToken)
     {
-        var contract = await _dbContext.Contracts.
-                            AsNoTracking()
-                            .Include(x => x.Project)
-                            .FirstOrDefaultAsync(x => x.Id == updateContractCommand.Id, cancellationToken);
+        var contract = await _dbContext.Contracts
+            .AsNoTracking()
+            .Include(x => x.Project)
+            .Include(x => x.Client)
+            .ThenInclude(x => x.Projects)
+            .Include(x => x.Freelancer)
+            .ThenInclude(x => x.Projects)
+            .FirstOrDefaultAsync(x => x.Id == updateContractCommand.Id, cancellationToken);
+        
         if (contract is null)
         {
             throw new NotFoundException($"nameof(Entities.Contracts) with {nameof(Entities.Contracts.Id)}: {updateContractCommand.Id} doe not exist.");
         }
+        
+        updateContractCommand.UpdateContractRequest.Adapt(contract);
 
         if (updateContractCommand.UpdateContractRequest.ContractFile is not null)
         {
@@ -132,12 +134,21 @@ public class ContractRepository : IContractRepository
                     $"{contract.Project.Id}/{updateContractCommand.UpdateContractRequest.ContractFile.FileName}",
                     updateContractCommand.UpdateContractRequest.ContractFile);
         }
-        contract.EndDate = updateContractCommand.UpdateContractRequest.EndDate;
-        contract.Amount = updateContractCommand.UpdateContractRequest.Amount;
-        contract.Status = "Modified";
-        contract.UpdatedAt = DateTime.UtcNow;
+
+        if (updateContractCommand.UpdateContractRequest.Status == "Signed"
+            && contract.Freelancer.Projects is not null
+            && contract.Client.Projects is not null)
+        {
+            contract.Freelancer.Projects.Add(contract.Project);
+            contract.Client.Projects.Add(contract.Project);
+        }
+
         _dbContext.Contracts.Update(contract);
+        _dbContext.ClientProfiles.Update(contract.Client);
+        _dbContext.FreelancerProfiles.Update(contract.Freelancer);
     }
+
+    
 
     public async Task DeleteContractAsync(DeleteContractCommand deleteContractCommand, CancellationToken cancellationToken)
     {

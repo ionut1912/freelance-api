@@ -5,12 +5,12 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.ClientProfiles;
 
-public class AddClientProfileCommandHandler : IRequestHandler<CreateClientProfileCommand, Unit>
+public class CreateClientProfileCommandHandler : IRequestHandler<CreateClientProfileCommand, Unit>
 {
     private readonly IClientProfileRepository _clientProfileRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public AddClientProfileCommandHandler(IClientProfileRepository clientProfileRepository, IUnitOfWork unitOfWork)
+    public CreateClientProfileCommandHandler(IClientProfileRepository clientProfileRepository, IUnitOfWork unitOfWork)
     {
         ArgumentNullException.ThrowIfNull(clientProfileRepository, nameof(clientProfileRepository));
         ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));

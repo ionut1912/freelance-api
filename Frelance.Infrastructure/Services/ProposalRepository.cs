@@ -40,14 +40,10 @@ public class ProposalRepository : IProposalRepository
             throw new NotFoundException($"{nameof(Projects)} with {nameof(Projects.Title)}:{createProposalCommand.CreateProposalRequest.ProjectName} not found");
         }
 
-        var proposal = new Proposals
-        {
-            ProjectId = project.Id,
-            ProposerId = user.Id,
-            ProposedBudget = createProposalCommand.CreateProposalRequest.ProposedBudget,
-            Status = "Created",
-            CreatedAt = DateTime.UtcNow,
-        };
+        var proposal = createProposalCommand.Adapt<Proposals>();
+        proposal.ProjectId = project.Id;
+        proposal.ProposerId = user.Id;
+        proposal.Status = "Created";
         await _dbContext.Proposals.AddAsync(proposal, cancellationToken);
     }
 
@@ -95,9 +91,7 @@ public class ProposalRepository : IProposalRepository
         {
             throw new NotFoundException($"{nameof(Proposals)}  with {nameof(Proposals.Id)}:{updateProposalCommand.Id} not found");
         }
-        proposalToUpdate.ProposedBudget = updateProposalCommand.UpdateProposalRequest.ProposedBudget;
-        proposalToUpdate.Status = updateProposalCommand.UpdateProposalRequest.Status;
-        proposalToUpdate.UpdatedAt = DateTime.UtcNow;
+        proposalToUpdate = updateProposalCommand.Adapt<Proposals>();
         _dbContext.Proposals.Update(proposalToUpdate);
     }
 

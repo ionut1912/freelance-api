@@ -38,18 +38,14 @@ public class ClientProfileRepository : IClientProfileRepository
         {
             throw new InvalidOperationException("User not found.");
         }
-
-        var address = new Addresses(clientProfileCommand.CreateClientProfileRequest.AddressCountry,
-            clientProfileCommand.CreateClientProfileRequest.AddressCity, clientProfileCommand.CreateClientProfileRequest.AddressStreet, clientProfileCommand.CreateClientProfileRequest.AddressStreetNumber, clientProfileCommand.CreateClientProfileRequest.AddressZip);
-        await _dbContext.Addresses.AddAsync(address, cancellationToken);
-        await _dbContext.SaveChangesAsync(cancellationToken);
         var clientProfile = clientProfileCommand.Adapt<ClientProfiles>();
+        await _dbContext.Addresses.AddAsync(clientProfile.Addresses, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
         clientProfile.UserId = user.Id;
-        clientProfile.AddressId = address.Id;
+        clientProfile.AddressId = clientProfile.Addresses.Id;
         var profileImageUrl = await _blobService.UploadBlobAsync(StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(),
             $"{user.Id}/{clientProfileCommand.CreateClientProfileRequest.ProfileImage.FileName}", clientProfileCommand.CreateClientProfileRequest.ProfileImage);
         clientProfile.ProfileImageUrl = profileImageUrl;
-        clientProfile.CreatedAt = DateTime.UtcNow;
         clientProfile.Bio = clientProfileCommand.CreateClientProfileRequest.Bio;
         await _dbContext.ClientProfiles.AddAsync(clientProfile, cancellationToken);
     }
@@ -63,10 +59,11 @@ public class ClientProfileRepository : IClientProfileRepository
             .Include(cp => cp.Users)
             .ThenInclude(u => u.Proposals)
             .Include(cp => cp.Contracts)
-            .ThenInclude(c => c.Project)
             .Include(cp => cp.Invoices)
-            .ThenInclude(i => i.Project)
+            .Include(x => x.Projects)
+            .Include(x=>x.Addresses)
             .FirstOrDefaultAsync(cp => cp.Id == query.Id, cancellationToken);
+
 
         if (clientProfile is null)
         {
@@ -87,6 +84,7 @@ public class ClientProfileRepository : IClientProfileRepository
             .Include(x => x.Addresses)
             .Include(x => x.Contracts)
             .Include(x => x.Invoices)
+            .Include(x => x.Projects)
             .ProjectToType<ClientProfileDto>();
 
         var count = await clientsQuery.CountAsync(cancellationToken);
@@ -109,7 +107,7 @@ public class ClientProfileRepository : IClientProfileRepository
         {
             throw new NotFoundException($"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Id)} : '{clientProfileCommand.Id}' does not exist");
         }
-
+        clientToUpdate = clientProfileCommand.Adapt<ClientProfiles>();
         if (clientProfileCommand.UpdateClientProfileRequest.ProfileImage is not null)
         {
             await _blobService.DeleteBlobAsync(StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(), clientToUpdate.UserId.ToString());
@@ -118,17 +116,6 @@ public class ClientProfileRepository : IClientProfileRepository
                 clientProfileCommand.UpdateClientProfileRequest.ProfileImage);
         }
 
-        if (clientProfileCommand.UpdateClientProfileRequest.AddressCity is not null)
-        {
-            var address = new Addresses(clientToUpdate.Addresses.Id, clientProfileCommand.UpdateClientProfileRequest.AddressCountry, clientProfileCommand.UpdateClientProfileRequest.AddressCity,
-                clientProfileCommand.UpdateClientProfileRequest.AddressStreet, clientProfileCommand.UpdateClientProfileRequest.AddressStreetNumber,
-                clientProfileCommand.UpdateClientProfileRequest.AddressZip);
-            _dbContext.Entry(clientToUpdate.Addresses).CurrentValues.SetValues(address);
-            clientToUpdate.AddressId = address.Id;
-            await _dbContext.SaveChangesAsync(cancellationToken);
-        }
-        clientToUpdate.Bio = clientProfileCommand.UpdateClientProfileRequest.Bio;
-        clientToUpdate.UpdatedAt = DateTime.UtcNow;
         _dbContext.ClientProfiles.Update(clientToUpdate);
     }
 

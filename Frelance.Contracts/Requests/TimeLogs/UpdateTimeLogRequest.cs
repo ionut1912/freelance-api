@@ -1,3 +1,9 @@
 namespace Frelance.Contracts.Requests.TimeLogs;
 
-public record UpdateTimeLogRequest(string TaskTitle, DateTime StartTime, DateTime EndTime, int TotalHours);
+public class UpdateTimeLogRequest
+{
+    public string? TaskTitle { get; set; }
+    public DateTime? StartTime { get; set; }
+    public DateTime? EndTime { get; set; }
+    public int? TotalHours { get; set; }
+};

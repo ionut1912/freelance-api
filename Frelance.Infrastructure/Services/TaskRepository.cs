@@ -16,14 +16,11 @@ namespace Frelance.Infrastructure.Services;
 public class TaskRepository : ITaskRepository
 {
     private readonly FrelanceDbContext _context;
-    private readonly IUserAccessor _userAccessor;
 
-    public TaskRepository(FrelanceDbContext context, IUserAccessor userAccessor)
+    public TaskRepository(FrelanceDbContext context)
     {
         ArgumentNullException.ThrowIfNull(context, nameof(context));
-        ArgumentNullException.ThrowIfNull(userAccessor, nameof(userAccessor));
         _context = context;
-        _userAccessor = userAccessor;
     }
 
     public async Task AddTaskAsync(CreateTaskCommand createTaskCommand, CancellationToken cancellationToken)
@@ -42,14 +39,10 @@ public class TaskRepository : ITaskRepository
                                         .Include(x => x.Users)
                                         .FirstOrDefaultAsync(x => x.Users.UserName == createTaskCommand.CreateProjectTaskRequest.FreelancerUsername, cancellationToken);
 
-        var task = createTaskCommand.Adapt<ProjectTasks>();
+        var task = createTaskCommand.CreateProjectTaskRequest.Adapt<ProjectTasks>();
         task.ProjectId = taskProject.Id;
         task.Status = ProjectTaskStatus.ToDo.ToString();
-        task.Priority = createTaskCommand.CreateProjectTaskRequest.Priority;
-        task.Title = createTaskCommand.CreateProjectTaskRequest.Title;
-        task.Description = createTaskCommand.CreateProjectTaskRequest.Description;
         task.FreelancerProfileId = freelancerProfile.Id;
-        task.CreatedAt = DateTime.UtcNow;
         await _context.Tasks.AddAsync(task, cancellationToken);
     }
 
@@ -63,11 +56,7 @@ public class TaskRepository : ITaskRepository
             throw new NotFoundException($"{nameof(ProjectTasks)} with {nameof(ProjectTasks.Id)}: '{updateTaskCommand.Id}' does not exist");
         }
 
-        projectTaskToUpdate.Title = updateTaskCommand.UpdateProjectTaskRequest.Title;
-        projectTaskToUpdate.Description = updateTaskCommand.UpdateProjectTaskRequest.Description;
-        projectTaskToUpdate.Status = updateTaskCommand.UpdateProjectTaskRequest.Status;
-        projectTaskToUpdate.Priority = updateTaskCommand.UpdateProjectTaskRequest.Priority;
-        projectTaskToUpdate.UpdatedAt = DateTime.UtcNow;
+        projectTaskToUpdate = updateTaskCommand.Adapt<ProjectTasks>();
         _context.Tasks.Update(projectTaskToUpdate);
     }
 

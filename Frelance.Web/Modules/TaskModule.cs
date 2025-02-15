@@ -1,4 +1,5 @@
 ﻿using Frelance.Application.Mediatr.Commands.Tasks;
+using Frelance.Application.Mediatr.Commands.TimeLogs;
 using Frelance.Application.Mediatr.Queries.Tasks;
 using Frelance.Contracts.Requests.Common;
 using Frelance.Contracts.Requests.ProjectTasks;
@@ -32,8 +33,7 @@ public static class TaskModule
         app.MapPost("/api/tasks", async (IMediator mediator, CreateProjectTaskRequest createProjectTaskRequest,
             CancellationToken ct) =>
             {
-                var command = new CreateTaskCommand(createProjectTaskRequest);
-                var result = await mediator.Send(command, ct);
+                var result = await mediator.Send(createProjectTaskRequest.Adapt<CreateTaskCommand>(), ct);
                 return Results.Ok(result);
             }).WithTags("Tasks")
             .RequireAuthorization();

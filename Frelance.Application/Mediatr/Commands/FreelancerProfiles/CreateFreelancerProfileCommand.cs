@@ -6,4 +6,4 @@ using Microsoft.AspNetCore.Http;
 namespace Frelance.Application.Mediatr.Commands.FreelancerProfiles;
 
 public record CreateFreelancerProfileCommand(
-CreateFreelancerProfieRequest CreateFreelancerProfileRequest) : IRequest<Unit>;
+CreateFreelancerProfileRequest CreateFreelancerProfileRequest) : IRequest<Unit>;

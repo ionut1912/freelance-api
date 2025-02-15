@@ -2,11 +2,13 @@ using Microsoft.AspNetCore.Http;
 
 namespace Frelance.Contracts.Requests.ClientProfile;
 
-public record UpdateClientProfileRequest(
-    string AddressCountry,
-    string AddressStreet,
-    string AddressStreetNumber,
-    string AddressCity,
-    string AddressZip,
-    string Bio,
-    IFormFile ProfileImage);
+public class UpdateClientProfileRequest
+{
+    public string? AddressCountry { get; set; }
+    public string? AddressStreet { get; set; }
+    public string? AddressStreetNumber { get; set; }
+    public string? AddressCity { get; set; }
+    public string? AddressZip { get; set; }
+    public string? Bio { get; set; }
+    public IFormFile? ProfileImage { get; set; }
+}

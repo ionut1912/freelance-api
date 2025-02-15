@@ -4,6 +4,7 @@ using Frelance.Contracts.Dtos;
 using Frelance.Contracts.Requests.ClientProfile;
 using Frelance.Contracts.Requests.Common;
 using Frelance.Web.Extensions;
+using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,8 +17,7 @@ namespace Frelance.Web.Modules
             var createClientProfileEndpoint = app.MapPost("/api/clientProfiles",
                     async (IMediator mediator, [FromForm] CreateClientProfileRequest createClientProfileRequest, CancellationToken ct) =>
                     {
-                        var command = new CreateClientProfileCommand(createClientProfileRequest);
-                        var result = await mediator.Send(command, ct);
+                        var result = await mediator.Send(createClientProfileRequest.Adapt<CreateClientProfileCommand>(), ct);
                         return Results.Ok(result);
                     })
                 .Accepts<ClientProfileDto>("multipart/form-data")
@@ -41,7 +41,7 @@ namespace Frelance.Web.Modules
             var updateClientProfileEndpoint = app.MapPut("/api/clientProfiles/{id}", async (IMediator mediator, int id,
                 [FromForm] UpdateClientProfileRequest updateClientProfileRequest, CancellationToken ct) =>
                 {
-                    var command = new UpdateClientProfileCommand(id, updateClientProfileRequest);
+                    var command = updateClientProfileRequest.Adapt<UpdateClientProfileCommand>() with { Id = id };
                     var result = await mediator.Send(command, ct);
                     return Results.Ok(result);
                 }).WithTags("ClientProfiles").

@@ -4,6 +4,7 @@ using Frelance.Application.Mediatr.Queries.Proposals;
 using Frelance.Contracts.Requests.Common;
 using Frelance.Contracts.Requests.Proposals;
 using Frelance.Web.Extensions;
+using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,11 +14,10 @@ public static class ProposalsModule
 {
     public static void AddProposalEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/proposals", async (IMediator mediator, CreateProposalRequest CreateProposalRequest,
+        app.MapPost("/api/proposals", async (IMediator mediator, CreateProposalRequest createProposalRequest,
                 CancellationToken ct) =>
             {
-                var command = new CreateProposalCommand(CreateProposalRequest);
-                var result = await mediator.Send(command, ct);
+                var result = await mediator.Send(createProposalRequest.Adapt<CreateProposalCommand>(), ct);
                 return Results.Ok(result);
             }).WithTags("Proposals")
             .RequireAuthorization();
@@ -39,7 +39,7 @@ public static class ProposalsModule
         app.MapPut("/api/proposals/{id}", async (IMediator mediator, int id,
                 UpdateProposalRequest updateProposalRequest, CancellationToken ct) =>
             {
-                var command = new UpdateProposalCommand(id, updateProposalRequest);
+                var command = updateProposalRequest.Adapt<UpdateProposalCommand>() with { Id = id };
                 var result = await mediator.Send(command, ct);
                 return Results.Ok(result);
             }).WithTags("Proposals")

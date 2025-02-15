@@ -60,20 +60,15 @@ public class InvoiceRepository : IInvoiceRepository
                 $"{nameof(Projects)} with {nameof(Projects.Title)}: {createInvoiceCommand.CreateInvoiceRequest.ProjectName} not found");
         }
 
-        var invoice = new Invoices
-        {
-            ProjectId = project.Id,
-            ClientId = client.Id,
-            FreelancerId = freelancer.Id,
-            CreatedAt = DateTime.UtcNow,
-            Amount = createInvoiceCommand.CreateInvoiceRequest.Amount,
-            InvoiceFileUrl = await _blobService.UploadBlobAsync(
-                StorageContainers.INVOICESCONTAINER.ToString().ToLower(),
-                $"{project.Id}/{createInvoiceCommand.CreateInvoiceRequest.InvoiceFile.FileName}",
-                createInvoiceCommand.CreateInvoiceRequest.InvoiceFile),
-            Status = "Submitted",
-
-        };
+        var invoice = createInvoiceCommand.Adapt<Invoices>();
+        invoice.ProjectId = project.Id;
+        invoice.ClientId = client.Id;
+        invoice.FreelancerId = freelancer.Id;
+        invoice.InvoiceFileUrl = await _blobService.UploadBlobAsync(
+            StorageContainers.INVOICESCONTAINER.ToString().ToLower(),
+            $"{project.Id}/{createInvoiceCommand.CreateInvoiceRequest.InvoiceFile.FileName}",
+            createInvoiceCommand.CreateInvoiceRequest.InvoiceFile);
+        invoice.Status = "Submitted";
         await _frelanceDbContext.Invoices.AddAsync(invoice, cancellationToken);
 
 
@@ -126,7 +121,7 @@ public class InvoiceRepository : IInvoiceRepository
         {
             throw new NotFoundException($"{nameof(Invoices)} with {nameof(Invoices.Id)}: {updateInvoiceCommand.Id} not found");
         }
-
+        invoiceToUpdate = updateInvoiceCommand.Adapt<Invoices>();
         if (updateInvoiceCommand.UpdateInvoiceRequest.InvoiceFile is not null)
         {
             await _blobService.DeleteBlobAsync(StorageContainers.INVOICESCONTAINER.ToString().ToLower(),
@@ -136,10 +131,6 @@ public class InvoiceRepository : IInvoiceRepository
                 $"{invoiceToUpdate.ProjectId}/{updateInvoiceCommand.UpdateInvoiceRequest.InvoiceFile}",
                 updateInvoiceCommand.UpdateInvoiceRequest.InvoiceFile);
         }
-
-        invoiceToUpdate.Amount = updateInvoiceCommand.UpdateInvoiceRequest.Amount;
-        invoiceToUpdate.Status = updateInvoiceCommand.UpdateInvoiceRequest.Status;
-        invoiceToUpdate.UpdatedAt = DateTime.UtcNow;
         _frelanceDbContext.Invoices.Update(invoiceToUpdate);
     }
 
