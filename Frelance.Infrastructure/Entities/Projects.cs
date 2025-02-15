@@ -8,7 +8,7 @@ public class Projects
     public string Title { get; set; }
     public string Description { get; set; }
     public DateTime Deadline { get; set; }
-    public List<string> Technologies { get; set; } = new();
+    public List<ProjectTechnologies> Technologies { get; set; } = new();
     public List<ProjectTasks> Tasks { get; set; } = new();
     public List<Proposals> Proposals { get; set; } = new();
     public List<Contracts> Contracts { get; set; } = new();

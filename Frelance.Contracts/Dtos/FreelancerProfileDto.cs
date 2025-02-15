@@ -9,6 +9,7 @@ public record FreelancerProfileDto(
     List<TaskDto> TaskDtos,
     List<SkillDto> SkillDtos,
     List<ForeignLanguageDto> ForeignLanguages,
+    List<ProjectDto>? ProjectDtos,
     bool IsAvailable,
     string Experience,
     int Rate,

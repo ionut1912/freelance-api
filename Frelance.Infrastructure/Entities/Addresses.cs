@@ -9,6 +9,10 @@ public class Addresses
     public string StreetNumber { get; set; }
     public string ZipCode { get; set; }
 
+    public Addresses()
+    {
+
+    }
     public Addresses(string country, string city, string street, string streetNumber, string zipCode)
     {
         Country = country;

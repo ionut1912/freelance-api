@@ -16,21 +16,29 @@ namespace Frelance.Infrastructure.Services;
 public class ProjectRepository : IProjectRepository
 {
     private readonly FrelanceDbContext _context;
-    private readonly IUserAccessor _userAccessor;
 
-    public ProjectRepository(FrelanceDbContext context, IUserAccessor userAccessor)
+    public ProjectRepository(FrelanceDbContext context)
     {
         ArgumentNullException.ThrowIfNull(context, nameof(context));
-        ArgumentNullException.ThrowIfNull(userAccessor, nameof(userAccessor));
         _context = context;
-        _userAccessor = userAccessor;
     }
     public async Task AddProjectAsync(CreateProjectCommand createProjectCommand, CancellationToken cancellationToken)
     {
         var project = createProjectCommand.CreateProjectRequest.Adapt<Projects>();
-        project.CreatedAt = DateTime.UtcNow;
         await _context.Projects.AddAsync(project, cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        if (project.Technologies.Count != 0)
+        {
+            project.Technologies.ForEach(tech =>
+            {
+                tech.ProjectId = project.Id;
+                tech.Id = 0;
+            });
+            await _context.ProjectTechnologies.AddRangeAsync(project.Technologies, cancellationToken);
+        }
     }
+
 
     public async Task UpdateProjectAsync(UpdateProjectCommand updateProjectCommand, CancellationToken cancellationToken)
     {
@@ -39,12 +47,8 @@ public class ProjectRepository : IProjectRepository
         {
             throw new NotFoundException($"{nameof(Projects)} with {nameof(Projects.Id)} : '{updateProjectCommand.Id}' does not exist");
         }
-        projectToUpdate.Description = updateProjectCommand.UpdateProjectRequest.Description;
-        projectToUpdate.Title = updateProjectCommand.UpdateProjectRequest.Title;
-        projectToUpdate.Deadline = updateProjectCommand.UpdateProjectRequest.Deadline;
-        projectToUpdate.Technologies = updateProjectCommand.UpdateProjectRequest.Technologies;
-        projectToUpdate.Budget = updateProjectCommand.UpdateProjectRequest.Budget;
-        projectToUpdate.UpdatedAt = DateTime.UtcNow;
+
+        projectToUpdate = updateProjectCommand.UpdateProjectRequest.Adapt<Projects>();
         _context.Projects.Update(projectToUpdate);
     }
 

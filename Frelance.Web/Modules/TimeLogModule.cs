@@ -32,8 +32,7 @@ public static class TimeLogModule
         app.MapPost("/api/timeLogs", async (IMediator mediator, CreateTimeLogRequest createTimeLogRequest,
             CancellationToken ct) =>
             {
-                var createTimeLogCommand = new CreateTimeLogCommand(createTimeLogRequest);
-                var result = await mediator.Send(createTimeLogCommand, ct);
+                var result = await mediator.Send(createTimeLogRequest.Adapt<CreateTimeLogCommand>(), ct);
                 return Results.Ok(result);
             }).WithTags("TimeLogs")
             .RequireAuthorization("FreelancerRole");

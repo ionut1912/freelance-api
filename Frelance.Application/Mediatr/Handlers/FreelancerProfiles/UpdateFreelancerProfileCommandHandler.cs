@@ -1,4 +1,4 @@
-using Frelance.Application.Mediatr.Commands.FreelancerProfiles;
+/*using Frelance.Application.Mediatr.Commands.FreelancerProfiles;
 using Frelance.Application.Repositories;
 using MediatR;
 
@@ -23,4 +23,4 @@ public class UpdateFreelancerProfileCommandHandler : IRequestHandler<UpdateFreel
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;
     }
-}
+}*/

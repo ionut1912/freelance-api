@@ -1,3 +1,7 @@
 namespace Frelance.Contracts.Requests.Proposals;
 
-public record UpdateProposalRequest(decimal ProposedBudget, string Status);
+public class UpdateProposalRequest
+{
+    public decimal? ProposedBudget { get; set; }
+    public string? Status { get; set; }
+}

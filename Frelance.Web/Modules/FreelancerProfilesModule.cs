@@ -6,6 +6,7 @@ using Frelance.Contracts.Requests.Common;
 using Frelance.Contracts.Requests.FreelancerProfiles;
 using Frelance.Contracts.Requests.Skills;
 using Frelance.Web.Extensions;
+using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,10 +17,10 @@ public static class FreelancerProfilesModule
     public static void AddFreelancerProfilesEndpoints(this IEndpointRouteBuilder app)
     {
         var createFreelancerProfileEndpoint = app.MapPost("/api/freelancerProfiles",
-                async (IMediator mediator, [FromForm] CreateFreelancerProfieRequest createFreelancerProfileRequest, CancellationToken ct) =>
+                async (IMediator mediator, [FromForm] CreateFreelancerProfileRequest createFreelancerProfileRequest, CancellationToken ct) =>
                 {
-                    var command = new CreateFreelancerProfileCommand(createFreelancerProfileRequest);
-                    var result = await mediator.Send(command, ct);
+
+                    var result = await mediator.Send(createFreelancerProfileRequest.Adapt<CreateFreelancerProfileCommand>(), ct);
                     return Results.Ok(result);
                 })
             .Accepts<FreelancerProfileDto>("multipart/form-data")
@@ -43,7 +44,7 @@ public static class FreelancerProfilesModule
         var updateFreelancerProfileEndpoint = app.MapPut("/api/freelancerProfiles/{id}", async (IMediator mediator, int id,
                 [FromForm] UpdateFreelancerProfileRequest updateFreelancerProfileRequest, CancellationToken ct) =>
             {
-                var command = new UpdateFreelancerProfileCommand(id, updateFreelancerProfileRequest);
+                var command = updateFreelancerProfileRequest.Adapt<UpdateFreelancerProfileCommand>() with { Id = id };
                 var result = await mediator.Send(command, ct);
                 return Results.Ok(result);
             }).WithTags("FreelancerProfiles").

@@ -5,6 +5,7 @@ using Frelance.Contracts.Dtos;
 using Frelance.Contracts.Requests.Common;
 using Frelance.Contracts.Requests.Invoices;
 using Frelance.Web.Extensions;
+using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,8 +19,7 @@ public static class InvoicesModule
                 async (IMediator mediator, [FromForm] CreateInvoiceRequest createInvoiceRequest,
                     CancellationToken ct) =>
                 {
-                    var command = new CreateInvoiceCommand(createInvoiceRequest);
-                    var result = await mediator.Send(command, ct);
+                    var result = await mediator.Send(createInvoiceRequest.Adapt<CreateInvoiceCommand>(), ct);
                     return Results.Ok(result);
                 })
             .Accepts<InvoicesDto>("multipart/form-data")
@@ -43,7 +43,7 @@ public static class InvoicesModule
         var updateInvoiceEndpoint = app.MapPut("/api/invoices/{id}", async (IMediator mediator, int id,
             [FromForm] UpdateInvoiceRequest updateInvoiceRequest, CancellationToken ct) =>
         {
-            var command = new UpdateInvoiceCommand(id, updateInvoiceRequest);
+            var command = updateInvoiceRequest.Adapt<UpdateInvoiceCommand>() with { Id = id };
             var result = await mediator.Send(command, ct);
             return Results.Ok(result);
         }).WithTags("Invoices")
