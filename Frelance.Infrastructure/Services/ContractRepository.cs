@@ -47,7 +47,7 @@ public class ContractRepository : IContractRepository
     public async Task AddContractAsync(CreateContractCommand createContractCommand, CancellationToken cancellationToken)
     {
         var freelancer = await _freelancerProfilesRepository.Query()
-            .Where(x => x.Users.UserName == createContractCommand.CreateContractRequest.FreelancerName)
+            .Where(x => x.Users!.UserName == createContractCommand.CreateContractRequest.FreelancerName)
             .Include(x => x.Users)
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -57,7 +57,7 @@ public class ContractRepository : IContractRepository
         }
 
         var client = await _clientProfilesRepository.Query()
-            .Where(x => x.Users.UserName == _userAccessor.GetUsername())
+            .Where(x => x.Users!.UserName == _userAccessor.GetUsername())
             .Include(x => x.Users)
             .FirstOrDefaultAsync(cancellationToken);
         if (client is null)

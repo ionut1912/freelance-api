@@ -40,6 +40,10 @@ public class ProposalRepository : IProposalRepository
         var user = await _userRepository.Query()
             .Where(x => x.UserName == _userAccessor.GetUsername())
             .FirstOrDefaultAsync(cancellationToken);
+        if (user is null)
+        {
+            throw new NotFoundException($"{nameof(Users)} with {nameof(Users.UserName)} {_userAccessor.GetUsername()} not found");
+        }
         var project = await _projectRepository.Query()
             .Where(x => x.Title == createProposalCommand.CreateProposalRequest.ProjectName)
             .FirstOrDefaultAsync(cancellationToken);

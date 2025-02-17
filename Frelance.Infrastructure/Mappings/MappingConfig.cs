@@ -63,12 +63,14 @@ namespace Frelance.Infrastructure.Mappings
             TypeAdapterConfig<CreateClientProfileCommand, ClientProfiles>
                 .NewConfig()
                 .Map(dest => dest.Addresses, src =>
-                    new Addresses(
-                        src.CreateClientProfileRequest.AddressCountry,
-                        src.CreateClientProfileRequest.AddressCity,
-                        src.CreateClientProfileRequest.AddressStreet,
-                        src.CreateClientProfileRequest.AddressStreetNumber,
-                        src.CreateClientProfileRequest.AddressZip))
+                    new Addresses
+                    {
+                        Country = src.CreateClientProfileRequest.AddressCountry,
+                        City = src.CreateClientProfileRequest.AddressCity,
+                        Street = src.CreateClientProfileRequest.AddressStreet,
+                        StreetNumber = src.CreateClientProfileRequest.AddressStreetNumber,
+                        ZipCode = src.CreateClientProfileRequest.AddressZip
+                    })
                 .Map(dest => dest.Bio, src => src.CreateClientProfileRequest.Bio)
                 .AfterMapping((src, dest) =>
                 {
@@ -104,8 +106,8 @@ namespace Frelance.Infrastructure.Mappings
                 .NewConfig()
                 .Map(dest => dest.Id, src => src.Id)
                 .Map(dest => dest.Project, src => src.Project.Adapt<ProjectDto>())
-                .Map(dest => dest.ClientName, src => src.Client.Users.UserName)
-                .Map(dest => dest.FreelancerName, src => src.Freelancer.Users.UserName)
+                .Map(dest => dest.ClientName, src => src.Client.Users!.UserName)
+                .Map(dest => dest.FreelancerName, src => src.Freelancer.Users!.UserName)
                 .Map(dest => dest.StartDate, src => src.StartDate)
                 .Map(dest => dest.EndDate, src => src.EndDate)
                 .Map(dest => dest.Amount, src => src.Amount)
@@ -118,8 +120,8 @@ namespace Frelance.Infrastructure.Mappings
                 .NewConfig()
                 .Map(dest => dest.Id, src => src.Id)
                 .Map(dest => dest.Project, src => src.Project.Adapt<ProjectDto>())
-                .Map(dest => dest.ClientName, src => src.Client.Users.UserName)
-                .Map(dest => dest.FreelancerName, src => src.Freelancer.Users.UserName)
+                .Map(dest => dest.ClientName, src => src.Client!.Users!.UserName)
+                .Map(dest => dest.FreelancerName, src => src.Freelancer!.Users!.UserName)
                 .Map(dest => dest.CreatedAt, src => src.CreatedAt)
                 .Map(dest => dest.UpdatedAt, src => src.UpdatedAt)
                 .Map(dest => dest.Amount, src => src.Amount)
@@ -134,7 +136,7 @@ namespace Frelance.Infrastructure.Mappings
                 .NewConfig()
                 .Map(dest => dest.Id, src => src.Id)
                 .Map(dest => dest.Project, src => src.Project.Adapt<ProjectDto>())
-                .Map(dest => dest.Username, src => src.Proposer.UserName)
+                .Map(dest => dest.Username, src => src.Proposer!.UserName)
                 .Map(dest => dest.ProposedBudget, src => src.ProposedBudget)
                 .Map(dest => dest.Status, src => src.Status)
                 .Map(dest => dest.CreatedAt, src => src.CreatedAt)
@@ -181,7 +183,7 @@ namespace Frelance.Infrastructure.Mappings
                 .AfterMapping((src, dest) =>
                 {
                     var req = src.UpdateClientProfileRequest;
-                    dest.Addresses.Country = !string.IsNullOrEmpty(req.AddressCountry) ? req.AddressCountry : dest.Addresses.Country;
+                    dest.Addresses!.Country = !string.IsNullOrEmpty(req.AddressCountry) ? req.AddressCountry : dest.Addresses.Country;
                     dest.Addresses.Street = !string.IsNullOrEmpty(req.AddressStreet) ? req.AddressStreet : dest.Addresses.Street;
                     dest.Addresses.StreetNumber = !string.IsNullOrEmpty(req.AddressStreetNumber) ? req.AddressStreetNumber : dest.Addresses.StreetNumber;
                     dest.Addresses.City = !string.IsNullOrEmpty(req.AddressCity) ? req.AddressCity : dest.Addresses.City;
@@ -284,7 +286,7 @@ namespace Frelance.Infrastructure.Mappings
                 .NewConfig()
                 .AfterMapping((src, dest) =>
                 {
-                    dest.Addresses.Country = src.AddressCountry ?? dest.Addresses.Country;
+                    dest.Addresses!.Country = src.AddressCountry ?? dest.Addresses.Country;
                     dest.Addresses.Street = src.AddressStreet ?? dest.Addresses.Street;
                     dest.Addresses.StreetNumber = src.AddressStreetNumber ?? dest.Addresses.StreetNumber;
                     dest.Addresses.City = src.AddressCity ?? dest.Addresses.City;

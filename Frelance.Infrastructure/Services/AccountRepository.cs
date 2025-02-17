@@ -80,8 +80,9 @@ public class AccountRepository : IAccountRepository
         }
 
         GenerateException(modelState);
+        
 
-        return new UserDto(user!.PhoneNumber, await _tokenService.GenerateToken(user), user.UserName, user.Email, user.CreatedAt);
+        return new UserDto(user.PhoneNumber!, await _tokenService.GenerateToken(user), user.UserName!, user.Email!, user.CreatedAt);
     }
 
     private static void AddErrorToModelState(IdentityResult result, ModelStateDictionary modelState)
@@ -96,8 +97,8 @@ public class AccountRepository : IAccountRepository
     {
         if (modelState.IsValid) return;
         var validationErrors = modelState
-            .Where(kvp => kvp.Value.Errors.Count > 0)
-            .SelectMany(kvp => kvp.Value.Errors.Select(error => new ValidationError(kvp.Key, error.ErrorMessage)))
+            .Where(kvp => kvp.Value!.Errors.Count > 0)
+            .SelectMany(kvp => kvp.Value!.Errors.Select(error => new ValidationError(kvp.Key, error.ErrorMessage)))
             .ToList();
         throw new CustomValidationException(validationErrors);
     }

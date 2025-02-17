@@ -4,11 +4,11 @@ public class BaseUserProfile
 {
     public int Id { get; set; }
     public int UserId { get; set; }
-    public Users Users { get; set; }
+    public Users? Users { get; set; }
     public int AddressId { get; set; }
-    public Addresses Addresses { get; set; }
-    public string Bio { get; set; }
-    public string ProfileImageUrl { get; set; }
+    public Addresses? Addresses { get; set; }
+    public required string Bio { get; set; }
+    public required string ProfileImageUrl { get; set; }
     public List<Contracts> Contracts { get; set; } = [];
     public List<Invoices> Invoices { get; set; } = [];
     public DateTime CreatedAt { get; set; }

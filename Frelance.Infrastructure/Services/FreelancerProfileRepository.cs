@@ -67,6 +67,11 @@ namespace Frelance.Infrastructure.Services
 
             var freelancerProfile = command.CreateFreelancerProfileRequest.Adapt<FreelancerProfiles>();
             freelancerProfile.UserId = user.Id;
+            if (freelancerProfile.Addresses is null)
+            {
+                throw new NotFoundException("Addresses not found.");
+            }
+            
             await _addressRepository.AddAsync(freelancerProfile.Addresses, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             freelancerProfile.AddressId = freelancerProfile.Addresses.Id;
@@ -112,9 +117,9 @@ namespace Frelance.Infrastructure.Services
             var profile = await _freelancerProfilesRepository.Query()
                 .Where(x => x.Id == query.Id)
                 .Include(fp => fp.Users)
-                .ThenInclude(u => u.Reviews)
+                .ThenInclude(u => u!.Reviews)
                 .Include(fp => fp.Users)
-                .ThenInclude(u => u.Proposals)
+                .ThenInclude(u => u!.Proposals)
                 .Include(fp => fp.Contracts)
                 .Include(fp => fp.Invoices)
                 .Include(fp => fp.Skills)
@@ -137,9 +142,9 @@ namespace Frelance.Infrastructure.Services
 
             var freelancersProfilesQuery = _freelancerProfilesRepository.Query()
                 .Include(x => x.Users)
-                .ThenInclude(x => x.Reviews)
+                .ThenInclude(x => x!.Reviews)
                 .Include(x => x.Users)
-                .ThenInclude(x => x.Proposals)
+                .ThenInclude(x => x!.Proposals)
                 .Include(x => x.Addresses)
                 .Include(f => f.Tasks)
                 .Include(x => x.Skills)
@@ -179,15 +184,22 @@ namespace Frelance.Infrastructure.Services
                     command.UpdateFreelancerProfileRequest.ProfileImage);
             }
 
-            if (command.UpdateFreelancerProfileRequest.AddressCity is not null)
+            if (command.UpdateFreelancerProfileRequest.AddressCountry is not null
+                && command.UpdateFreelancerProfileRequest.AddressCity is not null
+                && command.UpdateFreelancerProfileRequest.AddressStreet is not null
+                && command.UpdateFreelancerProfileRequest.AddressStreetNumber is not null
+                &&command.UpdateFreelancerProfileRequest.AddressZip is not null)
             {
-                var updatedAddress = new Addresses(
-                    freelancerProfile.Addresses.Id,
-                    command.UpdateFreelancerProfileRequest.AddressCountry,
-                    command.UpdateFreelancerProfileRequest.AddressCity,
-                    command.UpdateFreelancerProfileRequest.AddressStreet,
-                    command.UpdateFreelancerProfileRequest.AddressStreetNumber,
-                    command.UpdateFreelancerProfileRequest.AddressZip);
+         
+                var updatedAddress = new Addresses
+                {
+                    Id = freelancerProfile.Addresses!.Id,
+                    Country = command.UpdateFreelancerProfileRequest.AddressCountry!,
+                    City = command.UpdateFreelancerProfileRequest.AddressCity,
+                    Street = command.UpdateFreelancerProfileRequest.AddressStreet,
+                    StreetNumber = command.UpdateFreelancerProfileRequest.AddressStreetNumber,
+                    ZipCode = command.UpdateFreelancerProfileRequest.AddressZip
+                };
                 _addressRepository.Update(freelancerProfile.Addresses);
                 freelancerProfile.AddressId = updatedAddress.Id;
             }
@@ -196,7 +208,7 @@ namespace Frelance.Infrastructure.Services
             tempConfig.ForType<UpdateFreelancerProfileRequest, FreelancerProfiles>()
                 .Ignore(dest => dest.Skills)
                 .Ignore(dest => dest.ForeignLanguages)
-                .Ignore(dest => dest.Addresses);
+                .Ignore(dest => dest.Addresses!);
             command.UpdateFreelancerProfileRequest.Adapt(freelancerProfile, tempConfig);
 
             if (command.UpdateFreelancerProfileRequest.ProgrammingLanguages is { } progLangs &&

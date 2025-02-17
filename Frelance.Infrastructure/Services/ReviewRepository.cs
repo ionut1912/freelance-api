@@ -36,6 +36,11 @@ public class ReviewRepository : IReviewRepository
         var user = await _userRepository.Query()
             .Where(x => x.UserName == _userAccessor.GetUsername())
             .FirstOrDefaultAsync(cancellationToken);
+        if (user is null)
+        {
+            throw new NotFoundException($"{nameof(Users)} with {nameof(Users.UserName)} {_userAccessor.GetUsername()} not found");
+        }
+        
         var review = createReviewCommand.CreateReviewRequest.Adapt<Reviews>();
         review.ReviewerId = user.Id;
         await _reviewRepository.AddAsync(review, cancellationToken);
