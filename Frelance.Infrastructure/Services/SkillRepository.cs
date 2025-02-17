@@ -1,6 +1,6 @@
 using Frelance.Application.Repositories;
 using Frelance.Contracts.Dtos;
-using Frelance.Infrastructure.Context;
+using Frelance.Infrastructure.Entities;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,17 +8,17 @@ namespace Frelance.Infrastructure.Services;
 
 public class SkillRepository : ISkillsRepository
 {
-    private readonly FrelanceDbContext _context;
+    private readonly IGenericRepository<Skills> _repository;
 
-    public SkillRepository(FrelanceDbContext context)
+    public SkillRepository(IGenericRepository<Skills> repository)
     {
-        ArgumentNullException.ThrowIfNull(context, nameof(context));
-        _context = context;
+        ArgumentNullException.ThrowIfNull(repository, nameof(repository));
+        _repository=repository;
     }
 
-    public async Task<List<SkillDto>> GetSkillsAsync(CancellationToken ct = default)
+    public async Task<List<SkillDto>> GetSkillsAsync(CancellationToken cancellationToken)
     {
-        var skill = await _context.Skills.ToListAsync(ct);
-        return skill.Adapt<List<SkillDto>>();
+        var skills = await _repository.Query().ToListAsync(cancellationToken);
+        return skills.Adapt<List<SkillDto>>();
     }
 }

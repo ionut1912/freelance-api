@@ -1,4 +1,3 @@
-using Frelance.Application.Helpers;
 using Frelance.Application.Mediatr.Commands.Invoices;
 using Frelance.Application.Mediatr.Queries.Invoices;
 using Frelance.Application.Repositories;
@@ -7,7 +6,6 @@ using Frelance.Contracts.Dtos;
 using Frelance.Contracts.Enums;
 using Frelance.Contracts.Exceptions;
 using Frelance.Contracts.Responses.Common;
-using Frelance.Infrastructure.Context;
 using Frelance.Infrastructure.Entities;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
@@ -16,44 +14,62 @@ namespace Frelance.Infrastructure.Services;
 
 public class InvoiceRepository : IInvoiceRepository
 {
-    private readonly FrelanceDbContext _frelanceDbContext;
     private readonly IBlobService _blobService;
     private readonly IUserAccessor _userAccessor;
-
-    public InvoiceRepository(FrelanceDbContext frelanceDbContext, IBlobService blobService, IUserAccessor userAccessor)
+    private readonly IGenericRepository<Invoices> _invoiceRepository;
+    private readonly IGenericRepository<ClientProfiles> _clientProfileRepository;
+    private readonly IGenericRepository<FreelancerProfiles> _freelancerProfileRepository;
+    private readonly IGenericRepository<Projects> _projectRepository;
+    public InvoiceRepository( IBlobService blobService, 
+        IUserAccessor userAccessor,
+        IGenericRepository<Invoices> invoiceRepository,
+        IGenericRepository<ClientProfiles> clientProfileRepository,
+        IGenericRepository<FreelancerProfiles> freelancerProfileRepository,
+        IGenericRepository<Projects> projectRepository )
     {
-        ArgumentNullException.ThrowIfNull(frelanceDbContext, nameof(frelanceDbContext));
         ArgumentNullException.ThrowIfNull(blobService, nameof(blobService));
         ArgumentNullException.ThrowIfNull(userAccessor, nameof(userAccessor));
-        _frelanceDbContext = frelanceDbContext;
+        ArgumentNullException.ThrowIfNull(invoiceRepository, nameof(invoiceRepository));
+        ArgumentNullException.ThrowIfNull(clientProfileRepository, nameof(clientProfileRepository));
+        ArgumentNullException.ThrowIfNull(freelancerProfileRepository, nameof(freelancerProfileRepository));
+        ArgumentNullException.ThrowIfNull(projectRepository, nameof(projectRepository));
         _blobService = blobService;
         _userAccessor = userAccessor;
+        _invoiceRepository = invoiceRepository;
+        _clientProfileRepository = clientProfileRepository;
+        _freelancerProfileRepository = freelancerProfileRepository;
+        _projectRepository = projectRepository;
     }
 
     public async Task AddInvoiceAsync(CreateInvoiceCommand createInvoiceCommand, CancellationToken cancellationToken)
     {
-        var client = await _frelanceDbContext.ClientProfiles
-            .AsNoTracking()
-            .Include(x => x.Users)
-            .FirstOrDefaultAsync(x => x.Users.UserName == createInvoiceCommand.CreateInvoiceRequest.ClientName, cancellationToken);
+
+        var client=await _clientProfileRepository.Query()
+            .Where(x=>x.Users.UserName == createInvoiceCommand.CreateInvoiceRequest.ClientName)
+            .Include(x=>x.Users)
+            .FirstOrDefaultAsync(cancellationToken);
+        
         if (client is null)
         {
             throw new NotFoundException($"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Users.UserName)}: {createInvoiceCommand.CreateInvoiceRequest.ClientName} not foun");
         }
 
-        var freelancer = await _frelanceDbContext.FreelancerProfiles
-            .AsNoTracking()
-            .Include(x => x.Users)
-            .FirstOrDefaultAsync(x => x.Users.UserName == _userAccessor.GetUsername(), cancellationToken);
+
+        var freelancer=await _freelancerProfileRepository.Query()
+            .Where(x=>x.Users.UserName == _userAccessor.GetUsername())
+            .Include(x=>x.Users)
+            .FirstOrDefaultAsync(cancellationToken);
+
         if (freelancer is null)
         {
             throw new NotFoundException(
                 $"{nameof(FreelancerProfiles)} with {nameof(ClientProfiles.Users.UserName)}: {_userAccessor.GetUsername()} not found");
         }
-        var project = await _frelanceDbContext.Projects
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Title == createInvoiceCommand.CreateInvoiceRequest.ProjectName, cancellationToken);
 
+        var project=await _projectRepository.Query()
+            .Where(x=>x.Title==createInvoiceCommand.CreateInvoiceRequest.ProjectName)
+            .FirstOrDefaultAsync(cancellationToken);
+        
         if (project is null)
         {
             throw new NotFoundException(
@@ -69,21 +85,21 @@ public class InvoiceRepository : IInvoiceRepository
             $"{project.Id}/{createInvoiceCommand.CreateInvoiceRequest.InvoiceFile.FileName}",
             createInvoiceCommand.CreateInvoiceRequest.InvoiceFile);
         invoice.Status = "Submitted";
-        await _frelanceDbContext.Invoices.AddAsync(invoice, cancellationToken);
-
-
+        await _invoiceRepository.AddAsync(invoice, cancellationToken);
+        
     }
 
     public async Task<InvoicesDto> GetInvoiceByIdAsync(GetInvoiceByIdQuery query, CancellationToken cancellationToken)
     {
-        var invoice = await _frelanceDbContext.Invoices
-            .AsNoTracking()
+        var invoice = await _invoiceRepository.Query()
+            .Where(x=>x.Id == query.Id)
             .Include(x => x.Project)
             .Include(x => x.Client)
             .ThenInclude(x => x.Users)
             .Include(x => x.Freelancer)
             .ThenInclude(x => x.Users)
-            .FirstOrDefaultAsync(x => x.Id == query.Id, cancellationToken);
+            .FirstOrDefaultAsync(cancellationToken);
+        
         if (invoice is null)
         {
             throw new NotFoundException($"{nameof(Invoices)} with {nameof(Invoices.Id)}: {query.Id} not found");
@@ -94,13 +110,13 @@ public class InvoiceRepository : IInvoiceRepository
 
     public async Task<PaginatedList<InvoicesDto>> GetInvoicesAsync(GetInvoicesQuery query, CancellationToken cancellationToken)
     {
-        var invoicesQuery = _frelanceDbContext.Invoices
-            .AsNoTracking()
-            .Include(x => x.Client)
-            .ThenInclude(x => x.Users)
-            .Include(x => x.Freelancer)
-            .ThenInclude(f => f.Users)
-            .Include(x => x.Project)
+        
+        var invoicesQuery=_invoiceRepository.Query()
+            .Include(x=>x.Client)
+            .ThenInclude(x=>x.Users)
+            .Include(x=>x.Freelancer)
+            .ThenInclude(x=>x.Users)
+            .Include(x=>x.Project)
             .ProjectToType<InvoicesDto>();
 
         var count = await invoicesQuery.CountAsync(cancellationToken);
@@ -114,9 +130,10 @@ public class InvoiceRepository : IInvoiceRepository
 
     public async Task UpdateInvoiceAsync(UpdateInvoiceCommand updateInvoiceCommand, CancellationToken cancellationToken)
     {
-        var invoiceToUpdate = await _frelanceDbContext.Invoices
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Id == updateInvoiceCommand.Id, cancellationToken);
+        var invoiceToUpdate = await _invoiceRepository.Query()
+            .Where(x => x.Id == updateInvoiceCommand.Id)
+            .FirstOrDefaultAsync(cancellationToken);
+        
         if (invoiceToUpdate is null)
         {
             throw new NotFoundException($"{nameof(Invoices)} with {nameof(Invoices.Id)}: {updateInvoiceCommand.Id} not found");
@@ -131,19 +148,19 @@ public class InvoiceRepository : IInvoiceRepository
                 $"{invoiceToUpdate.ProjectId}/{updateInvoiceCommand.UpdateInvoiceRequest.InvoiceFile}",
                 updateInvoiceCommand.UpdateInvoiceRequest.InvoiceFile);
         }
-        _frelanceDbContext.Invoices.Update(invoiceToUpdate);
+        _invoiceRepository.Update(invoiceToUpdate);
     }
 
     public async Task DeleteInvoiceAsync(DeleteInvoiceCommand deleteInvoiceCommand, CancellationToken cancellationToken)
     {
-        var invoiceToDelete = await _frelanceDbContext.Invoices
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Id == deleteInvoiceCommand.Id, cancellationToken);
+        var invoiceToDelete = await _invoiceRepository.Query()
+            .Where(x => x.Id == deleteInvoiceCommand.Id)
+            .FirstOrDefaultAsync(cancellationToken);
         if (invoiceToDelete is null)
         {
             throw new NotFoundException($"{nameof(Invoices)} with {nameof(Invoices.Id)}: {deleteInvoiceCommand.Id} not found");
         }
         await _blobService.DeleteBlobAsync(StorageContainers.INVOICESCONTAINER.ToString().ToLower(), invoiceToDelete.ProjectId.ToString());
-        _frelanceDbContext.Invoices.Remove(invoiceToDelete);
+       _invoiceRepository.Delete(invoiceToDelete);
     }
 }

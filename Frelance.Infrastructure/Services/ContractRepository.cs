@@ -17,38 +17,57 @@ namespace Frelance.Infrastructure.Services;
 public class ContractRepository : IContractRepository
 {
     private readonly IBlobService _blobService;
-    private readonly FrelanceDbContext _dbContext;
     private readonly IUserAccessor _userAccessor;
+    private readonly IGenericRepository<Entities.Contracts> _contractsRepository;
+    private readonly IGenericRepository<FreelancerProfiles> _freelancerProfilesRepository;
+    private readonly IGenericRepository<ClientProfiles> _clientProfilesRepository;
+    private readonly IGenericRepository<Projects> _projectsRepository;
 
-    public ContractRepository(IBlobService blobService, FrelanceDbContext dbContext, IUserAccessor userAccessor)
+    public ContractRepository(IBlobService blobService,
+        IUserAccessor userAccessor, 
+        IGenericRepository<Entities.Contracts> contractsRepository,
+        IGenericRepository<FreelancerProfiles> freelancerProfilesRepository, 
+        IGenericRepository<ClientProfiles> clientProfilesRepository, 
+        IGenericRepository<Projects> projectsRepository)
     {
         ArgumentNullException.ThrowIfNull(blobService, nameof(blobService));
-        ArgumentNullException.ThrowIfNull(dbContext, nameof(dbContext));
         ArgumentNullException.ThrowIfNull(userAccessor, nameof(userAccessor));
+        ArgumentNullException.ThrowIfNull(contractsRepository, nameof(contractsRepository));
+        ArgumentNullException.ThrowIfNull(freelancerProfilesRepository, nameof(freelancerProfilesRepository));
+        ArgumentNullException.ThrowIfNull(clientProfilesRepository, nameof(clientProfilesRepository));
+        ArgumentNullException.ThrowIfNull(projectsRepository, nameof(projectsRepository));
+        _contractsRepository = contractsRepository;
+        _freelancerProfilesRepository = freelancerProfilesRepository;
+        _clientProfilesRepository = clientProfilesRepository;
+        _projectsRepository = projectsRepository;
         _blobService = blobService;
-        _dbContext = dbContext;
         _userAccessor = userAccessor;
     }
 
     public async Task AddContractAsync(CreateContractCommand createContractCommand, CancellationToken cancellationToken)
     {
-        var freelancer = await _dbContext.FreelancerProfiles
-            .AsNoTracking()
+        var freelancer = await _freelancerProfilesRepository.Query()
+            .Where(x => x.Users.UserName == createContractCommand.CreateContractRequest.FreelancerName)
             .Include(x => x.Users)
-            .FirstOrDefaultAsync(x => x.Users.UserName == createContractCommand.CreateContractRequest.FreelancerName, cancellationToken);
+            .FirstOrDefaultAsync(cancellationToken);
+            
         if (freelancer is null)
         {
             throw new NotFoundException($"{nameof(FreelancerProfiles)} with {nameof(FreelancerProfiles.Users.UserName)}: {createContractCommand.CreateContractRequest.FreelancerName} doe not exist.");
         }
-        var client = await _dbContext.ClientProfiles
-            .AsNoTracking()
-            .Include(x => x.Users)
-            .FirstOrDefaultAsync(x => x.Users.UserName == _userAccessor.GetUsername(), cancellationToken);
+
+        var client= await _clientProfilesRepository.Query()
+            .Where(x=>x.Users.UserName==_userAccessor.GetUsername())
+            .Include(x=>x.Users)
+            .FirstOrDefaultAsync(cancellationToken); 
         if (client is null)
         {
             throw new NotFoundException($"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Users.UserName)}: {_userAccessor.GetUsername()} doe not exist.");
         }
-        var project = await _dbContext.Projects.FirstOrDefaultAsync(x => x.Title == createContractCommand.CreateContractRequest.ProjectName, cancellationToken);
+
+        var project = await _projectsRepository.Query()
+            .Where(x => x.Title == createContractCommand.CreateContractRequest.ProjectName)
+            .FirstOrDefaultAsync(cancellationToken);
         if (project is null)
         {
             throw new NotFoundException(
@@ -64,21 +83,19 @@ public class ContractRepository : IContractRepository
             StorageContainers.CONTRACTSCONTAINER.ToString().ToLower(),
             $"{project.Id}/{createContractCommand.CreateContractRequest.ContractFile.FileName}",
             createContractCommand.CreateContractRequest.ContractFile);
-        await _dbContext.Contracts.AddAsync(contract, cancellationToken);
+        await _contractsRepository.AddAsync(contract, cancellationToken);
     }
 
     public async Task<ContractsDto> GetContractByIdAsync(GetContractByIdQuery query, CancellationToken cancellationToken)
     {
-        var contract = await _dbContext.Contracts
-            .AsNoTracking()
+        var contract=await _contractsRepository.Query()
+            .Where(x=>x.Id == query.Id)
             .Include(x => x.Project)
             .Include(x => x.Client)
             .ThenInclude(c => c.Users)
             .Include(x => x.Freelancer)
             .ThenInclude(f => f.Users)
-            .FirstOrDefaultAsync(x => x.Id == query.Id, cancellationToken);
-
-
+            .FirstOrDefaultAsync(cancellationToken);
         if (contract is null)
         {
             throw new NotFoundException($"{nameof(Entities.Contracts)} with {nameof(Entities.Contracts.Id)}: {query.Id} doe not exist.");
@@ -89,15 +106,13 @@ public class ContractRepository : IContractRepository
 
     public async Task<PaginatedList<ContractsDto>> GetContractsAsync(GetContractsQuery query, CancellationToken cancellationToken)
     {
-        var contractsQuery = _dbContext.Contracts
-            .AsNoTracking()
-            .Include(x => x.Client)
-            .ThenInclude(x => x.Users)
-            .Include(x => x.Freelancer)
-            .ThenInclude(f => f.Users)
-            .Include(x => x.Project)
+        var contractsQuery=_contractsRepository.Query()
+            .Include(x=>x.Client)
+            .ThenInclude(x=>x.Users)
+            .Include(x=>x.Freelancer)
+            .ThenInclude(f=>f.Users)
+            .Include(x=>x.Project)
             .ProjectToType<ContractsDto>();
-
         var count = await contractsQuery.CountAsync(cancellationToken);
         var items = await contractsQuery
             .Skip((query.PaginationParams.PageNumber - 1) * query.PaginationParams.PageSize)
@@ -109,15 +124,14 @@ public class ContractRepository : IContractRepository
 
     public async Task UpdateContractAsync(UpdateContractCommand updateContractCommand, CancellationToken cancellationToken)
     {
-        var contract = await _dbContext.Contracts
-            .AsNoTracking()
+        var contract = await _contractsRepository.Query()
+            .Where(x => x.Id == updateContractCommand.Id)
             .Include(x => x.Project)
             .Include(x => x.Client)
             .ThenInclude(x => x.Projects)
             .Include(x => x.Freelancer)
             .ThenInclude(x => x.Projects)
-            .FirstOrDefaultAsync(x => x.Id == updateContractCommand.Id, cancellationToken);
-
+            .FirstOrDefaultAsync(cancellationToken);
         if (contract is null)
         {
             throw new NotFoundException($"nameof(Entities.Contracts) with {nameof(Entities.Contracts.Id)}: {updateContractCommand.Id} doe not exist.");
@@ -143,19 +157,20 @@ public class ContractRepository : IContractRepository
             contract.Client.Projects.Add(contract.Project);
         }
 
-        _dbContext.Contracts.Update(contract);
-        _dbContext.ClientProfiles.Update(contract.Client);
-        _dbContext.FreelancerProfiles.Update(contract.Freelancer);
+        _contractsRepository.Update(contract);
+        _clientProfilesRepository.Update(contract.Client);
+        _freelancerProfilesRepository.Update(contract.Freelancer);
     }
 
 
 
     public async Task DeleteContractAsync(DeleteContractCommand deleteContractCommand, CancellationToken cancellationToken)
     {
-        var contractToDelete = await _dbContext.Contracts
-            .AsNoTracking()
+        var contractToDelete = await _contractsRepository.Query()
+            .Where(x => x.Id == deleteContractCommand.Id)
             .Include(x => x.Project)
-            .FirstOrDefaultAsync(x => x.Id == deleteContractCommand.Id, cancellationToken);
+            .FirstOrDefaultAsync(cancellationToken);
+        
         if (contractToDelete is null)
         {
             throw new NotFoundException($"{nameof(Entities.Contracts)} with {nameof(Entities.Contracts.Id)}: {deleteContractCommand.Id} doe not exist.");
@@ -163,6 +178,6 @@ public class ContractRepository : IContractRepository
 
         await _blobService.DeleteBlobAsync(StorageContainers.CONTRACTSCONTAINER.ToString().ToLower(),
             contractToDelete.Project.Id.ToString());
-        _dbContext.Contracts.Remove(contractToDelete);
+        _contractsRepository.Delete(contractToDelete);
     }
 }

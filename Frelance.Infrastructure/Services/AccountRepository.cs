@@ -14,16 +14,13 @@ namespace Frelance.Infrastructure.Services;
 
 public class AccountRepository : IAccountRepository
 {
-    private readonly FrelanceDbContext _dbContext;
     private readonly UserManager<Users> _userManager;
     private readonly TokenService _tokenService;
 
     public AccountRepository(FrelanceDbContext dbContext, UserManager<Users> userManager, TokenService tokenService)
     {
-        ArgumentNullException.ThrowIfNull(dbContext, nameof(dbContext));
         ArgumentNullException.ThrowIfNull(userManager, nameof(userManager));
         ArgumentNullException.ThrowIfNull(tokenService, nameof(tokenService));
-        _dbContext = dbContext;
         _userManager = userManager;
         _tokenService = tokenService;
     }
