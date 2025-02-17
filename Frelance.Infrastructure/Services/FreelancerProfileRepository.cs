@@ -19,25 +19,47 @@ namespace Frelance.Infrastructure.Services
 {
     public class FreelancerProfileRepository : IFreelancerProfileRepository
     {
-        private readonly FrelanceDbContext _dbContext;
         private readonly IBlobService _blobService;
         private readonly IUserAccessor _userAccessor;
+        private readonly IGenericRepository<FreelancerProfiles> _freelancerProfilesRepository;
+        private readonly IGenericRepository<Users> _userRepository;
+        private readonly IGenericRepository<Addresses> _addressRepository;
+        private readonly IGenericRepository<Skills> _skillsRepository;
+        private readonly IGenericRepository<FreelancerForeignLanguage> _freelancerForeignLanguageRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public FreelancerProfileRepository(FrelanceDbContext dbContext, IBlobService blobService, IUserAccessor userAccessor)
+        public FreelancerProfileRepository(IBlobService blobService,
+            IUserAccessor userAccessor, 
+            IGenericRepository<FreelancerProfiles> freelancerProfilesRepository,
+            IGenericRepository<Users> userRepository,
+            IGenericRepository<Addresses> addressRepository,
+            IGenericRepository<Skills> skillsRepository,
+            IGenericRepository<FreelancerForeignLanguage> freelancerForeignLanguageRepository,
+            IUnitOfWork unitOfWork)
         {
-            ArgumentNullException.ThrowIfNull(dbContext, nameof(dbContext));
             ArgumentNullException.ThrowIfNull(blobService, nameof(blobService));
             ArgumentNullException.ThrowIfNull(userAccessor, nameof(userAccessor));
-            _dbContext = dbContext;
+            ArgumentNullException.ThrowIfNull(freelancerProfilesRepository, nameof(freelancerProfilesRepository));
+            ArgumentNullException.ThrowIfNull(userRepository, nameof(userRepository));
+            ArgumentNullException.ThrowIfNull(addressRepository, nameof(addressRepository));
+            ArgumentNullException.ThrowIfNull(skillsRepository, nameof(skillsRepository));
+            ArgumentNullException.ThrowIfNull(freelancerForeignLanguageRepository, nameof(freelancerForeignLanguageRepository));
+            ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));
             _blobService = blobService;
             _userAccessor = userAccessor;
+            _freelancerProfilesRepository = freelancerProfilesRepository;
+            _userRepository = userRepository;
+            _addressRepository = addressRepository;
+            _skillsRepository = skillsRepository;
+            _freelancerForeignLanguageRepository = freelancerForeignLanguageRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task AddFreelancerProfileAsync(CreateFreelancerProfileCommand command, CancellationToken cancellationToken)
         {
-            var user = await _dbContext.Users
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.UserName == _userAccessor.GetUsername(), cancellationToken);
+            var user = await _userRepository.Query()
+                .Where(x => x.UserName == _userAccessor.GetUsername())
+                .FirstOrDefaultAsync(cancellationToken);
             if (user == null)
             {
                 throw new InvalidOperationException("User not found.");
@@ -45,25 +67,24 @@ namespace Frelance.Infrastructure.Services
 
             var freelancerProfile = command.CreateFreelancerProfileRequest.Adapt<FreelancerProfiles>();
             freelancerProfile.UserId = user.Id;
-
-            await _dbContext.Addresses.AddAsync(freelancerProfile.Addresses, cancellationToken);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            await _addressRepository.AddAsync(freelancerProfile.Addresses, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
             freelancerProfile.AddressId = freelancerProfile.Addresses.Id;
 
             freelancerProfile.ProfileImageUrl = await _blobService.UploadBlobAsync(
                 StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(),
                 $"{user.Id}/{command.CreateFreelancerProfileRequest.ProfileImage.FileName}",
                 command.CreateFreelancerProfileRequest.ProfileImage);
-
-            var skillsInDb = await _dbContext.Skills.AsNoTracking().ToListAsync(cancellationToken);
+            
+            var skillsInDb = await _skillsRepository.Query().ToListAsync(cancellationToken);
             var requestSkills = freelancerProfile.Skills?.Adapt<List<SkillRequest>>() ?? [];
             ValidateSkills(skillsInDb, requestSkills);
 
             freelancerProfile.IsAvailable = true;
             try
             {
-                await _dbContext.FreelancerProfiles.AddAsync(freelancerProfile, cancellationToken);
-                await _dbContext.SaveChangesAsync(cancellationToken);
+                await _freelancerProfilesRepository.AddAsync(freelancerProfile, cancellationToken);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 if (freelancerProfile.ForeignLanguages != null)
                 {
@@ -71,16 +92,16 @@ namespace Frelance.Infrastructure.Services
                     {
                         fl.FreelancerProfileId = freelancerProfile.Id;
                         fl.Id = 0;
-                        await _dbContext.FreelancerForeignLanguage.AddAsync(fl, cancellationToken);
+                        await _freelancerForeignLanguageRepository.AddAsync(fl, cancellationToken);
                     }
                 }
 
             }
-            catch (Exception e)
+            catch (Exception)
             {
-
-                _dbContext.FreelancerProfiles.Remove(freelancerProfile);
-                await _dbContext.SaveChangesAsync(cancellationToken);
+                
+                _freelancerProfilesRepository.Delete(freelancerProfile);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
                 throw;
             }
 
@@ -88,13 +109,12 @@ namespace Frelance.Infrastructure.Services
 
         public async Task<FreelancerProfileDto> GetFreelancerProfileByIdAsync(GetFreelancerProfileByIdQuery query, CancellationToken cancellationToken)
         {
-            var profile = await _dbContext.Set<FreelancerProfiles>()
-                .AsNoTracking()
+            var profile = await _freelancerProfilesRepository.Query()
+                .Where(x => x.Id == query.Id)
                 .Include(fp => fp.Users)
-                    .ThenInclude(u => u.Reviews)
+                .ThenInclude(u => u.Reviews)
                 .Include(fp => fp.Users)
-                    .ThenInclude(u => u.Proposals)
-
+                .ThenInclude(u => u.Proposals)
                 .Include(fp => fp.Contracts)
                 .Include(fp => fp.Invoices)
                 .Include(fp => fp.Skills)
@@ -102,8 +122,8 @@ namespace Frelance.Infrastructure.Services
                 .Include(x => x.ForeignLanguages)
                 .Include(x => x.Tasks)
                 .Include(x => x.Projects)
-                .FirstOrDefaultAsync(fp => fp.Id == query.Id, cancellationToken);
-
+                .FirstOrDefaultAsync(cancellationToken);
+            
             if (profile == null)
             {
                 throw new NotFoundException($"{nameof(FreelancerProfiles)} with {nameof(FreelancerProfiles.Id)}: '{query.Id}' does not exist");
@@ -114,8 +134,8 @@ namespace Frelance.Infrastructure.Services
 
         public async Task<PaginatedList<FreelancerProfileDto>> GetAllFreelancerProfilesAsync(GetFreelancerProfilesQuery query, CancellationToken cancellationToken)
         {
-            var freelancers = _dbContext.FreelancerProfiles
-                .AsNoTracking()
+            
+            var freelancersProfilesQuery=_freelancerProfilesRepository.Query()
                 .Include(x => x.Users)
                 .ThenInclude(x => x.Reviews)
                 .Include(x => x.Users)
@@ -127,8 +147,8 @@ namespace Frelance.Infrastructure.Services
                 .Include(x => x.Projects)
                 .ProjectToType<FreelancerProfileDto>();
 
-            var count = await freelancers.CountAsync(cancellationToken);
-            var items = await freelancers
+            var count = await freelancersProfilesQuery.CountAsync(cancellationToken);
+            var items = await freelancersProfilesQuery
                 .Skip((query.PaginationParams.PageNumber - 1) * query.PaginationParams.PageSize)
                 .Take(query.PaginationParams.PageSize)
                 .ToListAsync(cancellationToken);
@@ -137,13 +157,13 @@ namespace Frelance.Infrastructure.Services
         }
         public async Task UpdateFreelancerProfileAsync(UpdateFreelancerProfileCommand command, CancellationToken cancellationToken)
         {
-            var freelancerProfile = await _dbContext.FreelancerProfiles
+            var freelancerProfile = await _freelancerProfilesRepository.Query()
+                .Where(x => x.Id == command.Id)
                 .Include(fp => fp.Addresses)
                 .Include(fp => fp.Skills)
                 .Include(fp => fp.ForeignLanguages)
-                .FirstOrDefaultAsync(fp => fp.Id == command.Id, cancellationToken);
-
-            if (freelancerProfile == null)
+                .FirstOrDefaultAsync(cancellationToken);
+            if (freelancerProfile is null)
             {
                 throw new NotFoundException($"{nameof(FreelancerProfiles)} with {nameof(FreelancerProfiles.Id)}: '{command.Id}' does not exist");
             }
@@ -168,7 +188,7 @@ namespace Frelance.Infrastructure.Services
                     command.UpdateFreelancerProfileRequest.AddressStreet,
                     command.UpdateFreelancerProfileRequest.AddressStreetNumber,
                     command.UpdateFreelancerProfileRequest.AddressZip);
-                _dbContext.Entry(freelancerProfile.Addresses).CurrentValues.SetValues(updatedAddress);
+                _addressRepository.Update(freelancerProfile.Addresses);
                 freelancerProfile.AddressId = updatedAddress.Id;
             }
 
@@ -186,7 +206,7 @@ namespace Frelance.Infrastructure.Services
                     .Select(i => new SkillRequest(progLangs[i], areas[i]))
                     .ToList();
 
-                var skillsInDb = await _dbContext.Skills.AsNoTracking().ToListAsync(cancellationToken);
+                var skillsInDb=await _skillsRepository.Query().ToListAsync(cancellationToken);
                 ValidateSkills(skillsInDb, skills);
 
                 var existingSkillLanguages = freelancerProfile.Skills
@@ -206,8 +226,7 @@ namespace Frelance.Infrastructure.Services
 
             if (command.UpdateFreelancerProfileRequest.ForeignLanguages is { } newForeignLangs)
             {
-                var existingForeignLanguages = await _dbContext.FreelancerForeignLanguage
-                    .AsNoTracking()
+                var existingForeignLanguages=await _freelancerForeignLanguageRepository.Query()
                     .Where(x => x.FreelancerProfileId == command.Id)
                     .ToListAsync(cancellationToken);
 
@@ -220,22 +239,23 @@ namespace Frelance.Infrastructure.Services
                     })
                     .ToList();
 
-                if (languagesToAdd.Any())
+                if (languagesToAdd.Count != 0)
                 {
-                    await _dbContext.FreelancerForeignLanguage.AddRangeAsync(languagesToAdd, cancellationToken);
+                    await _freelancerForeignLanguageRepository.AddRangeAsync(languagesToAdd, cancellationToken);
                     freelancerProfile.ForeignLanguages.AddRange(languagesToAdd);
                 }
             }
-            _dbContext.FreelancerProfiles.Update(freelancerProfile);
+            _freelancerProfilesRepository.Update(freelancerProfile);
         }
 
 
         public async Task DeleteFreelancerProfileAsync(DeleteFreelancerProfileCommand deleteFreelancerProfileCommand,
             CancellationToken cancellationToken)
         {
-            var freelancerToDelete = await _dbContext.FreelancerProfiles
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.Id == deleteFreelancerProfileCommand.Id, cancellationToken);
+            var freelancerToDelete=await _freelancerProfilesRepository.Query()
+                .Where(x => x.Id == deleteFreelancerProfileCommand.Id)
+                .FirstOrDefaultAsync(cancellationToken);
+            
             if (freelancerToDelete is null)
             {
                 throw new NotFoundException(
@@ -244,7 +264,7 @@ namespace Frelance.Infrastructure.Services
 
             await _blobService.DeleteBlobAsync(StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(),
                 freelancerToDelete.UserId.ToString());
-            _dbContext.FreelancerProfiles.Remove(freelancerToDelete);
+            _freelancerProfilesRepository.Delete(freelancerToDelete);
         }
 
 

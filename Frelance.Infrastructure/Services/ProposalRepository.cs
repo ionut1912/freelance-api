@@ -14,27 +14,36 @@ namespace Frelance.Infrastructure.Services;
 
 public class ProposalRepository : IProposalRepository
 {
-    private readonly FrelanceDbContext _dbContext;
-    private readonly IUserAccessor _userAccessor;
 
-    public ProposalRepository(FrelanceDbContext dbContext, IUserAccessor userAccessor)
+    private readonly IUserAccessor _userAccessor;
+    private readonly IGenericRepository<Proposals> _proposalRepository;
+    private readonly IGenericRepository<Users> _userRepository;
+    private readonly IGenericRepository<Projects> _projectRepository;
+
+    public ProposalRepository(IUserAccessor userAccessor,
+        IGenericRepository<Proposals> proposalRepository,
+        IGenericRepository<Users> userRepository,
+        IGenericRepository<Projects> projectRepository)
     {
-        ArgumentNullException.ThrowIfNull(dbContext, nameof(dbContext));
         ArgumentNullException.ThrowIfNull(userAccessor, nameof(userAccessor));
-        _dbContext = dbContext;
+        ArgumentNullException.ThrowIfNull(proposalRepository, nameof(proposalRepository));
+        ArgumentNullException.ThrowIfNull(userRepository, nameof(userRepository));
+        ArgumentNullException.ThrowIfNull(projectRepository, nameof(projectRepository));
         _userAccessor = userAccessor;
+        _proposalRepository = proposalRepository;
+        _userRepository = userRepository;
+        _projectRepository = projectRepository;
     }
 
     public async Task AddProposalAsync(CreateProposalCommand createProposalCommand, CancellationToken cancellationToken)
-    {
-        var user = await _dbContext.Users.
-            AsNoTracking().
-            FirstOrDefaultAsync(x => x.UserName == _userAccessor.GetUsername(),
-            cancellationToken);
-        var project = await _dbContext.Projects
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Title == createProposalCommand.CreateProposalRequest.ProjectName,
-                cancellationToken);
+    { 
+        var user = await _userRepository.Query()
+            .Where(x => x.UserName == _userAccessor.GetUsername())
+            .FirstOrDefaultAsync(cancellationToken);
+        var project=await _projectRepository.Query()
+            .Where(x=>x.Title==createProposalCommand.CreateProposalRequest.ProjectName)
+            .FirstOrDefaultAsync(cancellationToken);
+        
         if (project == null)
         {
             throw new NotFoundException($"{nameof(Projects)} with {nameof(Projects.Title)}:{createProposalCommand.CreateProposalRequest.ProjectName} not found");
@@ -44,16 +53,16 @@ public class ProposalRepository : IProposalRepository
         proposal.ProjectId = project.Id;
         proposal.ProposerId = user.Id;
         proposal.Status = "Created";
-        await _dbContext.Proposals.AddAsync(proposal, cancellationToken);
+       await _proposalRepository.AddAsync(proposal,cancellationToken);
     }
 
     public async Task<ProposalsDto> GetProposalByIdAsync(GetProposalByIdQuery getProposalByIdQuery, CancellationToken cancellationToken)
     {
-        var proposal = await _dbContext.Proposals
-            .AsNoTracking()
+        var proposal=await _proposalRepository.Query()
+            .Where(x=>x.Id == getProposalByIdQuery.Id)
             .Include(x => x.Project)
             .Include(x => x.Proposer)
-            .FirstOrDefaultAsync(x => x.Id == getProposalByIdQuery.Id, cancellationToken);
+            .FirstOrDefaultAsync(cancellationToken);
 
         if (proposal is null)
         {
@@ -66,12 +75,10 @@ public class ProposalRepository : IProposalRepository
 
     public async Task<PaginatedList<ProposalsDto>> GetProposalsAsync(GetProposalsQuery getProposalsQuery, CancellationToken cancellationToken)
     {
-        var proposalsQuery = _dbContext.Proposals
-            .AsNoTracking()
-            .Include(x => x.Proposer)
+        var proposalsQuery=_proposalRepository.Query()
             .Include(x => x.Project)
+            .Include(x => x.Proposer)
             .ProjectToType<ProposalsDto>();
-
         var count = await proposalsQuery.CountAsync(cancellationToken);
         var items = await proposalsQuery
             .Skip((getProposalsQuery.PaginationParams.PageNumber - 1) * getProposalsQuery.PaginationParams.PageSize)
@@ -83,28 +90,26 @@ public class ProposalRepository : IProposalRepository
 
     public async Task UpdateProposalAsync(UpdateProposalCommand updateProposalCommand, CancellationToken cancellationToken)
     {
-        var proposalToUpdate = await _dbContext.Proposals
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Id == updateProposalCommand.Id, cancellationToken);
-
+        var proposalToUpdate = await _proposalRepository.Query()
+            .Where(x => x.Id == updateProposalCommand.Id)
+            .FirstOrDefaultAsync(cancellationToken);
         if (proposalToUpdate is null)
         {
             throw new NotFoundException($"{nameof(Proposals)}  with {nameof(Proposals.Id)}:{updateProposalCommand.Id} not found");
         }
         proposalToUpdate = updateProposalCommand.UpdateProposalRequest.Adapt<Proposals>();
-        _dbContext.Proposals.Update(proposalToUpdate);
+        _proposalRepository.Update(proposalToUpdate);
     }
 
     public async Task DeleteProposalAsync(DeleteProposalCommand deleteProposalCommand, CancellationToken cancellationToken)
     {
-        var proposalToDelete = await _dbContext.Proposals
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Id == deleteProposalCommand.Id, cancellationToken);
-
+        var proposalToDelete =await _proposalRepository.Query()
+            .Where(x => x.Id == deleteProposalCommand.Id)
+            .FirstOrDefaultAsync(cancellationToken);
         if (proposalToDelete is null)
         {
             throw new NotFoundException($"{nameof(Proposals)}  with {nameof(Proposals.Id)}:{deleteProposalCommand.Id} not found");
         }
-        _dbContext.Proposals.Remove(proposalToDelete);
+        _proposalRepository.Delete(proposalToDelete);
     }
 }
