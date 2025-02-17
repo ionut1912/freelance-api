@@ -8,5 +8,5 @@ public class Addresses
     public required string Street { get; set; }
     public required string StreetNumber { get; set; }
     public required string ZipCode { get; set; }
-    
+
 }

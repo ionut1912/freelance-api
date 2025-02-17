@@ -40,7 +40,7 @@ public class ReviewRepository : IReviewRepository
         {
             throw new NotFoundException($"{nameof(Users)} with {nameof(Users.UserName)} {_userAccessor.GetUsername()} not found");
         }
-        
+
         var review = createReviewCommand.CreateReviewRequest.Adapt<Reviews>();
         review.ReviewerId = user.Id;
         await _reviewRepository.AddAsync(review, cancellationToken);

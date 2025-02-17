@@ -71,7 +71,7 @@ namespace Frelance.Infrastructure.Services
             {
                 throw new NotFoundException("Addresses not found.");
             }
-            
+
             await _addressRepository.AddAsync(freelancerProfile.Addresses, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             freelancerProfile.AddressId = freelancerProfile.Addresses.Id;
@@ -188,9 +188,9 @@ namespace Frelance.Infrastructure.Services
                 && command.UpdateFreelancerProfileRequest.AddressCity is not null
                 && command.UpdateFreelancerProfileRequest.AddressStreet is not null
                 && command.UpdateFreelancerProfileRequest.AddressStreetNumber is not null
-                &&command.UpdateFreelancerProfileRequest.AddressZip is not null)
+                && command.UpdateFreelancerProfileRequest.AddressZip is not null)
             {
-         
+
                 var updatedAddress = new Addresses
                 {
                     Id = freelancerProfile.Addresses!.Id,

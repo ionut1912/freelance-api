@@ -80,7 +80,7 @@ public class AccountRepository : IAccountRepository
         }
 
         GenerateException(modelState);
-        
+
 
         return new UserDto(user.PhoneNumber!, await _tokenService.GenerateToken(user), user.UserName!, user.Email!, user.CreatedAt);
     }
