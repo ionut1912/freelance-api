@@ -36,14 +36,14 @@ public class ProposalRepository : IProposalRepository
     }
 
     public async Task AddProposalAsync(CreateProposalCommand createProposalCommand, CancellationToken cancellationToken)
-    { 
+    {
         var user = await _userRepository.Query()
             .Where(x => x.UserName == _userAccessor.GetUsername())
             .FirstOrDefaultAsync(cancellationToken);
-        var project=await _projectRepository.Query()
-            .Where(x=>x.Title==createProposalCommand.CreateProposalRequest.ProjectName)
+        var project = await _projectRepository.Query()
+            .Where(x => x.Title == createProposalCommand.CreateProposalRequest.ProjectName)
             .FirstOrDefaultAsync(cancellationToken);
-        
+
         if (project == null)
         {
             throw new NotFoundException($"{nameof(Projects)} with {nameof(Projects.Title)}:{createProposalCommand.CreateProposalRequest.ProjectName} not found");
@@ -53,13 +53,13 @@ public class ProposalRepository : IProposalRepository
         proposal.ProjectId = project.Id;
         proposal.ProposerId = user.Id;
         proposal.Status = "Created";
-       await _proposalRepository.AddAsync(proposal,cancellationToken);
+        await _proposalRepository.AddAsync(proposal, cancellationToken);
     }
 
     public async Task<ProposalsDto> GetProposalByIdAsync(GetProposalByIdQuery getProposalByIdQuery, CancellationToken cancellationToken)
     {
-        var proposal=await _proposalRepository.Query()
-            .Where(x=>x.Id == getProposalByIdQuery.Id)
+        var proposal = await _proposalRepository.Query()
+            .Where(x => x.Id == getProposalByIdQuery.Id)
             .Include(x => x.Project)
             .Include(x => x.Proposer)
             .FirstOrDefaultAsync(cancellationToken);
@@ -75,7 +75,7 @@ public class ProposalRepository : IProposalRepository
 
     public async Task<PaginatedList<ProposalsDto>> GetProposalsAsync(GetProposalsQuery getProposalsQuery, CancellationToken cancellationToken)
     {
-        var proposalsQuery=_proposalRepository.Query()
+        var proposalsQuery = _proposalRepository.Query()
             .Include(x => x.Project)
             .Include(x => x.Proposer)
             .ProjectToType<ProposalsDto>();
@@ -103,7 +103,7 @@ public class ProposalRepository : IProposalRepository
 
     public async Task DeleteProposalAsync(DeleteProposalCommand deleteProposalCommand, CancellationToken cancellationToken)
     {
-        var proposalToDelete =await _proposalRepository.Query()
+        var proposalToDelete = await _proposalRepository.Query()
             .Where(x => x.Id == deleteProposalCommand.Id)
             .FirstOrDefaultAsync(cancellationToken);
         if (proposalToDelete is null)

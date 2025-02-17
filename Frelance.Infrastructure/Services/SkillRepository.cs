@@ -13,7 +13,7 @@ public class SkillRepository : ISkillsRepository
     public SkillRepository(IGenericRepository<Skills> repository)
     {
         ArgumentNullException.ThrowIfNull(repository, nameof(repository));
-        _repository=repository;
+        _repository = repository;
     }
 
     public async Task<List<SkillDto>> GetSkillsAsync(CancellationToken cancellationToken)

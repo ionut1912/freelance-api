@@ -25,7 +25,7 @@ public class ClientProfileRepository : IClientProfileRepository
         IGenericRepository<Addresses> addressRepository,
         IGenericRepository<ClientProfiles> clientProfileRepository,
         IUnitOfWork unitOfWork,
-        IBlobService blobService, 
+        IBlobService blobService,
         IUserAccessor userAccessor)
     {
         ArgumentNullException.ThrowIfNull(userRepository, nameof(userRepository));
@@ -44,7 +44,7 @@ public class ClientProfileRepository : IClientProfileRepository
 
     public async Task AddClientProfileAsync(CreateClientProfileCommand clientProfileCommand, CancellationToken cancellationToken)
     {
-        var user=await _userRepository.Query().FirstOrDefaultAsync(x=>x.UserName == _userAccessor.GetUsername(), cancellationToken);
+        var user = await _userRepository.Query().FirstOrDefaultAsync(x => x.UserName == _userAccessor.GetUsername(), cancellationToken);
         if (user == null)
         {
             throw new InvalidOperationException("User not found.");
@@ -85,7 +85,7 @@ public class ClientProfileRepository : IClientProfileRepository
 
     public async Task<PaginatedList<ClientProfileDto>> GetClientProfilesAsync(GetClientProfilesQuery clientProfilesQuery, CancellationToken cancellationToken)
     {
-        var clientsQuery =_clientProfileRepository.Query()
+        var clientsQuery = _clientProfileRepository.Query()
             .Include(x => x.Users)
             .ThenInclude(x => x.Reviews)
             .Include(x => x.Users)
@@ -108,7 +108,7 @@ public class ClientProfileRepository : IClientProfileRepository
     public async Task UpdateClientProfileAsync(UpdateClientProfileCommand clientProfileCommand, CancellationToken cancellationToken)
     {
         var clientToUpdate = await _clientProfileRepository.Query()
-                                                         .Where(x=>x.Id == clientProfileCommand.Id)
+                                                         .Where(x => x.Id == clientProfileCommand.Id)
                                                          .AsNoTracking()
                                                          .Include(x => x.Addresses)
                                                          .FirstOrDefaultAsync(cancellationToken);
@@ -130,7 +130,7 @@ public class ClientProfileRepository : IClientProfileRepository
 
     public async Task DeleteClientProfileAsync(DeleteClientProfileCommand clientProfileCommand, CancellationToken cancellationToken)
     {
-        var clientToDelete=await _clientProfileRepository.Query()
+        var clientToDelete = await _clientProfileRepository.Query()
             .Where(x => x.Id == clientProfileCommand.Id)
             .FirstOrDefaultAsync(cancellationToken);
         if (clientToDelete is null)
