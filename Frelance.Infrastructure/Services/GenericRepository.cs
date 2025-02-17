@@ -4,14 +4,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Frelance.Infrastructure.Services;
 
-public class GenericRepository<T>: IGenericRepository<T> where T : class
+public class GenericRepository<T> : IGenericRepository<T> where T : class
 {
     private readonly FrelanceDbContext _dbContext;
     private readonly DbSet<T> _dbSet;
 
     public GenericRepository(FrelanceDbContext dbContext)
     {
-        ArgumentNullException.ThrowIfNull(dbContext,nameof(dbContext));
+        ArgumentNullException.ThrowIfNull(dbContext, nameof(dbContext));
         _dbContext = dbContext;
         _dbSet = _dbContext.Set<T>();
     }
@@ -23,7 +23,7 @@ public class GenericRepository<T>: IGenericRepository<T> where T : class
 
     public async Task AddAsync(T entity, CancellationToken cancellationToken)
     {
-       await _dbSet.AddAsync(entity, cancellationToken);
+        await _dbSet.AddAsync(entity, cancellationToken);
     }
 
     public async Task AddRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken)
@@ -33,7 +33,7 @@ public class GenericRepository<T>: IGenericRepository<T> where T : class
 
     public void Update(T entity)
     {
-       _dbSet.Update(entity);
+        _dbSet.Update(entity);
     }
 
     public void Delete(T entity)

@@ -36,10 +36,10 @@ public class TimeLogRepository : ITimeLogRepository
     }
     public async Task AddTimeLogAsync(CreateTimeLogCommand createTimeLogCommand, CancellationToken cancellationToken)
     {
-        var timeLogTask=await _projectTasksRepository.Query()
-            .Where(x=>x.Title==createTimeLogCommand.CreateTimeLogRequest.TaskTitle)
+        var timeLogTask = await _projectTasksRepository.Query()
+            .Where(x => x.Title == createTimeLogCommand.CreateTimeLogRequest.TaskTitle)
             .FirstOrDefaultAsync(cancellationToken);
-        
+
         if (timeLogTask is null)
         {
             throw new NotFoundException($"{nameof(ProjectTasks)} with {nameof(ProjectTasks.Title)} : '{createTimeLogCommand.CreateTimeLogRequest.TaskTitle}' does not exist");
@@ -70,8 +70,8 @@ public class TimeLogRepository : ITimeLogRepository
         {
             throw new NotFoundException($"{nameof(ProjectTasks)} with {nameof(ProjectTasks.Title)} : '{updateTimeLogCommand.UpdateTimeLogRequest.TaskTitle}' does not exist");
         }
-        var timeLogToUpdate=await _timeLogsRepository.Query()
-            .Where(x=>x.Id == updateTimeLogCommand.Id)
+        var timeLogToUpdate = await _timeLogsRepository.Query()
+            .Where(x => x.Id == updateTimeLogCommand.Id)
             .FirstOrDefaultAsync(cancellationToken);
         if (timeLogToUpdate is null)
         {
@@ -85,21 +85,21 @@ public class TimeLogRepository : ITimeLogRepository
 
     public async Task DeleteTimeLogAsync(DeleteTimeLogCommand deleteTimeLogCommand, CancellationToken cancellationToken)
     {
-        var timeLogToRemove=await _timeLogsRepository.Query()
-            .Where(x=>x.Id == deleteTimeLogCommand.Id)
+        var timeLogToRemove = await _timeLogsRepository.Query()
+            .Where(x => x.Id == deleteTimeLogCommand.Id)
             .FirstOrDefaultAsync(cancellationToken);
-        
+
         if (timeLogToRemove is null)
         {
             throw new NotFoundException($"{nameof(TimeLogs)} with {nameof(TimeLogs.Id)} : '{deleteTimeLogCommand.Id}' does not exist");
         }
-       _timeLogsRepository.Delete(timeLogToRemove);
+        _timeLogsRepository.Delete(timeLogToRemove);
     }
 
     public async Task<TimeLogDto> GetTimeLogByIdAsync(GetTimeLogByIdQuery getTimeLogByIdQuery, CancellationToken cancellationToken)
     {
-        var timeLog=await _timeLogsRepository.Query()
-            .Where(x=>x.Id == getTimeLogByIdQuery.Id)
+        var timeLog = await _timeLogsRepository.Query()
+            .Where(x => x.Id == getTimeLogByIdQuery.Id)
             .FirstOrDefaultAsync(cancellationToken);
         if (timeLog is null)
         {
@@ -110,7 +110,7 @@ public class TimeLogRepository : ITimeLogRepository
 
     public async Task<PaginatedList<TimeLogDto>> GetTimeLogsAsync(GetTimeLogsQuery getTimeLogsQuery, CancellationToken cancellationToken)
     {
-        var timeLogsQuery=_timeLogsRepository.Query()
+        var timeLogsQuery = _timeLogsRepository.Query()
             .ProjectToType<TimeLogDto>();
         var count = await timeLogsQuery.CountAsync(cancellationToken);
         var items = await timeLogsQuery

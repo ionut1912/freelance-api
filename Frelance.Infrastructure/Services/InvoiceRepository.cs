@@ -20,12 +20,12 @@ public class InvoiceRepository : IInvoiceRepository
     private readonly IGenericRepository<ClientProfiles> _clientProfileRepository;
     private readonly IGenericRepository<FreelancerProfiles> _freelancerProfileRepository;
     private readonly IGenericRepository<Projects> _projectRepository;
-    public InvoiceRepository( IBlobService blobService, 
+    public InvoiceRepository(IBlobService blobService,
         IUserAccessor userAccessor,
         IGenericRepository<Invoices> invoiceRepository,
         IGenericRepository<ClientProfiles> clientProfileRepository,
         IGenericRepository<FreelancerProfiles> freelancerProfileRepository,
-        IGenericRepository<Projects> projectRepository )
+        IGenericRepository<Projects> projectRepository)
     {
         ArgumentNullException.ThrowIfNull(blobService, nameof(blobService));
         ArgumentNullException.ThrowIfNull(userAccessor, nameof(userAccessor));
@@ -44,20 +44,20 @@ public class InvoiceRepository : IInvoiceRepository
     public async Task AddInvoiceAsync(CreateInvoiceCommand createInvoiceCommand, CancellationToken cancellationToken)
     {
 
-        var client=await _clientProfileRepository.Query()
-            .Where(x=>x.Users.UserName == createInvoiceCommand.CreateInvoiceRequest.ClientName)
-            .Include(x=>x.Users)
+        var client = await _clientProfileRepository.Query()
+            .Where(x => x.Users.UserName == createInvoiceCommand.CreateInvoiceRequest.ClientName)
+            .Include(x => x.Users)
             .FirstOrDefaultAsync(cancellationToken);
-        
+
         if (client is null)
         {
             throw new NotFoundException($"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Users.UserName)}: {createInvoiceCommand.CreateInvoiceRequest.ClientName} not foun");
         }
 
 
-        var freelancer=await _freelancerProfileRepository.Query()
-            .Where(x=>x.Users.UserName == _userAccessor.GetUsername())
-            .Include(x=>x.Users)
+        var freelancer = await _freelancerProfileRepository.Query()
+            .Where(x => x.Users.UserName == _userAccessor.GetUsername())
+            .Include(x => x.Users)
             .FirstOrDefaultAsync(cancellationToken);
 
         if (freelancer is null)
@@ -66,10 +66,10 @@ public class InvoiceRepository : IInvoiceRepository
                 $"{nameof(FreelancerProfiles)} with {nameof(ClientProfiles.Users.UserName)}: {_userAccessor.GetUsername()} not found");
         }
 
-        var project=await _projectRepository.Query()
-            .Where(x=>x.Title==createInvoiceCommand.CreateInvoiceRequest.ProjectName)
+        var project = await _projectRepository.Query()
+            .Where(x => x.Title == createInvoiceCommand.CreateInvoiceRequest.ProjectName)
             .FirstOrDefaultAsync(cancellationToken);
-        
+
         if (project is null)
         {
             throw new NotFoundException(
@@ -86,20 +86,20 @@ public class InvoiceRepository : IInvoiceRepository
             createInvoiceCommand.CreateInvoiceRequest.InvoiceFile);
         invoice.Status = "Submitted";
         await _invoiceRepository.AddAsync(invoice, cancellationToken);
-        
+
     }
 
     public async Task<InvoicesDto> GetInvoiceByIdAsync(GetInvoiceByIdQuery query, CancellationToken cancellationToken)
     {
         var invoice = await _invoiceRepository.Query()
-            .Where(x=>x.Id == query.Id)
+            .Where(x => x.Id == query.Id)
             .Include(x => x.Project)
             .Include(x => x.Client)
             .ThenInclude(x => x.Users)
             .Include(x => x.Freelancer)
             .ThenInclude(x => x.Users)
             .FirstOrDefaultAsync(cancellationToken);
-        
+
         if (invoice is null)
         {
             throw new NotFoundException($"{nameof(Invoices)} with {nameof(Invoices.Id)}: {query.Id} not found");
@@ -110,13 +110,13 @@ public class InvoiceRepository : IInvoiceRepository
 
     public async Task<PaginatedList<InvoicesDto>> GetInvoicesAsync(GetInvoicesQuery query, CancellationToken cancellationToken)
     {
-        
-        var invoicesQuery=_invoiceRepository.Query()
-            .Include(x=>x.Client)
-            .ThenInclude(x=>x.Users)
-            .Include(x=>x.Freelancer)
-            .ThenInclude(x=>x.Users)
-            .Include(x=>x.Project)
+
+        var invoicesQuery = _invoiceRepository.Query()
+            .Include(x => x.Client)
+            .ThenInclude(x => x.Users)
+            .Include(x => x.Freelancer)
+            .ThenInclude(x => x.Users)
+            .Include(x => x.Project)
             .ProjectToType<InvoicesDto>();
 
         var count = await invoicesQuery.CountAsync(cancellationToken);
@@ -133,7 +133,7 @@ public class InvoiceRepository : IInvoiceRepository
         var invoiceToUpdate = await _invoiceRepository.Query()
             .Where(x => x.Id == updateInvoiceCommand.Id)
             .FirstOrDefaultAsync(cancellationToken);
-        
+
         if (invoiceToUpdate is null)
         {
             throw new NotFoundException($"{nameof(Invoices)} with {nameof(Invoices.Id)}: {updateInvoiceCommand.Id} not found");
@@ -161,6 +161,6 @@ public class InvoiceRepository : IInvoiceRepository
             throw new NotFoundException($"{nameof(Invoices)} with {nameof(Invoices.Id)}: {deleteInvoiceCommand.Id} not found");
         }
         await _blobService.DeleteBlobAsync(StorageContainers.INVOICESCONTAINER.ToString().ToLower(), invoiceToDelete.ProjectId.ToString());
-       _invoiceRepository.Delete(invoiceToDelete);
+        _invoiceRepository.Delete(invoiceToDelete);
     }
 }

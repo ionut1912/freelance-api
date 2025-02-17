@@ -17,7 +17,7 @@ public class ReviewRepository : IReviewRepository
 {
     private readonly IUserAccessor _userAccessor;
     private readonly IGenericRepository<Users> _userRepository;
-    private readonly  IGenericRepository<Reviews> _reviewRepository;
+    private readonly IGenericRepository<Reviews> _reviewRepository;
 
     public ReviewRepository(IUserAccessor userAccessor
     , IGenericRepository<Users> userRepository
@@ -38,13 +38,13 @@ public class ReviewRepository : IReviewRepository
             .FirstOrDefaultAsync(cancellationToken);
         var review = createReviewCommand.CreateReviewRequest.Adapt<Reviews>();
         review.ReviewerId = user.Id;
-        await _reviewRepository.AddAsync(review,cancellationToken);
+        await _reviewRepository.AddAsync(review, cancellationToken);
     }
 
     public async Task<ReviewsDto> GetReviewsByIdAsync(GetReviewByIdQuery getReviewById, CancellationToken cancellationToken)
     {
-        var review= await _reviewRepository.Query()
-            .Where(x=>x.Id == getReviewById.Id)
+        var review = await _reviewRepository.Query()
+            .Where(x => x.Id == getReviewById.Id)
             .FirstOrDefaultAsync(cancellationToken);
         if (review is null)
         {
@@ -57,9 +57,9 @@ public class ReviewRepository : IReviewRepository
     public async Task<PaginatedList<ReviewsDto>> GetReviewsAsync(GetReviewsQuery query, CancellationToken cancellationToken)
     {
 
-        var reviewsQuery=_reviewRepository.Query()
+        var reviewsQuery = _reviewRepository.Query()
             .ProjectToType<ReviewsDto>();
-            
+
         var count = await reviewsQuery.CountAsync(cancellationToken);
         var items = await reviewsQuery
             .Skip((query.PaginationParams.PageNumber - 1) * query.PaginationParams.PageSize)
@@ -84,8 +84,8 @@ public class ReviewRepository : IReviewRepository
 
     public async Task DeleteReviewAsync(DeleteReviewCommand deleteReviewCommand, CancellationToken cancellationToken)
     {
-        var reviewToDelete=await _reviewRepository.Query()
-            .Where(x=>x.Id == deleteReviewCommand.Id)
+        var reviewToDelete = await _reviewRepository.Query()
+            .Where(x => x.Id == deleteReviewCommand.Id)
             .FirstOrDefaultAsync(cancellationToken);
         if (reviewToDelete is null)
         {

@@ -19,7 +19,7 @@ public class ProjectRepository : IProjectRepository
     private readonly IGenericRepository<Projects> _projectRepository;
     private readonly IGenericRepository<ProjectTechnologies> _projectTechnologyRepository;
     private readonly IUnitOfWork _unitOfWork;
- 
+
     public ProjectRepository(IGenericRepository<Projects> projectRepository,
         IGenericRepository<ProjectTechnologies> projectTechnologyRepository,
         IUnitOfWork unitOfWork)
@@ -31,7 +31,7 @@ public class ProjectRepository : IProjectRepository
         _projectRepository = projectRepository;
         _projectTechnologyRepository = projectTechnologyRepository;
         _unitOfWork = unitOfWork;
-        
+
     }
     public async Task AddProjectAsync(CreateProjectCommand createProjectCommand, CancellationToken cancellationToken)
     {
@@ -53,8 +53,8 @@ public class ProjectRepository : IProjectRepository
 
     public async Task UpdateProjectAsync(UpdateProjectCommand updateProjectCommand, CancellationToken cancellationToken)
     {
-        var projectToUpdate= await _projectRepository.Query()
-            .Where(x=>x.Id == updateProjectCommand.Id)
+        var projectToUpdate = await _projectRepository.Query()
+            .Where(x => x.Id == updateProjectCommand.Id)
             .FirstOrDefaultAsync(cancellationToken);
         if (projectToUpdate is null)
         {
@@ -67,8 +67,8 @@ public class ProjectRepository : IProjectRepository
 
     public async Task DeleteProjectAsync(DeleteProjectCommand deleteProjectCommand, CancellationToken cancellationToken)
     {
-        var projectToDelete=await _projectRepository.Query()
-            .Where(x=>x.Id == deleteProjectCommand.Id)
+        var projectToDelete = await _projectRepository.Query()
+            .Where(x => x.Id == deleteProjectCommand.Id)
             .FirstOrDefaultAsync(cancellationToken);
         if (projectToDelete is null)
         {
@@ -80,7 +80,7 @@ public class ProjectRepository : IProjectRepository
     public async Task<ProjectDto> FindProjectByIdAsync(GetProjectByIdQuery getProjectByIdQuery, CancellationToken cancellationToken)
     {
         var project = await _projectRepository.Query()
-            .Where(x=>x.Id == getProjectByIdQuery.Id)
+            .Where(x => x.Id == getProjectByIdQuery.Id)
             .Include(x => x.Tasks)
             .Include(x => x.Proposals)
             .Include(x => x.Contracts)
