@@ -49,7 +49,13 @@ public class ClientProfileRepository : IClientProfileRepository
         {
             throw new InvalidOperationException("User not found.");
         }
+
         var clientProfile = clientProfileCommand.CreateClientProfileRequest.Adapt<ClientProfiles>();
+        if (clientProfile.Addresses is null)
+        {
+            throw new NotFoundException($"Address not found.");
+        }
+        
         await _addressRepository.AddAsync(clientProfile.Addresses, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         clientProfile.UserId = user.Id;
@@ -66,9 +72,9 @@ public class ClientProfileRepository : IClientProfileRepository
         var clientProfile = await _clientProfileRepository.Query()
             .Where(x => x.Id == query.Id)
             .Include(cp => cp.Users)
-            .ThenInclude(u => u.Reviews)
+            .ThenInclude(u => u!.Reviews)
             .Include(cp => cp.Users)
-            .ThenInclude(u => u.Proposals)
+            .ThenInclude(u => u!.Proposals)
             .Include(cp => cp.Contracts)
             .Include(cp => cp.Invoices)
             .Include(x => x.Projects)
@@ -87,9 +93,9 @@ public class ClientProfileRepository : IClientProfileRepository
     {
         var clientsQuery = _clientProfileRepository.Query()
             .Include(x => x.Users)
-            .ThenInclude(x => x.Reviews)
+            .ThenInclude(x => x!.Reviews)
             .Include(x => x.Users)
-            .ThenInclude(x => x.Proposals)
+            .ThenInclude(x => x!.Proposals)
             .Include(x => x.Addresses)
             .Include(x => x.Contracts)
             .Include(x => x.Invoices)

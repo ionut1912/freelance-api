@@ -45,7 +45,7 @@ public class InvoiceRepository : IInvoiceRepository
     {
 
         var client = await _clientProfileRepository.Query()
-            .Where(x => x.Users.UserName == createInvoiceCommand.CreateInvoiceRequest.ClientName)
+            .Where(x => x.Users!.UserName == createInvoiceCommand.CreateInvoiceRequest.ClientName)
             .Include(x => x.Users)
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -56,7 +56,7 @@ public class InvoiceRepository : IInvoiceRepository
 
 
         var freelancer = await _freelancerProfileRepository.Query()
-            .Where(x => x.Users.UserName == _userAccessor.GetUsername())
+            .Where(x => x.Users!.UserName == _userAccessor.GetUsername())
             .Include(x => x.Users)
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -95,9 +95,9 @@ public class InvoiceRepository : IInvoiceRepository
             .Where(x => x.Id == query.Id)
             .Include(x => x.Project)
             .Include(x => x.Client)
-            .ThenInclude(x => x.Users)
+            .ThenInclude(x => x!.Users)
             .Include(x => x.Freelancer)
-            .ThenInclude(x => x.Users)
+            .ThenInclude(x => x!.Users)
             .FirstOrDefaultAsync(cancellationToken);
 
         if (invoice is null)
@@ -113,9 +113,9 @@ public class InvoiceRepository : IInvoiceRepository
 
         var invoicesQuery = _invoiceRepository.Query()
             .Include(x => x.Client)
-            .ThenInclude(x => x.Users)
+            .ThenInclude(x => x!.Users)
             .Include(x => x.Freelancer)
-            .ThenInclude(x => x.Users)
+            .ThenInclude(x => x!.Users)
             .Include(x => x.Project)
             .ProjectToType<InvoicesDto>();
 

@@ -43,7 +43,7 @@ public class TaskRepository : ITaskRepository
         }
 
         var freelancerProfile = await _freelancerRepository.Query()
-            .Where(x => x.Users.UserName == createTaskCommand.CreateProjectTaskRequest.FreelancerUsername)
+            .Where(x => x.Users!.UserName == createTaskCommand.CreateProjectTaskRequest.FreelancerUsername)
             .Include(x => x.Users)
             .FirstOrDefaultAsync(cancellationToken);
         if (freelancerProfile is null)

@@ -49,7 +49,7 @@ public class TimeLogRepository : ITimeLogRepository
         timeLog.TaskId = timeLogTask.Id;
         timeLog.TotalHours = createTimeLogCommand.CreateTimeLogRequest.EndTime.Hour - createTimeLogCommand.CreateTimeLogRequest.StartTime.Hour;
         var freelancerProfile = _freelancerProfilesRepository.Query()
-            .Where(x => x.Users.UserName == _userAccessor.GetUsername())
+            .Where(x => x.Users!.UserName == _userAccessor.GetUsername())
             .Include(x => x.Users)
             .FirstOrDefaultAsync(cancellationToken);
         timeLog.FreelancerProfileId = freelancerProfile.Id;
