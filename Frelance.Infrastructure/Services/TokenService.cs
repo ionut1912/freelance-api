@@ -27,7 +27,7 @@ public class TokenService
 
     public async Task<string> GenerateToken(Users user)
     {
-        
+
         var claims = new List<Claim>
         {
             new(ClaimTypes.Email, user.Email!),

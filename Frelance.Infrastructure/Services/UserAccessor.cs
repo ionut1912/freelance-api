@@ -18,7 +18,7 @@ public class UserAccessor : IUserAccessor
     public string GetUsername()
     {
         var username = _httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.Name)?.Value;
-        return username?? throw new NotFoundException($"{nameof(Users)} with {nameof(Users.UserName)}: {username} not found");
+        return username ?? throw new NotFoundException($"{nameof(Users)} with {nameof(Users.UserName)}: {username} not found");
     }
 
 }

@@ -55,7 +55,7 @@ public class ClientProfileRepository : IClientProfileRepository
         {
             throw new NotFoundException($"Address not found.");
         }
-        
+
         await _addressRepository.AddAsync(clientProfile.Addresses, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         clientProfile.UserId = user.Id;
