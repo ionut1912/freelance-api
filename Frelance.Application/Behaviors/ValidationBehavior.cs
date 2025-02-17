@@ -7,6 +7,7 @@ namespace Frelance.Application.Behaviors;
 
 
 public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+    where TRequest : notnull
 {
     private readonly IEnumerable<IValidator<TRequest>> _validators;
 
@@ -28,7 +29,6 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
             .SelectMany(x => x.Errors)
             .Select(x => new ValidationError(x.PropertyName, x.ErrorMessage))
             .ToList();
-
 
         if (failures.Count > 0)
         {
