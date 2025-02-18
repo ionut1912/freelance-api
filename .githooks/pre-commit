@@ -1,2 +1,13 @@
 #!/bin/sh
-dotnet format && git add .
+if ! command -v dotnet >/dev/null 2>&1; then
+  echo "dotnet is not found in PATH"
+  exit 1
+fi
+
+dotnet format
+if [ $? -eq 0 ]; then
+  git add .
+else
+  echo "dotnet format failed"
+  exit 1
+fi
