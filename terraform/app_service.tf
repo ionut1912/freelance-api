@@ -34,7 +34,7 @@ resource "azurerm_linux_web_app" "app_service" {
     "AzureKeyVault__JWTTokenSecretName"         = "jwt-token-key",
     "AZURE_AUTHORITY_HOST"                      = "https://login.microsoftonline.com/",
     "AZURE_IDENTITY_DISABLE_IMDS"               = "0",
-    "WEBSITES_CONTAINER_START_TIME_LIMIT"       = "900",
+    "WEBSITES_CONTAINER_START_TIME_LIMIT"       = "1300",
     "PORT"                                      = "80",
     "WEBSITES_PORT"                             = "80"
   }
