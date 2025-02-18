@@ -27,7 +27,7 @@ resource "azurerm_linux_web_app" "app_service" {
   }
 
   app_settings = {
-    "DOCKER_CUSTOM_IMAGE_NAME"                  = "${azurerm_container_registry.acr.login_server}/frelance-api:latest",
+    "DOCKER_CUSTOM_IMAGE_NAME"                  = "${azurerm_container_registry.acr.login_server}/freelance-api:latest",
     "AzureKeyVault__VaultUrl"                   = azurerm_key_vault.keyvault.vault_uri,
     "AzureKeyVault__ConnectionStringSecretName" = "db-connection-string",
     "AzureKeyVault__StorageConnectionString"    = "storage-connection-string",
