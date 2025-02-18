@@ -89,6 +89,24 @@ public class ClientProfileRepository : IClientProfileRepository
         return clientProfile.Adapt<ClientProfileDto>();
     }
 
+    public async Task<ClientProfileDto?> GetLoggedInClientProfileAsync(GetLoggedInClientProfileQuery loggedInClientProfileQuery,
+        CancellationToken cancellationToken)
+    {
+        var profile = await _clientProfileRepository.Query()
+            .Where(x => x.Users!.UserName == _userAccessor.GetUsername())
+            .Include(x => x.Users)
+            .ThenInclude(x => x!.Reviews)
+            .Include(x => x.Users)
+            .ThenInclude(x => x!.Proposals)
+            .Include(x => x.Contracts)
+            .Include(x => x.Invoices)
+            .Include(x => x.Projects)
+            .Include(x => x.Addresses)
+            .FirstOrDefaultAsync(cancellationToken);
+        return profile.Adapt<ClientProfileDto>();
+
+    }
+
     public async Task<PaginatedList<ClientProfileDto>> GetClientProfilesAsync(GetClientProfilesQuery clientProfilesQuery, CancellationToken cancellationToken)
     {
         var clientsQuery = _clientProfileRepository.Query()

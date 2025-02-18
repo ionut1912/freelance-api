@@ -60,21 +60,20 @@ namespace Frelance.Infrastructure.Mappings
                 .NewConfig()
                 .Map(dest => dest.CreateClientProfileRequest, src => src);
 
-            TypeAdapterConfig<CreateClientProfileCommand, ClientProfiles>
+            TypeAdapterConfig<CreateClientProfileRequest, ClientProfiles>
                 .NewConfig()
-                .Map(dest => dest.Addresses, src =>
-                    new Addresses
-                    {
-                        Country = src.CreateClientProfileRequest.AddressCountry,
-                        City = src.CreateClientProfileRequest.AddressCity,
-                        Street = src.CreateClientProfileRequest.AddressStreet,
-                        StreetNumber = src.CreateClientProfileRequest.AddressStreetNumber,
-                        ZipCode = src.CreateClientProfileRequest.AddressZip
-                    })
-                .Map(dest => dest.Bio, src => src.CreateClientProfileRequest.Bio)
+                .Map(dest => dest.Bio, src => src.Bio)
                 .AfterMapping((src, dest) =>
                 {
                     dest.CreatedAt = DateTime.UtcNow;
+                    dest.Addresses = new Addresses
+                    {
+                        Country = src.AddressCountry,
+                        City = src.AddressCity,
+                        Street = src.AddressStreet,
+                        StreetNumber = src.AddressStreetNumber,
+                        ZipCode = src.AddressZip
+                    };
                 });
 
             TypeAdapterConfig<ClientProfiles, ClientProfileDto>
@@ -239,7 +238,7 @@ namespace Frelance.Infrastructure.Mappings
                 .Map(dest => dest.Rating, src => src.Rating)
                 .Map(dest => dest.PortfolioUrl, src => src.PortfolioUrl)
                 .Ignore(dest => dest.Skills)
-                .Ignore(dest => dest.ForeignLanguages) // Prevent automatic mapping of foreign languages.
+                .Ignore(dest => dest.ForeignLanguages)
                 .AfterMapping((src, dest) =>
                 {
                     dest.Addresses = new Addresses
@@ -251,25 +250,19 @@ namespace Frelance.Infrastructure.Mappings
                         ZipCode = src.AddressZip
                     };
 
-                    if (src.ProgrammingLanguages != null && src.Areas != null)
+                    var count = Math.Min(src.ProgrammingLanguages.Count, src.Areas.Count);
+                    for (var i = 0; i < count; i++)
                     {
-                        var count = Math.Min(src.ProgrammingLanguages.Count, src.Areas.Count);
-                        for (var i = 0; i < count; i++)
+                        dest.Skills.Add(new Skills
                         {
-                            dest.Skills.Add(new Skills
-                            {
-                                ProgrammingLanguage = src.ProgrammingLanguages[i],
-                                Area = src.Areas[i]
-                            });
-                        }
+                            ProgrammingLanguage = src.ProgrammingLanguages[i],
+                            Area = src.Areas[i]
+                        });
                     }
 
-                    if (src.ForeignLanguages != null)
-                    {
-                        dest.ForeignLanguages = src.ForeignLanguages
-                            .Select(lang => new FreelancerForeignLanguage { Language = lang })
-                            .ToList();
-                    }
+                    dest.ForeignLanguages = src.ForeignLanguages
+                        .Select(lang => new FreelancerForeignLanguage { Language = lang })
+                        .ToList();
                     dest.CreatedAt = DateTime.UtcNow;
                 });
 

@@ -38,6 +38,13 @@ namespace Frelance.Web.Modules
                     paginatedClientProfiles.TotalCount, paginatedClientProfiles.TotalPages, paginatedClientProfiles.Items);
             }).WithTags("ClientProfiles").
             RequireAuthorization();
+            app.MapGet("/api/current/clientProfiles",
+                async (IMediator mediator, CancellationToken ct) =>
+                {
+                    var clientProfile = await mediator.Send(new GetLoggedInClientProfileQuery(), ct);
+                    return Results.Ok(clientProfile);
+                }).WithTags("ClientProfiles")
+                .RequireAuthorization("ClientRole");
             var updateClientProfileEndpoint = app.MapPut("/api/clientProfiles/{id}", async (IMediator mediator, int id,
                 [FromForm] UpdateClientProfileRequest updateClientProfileRequest, CancellationToken ct) =>
                 {
