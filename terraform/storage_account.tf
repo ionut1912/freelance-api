@@ -11,19 +11,19 @@ resource "azurerm_storage_account" "storage" {
 }
 
 resource "azurerm_storage_container" "user_images" {
-  name                  = "userimagescontainer"
+  name                  = "userimages"
   storage_account_name  = azurerm_storage_account.storage.name
   container_access_type = "blob"
 }
 
 resource "azurerm_storage_container" "invoices" {
-  name                  = "invoicescontainer"
+  name                  = "invoices"
   storage_account_name  = azurerm_storage_account.storage.name
   container_access_type = "blob"
 }
 
 resource "azurerm_storage_container" "contracts" {
-  name                  = "contractscontainer"
+  name                  = "contracts"
   storage_account_name  = azurerm_storage_account.storage.name
   container_access_type = "blob"
 }
