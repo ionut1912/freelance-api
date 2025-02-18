@@ -1,3 +1,8 @@
+data "azurerm_storage_account_keys" "storage_keys" {
+  resource_group_name  = azurerm_storage_account.storage.resource_group_name
+  storage_account_name = azurerm_storage_account.storage.name
+}
+
 resource "azurerm_key_vault" "keyvault" {
   name                      = "freelance-api-keyvault"
   resource_group_name       = azurerm_resource_group.main.name
@@ -79,6 +84,6 @@ resource "azurerm_key_vault_secret" "db_connection_string" {
 
 resource "azurerm_key_vault_secret" "storage_connection_string" {
   name         = "storage-connection-string"
-  value        = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.storage.name};AccountKey=${azurerm_storage_account.storage.primary_access_key};EndpointSuffix=core.windows.net"
+  value        = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.storage.name};AccountKey=${data.azurerm_storage_account_keys.storage_keys.keys[0].value};EndpointSuffix=core.windows.net"
   key_vault_id = azurerm_key_vault.keyvault.id
 }
