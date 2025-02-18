@@ -137,18 +137,40 @@ namespace Frelance.Infrastructure.Services
             return profile.Adapt<FreelancerProfileDto>();
         }
 
+        public async Task<FreelancerProfileDto?> GetLoggedInFreelancerProfileAsync(GetLoggedInFreelancerProfileQuery getLoggedInFreelancerProfileQuery,
+            CancellationToken cancellationToken)
+        {
+            var  profile=await _freelancerProfilesRepository.Query()
+                .Where(x=>x.Users!.UserName==_userAccessor.GetUsername())
+                .Include(fp => fp.Users)
+                .ThenInclude(u => u!.Reviews)
+                .Include(fp => fp.Users)
+                .ThenInclude(u => u!.Proposals)
+                .Include(fp => fp.Contracts)
+                .Include(fp => fp.Invoices)
+                .Include(fp => fp.Skills)
+                .Include(x => x.Addresses)
+                .Include(x => x.ForeignLanguages)
+                .Include(x => x.Tasks)
+                .Include(x => x.Projects)
+                .FirstOrDefaultAsync(cancellationToken);
+            return profile.Adapt<FreelancerProfileDto>();
+        }
+
         public async Task<PaginatedList<FreelancerProfileDto>> GetAllFreelancerProfilesAsync(GetFreelancerProfilesQuery query, CancellationToken cancellationToken)
         {
 
             var freelancersProfilesQuery = _freelancerProfilesRepository.Query()
-                .Include(x => x.Users)
-                .ThenInclude(x => x!.Reviews)
-                .Include(x => x.Users)
-                .ThenInclude(x => x!.Proposals)
+                .Include(fp => fp.Users)
+                .ThenInclude(u => u!.Reviews)
+                .Include(fp => fp.Users)
+                .ThenInclude(u => u!.Proposals)
+                .Include(fp => fp.Contracts)
+                .Include(fp => fp.Invoices)
+                .Include(fp => fp.Skills)
                 .Include(x => x.Addresses)
-                .Include(f => f.Tasks)
-                .Include(x => x.Skills)
                 .Include(x => x.ForeignLanguages)
+                .Include(x => x.Tasks)
                 .Include(x => x.Projects)
                 .ProjectToType<FreelancerProfileDto>();
 
