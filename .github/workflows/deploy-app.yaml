@@ -37,23 +37,23 @@ jobs:
         working-directory: .
         
       - name: Docker login to ACR
-        run: az acr login --name frelanceacr
+        run: az acr login --name freelanceacr
 
       - name: Build Docker image
-        run: docker build -t frelance-api .
+        run: docker build -t freelance-api .
 
       - name: Tag Docker image
-        run: docker tag frelance-api frelanceacr.azurecr.io/frelance-api:latest
+        run: docker tag freelance-api freelanceacr.azurecr.io/freelance-api:latest
 
       - name: Push Docker image to ACR
-        run: docker push frelanceacr.azurecr.io/frelance-api:latest
+        run: docker push freelanceacr.azurecr.io/freelance-api:latest
 
       - name: Deploy Docker image to Azure App Service
         uses: azure/webapps-deploy@v2
         with:
-          app-name: frelance-api
-          images: frelanceacr.azurecr.io/frelance-api:latest
+          app-name: freelance-api
+          images: freelanceacr.azurecr.io/freelance-api:latest
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
 
       - name: Restart Azure App Service
-        run: az webapp restart --name frelance-api --resource-group frelance-api
+        run: az webapp restart --name freelance-api --resource-group freelance-api
