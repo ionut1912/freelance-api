@@ -1,9 +1,9 @@
 resource "azurerm_key_vault" "keyvault" {
-  name                      = "freelance-api-keyvault"
-  resource_group_name       = azurerm_resource_group.main.name
-  location                  = azurerm_resource_group.main.location
-  sku_name                  = "standard"
-  tenant_id                 = "5c384fed-84cc-44a6-b34a-b060bf102a6e"
+  name                = "freelance-api-keyvault"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  sku_name            = "standard"
+  tenant_id           = "5c384fed-84cc-44a6-b34a-b060bf102a6e"
   enable_rbac_authorization = false
 }
 
