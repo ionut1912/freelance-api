@@ -1,59 +1,59 @@
-# name: Deploy to Azure (Terraform & Docker via Publish Profile)
+name: Deploy to Azure (Terraform & Docker via Publish Profile)
 
-# on:
-#   push:
-#     branches:
-#       - master
+on:
+  push:
+    branches:
+      - master
 
-# jobs:
-#   build-and-deploy:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout repository
-#         uses: actions/checkout@v4
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-#       - name: Manually Login to Azure
-#         run: |
-#           az login --use-device-code
-#           az account set --subscription ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DCC19E65B4AF4106B1ED3942B9CDF939 }}
+      - name: Manually Login to Azure
+        run: |
+          az login --use-device-code
+          az account set --subscription ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DCC19E65B4AF4106B1ED3942B9CDF939 }}
 
-#       - name: Set up Terraform
-#         uses: hashicorp/setup-terraform@v3
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
 
-#       - name: Check Terraform Formatting
-#         run: terraform fmt -check
-#         working-directory: terraform
+      - name: Check Terraform Formatting
+        run: terraform fmt -check
+        working-directory: terraform
 
-#       - name: Terraform Init
-#         run: terraform init
-#         working-directory: terraform
+      - name: Terraform Init
+        run: terraform init
+        working-directory: terraform
 
-#       - name: Terraform Apply
-#         run: terraform apply -auto-approve
-#         working-directory: terraform
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+        working-directory: terraform
 
-#       - name: C# Format Check
-#         run: dotnet tool install -g dotnet-format && dotnet format --verify-no-changes
-#         working-directory: .
+      - name: C# Format Check
+        run: dotnet tool install -g dotnet-format && dotnet format --verify-no-changes
+        working-directory: .
         
-#       - name: Docker login to ACR
-#         run: az acr login --name frelanceacr
+      - name: Docker login to ACR
+        run: az acr login --name frelanceacr
 
-#       - name: Build Docker image
-#         run: docker build -t frelance-api .
+      - name: Build Docker image
+        run: docker build -t frelance-api .
 
-#       - name: Tag Docker image
-#         run: docker tag frelance-api frelanceacr.azurecr.io/frelance-api:latest
+      - name: Tag Docker image
+        run: docker tag frelance-api frelanceacr.azurecr.io/frelance-api:latest
 
-#       - name: Push Docker image to ACR
-#         run: docker push frelanceacr.azurecr.io/frelance-api:latest
+      - name: Push Docker image to ACR
+        run: docker push frelanceacr.azurecr.io/frelance-api:latest
 
-#       - name: Deploy Docker image to Azure App Service
-#         uses: azure/webapps-deploy@v2
-#         with:
-#           app-name: frelance-api
-#           images: frelanceacr.azurecr.io/frelance-api:latest
-#           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+      - name: Deploy Docker image to Azure App Service
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: frelance-api
+          images: frelanceacr.azurecr.io/frelance-api:latest
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
 
-#       - name: Restart Azure App Service
-#         run: az webapp restart --name frelance-api --resource-group frelance-api
+      - name: Restart Azure App Service
+        run: az webapp restart --name frelance-api --resource-group frelance-api
