@@ -312,9 +312,9 @@ namespace Frelance.Infrastructure.Mappings
                             .ToList();
                     }
                     dest.Experience = src.Experience ?? dest.Experience;
-                    dest.Rate = src.Rate ?? dest.Rate;
+                    dest.Rate = src.Rate;
                     dest.Currency = src.Currency ?? dest.Currency;
-                    dest.Rating = src.Rating ?? dest.Rating;
+                    dest.Rating = src.Rating;
                     dest.PortfolioUrl = src.PortfolioUrl ?? dest.PortfolioUrl;
                     dest.UpdatedAt = DateTime.UtcNow;
                 });
@@ -408,7 +408,7 @@ namespace Frelance.Infrastructure.Mappings
                 .NewConfig()
                 .AfterMapping((src, dest) =>
                 {
-                    dest.ProposedBudget = src.ProposedBudget ?? dest.ProposedBudget;
+                    dest.ProposedBudget = src.ProposedBudget;
                     dest.Status = src.Status ?? dest.Status;
                     dest.UpdatedAt = DateTime.UtcNow;
                 });
@@ -496,14 +496,14 @@ namespace Frelance.Infrastructure.Mappings
             TypeAdapterConfig<FreelancerProfiles, FreelancerProfileDto>
                 .NewConfig()
                 .Map(dest => dest.Id, src => src.Id)
-                .Map(dest => dest.UserProfileDto, src => src.Users.Adapt<UserProfileDto>())
-                .Map(dest => dest.AddressDto, src => src.Addresses.Adapt<AddressDto>())
+                .Map(dest => dest.UserProfile, src => src.Users.Adapt<UserProfileDto>())
+                .Map(dest => dest.Address, src => src.Addresses.Adapt<AddressDto>())
                 .Map(dest => dest.Bio, src => src.Bio)
                 .Map(dest => dest.ProfileImageUrl, src => src.ProfileImageUrl)
-                .Map(dest => dest.TaskDtos, src => src.Tasks.Adapt<List<TaskDto>>())
-                .Map(dest => dest.SkillDtos, src => src.Skills.Adapt<List<SkillDto>>())
+                .Map(dest => dest.Tasks, src => src.Tasks.Adapt<List<TaskDto>>())
+                .Map(dest => dest.Skills, src => src.Skills.Adapt<List<SkillDto>>())
                 .Map(dest => dest.ForeignLanguages, src => src.ForeignLanguages.Adapt<List<ForeignLanguageDto>>())
-                .Map(dest => dest.ProjectDtos, src => src.Projects.Adapt<List<ProjectDto>>())
+                .Map(dest => dest.Projects, src => src.Projects.Adapt<List<ProjectDto>>())
                 .Map(dest => dest.IsAvailable, src => src.IsAvailable)
                 .Map(dest => dest.Experience, src => src.Experience)
                 .Map(dest => dest.Rate, src => src.Rate)
