@@ -1,5 +1,5 @@
 resource "azurerm_key_vault" "keyvault" {
-  name                = "frelance-api-keyvault"
+  name                = "freelance-api-keyvault"
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
   sku_name            = "standard"

@@ -1,5 +1,5 @@
 resource "azurerm_mssql_server" "sql_server" {
-  name                         = "frelance-db"
+  name                         = "freelance-db"
   resource_group_name          = azurerm_resource_group.main.name
   location                     = azurerm_resource_group.main.location
   version                      = "12.0"
@@ -8,7 +8,7 @@ resource "azurerm_mssql_server" "sql_server" {
 }
 
 resource "azurerm_mssql_database" "sql_database" {
-  name           = "frelance-db"
+  name           = "freelance-db"
   server_id      = azurerm_mssql_server.sql_server.id
   sku_name       = var.sql_sku_name
   max_size_gb    = 2
