@@ -1,7 +1,7 @@
 resource "azurerm_storage_account" "storage" {
   name                     = "usersprofiles"
   resource_group_name      = var.resource_group_name
-  location                 = azurerm_resource_group.main.location
+  location                 = var.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
 
