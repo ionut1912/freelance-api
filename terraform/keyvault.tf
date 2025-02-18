@@ -1,5 +1,5 @@
 resource "azurerm_key_vault" "keyvault" {
-  name                = "frelance-api-keyvault"
+  name                = "freelance-api-keyvault"
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
   sku_name            = "standard"
@@ -11,20 +11,9 @@ resource "azurerm_key_vault_access_policy" "app_service_access" {
   tenant_id    = azurerm_key_vault.keyvault.tenant_id
   object_id    = "df66e3ec-c251-4294-8587-4721f1ac225e"
 
-  secret_permissions = [
-    "Get",
-    "List"
-  ]
-
-  key_permissions = [
-    "Get",
-    "List"
-  ]
-
-  certificate_permissions = [
-    "Get",
-    "List"
-  ]
+  secret_permissions      = ["Get", "List"]
+  key_permissions         = ["Get", "List"]
+  certificate_permissions = ["Get", "List"]
 }
 
 resource "azurerm_key_vault_secret" "jwt_token_key" {
@@ -38,24 +27,9 @@ resource "azurerm_key_vault_access_policy" "user_access" {
   tenant_id    = "5c384fed-84cc-44a6-b34a-b060bf102a6e"
   object_id    = "fe4c5ebe-84a4-4bea-9a09-57fbfe9b0bcb"
 
-  secret_permissions = [
-    "Get",
-    "List",
-    "Set",
-    "Delete",
-    "Purge",
-    "Recover"
-  ]
-
-  key_permissions = [
-    "Get",
-    "List"
-  ]
-
-  certificate_permissions = [
-    "Get",
-    "List"
-  ]
+  secret_permissions      = ["Get", "List", "Set", "Delete", "Purge", "Recover"]
+  key_permissions         = ["Get", "List"]
+  certificate_permissions = ["Get", "List"]
 }
 
 resource "azurerm_key_vault_secret" "sql_admin_username" {
@@ -78,6 +52,9 @@ resource "azurerm_key_vault_secret" "db_connection_string" {
 
 resource "azurerm_key_vault_secret" "storage_connection_string" {
   name         = "storage-connection-string"
-  value        = "DefaultEndpointsProtocol=https;AccountName=usersprofiles;AccountKey=${var.storage_account_access_key};EndpointSuffix=core.windows.net"
+  value        = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.storage.name};AccountKey=${azurerm_storage_account.storage.primary_access_key};EndpointSuffix=core.windows.net"
   key_vault_id = azurerm_key_vault.keyvault.id
+
+  # Ensures the secret is created only after the storage account is fully available:
+  depends_on = [azurerm_storage_account.storage]
 }
