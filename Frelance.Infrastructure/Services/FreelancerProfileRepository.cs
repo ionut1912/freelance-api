@@ -140,8 +140,8 @@ namespace Frelance.Infrastructure.Services
         public async Task<FreelancerProfileDto?> GetLoggedInFreelancerProfileAsync(GetLoggedInFreelancerProfileQuery getLoggedInFreelancerProfileQuery,
             CancellationToken cancellationToken)
         {
-            var  profile=await _freelancerProfilesRepository.Query()
-                .Where(x=>x.Users!.UserName==_userAccessor.GetUsername())
+            var profile = await _freelancerProfilesRepository.Query()
+                .Where(x => x.Users!.UserName == _userAccessor.GetUsername())
                 .Include(fp => fp.Users)
                 .ThenInclude(u => u!.Reviews)
                 .Include(fp => fp.Users)

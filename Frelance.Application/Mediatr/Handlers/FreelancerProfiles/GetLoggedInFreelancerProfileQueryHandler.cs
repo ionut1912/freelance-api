@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.FreelancerProfiles;
 
-public class GetLoggedInFreelancerProfileQueryHandler:IRequestHandler<GetLoggedInFreelancerProfileQuery,FreelancerProfileDto?>
+public class GetLoggedInFreelancerProfileQueryHandler : IRequestHandler<GetLoggedInFreelancerProfileQuery, FreelancerProfileDto?>
 {
     private readonly IFreelancerProfileRepository _freelancerProfileRepository;
 
@@ -14,7 +14,7 @@ public class GetLoggedInFreelancerProfileQueryHandler:IRequestHandler<GetLoggedI
         ArgumentNullException.ThrowIfNull(freelancerProfileRepository, nameof(freelancerProfileRepository));
         _freelancerProfileRepository = freelancerProfileRepository;
     }
-    
+
     public async Task<FreelancerProfileDto?> Handle(GetLoggedInFreelancerProfileQuery request, CancellationToken cancellationToken)
     {
         return await _freelancerProfileRepository.GetLoggedInFreelancerProfileAsync(request, cancellationToken);
