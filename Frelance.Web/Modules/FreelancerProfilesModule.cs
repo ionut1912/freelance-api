@@ -41,7 +41,7 @@ public static class FreelancerProfilesModule
                     paginatedFreelancerProfiles.TotalCount, paginatedFreelancerProfiles.TotalPages, paginatedFreelancerProfiles.Items);
             }).WithTags("FreelancerProfiles").
             RequireAuthorization();
-        
+
         app.MapGet("/api/current/freelancerProfiles",
                 async (IMediator mediator, CancellationToken ct) =>
                 {
@@ -49,7 +49,7 @@ public static class FreelancerProfilesModule
                     return Results.Ok(freelancerProfile);
                 }).WithTags("FreelancerProfiles")
             .RequireAuthorization("FreelancerRole");
-        
+
         var updateFreelancerProfileEndpoint = app.MapPut("/api/freelancerProfiles/{id}", async (IMediator mediator, int id,
                 [FromForm] UpdateFreelancerProfileRequest updateFreelancerProfileRequest, CancellationToken ct) =>
             {
