@@ -9,7 +9,7 @@ resource "azurerm_key_vault" "keyvault" {
 resource "azurerm_key_vault_access_policy" "app_service_access" {
   key_vault_id = azurerm_key_vault.keyvault.id
   tenant_id    = azurerm_key_vault.keyvault.tenant_id
-  object_id    = "df66e3ec-c251-4294-8587-4721f1ac225e"
+  object_id    = "0f7db1d5-76d4-4759-91ea-7d335f63e491"
 
   secret_permissions      = ["Get", "List"]
   key_permissions         = ["Get", "List"]
@@ -29,7 +29,7 @@ resource "azurerm_key_vault_secret" "jwt_token_key" {
   name         = "jwt-token-key"
   value        = "this is a secret key and needs to be a long string"
   key_vault_id = azurerm_key_vault.keyvault.id
-  depends_on = [azurerm_key_vault_access_policy.work_account_access]
+  depends_on   = [azurerm_key_vault_access_policy.work_account_access]
 }
 
 resource "azurerm_key_vault_secret" "sql_admin_username" {
