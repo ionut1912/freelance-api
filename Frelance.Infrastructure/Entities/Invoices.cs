@@ -12,6 +12,5 @@ public class Invoices
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public decimal Amount { get; set; }
-    public required string InvoiceFileUrl { get; set; }
     public required string Status { get; set; }
 }

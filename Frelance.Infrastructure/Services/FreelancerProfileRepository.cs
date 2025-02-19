@@ -2,7 +2,6 @@ using Frelance.Application.Helpers;
 using Frelance.Application.Mediatr.Commands.FreelancerProfiles;
 using Frelance.Application.Mediatr.Queries.FreelancerProfiles;
 using Frelance.Application.Repositories;
-using Frelance.Application.Repositories.External;
 using Frelance.Contracts.Dtos;
 using Frelance.Contracts.Enums;
 using Frelance.Contracts.Errors;
@@ -19,7 +18,6 @@ namespace Frelance.Infrastructure.Services
 {
     public class FreelancerProfileRepository : IFreelancerProfileRepository
     {
-        private readonly IBlobService _blobService;
         private readonly IUserAccessor _userAccessor;
         private readonly IGenericRepository<FreelancerProfiles> _freelancerProfilesRepository;
         private readonly IGenericRepository<Users> _userRepository;
@@ -28,7 +26,7 @@ namespace Frelance.Infrastructure.Services
         private readonly IGenericRepository<FreelancerForeignLanguage> _freelancerForeignLanguageRepository;
         private readonly IUnitOfWork _unitOfWork;
 
-        public FreelancerProfileRepository(IBlobService blobService,
+        public FreelancerProfileRepository(
             IUserAccessor userAccessor,
             IGenericRepository<FreelancerProfiles> freelancerProfilesRepository,
             IGenericRepository<Users> userRepository,
@@ -37,7 +35,6 @@ namespace Frelance.Infrastructure.Services
             IGenericRepository<FreelancerForeignLanguage> freelancerForeignLanguageRepository,
             IUnitOfWork unitOfWork)
         {
-            ArgumentNullException.ThrowIfNull(blobService, nameof(blobService));
             ArgumentNullException.ThrowIfNull(userAccessor, nameof(userAccessor));
             ArgumentNullException.ThrowIfNull(freelancerProfilesRepository, nameof(freelancerProfilesRepository));
             ArgumentNullException.ThrowIfNull(userRepository, nameof(userRepository));
@@ -45,7 +42,6 @@ namespace Frelance.Infrastructure.Services
             ArgumentNullException.ThrowIfNull(skillsRepository, nameof(skillsRepository));
             ArgumentNullException.ThrowIfNull(freelancerForeignLanguageRepository, nameof(freelancerForeignLanguageRepository));
             ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));
-            _blobService = blobService;
             _userAccessor = userAccessor;
             _freelancerProfilesRepository = freelancerProfilesRepository;
             _userRepository = userRepository;
@@ -75,12 +71,6 @@ namespace Frelance.Infrastructure.Services
             await _addressRepository.AddAsync(freelancerProfile.Addresses, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             freelancerProfile.AddressId = freelancerProfile.Addresses.Id;
-
-            freelancerProfile.ProfileImageUrl = await _blobService.UploadBlobAsync(
-                StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(),
-                $"{user.Id}/{command.CreateFreelancerProfileRequest.ProfileImage.FileName}",
-                command.CreateFreelancerProfileRequest.ProfileImage);
-
             var skillsInDb = await _skillsRepository.Query().ToListAsync(cancellationToken);
             var requestSkills = freelancerProfile.Skills?.Adapt<List<SkillRequest>>() ?? [];
             ValidateSkills(skillsInDb, requestSkills);
@@ -195,17 +185,6 @@ namespace Frelance.Infrastructure.Services
                 throw new NotFoundException($"{nameof(FreelancerProfiles)} with {nameof(FreelancerProfiles.Id)}: '{command.Id}' does not exist");
             }
 
-            if (command.UpdateFreelancerProfileRequest.ProfileImage is not null)
-            {
-                await _blobService.DeleteBlobAsync(
-                    StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(),
-                    freelancerProfile.UserId.ToString());
-                freelancerProfile.ProfileImageUrl = await _blobService.UploadBlobAsync(
-                    StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(),
-                    $"{freelancerProfile.UserId}/{command.UpdateFreelancerProfileRequest.ProfileImage.FileName}",
-                    command.UpdateFreelancerProfileRequest.ProfileImage);
-            }
-
             if (command.UpdateFreelancerProfileRequest.AddressCountry is not null
                 && command.UpdateFreelancerProfileRequest.AddressCity is not null
                 && command.UpdateFreelancerProfileRequest.AddressStreet is not null
@@ -295,9 +274,7 @@ namespace Frelance.Infrastructure.Services
                 throw new NotFoundException(
                     $"{nameof(FreelancerProfiles)} with {nameof(FreelancerProfiles.Id)} : '{deleteFreelancerProfileCommand.Id}' does not exist");
             }
-
-            await _blobService.DeleteBlobAsync(StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(),
-                freelancerToDelete.UserId.ToString());
+            
             _freelancerProfilesRepository.Delete(freelancerToDelete);
         }
 

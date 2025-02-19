@@ -82,7 +82,6 @@ namespace Frelance.Infrastructure.Mappings
                 .Map(dest => dest.User, src => src.Users.Adapt<UserProfileDto>())
                 .Map(dest => dest.Address, src => src.Addresses.Adapt<AddressDto>())
                 .Map(dest => dest.Bio, src => src.Bio)
-                .Map(dest => dest.ProfileImageUrl, src => src.ProfileImageUrl)
                 .Map(dest => dest.Contracts, src => src.Contracts.Adapt<List<ContractsDto>>())
                 .Map(dest => dest.Invoices, src => src.Invoices.Adapt<List<InvoicesDto>>())
                 .Map(dest => dest.Projects, src => src.Projects.Adapt<List<ProjectDto>>());
@@ -110,7 +109,6 @@ namespace Frelance.Infrastructure.Mappings
                 .Map(dest => dest.StartDate, src => src.StartDate)
                 .Map(dest => dest.EndDate, src => src.EndDate)
                 .Map(dest => dest.Amount, src => src.Amount)
-                .Map(dest => dest.ContractFileUrl, src => src.ContractFileUrl)
                 .Map(dest => dest.Status, src => src.Status)
                 .Map(dest => dest.CreatedAt, src => src.CreatedAt)
                 .Map(dest => dest.UpdatedAt, src => src.UpdatedAt);
@@ -124,7 +122,6 @@ namespace Frelance.Infrastructure.Mappings
                 .Map(dest => dest.CreatedAt, src => src.CreatedAt)
                 .Map(dest => dest.UpdatedAt, src => src.UpdatedAt)
                 .Map(dest => dest.Amount, src => src.Amount)
-                .Map(dest => dest.InvoiceFileUrl, src => src.InvoiceFileUrl)
                 .Map(dest => dest.Status, src => src.Status);
 
             TypeAdapterConfig<Reviews, ReviewsDto>
@@ -492,7 +489,6 @@ namespace Frelance.Infrastructure.Mappings
                 .Map(dest => dest.UserProfile, src => src.Users.Adapt<UserProfileDto>())
                 .Map(dest => dest.Address, src => src.Addresses.Adapt<AddressDto>())
                 .Map(dest => dest.Bio, src => src.Bio)
-                .Map(dest => dest.ProfileImageUrl, src => src.ProfileImageUrl)
                 .Map(dest => dest.Tasks, src => src.Tasks.Adapt<List<TaskDto>>())
                 .Map(dest => dest.Skills, src => src.Skills.Adapt<List<SkillDto>>())
                 .Map(dest => dest.ForeignLanguages, src => src.ForeignLanguages.Adapt<List<ForeignLanguageDto>>())
