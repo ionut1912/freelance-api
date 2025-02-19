@@ -54,7 +54,7 @@ namespace Frelance.Infrastructure.Mappings
             TypeAdapterConfig<CreateClientProfileRequest, ClientProfiles>
                 .NewConfig()
                 .Map(dest => dest.Bio, src => src.Bio)
-                .Map(dest=>dest.Image, src=>src.Image)
+                .Map(dest => dest.Image, src => src.Image)
                 .AfterMapping((src, dest) =>
                 {
                     dest.CreatedAt = DateTime.UtcNow;
@@ -178,7 +178,7 @@ namespace Frelance.Infrastructure.Mappings
                     dest.Addresses.City = !string.IsNullOrEmpty(src.AddressCity) ? src.AddressCity : dest.Addresses.City;
                     dest.Addresses.ZipCode = !string.IsNullOrEmpty(src.AddressZip) ? src.AddressZip : dest.Addresses.ZipCode;
                     dest.Bio = !string.IsNullOrEmpty(src.Bio) ? src.Bio : dest.Bio;
-                    dest.Image= !string.IsNullOrEmpty(src.Image) ? src.Image : dest.Image;
+                    dest.Image = !string.IsNullOrEmpty(src.Image) ? src.Image : dest.Image;
                     dest.UpdatedAt = DateTime.UtcNow;
                 });
 
@@ -191,7 +191,7 @@ namespace Frelance.Infrastructure.Mappings
                 .Map(dest => dest.StartDate, src => src.StartDate)
                 .Map(dest => dest.EndDate, src => src.EndDate)
                 .Map(dest => dest.Amount, src => src.Amount)
-                .Map(dest=>dest.ContractFile,src=>src.ContractFile)
+                .Map(dest => dest.ContractFile, src => src.ContractFile)
                 .AfterMapping((src, dest) =>
                 {
                     dest.CreatedAt = DateTime.UtcNow;
@@ -205,9 +205,9 @@ namespace Frelance.Infrastructure.Mappings
                 .NewConfig()
                 .AfterMapping((src, dest) =>
                 {
-                    dest.EndDate = src.EndDate??dest.EndDate;
-                    dest.Amount = src.Amount??dest.Amount;
-                    dest.ContractFile = src.ContractFile??dest.ContractFile;
+                    dest.EndDate = src.EndDate ?? dest.EndDate;
+                    dest.Amount = src.Amount ?? dest.Amount;
+                    dest.ContractFile = src.ContractFile ?? dest.ContractFile;
                     dest.UpdatedAt = DateTime.UtcNow;
                 });
 
@@ -227,7 +227,7 @@ namespace Frelance.Infrastructure.Mappings
                 .Map(dest => dest.Currency, src => src.Currency)
                 .Map(dest => dest.Rating, src => src.Rating)
                 .Map(dest => dest.PortfolioUrl, src => src.PortfolioUrl)
-                .Map(dest=>dest.Image, src=>src.Image)
+                .Map(dest => dest.Image, src => src.Image)
                 .Ignore(dest => dest.Skills)
                 .Ignore(dest => dest.ForeignLanguages)
                 .AfterMapping((src, dest) =>
@@ -255,6 +255,7 @@ namespace Frelance.Infrastructure.Mappings
                         .Select(lang => new FreelancerForeignLanguage { Language = lang })
                         .ToList();
                     dest.CreatedAt = DateTime.UtcNow;
+                    dest.IsAvailable = true;
                 });
 
 
@@ -300,7 +301,7 @@ namespace Frelance.Infrastructure.Mappings
                     dest.Currency = src.Currency ?? dest.Currency;
                     dest.Rating = src.Rating;
                     dest.PortfolioUrl = src.PortfolioUrl ?? dest.PortfolioUrl;
-                    dest.Image=!string.IsNullOrWhiteSpace(src.Image) ? src.Image : dest.Image;
+                    dest.Image = !string.IsNullOrWhiteSpace(src.Image) ? src.Image : dest.Image;
                     dest.UpdatedAt = DateTime.UtcNow;
                 });
 
@@ -311,7 +312,7 @@ namespace Frelance.Infrastructure.Mappings
             TypeAdapterConfig<CreateInvoiceRequest, Invoices>
                 .NewConfig()
                 .Map(dest => dest.Amount, src => src.Amount)
-                .Map(dest=>dest.InvoiceFile,src=>src.InvoiceFile)
+                .Map(dest => dest.InvoiceFile, src => src.InvoiceFile)
                 .AfterMapping((src, dest) =>
                 {
                     dest.CreatedAt = DateTime.UtcNow;

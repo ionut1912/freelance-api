@@ -55,7 +55,6 @@ public class ClientProfileRepository : IClientProfileRepository
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         clientProfile.UserId = user.Id;
         clientProfile.AddressId = clientProfile.Addresses.Id;
-        clientProfile.Bio = clientProfileCommand.CreateClientProfileRequest.Bio;
         await _clientProfileRepository.AddAsync(clientProfile, cancellationToken);
     }
 
@@ -133,7 +132,7 @@ public class ClientProfileRepository : IClientProfileRepository
         {
             throw new NotFoundException($"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Id)} : '{clientProfileCommand.Id}' does not exist");
         }
-        clientToUpdate=clientProfileCommand.UpdateClientProfileRequest.Adapt<ClientProfiles>();
+        clientToUpdate = clientProfileCommand.UpdateClientProfileRequest.Adapt<ClientProfiles>();
         _clientProfileRepository.Update(clientToUpdate);
     }
 
