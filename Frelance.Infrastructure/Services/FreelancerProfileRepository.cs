@@ -274,7 +274,7 @@ namespace Frelance.Infrastructure.Services
                 throw new NotFoundException(
                     $"{nameof(FreelancerProfiles)} with {nameof(FreelancerProfiles.Id)} : '{deleteFreelancerProfileCommand.Id}' does not exist");
             }
-            
+
             _freelancerProfilesRepository.Delete(freelancerToDelete);
         }
 
