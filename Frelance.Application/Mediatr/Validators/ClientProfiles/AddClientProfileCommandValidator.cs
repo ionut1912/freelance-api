@@ -13,7 +13,6 @@ public class AddClientProfileCommandValidator : AbstractValidator<CreateClientPr
         RuleFor(x => x.CreateClientProfileRequest.AddressStreetNumber).NotEmpty();
         RuleFor(x => x.CreateClientProfileRequest.AddressZip).NotEmpty();
         RuleFor(x => x.CreateClientProfileRequest.Bio).NotEmpty();
-        RuleFor(x => x.CreateClientProfileRequest.ProfileImage).NotEmpty();
 
     }
 

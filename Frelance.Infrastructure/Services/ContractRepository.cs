@@ -2,7 +2,6 @@ using Frelance.Application.Helpers;
 using Frelance.Application.Mediatr.Commands.Contracts;
 using Frelance.Application.Mediatr.Queries.Contracts;
 using Frelance.Application.Repositories;
-using Frelance.Application.Repositories.External;
 using Frelance.Contracts.Dtos;
 using Frelance.Contracts.Enums;
 using Frelance.Contracts.Exceptions;
@@ -16,21 +15,19 @@ namespace Frelance.Infrastructure.Services;
 
 public class ContractRepository : IContractRepository
 {
-    private readonly IBlobService _blobService;
     private readonly IUserAccessor _userAccessor;
     private readonly IGenericRepository<Entities.Contracts> _contractsRepository;
     private readonly IGenericRepository<FreelancerProfiles> _freelancerProfilesRepository;
     private readonly IGenericRepository<ClientProfiles> _clientProfilesRepository;
     private readonly IGenericRepository<Projects> _projectsRepository;
 
-    public ContractRepository(IBlobService blobService,
+    public ContractRepository(
         IUserAccessor userAccessor,
         IGenericRepository<Entities.Contracts> contractsRepository,
         IGenericRepository<FreelancerProfiles> freelancerProfilesRepository,
         IGenericRepository<ClientProfiles> clientProfilesRepository,
         IGenericRepository<Projects> projectsRepository)
     {
-        ArgumentNullException.ThrowIfNull(blobService, nameof(blobService));
         ArgumentNullException.ThrowIfNull(userAccessor, nameof(userAccessor));
         ArgumentNullException.ThrowIfNull(contractsRepository, nameof(contractsRepository));
         ArgumentNullException.ThrowIfNull(freelancerProfilesRepository, nameof(freelancerProfilesRepository));
@@ -40,7 +37,6 @@ public class ContractRepository : IContractRepository
         _freelancerProfilesRepository = freelancerProfilesRepository;
         _clientProfilesRepository = clientProfilesRepository;
         _projectsRepository = projectsRepository;
-        _blobService = blobService;
         _userAccessor = userAccessor;
     }
 
@@ -79,10 +75,6 @@ public class ContractRepository : IContractRepository
         contract.ClientId = client.Id;
         contract.FreelancerId = freelancer.Id;
         contract.Status = "Signed";
-        contract.ContractFileUrl = await _blobService.UploadBlobAsync(
-            StorageContainers.CONTRACTSCONTAINER.ToString().ToLower(),
-            $"{project.Id}/{createContractCommand.CreateContractRequest.ContractFile.FileName}",
-            createContractCommand.CreateContractRequest.ContractFile);
         await _contractsRepository.AddAsync(contract, cancellationToken);
     }
 
@@ -138,17 +130,7 @@ public class ContractRepository : IContractRepository
         }
 
         updateContractCommand.UpdateContractRequest.Adapt(contract);
-
-        if (updateContractCommand.UpdateContractRequest.ContractFile is not null)
-        {
-            await _blobService.DeleteBlobAsync(StorageContainers.CONTRACTSCONTAINER.ToString().ToLower(),
-                contract.Project.Id.ToString());
-            contract.ContractFileUrl =
-                await _blobService.UploadBlobAsync(StorageContainers.CONTRACTSCONTAINER.ToString().ToLower(),
-                    $"{contract.Project.Id}/{updateContractCommand.UpdateContractRequest.ContractFile.FileName}",
-                    updateContractCommand.UpdateContractRequest.ContractFile);
-        }
-
+        
         if (updateContractCommand.UpdateContractRequest.Status == "Signed"
             && contract.Freelancer.Projects is not null
             && contract.Client.Projects is not null)
@@ -175,9 +157,7 @@ public class ContractRepository : IContractRepository
         {
             throw new NotFoundException($"{nameof(Entities.Contracts)} with {nameof(Entities.Contracts.Id)}: {deleteContractCommand.Id} doe not exist.");
         }
-
-        await _blobService.DeleteBlobAsync(StorageContainers.CONTRACTSCONTAINER.ToString().ToLower(),
-            contractToDelete.Project.Id.ToString());
+        
         _contractsRepository.Delete(contractToDelete);
     }
 }

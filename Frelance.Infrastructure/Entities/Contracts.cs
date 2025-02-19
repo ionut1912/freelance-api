@@ -12,7 +12,6 @@ public class Contracts
     public DateOnly StartDate { get; set; }
     public DateOnly EndDate { get; set; }
     public decimal Amount { get; set; }
-    public required string ContractFileUrl { get; set; }
     public required string Status { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
