@@ -89,11 +89,9 @@ public static class DependencyInjection
                 .AddEntityFrameworkStores<FrelanceDbContext>()
                 .AddTokenProvider<DataProtectorTokenProvider<Users>>(TokenOptions.DefaultProvider);
 
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("ClientRole", policy => policy.RequireRole("Client"));
-                options.AddPolicy("FreelancerRole", policy => policy.RequireRole("Freelancer"));
-            });
+            services.AddAuthorizationBuilder()
+                .AddPolicy("ClientRole", policy => policy.RequireRole("Client"))
+                .AddPolicy("FreelancerRole", policy => policy.RequireRole("Freelancer"));
 
             services.AddScoped<TokenService>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
