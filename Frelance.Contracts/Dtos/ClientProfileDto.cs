@@ -11,4 +11,5 @@ public class ClientProfileDto
     public List<ContractsDto>? Contracts { get; set; }
     public List<ProjectDto>? Projects { get; set; }
     public List<InvoicesDto>? Invoices { get; set; }
+    public required string Image { get; set; }
 }

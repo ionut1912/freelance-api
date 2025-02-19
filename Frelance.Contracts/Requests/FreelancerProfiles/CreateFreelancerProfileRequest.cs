@@ -24,4 +24,5 @@ public class CreateFreelancerProfileRequest
     public required string Currency { get; set; }
     public int Rating { get; set; }
     public required string PortfolioUrl { get; set; }
+    public required string Image{get;set;}
 }

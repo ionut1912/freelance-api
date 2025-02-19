@@ -21,4 +21,5 @@ public class UpdateFreelancerProfileRequest
     public string? Currency { get; set; }
     public int Rating { get; set; }
     public string? PortfolioUrl { get; set; }
+    public string? Image { get; set; }
 }
