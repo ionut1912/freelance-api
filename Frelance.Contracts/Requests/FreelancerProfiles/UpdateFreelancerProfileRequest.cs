@@ -10,7 +10,6 @@ public class UpdateFreelancerProfileRequest
     public string? AddressCity { get; set; }
     public string? AddressZip { get; set; }
     public string? Bio { get; set; }
-    public IFormFile? ProfileImage { get; set; }
 
     public List<string>? ProgrammingLanguages { get; set; }
 

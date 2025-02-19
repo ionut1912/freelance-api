@@ -1,7 +1,6 @@
 using Frelance.Application.Mediatr.Commands.ClientProfiles;
 using Frelance.Application.Mediatr.Queries.ClientProfiles;
 using Frelance.Application.Repositories;
-using Frelance.Application.Repositories.External;
 using Frelance.Contracts.Dtos;
 using Frelance.Contracts.Enums;
 using Frelance.Contracts.Exceptions;
@@ -18,27 +17,23 @@ public class ClientProfileRepository : IClientProfileRepository
     private readonly IGenericRepository<Addresses> _addressRepository;
     private readonly IGenericRepository<ClientProfiles> _clientProfileRepository;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IBlobService _blobService;
     private readonly IUserAccessor _userAccessor;
 
     public ClientProfileRepository(IGenericRepository<Users> userRepository,
         IGenericRepository<Addresses> addressRepository,
         IGenericRepository<ClientProfiles> clientProfileRepository,
         IUnitOfWork unitOfWork,
-        IBlobService blobService,
         IUserAccessor userAccessor)
     {
         ArgumentNullException.ThrowIfNull(userRepository, nameof(userRepository));
         ArgumentNullException.ThrowIfNull(addressRepository, nameof(addressRepository));
         ArgumentNullException.ThrowIfNull(clientProfileRepository, nameof(clientProfileRepository));
-        ArgumentNullException.ThrowIfNull(blobService, nameof(blobService));
         ArgumentNullException.ThrowIfNull(userAccessor, nameof(userAccessor));
         ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));
         _userRepository = userRepository;
         _addressRepository = addressRepository;
         _clientProfileRepository = clientProfileRepository;
         _unitOfWork = unitOfWork;
-        _blobService = blobService;
         _userAccessor = userAccessor;
     }
 
@@ -60,9 +55,6 @@ public class ClientProfileRepository : IClientProfileRepository
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         clientProfile.UserId = user.Id;
         clientProfile.AddressId = clientProfile.Addresses.Id;
-        var profileImageUrl = await _blobService.UploadBlobAsync(StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(),
-            $"{user.Id}/{clientProfileCommand.CreateClientProfileRequest.ProfileImage.FileName}", clientProfileCommand.CreateClientProfileRequest.ProfileImage);
-        clientProfile.ProfileImageUrl = profileImageUrl;
         clientProfile.Bio = clientProfileCommand.CreateClientProfileRequest.Bio;
         await _clientProfileRepository.AddAsync(clientProfile, cancellationToken);
     }
@@ -142,14 +134,6 @@ public class ClientProfileRepository : IClientProfileRepository
             throw new NotFoundException($"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Id)} : '{clientProfileCommand.Id}' does not exist");
         }
         clientProfileCommand.UpdateClientProfileRequest.Adapt<ClientProfiles>();
-        if (clientProfileCommand.UpdateClientProfileRequest.ProfileImage is not null)
-        {
-            await _blobService.DeleteBlobAsync(StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(), clientToUpdate.UserId.ToString());
-            clientToUpdate.ProfileImageUrl = await _blobService.UploadBlobAsync(StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(),
-                $"{clientToUpdate.UserId}/{clientProfileCommand.UpdateClientProfileRequest.ProfileImage.FileName}",
-                clientProfileCommand.UpdateClientProfileRequest.ProfileImage);
-        }
-        _clientProfileRepository.Update(clientToUpdate);
     }
 
     public async Task DeleteClientProfileAsync(DeleteClientProfileCommand clientProfileCommand, CancellationToken cancellationToken)
@@ -161,8 +145,6 @@ public class ClientProfileRepository : IClientProfileRepository
         {
             throw new NotFoundException($"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Id)} : '{clientProfileCommand.Id}' does not exist");
         }
-
-        await _blobService.DeleteBlobAsync(StorageContainers.USERIMAGESCONTAINER.ToString().ToLower(), clientToDelete.UserId.ToString());
         _clientProfileRepository.Delete(clientToDelete);
     }
 }

@@ -3,14 +3,11 @@ using System.Text;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using Frelance.Application.Repositories;
-using Frelance.Application.Repositories.External;
 using Frelance.Contracts.Dtos;
 using Frelance.Infrastructure.Context;
 using Frelance.Infrastructure.Entities;
-using Frelance.Infrastructure.Extensions;
 using Frelance.Infrastructure.Mappings;
 using Frelance.Infrastructure.Services;
-using Frelance.Infrastructure.Services.External;
 using Frelance.Infrastructure.Settings;
 using Mapster;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -34,24 +31,22 @@ public static class DependencyInjection
         var logger = loggerFactory.CreateLogger("Startup");
         var databaseSettings = new DatabaseSettings();
         configuration.GetSection("DatabaseSettings").Bind(databaseSettings);
-        var connectionStringSecretName = configuration["AzureKeyVault__ConnectionStringSecretName"];
-        var jwtSecretName = configuration["AzureKeyVault__JWTTokenSecretName"];
 
         try
         {
-            var connectionString = configuration.GetSecret(connectionStringSecretName!, "AzureKeyVault__ConnectionStringSecretName");
+            var connectionString = configuration["ConnectionString"];
             if (string.IsNullOrEmpty(connectionString))
             {
-                throw new InvalidOperationException($"The secret '{connectionStringSecretName}' returned an empty connection string.");
+                throw new InvalidOperationException($"The secret '{nameof(connectionString)}' returned an empty connection string.");
             }
 
             logger.LogInformation("Connection string retrieved successfully. (Value not displayed for security)");
             databaseSettings.ConnectionString = connectionString;
 
-            var jwtTokenKey = configuration.GetSecret(jwtSecretName!, "AzureKeyVault__JWTTokenSecretName");
+            var jwtTokenKey = configuration["JwtTokenKey"];
             if (string.IsNullOrEmpty(jwtTokenKey))
             {
-                throw new InvalidOperationException($"The secret '{jwtSecretName}' returned an empty JWT token key.");
+                throw new InvalidOperationException($"The secret '{nameof(jwtTokenKey)}' returned an empty JWT token key.");
             }
 
             logger.LogInformation("JWT token key retrieved successfully. (Value not displayed for security)");
@@ -75,7 +70,6 @@ public static class DependencyInjection
             services.AddScoped<ITimeLogRepository, TimeLogRepository>();
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<ISkillsRepository, SkillRepository>();
-            services.AddScoped<IBlobService, BlobService>();
             services.AddScoped<IClientProfileRepository, ClientProfileRepository>();
             services.AddScoped<IFreelancerProfileRepository, FreelancerProfileRepository>();
             services.AddScoped<IReviewRepository, ReviewRepository>();

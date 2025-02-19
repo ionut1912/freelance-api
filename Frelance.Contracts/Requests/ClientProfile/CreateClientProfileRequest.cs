@@ -8,5 +8,4 @@ public record CreateClientProfileRequest(
     string AddressStreetNumber,
     string AddressCity,
     string AddressZip,
-    string Bio,
-    IFormFile ProfileImage);
+    string Bio);

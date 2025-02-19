@@ -14,7 +14,6 @@ public class AddFreelancerProfileCommandValidator : AbstractValidator<CreateFree
         RuleFor(x => x.CreateFreelancerProfileRequest.AddressZip).NotEmpty();
         RuleFor(x => x.CreateFreelancerProfileRequest.Bio).NotEmpty();
         RuleFor(x => x.CreateFreelancerProfileRequest.Bio).MaximumLength(256);
-        RuleFor(x => x.CreateFreelancerProfileRequest.ProfileImage).NotEmpty();
         RuleFor(x => x.CreateFreelancerProfileRequest.Areas).NotEmpty();
         RuleFor(x => x.CreateFreelancerProfileRequest.ProgrammingLanguages).NotEmpty();
         RuleFor(x => x.CreateFreelancerProfileRequest.ForeignLanguages).NotEmpty();

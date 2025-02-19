@@ -8,7 +8,6 @@ public class BaseUserProfile
     public int AddressId { get; set; }
     public Addresses? Addresses { get; set; }
     public required string Bio { get; set; }
-    public required string ProfileImageUrl { get; set; }
     public List<Contracts> Contracts { get; set; } = [];
     public List<Invoices> Invoices { get; set; } = [];
     public DateTime CreatedAt { get; set; }
