@@ -75,21 +75,17 @@ namespace Frelance.Infrastructure.Services
             var requestSkills = freelancerProfile.Skills?.Adapt<List<SkillRequest>>() ?? [];
             ValidateSkills(skillsInDb, requestSkills);
 
-            freelancerProfile.IsAvailable = true;
             try
             {
                 await _freelancerProfilesRepository.AddAsync(freelancerProfile, cancellationToken);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                if (freelancerProfile.ForeignLanguages != null)
+                foreach (var fl in freelancerProfile.ForeignLanguages)
                 {
-                    foreach (var fl in freelancerProfile.ForeignLanguages)
-                    {
-                        fl.FreelancerProfileId = freelancerProfile.Id;
-                        fl.Id = 0;
-                        await _freelancerForeignLanguageRepository.AddAsync(fl, cancellationToken);
-                    }
+                    fl.FreelancerProfileId = freelancerProfile.Id;
+                    fl.Id = 0;
+                    await _freelancerForeignLanguageRepository.AddAsync(fl, cancellationToken);
                 }
+
 
             }
             catch (Exception)
