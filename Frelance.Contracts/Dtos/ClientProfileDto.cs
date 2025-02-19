@@ -8,7 +8,6 @@ public class ClientProfileDto
     public required UserProfileDto User { get; set; }
     public required AddressDto Address { get; set; }
     public required string Bio { get; set; }
-    public required string ProfileImageUrl { get; set; }
     public List<ContractsDto>? Contracts { get; set; }
     public List<ProjectDto>? Projects { get; set; }
     public List<InvoicesDto>? Invoices { get; set; }

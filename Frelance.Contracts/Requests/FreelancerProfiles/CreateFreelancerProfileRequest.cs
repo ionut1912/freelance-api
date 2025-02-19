@@ -13,7 +13,6 @@ public class CreateFreelancerProfileRequest
     public required string AddressCity { get; set; }
     public required string AddressZip { get; set; }
     public required string Bio { get; set; }
-    public required IFormFile ProfileImage { get; set; }
 
     public required List<string> ProgrammingLanguages { get; set; }
 

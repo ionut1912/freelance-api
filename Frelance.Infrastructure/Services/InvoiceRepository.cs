@@ -1,7 +1,6 @@
 using Frelance.Application.Mediatr.Commands.Invoices;
 using Frelance.Application.Mediatr.Queries.Invoices;
 using Frelance.Application.Repositories;
-using Frelance.Application.Repositories.External;
 using Frelance.Contracts.Dtos;
 using Frelance.Contracts.Enums;
 using Frelance.Contracts.Exceptions;
@@ -14,26 +13,23 @@ namespace Frelance.Infrastructure.Services;
 
 public class InvoiceRepository : IInvoiceRepository
 {
-    private readonly IBlobService _blobService;
     private readonly IUserAccessor _userAccessor;
     private readonly IGenericRepository<Invoices> _invoiceRepository;
     private readonly IGenericRepository<ClientProfiles> _clientProfileRepository;
     private readonly IGenericRepository<FreelancerProfiles> _freelancerProfileRepository;
     private readonly IGenericRepository<Projects> _projectRepository;
-    public InvoiceRepository(IBlobService blobService,
+    public InvoiceRepository(
         IUserAccessor userAccessor,
         IGenericRepository<Invoices> invoiceRepository,
         IGenericRepository<ClientProfiles> clientProfileRepository,
         IGenericRepository<FreelancerProfiles> freelancerProfileRepository,
         IGenericRepository<Projects> projectRepository)
     {
-        ArgumentNullException.ThrowIfNull(blobService, nameof(blobService));
         ArgumentNullException.ThrowIfNull(userAccessor, nameof(userAccessor));
         ArgumentNullException.ThrowIfNull(invoiceRepository, nameof(invoiceRepository));
         ArgumentNullException.ThrowIfNull(clientProfileRepository, nameof(clientProfileRepository));
         ArgumentNullException.ThrowIfNull(freelancerProfileRepository, nameof(freelancerProfileRepository));
         ArgumentNullException.ThrowIfNull(projectRepository, nameof(projectRepository));
-        _blobService = blobService;
         _userAccessor = userAccessor;
         _invoiceRepository = invoiceRepository;
         _clientProfileRepository = clientProfileRepository;
@@ -80,10 +76,6 @@ public class InvoiceRepository : IInvoiceRepository
         invoice.ProjectId = project.Id;
         invoice.ClientId = client.Id;
         invoice.FreelancerId = freelancer.Id;
-        invoice.InvoiceFileUrl = await _blobService.UploadBlobAsync(
-            StorageContainers.INVOICESCONTAINER.ToString().ToLower(),
-            $"{project.Id}/{createInvoiceCommand.CreateInvoiceRequest.InvoiceFile.FileName}",
-            createInvoiceCommand.CreateInvoiceRequest.InvoiceFile);
         invoice.Status = "Submitted";
         await _invoiceRepository.AddAsync(invoice, cancellationToken);
 
@@ -139,15 +131,6 @@ public class InvoiceRepository : IInvoiceRepository
             throw new NotFoundException($"{nameof(Invoices)} with {nameof(Invoices.Id)}: {updateInvoiceCommand.Id} not found");
         }
         updateInvoiceCommand.UpdateInvoiceRequest.Adapt<Invoices>();
-        if (updateInvoiceCommand.UpdateInvoiceRequest.InvoiceFile is not null)
-        {
-            await _blobService.DeleteBlobAsync(StorageContainers.INVOICESCONTAINER.ToString().ToLower(),
-                invoiceToUpdate.ProjectId.ToString());
-            invoiceToUpdate.InvoiceFileUrl = await _blobService.UploadBlobAsync(
-                StorageContainers.INVOICESCONTAINER.ToString().ToLower(),
-                $"{invoiceToUpdate.ProjectId}/{updateInvoiceCommand.UpdateInvoiceRequest.InvoiceFile}",
-                updateInvoiceCommand.UpdateInvoiceRequest.InvoiceFile);
-        }
         _invoiceRepository.Update(invoiceToUpdate);
     }
 
@@ -160,7 +143,6 @@ public class InvoiceRepository : IInvoiceRepository
         {
             throw new NotFoundException($"{nameof(Invoices)} with {nameof(Invoices.Id)}: {deleteInvoiceCommand.Id} not found");
         }
-        await _blobService.DeleteBlobAsync(StorageContainers.INVOICESCONTAINER.ToString().ToLower(), invoiceToDelete.ProjectId.ToString());
         _invoiceRepository.Delete(invoiceToDelete);
     }
 }
