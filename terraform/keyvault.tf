@@ -25,7 +25,7 @@ resource "azurerm_key_vault_secret" "jwt_token_key" {
 resource "azurerm_key_vault_access_policy" "user_access" {
   key_vault_id = azurerm_key_vault.keyvault.id
   tenant_id    = "5c384fed-84cc-44a6-b34a-b060bf102a6e"
-  object_id    = "fe4c5ebe-84a4-4bea-9a09-57fbfe9b0bcb"
+  object_id    = "0f7db1d5-76d4-4759-91ea-7d335f63e491"
 
   secret_permissions      = ["Get", "List", "Set", "Delete", "Purge", "Recover"]
   key_permissions         = ["Get", "List"]
