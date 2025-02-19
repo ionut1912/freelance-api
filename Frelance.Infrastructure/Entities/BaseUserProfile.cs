@@ -13,5 +13,5 @@ public class BaseUserProfile
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public List<Projects>? Projects { get; set; } = [];
-
+    public required string Image { get; set; }
 }

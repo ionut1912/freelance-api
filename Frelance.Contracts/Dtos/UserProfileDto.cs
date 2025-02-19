@@ -10,4 +10,5 @@ public class UserProfileDto
     public required List<ReviewsDto> Reviews { get; set; }
     public required List<ProposalsDto> Proposals { get; set; }
     public DateTime CreatedAt { get; set; }
+    public required string Image { get; set; }
 }

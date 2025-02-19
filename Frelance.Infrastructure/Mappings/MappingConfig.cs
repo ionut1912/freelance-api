@@ -29,15 +29,6 @@ namespace Frelance.Infrastructure.Mappings
     {
         public static void Configure()
         {
-            TypeAdapterConfig<IFormFile, IFormFile>
-                .NewConfig()
-                .Ignore(dest => dest.Headers);
-
-            TypeAdapterConfig<IFormFile, IFormFile>
-                .NewConfig()
-                .MapWith(src => src);
-
-
             TypeAdapterConfig<RegisterDto, CreateUserCommand>
                 .NewConfig()
                 .Map(dest => dest.RegisterDto, src => src);
@@ -63,6 +54,7 @@ namespace Frelance.Infrastructure.Mappings
             TypeAdapterConfig<CreateClientProfileRequest, ClientProfiles>
                 .NewConfig()
                 .Map(dest => dest.Bio, src => src.Bio)
+                .Map(dest=>dest.Image, src=>src.Image)
                 .AfterMapping((src, dest) =>
                 {
                     dest.CreatedAt = DateTime.UtcNow;
@@ -84,7 +76,8 @@ namespace Frelance.Infrastructure.Mappings
                 .Map(dest => dest.Bio, src => src.Bio)
                 .Map(dest => dest.Contracts, src => src.Contracts.Adapt<List<ContractsDto>>())
                 .Map(dest => dest.Invoices, src => src.Invoices.Adapt<List<InvoicesDto>>())
-                .Map(dest => dest.Projects, src => src.Projects.Adapt<List<ProjectDto>>());
+                .Map(dest => dest.Projects, src => src.Projects.Adapt<List<ProjectDto>>())
+                .Map(dest => dest.Image, src => src.Image);
 
             TypeAdapterConfig<Users, UserProfileDto>
                 .NewConfig()
@@ -111,7 +104,8 @@ namespace Frelance.Infrastructure.Mappings
                 .Map(dest => dest.Amount, src => src.Amount)
                 .Map(dest => dest.Status, src => src.Status)
                 .Map(dest => dest.CreatedAt, src => src.CreatedAt)
-                .Map(dest => dest.UpdatedAt, src => src.UpdatedAt);
+                .Map(dest => dest.UpdatedAt, src => src.UpdatedAt)
+                .Map(dest => dest.ContractFile, src => src.ContractFile);
 
             TypeAdapterConfig<Invoices, InvoicesDto>
                 .NewConfig()
@@ -122,7 +116,8 @@ namespace Frelance.Infrastructure.Mappings
                 .Map(dest => dest.CreatedAt, src => src.CreatedAt)
                 .Map(dest => dest.UpdatedAt, src => src.UpdatedAt)
                 .Map(dest => dest.Amount, src => src.Amount)
-                .Map(dest => dest.Status, src => src.Status);
+                .Map(dest => dest.Status, src => src.Status)
+                .Map(dest => dest.InvoiceFile, src => src.InvoiceFile);
 
             TypeAdapterConfig<Reviews, ReviewsDto>
                 .NewConfig()
@@ -173,30 +168,30 @@ namespace Frelance.Infrastructure.Mappings
                 .NewConfig()
                 .Map(dest => dest.UpdateClientProfileRequest, src => src);
 
-            TypeAdapterConfig<UpdateClientProfileCommand, ClientProfiles>
+            TypeAdapterConfig<UpdateClientProfileRequest, ClientProfiles>
                 .NewConfig()
-                .Map(dest => dest.Id, src => src.Id)
                 .AfterMapping((src, dest) =>
                 {
-                    var req = src.UpdateClientProfileRequest;
-                    dest.Addresses!.Country = !string.IsNullOrEmpty(req.AddressCountry) ? req.AddressCountry : dest.Addresses.Country;
-                    dest.Addresses.Street = !string.IsNullOrEmpty(req.AddressStreet) ? req.AddressStreet : dest.Addresses.Street;
-                    dest.Addresses.StreetNumber = !string.IsNullOrEmpty(req.AddressStreetNumber) ? req.AddressStreetNumber : dest.Addresses.StreetNumber;
-                    dest.Addresses.City = !string.IsNullOrEmpty(req.AddressCity) ? req.AddressCity : dest.Addresses.City;
-                    dest.Addresses.ZipCode = !string.IsNullOrEmpty(req.AddressZip) ? req.AddressZip : dest.Addresses.ZipCode;
-                    dest.Bio = !string.IsNullOrEmpty(req.Bio) ? req.Bio : dest.Bio;
-                    dest.CreatedAt = DateTime.UtcNow;
+                    dest.Addresses!.Country = !string.IsNullOrEmpty(src.AddressCountry) ? src.AddressCountry : dest.Addresses.Country;
+                    dest.Addresses.Street = !string.IsNullOrEmpty(src.AddressStreet) ? src.AddressStreet : dest.Addresses.Street;
+                    dest.Addresses.StreetNumber = !string.IsNullOrEmpty(src.AddressStreetNumber) ? src.AddressStreetNumber : dest.Addresses.StreetNumber;
+                    dest.Addresses.City = !string.IsNullOrEmpty(src.AddressCity) ? src.AddressCity : dest.Addresses.City;
+                    dest.Addresses.ZipCode = !string.IsNullOrEmpty(src.AddressZip) ? src.AddressZip : dest.Addresses.ZipCode;
+                    dest.Bio = !string.IsNullOrEmpty(src.Bio) ? src.Bio : dest.Bio;
+                    dest.Image= !string.IsNullOrEmpty(src.Image) ? src.Image : dest.Image;
+                    dest.UpdatedAt = DateTime.UtcNow;
                 });
 
             TypeAdapterConfig<CreateContractRequest, CreateContractCommand>
                 .NewConfig()
                 .Map(dest => dest.CreateContractRequest, src => src);
 
-            TypeAdapterConfig<CreateContractCommand, Entities.Contracts>
+            TypeAdapterConfig<CreateContractRequest, Entities.Contracts>
                 .NewConfig()
-                .Map(dest => dest.StartDate, src => src.CreateContractRequest.StartDate)
-                .Map(dest => dest.EndDate, src => src.CreateContractRequest.EndDate)
-                .Map(dest => dest.Amount, src => src.CreateContractRequest.Amount)
+                .Map(dest => dest.StartDate, src => src.StartDate)
+                .Map(dest => dest.EndDate, src => src.EndDate)
+                .Map(dest => dest.Amount, src => src.Amount)
+                .Map(dest=>dest.ContractFile,src=>src.ContractFile)
                 .AfterMapping((src, dest) =>
                 {
                     dest.CreatedAt = DateTime.UtcNow;
@@ -206,16 +201,14 @@ namespace Frelance.Infrastructure.Mappings
                 .NewConfig()
                 .Map(dest => dest.UpdateContractRequest, src => src);
 
-            TypeAdapterConfig<Entities.Contracts, UpdateContractCommand>
+            TypeAdapterConfig<UpdateContractRequest, Entities.Contracts>
                 .NewConfig()
-                .Map(dest => dest.Id, src => src.Id)
                 .AfterMapping((src, dest) =>
                 {
-                    var req = dest.UpdateContractRequest;
-                    src.EndDate = req.EndDate ?? src.EndDate;
-                    src.Amount = req.Amount ?? src.Amount;
-                    src.Status = req.Status ?? src.Status;
-                    src.UpdatedAt = DateTime.UtcNow;
+                    dest.EndDate = src.EndDate??dest.EndDate;
+                    dest.Amount = src.Amount??dest.Amount;
+                    dest.ContractFile = src.ContractFile??dest.ContractFile;
+                    dest.UpdatedAt = DateTime.UtcNow;
                 });
 
             TypeAdapterConfig<CreateFreelancerProfileRequest, CreateFreelancerProfileCommand>
@@ -234,6 +227,7 @@ namespace Frelance.Infrastructure.Mappings
                 .Map(dest => dest.Currency, src => src.Currency)
                 .Map(dest => dest.Rating, src => src.Rating)
                 .Map(dest => dest.PortfolioUrl, src => src.PortfolioUrl)
+                .Map(dest=>dest.Image, src=>src.Image)
                 .Ignore(dest => dest.Skills)
                 .Ignore(dest => dest.ForeignLanguages)
                 .AfterMapping((src, dest) =>
@@ -306,6 +300,7 @@ namespace Frelance.Infrastructure.Mappings
                     dest.Currency = src.Currency ?? dest.Currency;
                     dest.Rating = src.Rating;
                     dest.PortfolioUrl = src.PortfolioUrl ?? dest.PortfolioUrl;
+                    dest.Image=!string.IsNullOrWhiteSpace(src.Image) ? src.Image : dest.Image;
                     dest.UpdatedAt = DateTime.UtcNow;
                 });
 
@@ -313,9 +308,10 @@ namespace Frelance.Infrastructure.Mappings
                 .NewConfig()
                 .Map(dest => dest.CreateInvoiceRequest, src => src);
 
-            TypeAdapterConfig<CreateInvoiceCommand, Invoices>
+            TypeAdapterConfig<CreateInvoiceRequest, Invoices>
                 .NewConfig()
-                .Map(dest => dest.Amount, src => src.CreateInvoiceRequest.Amount)
+                .Map(dest => dest.Amount, src => src.Amount)
+                .Map(dest=>dest.InvoiceFile,src=>src.InvoiceFile)
                 .AfterMapping((src, dest) =>
                 {
                     dest.CreatedAt = DateTime.UtcNow;
@@ -331,6 +327,7 @@ namespace Frelance.Infrastructure.Mappings
                 {
                     dest.Status = src.Status ?? dest.Status;
                     dest.Amount = src.Amount ?? dest.Amount;
+                    dest.InvoiceFile = src.InvoiceFile ?? dest.InvoiceFile;
                     dest.UpdatedAt = DateTime.UtcNow;
                 });
 
@@ -498,7 +495,8 @@ namespace Frelance.Infrastructure.Mappings
                 .Map(dest => dest.Rate, src => src.Rate)
                 .Map(dest => dest.Currency, src => src.Currency)
                 .Map(dest => dest.Rating, src => src.Rating)
-                .Map(dest => dest.PortfolioUrl, src => src.PortfolioUrl);
+                .Map(dest => dest.PortfolioUrl, src => src.PortfolioUrl)
+                .Map(dest => dest.Image, src => src.Image);
 
             TypeAdapterConfig<List<Skills>, List<SkillDto>>
                 .NewConfig()

@@ -14,4 +14,5 @@ public record FreelancerProfileDto(
     int Rate,
     string Currency,
     int Rating,
+    string Image,
     string PortfolioUrl);

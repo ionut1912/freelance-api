@@ -133,7 +133,8 @@ public class ClientProfileRepository : IClientProfileRepository
         {
             throw new NotFoundException($"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Id)} : '{clientProfileCommand.Id}' does not exist");
         }
-        clientProfileCommand.UpdateClientProfileRequest.Adapt<ClientProfiles>();
+        clientToUpdate=clientProfileCommand.UpdateClientProfileRequest.Adapt<ClientProfiles>();
+        _clientProfileRepository.Update(clientToUpdate);
     }
 
     public async Task DeleteClientProfileAsync(DeleteClientProfileCommand clientProfileCommand, CancellationToken cancellationToken)
