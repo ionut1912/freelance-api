@@ -130,7 +130,7 @@ public class ContractRepository : IContractRepository
         }
 
         updateContractCommand.UpdateContractRequest.Adapt(contract);
-        
+
         if (updateContractCommand.UpdateContractRequest.Status == "Signed"
             && contract.Freelancer.Projects is not null
             && contract.Client.Projects is not null)
@@ -157,7 +157,7 @@ public class ContractRepository : IContractRepository
         {
             throw new NotFoundException($"{nameof(Entities.Contracts)} with {nameof(Entities.Contracts.Id)}: {deleteContractCommand.Id} doe not exist.");
         }
-        
+
         _contractsRepository.Delete(contractToDelete);
     }
 }
