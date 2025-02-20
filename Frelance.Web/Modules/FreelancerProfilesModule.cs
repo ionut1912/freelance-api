@@ -16,17 +16,17 @@ public static class FreelancerProfilesModule
 {
     public static void AddFreelancerProfilesEndpoints(this IEndpointRouteBuilder app)
     {
-        var createFreelancerProfileEndpoint = app.MapPost("/api/freelancerProfiles",
-                async (IMediator mediator, [FromForm] CreateFreelancerProfileRequest createFreelancerProfileRequest, CancellationToken ct) =>
+        app.MapPost("/api/freelancerProfiles",
+                async (IMediator mediator, CreateFreelancerProfileRequest createFreelancerProfileRequest,
+                    CancellationToken ct) =>
                 {
 
-                    var result = await mediator.Send(createFreelancerProfileRequest.Adapt<CreateFreelancerProfileCommand>(), ct);
+                    var result =
+                        await mediator.Send(createFreelancerProfileRequest.Adapt<CreateFreelancerProfileCommand>(), ct);
                     return Results.Ok(result);
                 })
-            .Accepts<FreelancerProfileDto>("multipart/form-data")
             .WithTags("FreelancerProfiles")
-            .RequireAuthorization("FreelancerRole")
-            .WithMetadata(new IgnoreAntiforgeryTokenAttribute());
+            .RequireAuthorization("FreelancerRole");
         app.MapGet("/api/freelancerProfiles/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
             {
                 var freelancerProfile = await mediator.Send(new GetFreelancerProfileByIdQuery(id), ct);
@@ -50,14 +50,14 @@ public static class FreelancerProfilesModule
                 }).WithTags("FreelancerProfiles")
             .RequireAuthorization("FreelancerRole");
 
-        var updateFreelancerProfileEndpoint = app.MapPut("/api/freelancerProfiles/{id}", async (IMediator mediator, int id,
-                [FromForm] UpdateFreelancerProfileRequest updateFreelancerProfileRequest, CancellationToken ct) =>
-            {
-                var command = updateFreelancerProfileRequest.Adapt<UpdateFreelancerProfileCommand>() with { Id = id };
-                var result = await mediator.Send(command, ct);
-                return Results.Ok(result);
-            }).WithTags("FreelancerProfiles").
-            RequireAuthorization("FreelancerRole");
+        app.MapPut("/api/freelancerProfiles/{id}", async (IMediator mediator, int id,
+                         UpdateFreelancerProfileRequest updateFreelancerProfileRequest, CancellationToken ct) =>
+                    {
+                        var command = updateFreelancerProfileRequest.Adapt<UpdateFreelancerProfileCommand>() with { Id = id };
+                        var result = await mediator.Send(command, ct);
+                        return Results.Ok(result);
+                    }).WithTags("FreelancerProfiles").
+                    RequireAuthorization("FreelancerRole");
         app.MapDelete("/api/freelancerProfiles/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
             {
                 var command = new DeleteFreelancerProfileCommand(id);
@@ -65,7 +65,5 @@ public static class FreelancerProfilesModule
                 return Results.Ok(result);
             }).WithTags("FreelancerProfiles").
             RequireAuthorization("FreelancerRole");
-        createFreelancerProfileEndpoint.RemoveAntiforgery();
-        updateFreelancerProfileEndpoint.RemoveAntiforgery();
     }
 }
