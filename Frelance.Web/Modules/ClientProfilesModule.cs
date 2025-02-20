@@ -14,16 +14,16 @@ namespace Frelance.Web.Modules
     {
         public static void AddClientProfilesEndpoints(this IEndpointRouteBuilder app)
         {
-            var createClientProfileEndpoint = app.MapPost("/api/clientProfiles",
-                    async (IMediator mediator, [FromForm] CreateClientProfileRequest createClientProfileRequest, CancellationToken ct) =>
+            app.MapPost("/api/clientProfiles",
+                    async (IMediator mediator, CreateClientProfileRequest createClientProfileRequest,
+                        CancellationToken ct) =>
                     {
-                        var result = await mediator.Send(createClientProfileRequest.Adapt<CreateClientProfileCommand>(), ct);
+                        var result = await mediator.Send(createClientProfileRequest.Adapt<CreateClientProfileCommand>(),
+                            ct);
                         return Results.Ok(result);
                     })
-                .Accepts<ClientProfileDto>("multipart/form-data")
                 .WithTags("ClientProfiles")
-                .RequireAuthorization("ClientRole")
-                .WithMetadata(new IgnoreAntiforgeryTokenAttribute());
+                .RequireAuthorization("ClientRole");
             app.MapGet("/api/clientProfiles/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
             {
                 var clientProfile = await mediator.Send(new GetClientProfileByIdQuery(id), ct);
@@ -45,8 +45,8 @@ namespace Frelance.Web.Modules
                     return Results.Ok(clientProfile);
                 }).WithTags("ClientProfiles")
                 .RequireAuthorization("ClientRole");
-            var updateClientProfileEndpoint = app.MapPut("/api/clientProfiles/{id}", async (IMediator mediator, int id,
-                [FromForm] UpdateClientProfileRequest updateClientProfileRequest, CancellationToken ct) =>
+            app.MapPut("/api/clientProfiles/{id}", async (IMediator mediator, int id,
+                 UpdateClientProfileRequest updateClientProfileRequest, CancellationToken ct) =>
                 {
                     var command = updateClientProfileRequest.Adapt<UpdateClientProfileCommand>() with { Id = id };
                     var result = await mediator.Send(command, ct);
@@ -60,8 +60,6 @@ namespace Frelance.Web.Modules
                 return Results.Ok(result);
             }).WithTags("ClientProfiles").
             RequireAuthorization("ClientRole");
-            createClientProfileEndpoint.RemoveAntiforgery();
-            updateClientProfileEndpoint.RemoveAntiforgery();
         }
 
     }

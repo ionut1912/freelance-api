@@ -15,17 +15,15 @@ public static class InvoicesModule
 {
     public static void AddInvoicesEndpoints(this IEndpointRouteBuilder app)
     {
-        var createInvoiceEnpoint = app.MapPost("/api/invoice",
-                async (IMediator mediator, [FromForm] CreateInvoiceRequest createInvoiceRequest,
+        app.MapPost("/api/invoice",
+                async (IMediator mediator, CreateInvoiceRequest createInvoiceRequest,
                     CancellationToken ct) =>
                 {
                     var result = await mediator.Send(createInvoiceRequest.Adapt<CreateInvoiceCommand>(), ct);
                     return Results.Ok(result);
                 })
-            .Accepts<InvoicesDto>("multipart/form-data")
             .WithTags("Invoices")
-            .RequireAuthorization("FreelancerRole")
-            .WithMetadata(new IgnoreAntiforgeryTokenAttribute());
+            .RequireAuthorization("FreelancerRole");
         app.MapGet("/api/invoices/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
                     {
                         var invoice = await mediator.Send(new GetInvoiceByIdQuery(id), ct);
@@ -40,14 +38,14 @@ public static class InvoicesModule
                     paginatedInvoices.TotalCount, paginatedInvoices.TotalPages, paginatedInvoices.Items);
             }).WithTags("Invoices").
             RequireAuthorization();
-        var updateInvoiceEndpoint = app.MapPut("/api/invoices/{id}", async (IMediator mediator, int id,
-            [FromForm] UpdateInvoiceRequest updateInvoiceRequest, CancellationToken ct) =>
-        {
-            var command = updateInvoiceRequest.Adapt<UpdateInvoiceCommand>() with { Id = id };
-            var result = await mediator.Send(command, ct);
-            return Results.Ok(result);
-        }).WithTags("Invoices")
-            .RequireAuthorization();
+        app.MapPut("/api/invoices/{id}", async (IMediator mediator, int id,
+                    UpdateInvoiceRequest updateInvoiceRequest, CancellationToken ct) =>
+               {
+                   var command = updateInvoiceRequest.Adapt<UpdateInvoiceCommand>() with { Id = id };
+                   var result = await mediator.Send(command, ct);
+                   return Results.Ok(result);
+               }).WithTags("Invoices")
+                   .RequireAuthorization();
         app.MapDelete("/api/invoices/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
             {
                 var command = new DeleteInvoiceCommand(id);
@@ -55,7 +53,5 @@ public static class InvoicesModule
                 return Results.Ok(result);
             }).WithTags("Invoices").
             RequireAuthorization();
-        createInvoiceEnpoint.RemoveAntiforgery();
-        updateInvoiceEndpoint.RemoveAntiforgery();
     }
 }

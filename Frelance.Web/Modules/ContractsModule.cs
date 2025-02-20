@@ -14,17 +14,15 @@ public static class ContractsModule
 {
     public static void AddContractEndpoints(this IEndpointRouteBuilder app)
     {
-        var createContractEndpoint = app.MapPost("/api/contracts",
-                async (IMediator mediator, [FromForm] CreateContractRequest addContractRequest, CancellationToken ct) =>
+        app.MapPost("/api/contracts",
+                async (IMediator mediator, CreateContractRequest addContractRequest, CancellationToken ct) =>
                 {
                     var command = addContractRequest.Adapt<CreateContractCommand>();
                     var result = await mediator.Send(command, ct);
                     return Results.Ok(result);
                 })
-            .Accepts<ContractsDto>("multipart/form-data")
             .WithTags("Contracts")
-            .RequireAuthorization("ClientRole")
-            .WithMetadata(new IgnoreAntiforgeryTokenAttribute());
+            .RequireAuthorization("ClientRole");
         app.MapGet("/api/contracts/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
             {
                 var contract = await mediator.Send(new GetContractByIdQuery(id), ct);
@@ -39,8 +37,8 @@ public static class ContractsModule
                     paginatedContracts.TotalCount, paginatedContracts.TotalPages, paginatedContracts.Items);
             }).WithTags("Contracts").
             RequireAuthorization();
-        var updateContractEndpoint = app.MapPut("/api/contracts/{id}", async (IMediator mediator, int id,
-                [FromForm] UpdateContractRequest updateContractRequest, CancellationToken ct) =>
+        app.MapPut("/api/contracts/{id}", async (IMediator mediator, int id,
+                 UpdateContractRequest updateContractRequest, CancellationToken ct) =>
             {
                 var command = updateContractRequest.Adapt<UpdateContractCommand>() with { Id = id };
                 var result = await mediator.Send(command, ct);
@@ -54,8 +52,7 @@ public static class ContractsModule
                 return Results.Ok(result);
             }).WithTags("Contracts").
             RequireAuthorization();
-        createContractEndpoint.RemoveAntiforgery();
-        updateContractEndpoint.RemoveAntiforgery();
+
     }
 
 }
