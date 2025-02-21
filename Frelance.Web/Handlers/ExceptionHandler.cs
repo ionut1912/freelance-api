@@ -6,7 +6,8 @@ namespace Frelance.Web.Handlers;
 
 public class ExceptionHandler : IExceptionHandler
 {
-    public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
+    public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception,
+        CancellationToken cancellationToken)
     {
         var problemDetails = CreateProblemDetails(exception);
 
@@ -28,9 +29,7 @@ public class ExceptionHandler : IExceptionHandler
         };
 
         if (exception is CustomValidationException customValidationException)
-        {
             problemDetails.Extensions["errors"] = customValidationException.ValidationErrors;
-        }
 
         return problemDetails;
     }

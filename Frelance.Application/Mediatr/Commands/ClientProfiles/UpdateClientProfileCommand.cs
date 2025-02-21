@@ -4,4 +4,5 @@ using MediatR;
 namespace Frelance.Application.Mediatr.Commands.ClientProfiles;
 
 public record UpdateClientProfileCommand(
-    int Id, UpdateClientProfileRequest UpdateClientProfileRequest) : IRequest<Unit>;
+    int Id,
+    UpdateClientProfileRequest UpdateClientProfileRequest) : IRequest<Unit>;

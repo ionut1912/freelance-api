@@ -1,9 +1,6 @@
 using System.Reflection;
 using System.Text;
-using Azure.Identity;
-using Azure.Security.KeyVault.Secrets;
 using Frelance.Application.Repositories;
-using Frelance.Contracts.Dtos;
 using Frelance.Infrastructure.Context;
 using Frelance.Infrastructure.Entities;
 using Frelance.Infrastructure.Mappings;
@@ -17,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+
 namespace Frelance.Infrastructure;
 
 public static class DependencyInjection
@@ -36,22 +34,21 @@ public static class DependencyInjection
         {
             var connectionString = configuration["ConnectionString"];
             if (string.IsNullOrEmpty(connectionString))
-            {
-                throw new InvalidOperationException($"The secret '{nameof(connectionString)}' returned an empty connection string.");
-            }
+                throw new InvalidOperationException(
+                    $"The secret '{nameof(connectionString)}' returned an empty connection string.");
 
             logger.LogInformation("Connection string retrieved successfully. (Value not displayed for security)");
             databaseSettings.ConnectionString = connectionString;
 
             var jwtTokenKey = configuration["JwtTokenKey"];
             if (string.IsNullOrEmpty(jwtTokenKey))
-            {
-                throw new InvalidOperationException($"The secret '{nameof(jwtTokenKey)}' returned an empty JWT token key.");
-            }
+                throw new InvalidOperationException(
+                    $"The secret '{nameof(jwtTokenKey)}' returned an empty JWT token key.");
 
             logger.LogInformation("JWT token key retrieved successfully. (Value not displayed for security)");
 
-            services.AddDbContext<FrelanceDbContext>(options => options.UseSqlServer(databaseSettings.ConnectionString));
+            services.AddDbContext<FrelanceDbContext>(options =>
+                options.UseSqlServer(databaseSettings.ConnectionString));
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(opt =>
                 {

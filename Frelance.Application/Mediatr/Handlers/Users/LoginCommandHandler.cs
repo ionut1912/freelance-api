@@ -14,6 +14,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, UserDto>
         ArgumentNullException.ThrowIfNull(accountRepository, nameof(accountRepository));
         _accountRepository = accountRepository;
     }
+
     public async Task<UserDto> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
         return await _accountRepository.LoginAsync(request.LoginDto, cancellationToken);

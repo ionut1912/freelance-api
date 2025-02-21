@@ -1,12 +1,9 @@
-using Frelance.Application.Helpers;
 using Frelance.Application.Mediatr.Commands.Contracts;
 using Frelance.Application.Mediatr.Queries.Contracts;
 using Frelance.Application.Repositories;
 using Frelance.Contracts.Dtos;
-using Frelance.Contracts.Enums;
 using Frelance.Contracts.Exceptions;
 using Frelance.Contracts.Responses.Common;
-using Frelance.Infrastructure.Context;
 using Frelance.Infrastructure.Entities;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
@@ -15,11 +12,11 @@ namespace Frelance.Infrastructure.Services;
 
 public class ContractRepository : IContractRepository
 {
-    private readonly IUserAccessor _userAccessor;
+    private readonly IGenericRepository<ClientProfiles> _clientProfilesRepository;
     private readonly IGenericRepository<Entities.Contracts> _contractsRepository;
     private readonly IGenericRepository<FreelancerProfiles> _freelancerProfilesRepository;
-    private readonly IGenericRepository<ClientProfiles> _clientProfilesRepository;
     private readonly IGenericRepository<Projects> _projectsRepository;
+    private readonly IUserAccessor _userAccessor;
 
     public ContractRepository(
         IUserAccessor userAccessor,
@@ -48,27 +45,23 @@ public class ContractRepository : IContractRepository
             .FirstOrDefaultAsync(cancellationToken);
 
         if (freelancer is null)
-        {
-            throw new NotFoundException($"{nameof(FreelancerProfiles)} with {nameof(FreelancerProfiles.Users.UserName)}: {createContractCommand.CreateContractRequest.FreelancerName} doe not exist.");
-        }
+            throw new NotFoundException(
+                $"{nameof(FreelancerProfiles)} with {nameof(FreelancerProfiles.Users.UserName)}: {createContractCommand.CreateContractRequest.FreelancerName} doe not exist.");
 
         var client = await _clientProfilesRepository.Query()
             .Where(x => x.Users!.UserName == _userAccessor.GetUsername())
             .Include(x => x.Users)
             .FirstOrDefaultAsync(cancellationToken);
         if (client is null)
-        {
-            throw new NotFoundException($"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Users.UserName)}: {_userAccessor.GetUsername()} doe not exist.");
-        }
+            throw new NotFoundException(
+                $"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Users.UserName)}: {_userAccessor.GetUsername()} doe not exist.");
 
         var project = await _projectsRepository.Query()
             .Where(x => x.Title == createContractCommand.CreateContractRequest.ProjectName)
             .FirstOrDefaultAsync(cancellationToken);
         if (project is null)
-        {
             throw new NotFoundException(
                 $"{nameof(Projects)} with {nameof(Projects.Title)}: {createContractCommand.CreateContractRequest.ProjectName} doe not exist.");
-        }
 
         var contract = createContractCommand.CreateContractRequest.Adapt<Entities.Contracts>();
         contract.ProjectId = project.Id;
@@ -78,7 +71,8 @@ public class ContractRepository : IContractRepository
         await _contractsRepository.AddAsync(contract, cancellationToken);
     }
 
-    public async Task<ContractsDto> GetContractByIdAsync(GetContractByIdQuery query, CancellationToken cancellationToken)
+    public async Task<ContractsDto> GetContractByIdAsync(GetContractByIdQuery query,
+        CancellationToken cancellationToken)
     {
         var contract = await _contractsRepository.Query()
             .Where(x => x.Id == query.Id)
@@ -89,14 +83,14 @@ public class ContractRepository : IContractRepository
             .ThenInclude(f => f.Users)
             .FirstOrDefaultAsync(cancellationToken);
         if (contract is null)
-        {
-            throw new NotFoundException($"{nameof(Entities.Contracts)} with {nameof(Entities.Contracts.Id)}: {query.Id} doe not exist.");
-        }
+            throw new NotFoundException(
+                $"{nameof(Entities.Contracts)} with {nameof(Entities.Contracts.Id)}: {query.Id} doe not exist.");
 
         return contract.Adapt<ContractsDto>();
     }
 
-    public async Task<PaginatedList<ContractsDto>> GetContractsAsync(GetContractsQuery query, CancellationToken cancellationToken)
+    public async Task<PaginatedList<ContractsDto>> GetContractsAsync(GetContractsQuery query,
+        CancellationToken cancellationToken)
     {
         var contractsQuery = _contractsRepository.Query()
             .Include(x => x.Client)
@@ -111,10 +105,12 @@ public class ContractRepository : IContractRepository
             .Take(query.PaginationParams.PageSize)
             .ToListAsync(cancellationToken);
 
-        return new PaginatedList<ContractsDto>(items, count, query.PaginationParams.PageNumber, query.PaginationParams.PageSize);
+        return new PaginatedList<ContractsDto>(items, count, query.PaginationParams.PageNumber,
+            query.PaginationParams.PageSize);
     }
 
-    public async Task UpdateContractAsync(UpdateContractCommand updateContractCommand, CancellationToken cancellationToken)
+    public async Task UpdateContractAsync(UpdateContractCommand updateContractCommand,
+        CancellationToken cancellationToken)
     {
         var contract = await _contractsRepository.Query()
             .Where(x => x.Id == updateContractCommand.Id)
@@ -125,9 +121,8 @@ public class ContractRepository : IContractRepository
             .ThenInclude(x => x.Projects)
             .FirstOrDefaultAsync(cancellationToken);
         if (contract is null)
-        {
-            throw new NotFoundException($"nameof(Entities.Contracts) with {nameof(Entities.Contracts.Id)}: {updateContractCommand.Id} doe not exist.");
-        }
+            throw new NotFoundException(
+                $"nameof(Entities.Contracts) with {nameof(Entities.Contracts.Id)}: {updateContractCommand.Id} doe not exist.");
 
         updateContractCommand.UpdateContractRequest.Adapt(contract);
 
@@ -145,8 +140,8 @@ public class ContractRepository : IContractRepository
     }
 
 
-
-    public async Task DeleteContractAsync(DeleteContractCommand deleteContractCommand, CancellationToken cancellationToken)
+    public async Task DeleteContractAsync(DeleteContractCommand deleteContractCommand,
+        CancellationToken cancellationToken)
     {
         var contractToDelete = await _contractsRepository.Query()
             .Where(x => x.Id == deleteContractCommand.Id)
@@ -154,9 +149,8 @@ public class ContractRepository : IContractRepository
             .FirstOrDefaultAsync(cancellationToken);
 
         if (contractToDelete is null)
-        {
-            throw new NotFoundException($"{nameof(Entities.Contracts)} with {nameof(Entities.Contracts.Id)}: {deleteContractCommand.Id} doe not exist.");
-        }
+            throw new NotFoundException(
+                $"{nameof(Entities.Contracts)} with {nameof(Entities.Contracts.Id)}: {deleteContractCommand.Id} doe not exist.");
 
         _contractsRepository.Delete(contractToDelete);
     }

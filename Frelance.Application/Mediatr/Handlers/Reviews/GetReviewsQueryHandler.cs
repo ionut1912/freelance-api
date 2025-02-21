@@ -13,7 +13,6 @@ public class GetReviewsQueryHandler : IRequestHandler<GetReviewsQuery, Paginated
     public GetReviewsQueryHandler(IReviewRepository reviewRepository)
     {
         _reviewRepository = reviewRepository;
-
     }
 
     public async Task<PaginatedList<ReviewsDto>> Handle(GetReviewsQuery request, CancellationToken cancellationToken)

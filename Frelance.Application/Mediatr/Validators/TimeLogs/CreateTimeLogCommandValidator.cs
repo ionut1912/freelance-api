@@ -11,5 +11,4 @@ public class CreateTimeLogCommandValidator : AbstractValidator<CreateTimeLogComm
         RuleFor(x => x.CreateTimeLogRequest.StartTime).NotEmpty();
         RuleFor(x => x.CreateTimeLogRequest.EndTime).NotEmpty();
     }
-
 }

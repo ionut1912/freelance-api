@@ -16,7 +16,8 @@ public class GetContractsQueryHandler : IRequestHandler<GetContractsQuery, Pagin
         _contractRepository = contractRepository;
     }
 
-    public async Task<PaginatedList<ContractsDto>> Handle(GetContractsQuery request, CancellationToken cancellationToken)
+    public async Task<PaginatedList<ContractsDto>> Handle(GetContractsQuery request,
+        CancellationToken cancellationToken)
     {
         return await _contractRepository.GetContractsAsync(request, cancellationToken);
     }

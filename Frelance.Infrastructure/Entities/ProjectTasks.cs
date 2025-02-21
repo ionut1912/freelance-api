@@ -1,5 +1,3 @@
-using Frelance.Contracts.Enums;
-
 namespace Frelance.Infrastructure.Entities;
 
 public class ProjectTasks

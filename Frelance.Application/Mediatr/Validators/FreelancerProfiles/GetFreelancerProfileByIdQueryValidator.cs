@@ -9,5 +9,4 @@ public class GetFreelancerProfileByIdQueryValidator : AbstractValidator<GetFreel
     {
         RuleFor(x => x.Id).NotEmpty();
     }
-
 }

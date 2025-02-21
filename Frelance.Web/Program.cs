@@ -1,6 +1,5 @@
 using Frelance.Application;
 using Frelance.Infrastructure;
-using Frelance.Web;
 using Frelance.Web.Handlers;
 using Frelance.Web.Modules;
 using Frelance.Web.SwaggerFilters;
@@ -17,7 +16,8 @@ builder.Services.AddSwaggerGen(options =>
         Scheme = "Bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "Enter 'Bearer' [space] and then your valid JWT token.\nExample: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+        Description =
+            "Enter 'Bearer' [space] and then your valid JWT token.\nExample: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
     });
 
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -31,7 +31,7 @@ builder.Services.AddSwaggerGen(options =>
                     Id = "Bearer"
                 }
             },
-            new string[] {}
+            new string[] { }
         }
     });
     options.OperationFilter<FileUploadOperationFilter>();
@@ -51,7 +51,8 @@ app.UseSwaggerUI();
 app.UseExceptionHandler(_ => { });
 app.UseCors(opt =>
 {
-    opt.WithOrigins("http://localhost:4200", "https://freelance-client.azurewebsites.net").AllowAnyHeader().AllowAnyMethod().AllowCredentials();
+    opt.WithOrigins("http://localhost:4200", "https://freelance-client.azurewebsites.net").AllowAnyHeader()
+        .AllowAnyMethod().AllowCredentials();
 });
 app.UseHttpsRedirection();
 app.UseAuthentication();

@@ -1,5 +1,4 @@
 using Frelance.Application.Mediatr.Commands.Reviews;
-using Frelance.Application.Mediatr.Queries.Projects;
 using Frelance.Application.Mediatr.Queries.Reviews;
 using Frelance.Contracts.Requests.Common;
 using Frelance.Contracts.Requests.Reviews;
@@ -15,12 +14,12 @@ public static class ReviewsModule
     public static void AddReviewsEndpoints(this IEndpointRouteBuilder app)
     {
         app.MapPost("/api/reviews", async (IMediator mediator, CreateReviewRequest addReviewRequest,
-            CancellationToken ct) =>
-        {
-            var result = await mediator.Send(addReviewRequest.Adapt<CreateReviewCommand>(), ct);
-            return Results.Ok(result);
-        }).WithTags("Reviews")
-        .RequireAuthorization();
+                CancellationToken ct) =>
+            {
+                var result = await mediator.Send(addReviewRequest.Adapt<CreateReviewCommand>(), ct);
+                return Results.Ok(result);
+            }).WithTags("Reviews")
+            .RequireAuthorization();
         app.MapGet("/api/reviews/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
             {
                 var project = await mediator.Send(new GetReviewByIdQuery(id), ct);
@@ -28,13 +27,16 @@ public static class ReviewsModule
             }).WithTags("Reviews")
             .RequireAuthorization();
 
-        app.MapGet("/api/reviews", async (IMediator mediator, [FromQuery] int pageSize, [FromQuery] int pageNumber, CancellationToken ct) =>
-            {
-                var paginatedReviews = await mediator.Send(new GetReviewsQuery
-                    (new PaginationParams { PageSize = pageSize, PageNumber = pageNumber }), ct);
-                return Results.Extensions.OkPaginationResult(paginatedReviews.PageSize, paginatedReviews.CurrentPage,
-                    paginatedReviews.TotalCount, paginatedReviews.TotalPages, paginatedReviews.Items);
-            }).WithTags("Reviews")
+        app.MapGet("/api/reviews",
+                async (IMediator mediator, [FromQuery] int pageSize, [FromQuery] int pageNumber,
+                    CancellationToken ct) =>
+                {
+                    var paginatedReviews = await mediator.Send(new GetReviewsQuery
+                        (new PaginationParams { PageSize = pageSize, PageNumber = pageNumber }), ct);
+                    return Results.Extensions.OkPaginationResult(paginatedReviews.PageSize,
+                        paginatedReviews.CurrentPage,
+                        paginatedReviews.TotalCount, paginatedReviews.TotalPages, paginatedReviews.Items);
+                }).WithTags("Reviews")
             .RequireAuthorization();
         app.MapPut("/api/reviews/{id}", async (IMediator mediator, int id,
                 UpdateReviewRequest updateReviewRequest, CancellationToken ct) =>
@@ -52,5 +54,4 @@ public static class ReviewsModule
             }).WithTags("Reviews")
             .RequireAuthorization();
     }
-
 }

@@ -1,6 +1,5 @@
 using Frelance.Application.Mediatr.Commands.Contracts;
 using Frelance.Application.Mediatr.Queries.Contracts;
-using Frelance.Contracts.Dtos;
 using Frelance.Contracts.Requests.Common;
 using Frelance.Contracts.Requests.Contracts;
 using Frelance.Web.Extensions;
@@ -24,35 +23,31 @@ public static class ContractsModule
             .WithTags("Contracts")
             .RequireAuthorization("ClientRole");
         app.MapGet("/api/contracts/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
-            {
-                var contract = await mediator.Send(new GetContractByIdQuery(id), ct);
-                return Results.Ok(contract);
-            }).WithTags("Contracts").
-            RequireAuthorization();
-        app.MapGet("/api/contracts", async (IMediator mediator, [FromQuery] int pageSize, [FromQuery] int pageNumber, CancellationToken ct) =>
+        {
+            var contract = await mediator.Send(new GetContractByIdQuery(id), ct);
+            return Results.Ok(contract);
+        }).WithTags("Contracts").RequireAuthorization();
+        app.MapGet("/api/contracts",
+            async (IMediator mediator, [FromQuery] int pageSize, [FromQuery] int pageNumber, CancellationToken ct) =>
             {
                 var paginatedContracts = await mediator.Send(new GetContractsQuery
                     (new PaginationParams { PageSize = pageSize, PageNumber = pageNumber }), ct);
-                return Results.Extensions.OkPaginationResult(paginatedContracts.PageSize, paginatedContracts.CurrentPage,
+                return Results.Extensions.OkPaginationResult(paginatedContracts.PageSize,
+                    paginatedContracts.CurrentPage,
                     paginatedContracts.TotalCount, paginatedContracts.TotalPages, paginatedContracts.Items);
-            }).WithTags("Contracts").
-            RequireAuthorization();
+            }).WithTags("Contracts").RequireAuthorization();
         app.MapPut("/api/contracts/{id}", async (IMediator mediator, int id,
-                 UpdateContractRequest updateContractRequest, CancellationToken ct) =>
-            {
-                var command = updateContractRequest.Adapt<UpdateContractCommand>() with { Id = id };
-                var result = await mediator.Send(command, ct);
-                return Results.Ok(result);
-            }).WithTags("Contracts").
-            RequireAuthorization();
+            UpdateContractRequest updateContractRequest, CancellationToken ct) =>
+        {
+            var command = updateContractRequest.Adapt<UpdateContractCommand>() with { Id = id };
+            var result = await mediator.Send(command, ct);
+            return Results.Ok(result);
+        }).WithTags("Contracts").RequireAuthorization();
         app.MapDelete("/api/contracts/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
-            {
-                var command = new DeleteContractCommand(id);
-                var result = await mediator.Send(command, ct);
-                return Results.Ok(result);
-            }).WithTags("Contracts").
-            RequireAuthorization();
-
+        {
+            var command = new DeleteContractCommand(id);
+            var result = await mediator.Send(command, ct);
+            return Results.Ok(result);
+        }).WithTags("Contracts").RequireAuthorization();
     }
-
 }

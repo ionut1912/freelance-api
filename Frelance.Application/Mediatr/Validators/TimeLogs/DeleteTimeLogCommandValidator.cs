@@ -9,5 +9,4 @@ public class DeleteTimeLogCommandValidator : AbstractValidator<DeleteTimeLogComm
     {
         RuleFor(x => x.Id).NotEmpty();
     }
-
 }

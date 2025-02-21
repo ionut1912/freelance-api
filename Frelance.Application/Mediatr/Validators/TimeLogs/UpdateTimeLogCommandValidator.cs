@@ -10,5 +10,4 @@ public class UpdateTimeLogCommandValidator : AbstractValidator<UpdateTimeLogComm
         RuleFor(x => x.Id).NotEmpty();
         RuleFor(x => x.UpdateTimeLogRequest.TotalHours).GreaterThan(0);
     }
-
 }

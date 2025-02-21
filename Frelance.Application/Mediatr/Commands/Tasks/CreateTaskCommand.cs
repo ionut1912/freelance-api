@@ -1,4 +1,3 @@
-using Frelance.Contracts.Enums;
 using Frelance.Contracts.Requests.ProjectTasks;
 using MediatR;
 

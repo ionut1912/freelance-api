@@ -9,5 +9,4 @@ public class DeleteTaskCommandValidator : AbstractValidator<DeleteTaskCommand>
     {
         RuleFor(x => x.Id).NotEmpty();
     }
-
 }

@@ -1,5 +1,4 @@
 using Frelance.Application.Mediatr.Commands.Proposals;
-using Frelance.Application.Mediatr.Queries.Projects;
 using Frelance.Application.Mediatr.Queries.Proposals;
 using Frelance.Contracts.Requests.Common;
 using Frelance.Contracts.Requests.Proposals;
@@ -22,18 +21,20 @@ public static class ProposalsModule
             }).WithTags("Proposals")
             .RequireAuthorization();
         app.MapGet("/api/proposals/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
-            {
-                var proposal = await mediator.Send(new GetProposalByIdQuery(id), ct);
-                return Results.Ok(proposal);
-            }).WithTags("Proposals").
-            RequireAuthorization();
-        app.MapGet("/api/proposals", async (IMediator mediator, [FromQuery] int pageSize, [FromQuery] int pageNumber, CancellationToken ct) =>
-            {
-                var paginatedProposals = await mediator.Send(new GetProposalsQuery
-                    (new PaginationParams { PageSize = pageSize, PageNumber = pageNumber }), ct);
-                return Results.Extensions.OkPaginationResult(paginatedProposals.PageSize, paginatedProposals.CurrentPage,
-                    paginatedProposals.TotalCount, paginatedProposals.TotalPages, paginatedProposals.Items);
-            }).WithTags("Proposals")
+        {
+            var proposal = await mediator.Send(new GetProposalByIdQuery(id), ct);
+            return Results.Ok(proposal);
+        }).WithTags("Proposals").RequireAuthorization();
+        app.MapGet("/api/proposals",
+                async (IMediator mediator, [FromQuery] int pageSize, [FromQuery] int pageNumber,
+                    CancellationToken ct) =>
+                {
+                    var paginatedProposals = await mediator.Send(new GetProposalsQuery
+                        (new PaginationParams { PageSize = pageSize, PageNumber = pageNumber }), ct);
+                    return Results.Extensions.OkPaginationResult(paginatedProposals.PageSize,
+                        paginatedProposals.CurrentPage,
+                        paginatedProposals.TotalCount, paginatedProposals.TotalPages, paginatedProposals.Items);
+                }).WithTags("Proposals")
             .RequireAuthorization();
 
         app.MapPut("/api/proposals/{id}", async (IMediator mediator, int id,

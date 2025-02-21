@@ -14,6 +14,7 @@ public class GetSkillsQueryHandler : IRequestHandler<GetSkillsQuery, List<SkillD
         ArgumentNullException.ThrowIfNull(skillRepository, nameof(skillRepository));
         _skillRepository = skillRepository;
     }
+
     public async Task<List<SkillDto>> Handle(GetSkillsQuery request, CancellationToken cancellationToken)
     {
         return await _skillRepository.GetSkillsAsync(cancellationToken);

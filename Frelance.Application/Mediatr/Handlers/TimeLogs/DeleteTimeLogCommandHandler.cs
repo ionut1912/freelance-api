@@ -16,9 +16,9 @@ public class DeleteTimeLogCommandHandler : IRequestHandler<DeleteTimeLogCommand,
         _timeLogRepository = timeLogRepository;
         _unitOfWork = unitOfWork;
     }
+
     public async Task<Unit> Handle(DeleteTimeLogCommand request, CancellationToken cancellationToken)
     {
-
         await _timeLogRepository.DeleteTimeLogAsync(request, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;

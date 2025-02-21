@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Skills;
 
-public record GetSkillsQuery() : IRequest<List<SkillDto>>;
+public record GetSkillsQuery : IRequest<List<SkillDto>>;

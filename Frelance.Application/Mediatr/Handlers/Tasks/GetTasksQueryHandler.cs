@@ -1,4 +1,3 @@
-using Frelance.Application.Helpers;
 using Frelance.Application.Mediatr.Queries.Tasks;
 using Frelance.Application.Repositories;
 using Frelance.Contracts.Dtos;
@@ -16,6 +15,7 @@ public class GetTasksQueryHandler : IRequestHandler<GetTasksQuery, PaginatedList
         ArgumentNullException.ThrowIfNull(taskRepository, nameof(taskRepository));
         _taskRepository = taskRepository;
     }
+
     public async Task<PaginatedList<TaskDto>> Handle(GetTasksQuery request, CancellationToken cancellationToken)
     {
         return await _taskRepository.GetTasksAsync(request, cancellationToken);

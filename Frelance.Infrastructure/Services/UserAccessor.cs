@@ -15,10 +15,11 @@ public class UserAccessor : IUserAccessor
         ArgumentNullException.ThrowIfNull(httpContextAccessor, nameof(httpContextAccessor));
         _httpContextAccessor = httpContextAccessor;
     }
+
     public string GetUsername()
     {
         var username = _httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.Name)?.Value;
-        return username ?? throw new NotFoundException($"{nameof(Users)} with {nameof(Users.UserName)}: {username} not found");
+        return username ??
+               throw new NotFoundException($"{nameof(Users)} with {nameof(Users.UserName)}: {username} not found");
     }
-
 }

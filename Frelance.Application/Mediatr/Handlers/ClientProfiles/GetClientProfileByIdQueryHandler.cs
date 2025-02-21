@@ -14,6 +14,7 @@ public class GetClientProfileByIdQueryHandler : IRequestHandler<GetClientProfile
         ArgumentNullException.ThrowIfNull(clientProfileRepository, nameof(clientProfileRepository));
         _clientProfileRepository = clientProfileRepository;
     }
+
     public async Task<ClientProfileDto> Handle(GetClientProfileByIdQuery request, CancellationToken cancellationToken)
     {
         return await _clientProfileRepository.GetClientProfileByIdAsync(request, cancellationToken);

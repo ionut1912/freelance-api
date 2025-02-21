@@ -1,4 +1,3 @@
-using System.Data;
 using FluentValidation;
 using Frelance.Application.Mediatr.Commands.Users;
 
@@ -11,6 +10,5 @@ public class LoginUserCommandValidator : AbstractValidator<LoginCommand>
         RuleFor(x => x.LoginDto.Password).NotEmpty();
         RuleFor(x => x.LoginDto.Username).NotEmpty();
         RuleFor(x => x.LoginDto.Email).NotEmpty().EmailAddress();
-
     }
 }

@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Queries.ClientProfiles;
 
-public record GetLoggedInClientProfileQuery() : IRequest<ClientProfileDto?>;
+public record GetLoggedInClientProfileQuery : IRequest<ClientProfileDto?>;

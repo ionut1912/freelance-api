@@ -16,7 +16,8 @@ public class GetProposalsQueryHandler : IRequestHandler<GetProposalsQuery, Pagin
         _proposalRepository = proposalRepository;
     }
 
-    public async Task<PaginatedList<ProposalsDto>> Handle(GetProposalsQuery request, CancellationToken cancellationToken)
+    public async Task<PaginatedList<ProposalsDto>> Handle(GetProposalsQuery request,
+        CancellationToken cancellationToken)
     {
         return await _proposalRepository.GetProposalsAsync(request, cancellationToken);
     }

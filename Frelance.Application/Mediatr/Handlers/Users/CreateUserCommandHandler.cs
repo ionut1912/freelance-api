@@ -16,6 +16,7 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Unit>
         _accountRepository = accountRepository;
         _unitOfWork = unitOfWork;
     }
+
     public async Task<Unit> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
         await _accountRepository.RegisterAsync(request);

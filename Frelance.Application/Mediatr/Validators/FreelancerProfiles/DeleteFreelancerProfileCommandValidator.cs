@@ -9,5 +9,4 @@ public class DeleteFreelancerProfileCommandValidator : AbstractValidator<DeleteF
     {
         RuleFor(x => x.Id).NotEmpty();
     }
-
 }

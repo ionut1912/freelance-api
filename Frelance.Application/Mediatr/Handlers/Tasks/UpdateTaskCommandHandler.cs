@@ -4,7 +4,6 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.Tasks;
 
-
 public class UpdateTaskCommandHandler : IRequestHandler<UpdateTaskCommand, Unit>
 {
     private readonly ITaskRepository _taskRepository;
@@ -17,11 +16,11 @@ public class UpdateTaskCommandHandler : IRequestHandler<UpdateTaskCommand, Unit>
         _taskRepository = taskRepository;
         _unitOfWork = unitOfWork;
     }
+
     public async Task<Unit> Handle(UpdateTaskCommand request, CancellationToken cancellationToken)
     {
         await _taskRepository.UpdateTaskAsync(request, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;
-
     }
 }

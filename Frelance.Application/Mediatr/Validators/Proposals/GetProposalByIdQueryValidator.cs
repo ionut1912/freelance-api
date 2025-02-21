@@ -9,5 +9,4 @@ public class GetProposalByIdQueryValidator : AbstractValidator<GetProposalByIdQu
     {
         RuleFor(x => x.Id).NotEmpty();
     }
-
 }

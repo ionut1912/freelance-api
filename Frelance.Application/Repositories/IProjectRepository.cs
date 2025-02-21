@@ -11,6 +11,7 @@ public interface IProjectRepository
     Task UpdateProjectAsync(UpdateProjectCommand updateProjectCommand, CancellationToken cancellationToken);
     Task DeleteProjectAsync(DeleteProjectCommand deleteProjectCommand, CancellationToken cancellationToken);
     Task<ProjectDto> FindProjectByIdAsync(GetProjectByIdQuery getProjectByIdQuery, CancellationToken cancellationToken);
-    Task<PaginatedList<ProjectDto>> FindProjectsAsync(GetProjectsQuery getProjectsQuery, CancellationToken cancellationToken);
 
+    Task<PaginatedList<ProjectDto>> FindProjectsAsync(GetProjectsQuery getProjectsQuery,
+        CancellationToken cancellationToken);
 }

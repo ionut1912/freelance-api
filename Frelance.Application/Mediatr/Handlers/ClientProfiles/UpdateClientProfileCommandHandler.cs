@@ -16,6 +16,7 @@ public class UpdateClientProfileCommandHandler : IRequestHandler<UpdateClientPro
         _clientProfileRepository = clientProfileRepository;
         _unitOfWork = unitOfWork;
     }
+
     public async Task<Unit> Handle(UpdateClientProfileCommand request, CancellationToken cancellationToken)
     {
         await _clientProfileRepository.UpdateClientProfileAsync(request, cancellationToken);

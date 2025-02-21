@@ -16,6 +16,7 @@ public class DeleteTaskCommandHandler : IRequestHandler<DeleteTaskCommand, Unit>
         _taskRepository = taskRepository;
         _unitOfWork = unitOfWork;
     }
+
     public async Task<Unit> Handle(DeleteTaskCommand request, CancellationToken cancellationToken)
     {
         await _taskRepository.DeleteTaskAsync(request, cancellationToken);

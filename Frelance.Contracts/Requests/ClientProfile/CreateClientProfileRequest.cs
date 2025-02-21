@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Http;
-
 namespace Frelance.Contracts.Requests.ClientProfile;
 
 public record CreateClientProfileRequest(

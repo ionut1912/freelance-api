@@ -4,7 +4,6 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.Tasks;
 
-
 public class CreateTaskCommandHandler : IRequestHandler<CreateTaskCommand, Unit>
 {
     private readonly ITaskRepository _taskRepository;
@@ -17,6 +16,7 @@ public class CreateTaskCommandHandler : IRequestHandler<CreateTaskCommand, Unit>
         _taskRepository = taskRepository;
         _unitOfWork = unitOfWork;
     }
+
     public async Task<Unit> Handle(CreateTaskCommand request, CancellationToken cancellationToken)
     {
         await _taskRepository.AddTaskAsync(request, cancellationToken);

@@ -2,7 +2,6 @@ using Frelance.Application.Mediatr.Commands.Users;
 using Frelance.Contracts.Dtos;
 using Mapster;
 using MediatR;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Frelance.Web.Modules;
 
@@ -22,6 +21,5 @@ public static class UserModule
             var result = await mediator.Send(loginDto.Adapt<LoginCommand>(), ct);
             return Results.Ok(result);
         }).WithTags("Users");
-
     }
 }
