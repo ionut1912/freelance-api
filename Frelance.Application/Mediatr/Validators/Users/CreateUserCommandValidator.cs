@@ -1,4 +1,3 @@
-using System.Data;
 using FluentValidation;
 using Frelance.Application.Mediatr.Commands.Users;
 
@@ -17,5 +16,4 @@ public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
         RuleFor(x => x.RegisterDto.Role).NotEmpty()
             .Must(r => r is "Freelancer" or "Client").WithMessage("Role must be either 'Freelancer' or 'Client'");
     }
-
 }

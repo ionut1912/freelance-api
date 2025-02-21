@@ -15,6 +15,7 @@ public class GetTimeLogsQueryHandler : IRequestHandler<GetTimeLogsQuery, Paginat
         ArgumentNullException.ThrowIfNull(timeLogRepository, nameof(timeLogRepository));
         _timeLogRepository = timeLogRepository;
     }
+
     public async Task<PaginatedList<TimeLogDto>> Handle(GetTimeLogsQuery request, CancellationToken cancellationToken)
     {
         return await _timeLogRepository.GetTimeLogsAsync(request, cancellationToken);

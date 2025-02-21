@@ -12,6 +12,7 @@ public class UnitOfWork : IUnitOfWork
         ArgumentNullException.ThrowIfNull(context, nameof(context));
         _context = context;
     }
+
     public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         await _context.SaveChangesAsync(cancellationToken);

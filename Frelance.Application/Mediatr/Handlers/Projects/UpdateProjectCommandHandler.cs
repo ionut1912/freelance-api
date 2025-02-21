@@ -16,11 +16,11 @@ public class UpdateProjectCommandHandler : IRequestHandler<UpdateProjectCommand,
         _projectRepository = projectRepository;
         _unitOfWork = unitOfWork;
     }
+
     public async Task<Unit> Handle(UpdateProjectCommand request, CancellationToken cancellationToken)
     {
         await _projectRepository.UpdateProjectAsync(request, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;
-
     }
 }

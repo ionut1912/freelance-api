@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Http;
-
 namespace Frelance.Contracts.Requests.FreelancerProfiles;
 
 public class UpdateFreelancerProfileRequest

@@ -16,7 +16,8 @@ public class GetClientProfilesQueryHandler : IRequestHandler<GetClientProfilesQu
         _clientProfileRepository = clientProfileRepository;
     }
 
-    public async Task<PaginatedList<ClientProfileDto>> Handle(GetClientProfilesQuery request, CancellationToken cancellationToken)
+    public async Task<PaginatedList<ClientProfileDto>> Handle(GetClientProfilesQuery request,
+        CancellationToken cancellationToken)
     {
         return await _clientProfileRepository.GetClientProfilesAsync(request, cancellationToken);
     }

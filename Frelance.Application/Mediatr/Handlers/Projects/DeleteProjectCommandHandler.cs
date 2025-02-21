@@ -15,8 +15,8 @@ public class DeleteProjectCommandHandler : IRequestHandler<DeleteProjectCommand,
         ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));
         _projectRepository = projectRepository;
         _unitOfWork = unitOfWork;
-
     }
+
     public async Task<Unit> Handle(DeleteProjectCommand request, CancellationToken cancellationToken)
     {
         await _projectRepository.DeleteProjectAsync(request, cancellationToken);

@@ -14,6 +14,7 @@ public class GetTimeLogByIdQueryHandler : IRequestHandler<GetTimeLogByIdQuery, T
         ArgumentNullException.ThrowIfNull(timeLogRepository, nameof(timeLogRepository));
         _timeLogRepository = timeLogRepository;
     }
+
     public async Task<TimeLogDto> Handle(GetTimeLogByIdQuery request, CancellationToken cancellationToken)
     {
         return await _timeLogRepository.GetTimeLogByIdAsync(request, cancellationToken);

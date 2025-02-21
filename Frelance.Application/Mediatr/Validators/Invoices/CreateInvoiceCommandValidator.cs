@@ -11,5 +11,4 @@ public class CreateInvoiceCommandValidator : AbstractValidator<CreateInvoiceComm
         RuleFor(x => x.CreateInvoiceRequest.ClientName).NotEmpty();
         RuleFor(x => x.CreateInvoiceRequest.Amount).NotEmpty().GreaterThan(0);
     }
-
 }

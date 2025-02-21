@@ -1,8 +1,4 @@
-﻿
-
-using Frelance.Contracts.Enums;
-
-namespace Frelance.Contracts.Requests.ProjectTasks;
+﻿namespace Frelance.Contracts.Requests.ProjectTasks;
 
 public record UpdateProjectTaskRequest
 {
@@ -10,4 +6,4 @@ public record UpdateProjectTaskRequest
     public string? Description { get; set; }
     public string? Status { get; set; }
     public string? Priority { get; set; }
-};
+}

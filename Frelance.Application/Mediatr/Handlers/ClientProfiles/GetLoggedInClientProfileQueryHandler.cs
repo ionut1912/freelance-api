@@ -16,7 +16,8 @@ public class GetLoggedInClientProfileQueryHandler :
         _clientProfileRepository = clientProfileRepository;
     }
 
-    public async Task<ClientProfileDto?> Handle(GetLoggedInClientProfileQuery request, CancellationToken cancellationToken)
+    public async Task<ClientProfileDto?> Handle(GetLoggedInClientProfileQuery request,
+        CancellationToken cancellationToken)
     {
         return await _clientProfileRepository.GetLoggedInClientProfileAsync(request, cancellationToken);
     }

@@ -14,7 +14,9 @@ public class GetFreelancerProfileByIdQueryHandler : IRequestHandler<GetFreelance
         ArgumentNullException.ThrowIfNull(freelancerProfileRepository, nameof(freelancerProfileRepository));
         _freelancerProfileRepository = freelancerProfileRepository;
     }
-    public async Task<FreelancerProfileDto> Handle(GetFreelancerProfileByIdQuery request, CancellationToken cancellationToken)
+
+    public async Task<FreelancerProfileDto> Handle(GetFreelancerProfileByIdQuery request,
+        CancellationToken cancellationToken)
     {
         return await _freelancerProfileRepository.GetFreelancerProfileByIdAsync(request, cancellationToken);
     }

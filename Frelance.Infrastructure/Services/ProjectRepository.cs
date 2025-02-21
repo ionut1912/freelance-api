@@ -1,12 +1,9 @@
-
-using Frelance.Application.Helpers;
 using Frelance.Application.Mediatr.Commands.Projects;
 using Frelance.Application.Mediatr.Queries.Projects;
 using Frelance.Application.Repositories;
 using Frelance.Contracts.Dtos;
 using Frelance.Contracts.Exceptions;
 using Frelance.Contracts.Responses.Common;
-using Frelance.Infrastructure.Context;
 using Frelance.Infrastructure.Entities;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +12,6 @@ namespace Frelance.Infrastructure.Services;
 
 public class ProjectRepository : IProjectRepository
 {
-
     private readonly IGenericRepository<Projects> _projectRepository;
     private readonly IGenericRepository<ProjectTechnologies> _projectTechnologyRepository;
     private readonly IUnitOfWork _unitOfWork;
@@ -24,15 +20,14 @@ public class ProjectRepository : IProjectRepository
         IGenericRepository<ProjectTechnologies> projectTechnologyRepository,
         IUnitOfWork unitOfWork)
     {
-
         ArgumentNullException.ThrowIfNull(projectRepository, nameof(projectRepository));
         ArgumentNullException.ThrowIfNull(projectTechnologyRepository, nameof(projectTechnologyRepository));
         ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));
         _projectRepository = projectRepository;
         _projectTechnologyRepository = projectTechnologyRepository;
         _unitOfWork = unitOfWork;
-
     }
+
     public async Task AddProjectAsync(CreateProjectCommand createProjectCommand, CancellationToken cancellationToken)
     {
         var project = createProjectCommand.CreateProjectRequest.Adapt<Projects>();
@@ -57,9 +52,8 @@ public class ProjectRepository : IProjectRepository
             .Where(x => x.Id == updateProjectCommand.Id)
             .FirstOrDefaultAsync(cancellationToken);
         if (projectToUpdate is null)
-        {
-            throw new NotFoundException($"{nameof(Projects)} with {nameof(Projects.Id)} : '{updateProjectCommand.Id}' does not exist");
-        }
+            throw new NotFoundException(
+                $"{nameof(Projects)} with {nameof(Projects.Id)} : '{updateProjectCommand.Id}' does not exist");
 
         projectToUpdate = updateProjectCommand.UpdateProjectRequest.Adapt<Projects>();
         _projectRepository.Update(projectToUpdate);
@@ -71,13 +65,13 @@ public class ProjectRepository : IProjectRepository
             .Where(x => x.Id == deleteProjectCommand.Id)
             .FirstOrDefaultAsync(cancellationToken);
         if (projectToDelete is null)
-        {
-            throw new NotFoundException($"{nameof(Projects)} with {nameof(Projects.Id)} : '{deleteProjectCommand.Id}' does not exist");
-        }
+            throw new NotFoundException(
+                $"{nameof(Projects)} with {nameof(Projects.Id)} : '{deleteProjectCommand.Id}' does not exist");
         _projectRepository.Delete(projectToDelete);
     }
 
-    public async Task<ProjectDto> FindProjectByIdAsync(GetProjectByIdQuery getProjectByIdQuery, CancellationToken cancellationToken)
+    public async Task<ProjectDto> FindProjectByIdAsync(GetProjectByIdQuery getProjectByIdQuery,
+        CancellationToken cancellationToken)
     {
         var project = await _projectRepository.Query()
             .Where(x => x.Id == getProjectByIdQuery.Id)
@@ -87,14 +81,14 @@ public class ProjectRepository : IProjectRepository
             .Include(x => x.Invoices)
             .FirstOrDefaultAsync(cancellationToken);
         if (project is null)
-        {
-            throw new NotFoundException($"{nameof(Projects)} with {nameof(Projects.Id)} : '{getProjectByIdQuery.Id}' does not exist");
-        }
+            throw new NotFoundException(
+                $"{nameof(Projects)} with {nameof(Projects.Id)} : '{getProjectByIdQuery.Id}' does not exist");
 
         return project.Adapt<ProjectDto>();
     }
 
-    public async Task<PaginatedList<ProjectDto>> FindProjectsAsync(GetProjectsQuery getProjectsQuery, CancellationToken cancellationToken)
+    public async Task<PaginatedList<ProjectDto>> FindProjectsAsync(GetProjectsQuery getProjectsQuery,
+        CancellationToken cancellationToken)
     {
         var projectQuery = _projectRepository.Query()
             .Include(x => x.Tasks)
@@ -108,7 +102,7 @@ public class ProjectRepository : IProjectRepository
             .Take(getProjectsQuery.PaginationParams.PageSize)
             .ToListAsync(cancellationToken);
 
-        return new PaginatedList<ProjectDto>(items, count, getProjectsQuery.PaginationParams.PageNumber, getProjectsQuery.PaginationParams.PageSize);
+        return new PaginatedList<ProjectDto>(items, count, getProjectsQuery.PaginationParams.PageNumber,
+            getProjectsQuery.PaginationParams.PageSize);
     }
-
 }

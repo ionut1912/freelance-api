@@ -15,7 +15,6 @@ public class UpdateInvoiceCommandHandler : IRequestHandler<UpdateInvoiceCommand,
         ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));
         _invoiceRepository = invoiceRepository;
         _unitOfWork = unitOfWork;
-
     }
 
     public async Task<Unit> Handle(UpdateInvoiceCommand request, CancellationToken cancellationToken)

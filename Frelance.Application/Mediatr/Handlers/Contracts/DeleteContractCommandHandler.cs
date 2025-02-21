@@ -15,7 +15,6 @@ public class DeleteContractCommandHandler : IRequestHandler<DeleteContractComman
         ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));
         _contractRepository = contractRepository;
         _unitOfWork = unitOfWork;
-
     }
 
     public async Task<Unit> Handle(DeleteContractCommand request, CancellationToken cancellationToken)

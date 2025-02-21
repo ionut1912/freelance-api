@@ -16,6 +16,7 @@ public class UpdateTimeLogCommandHandler : IRequestHandler<UpdateTimeLogCommand,
         _timeLogRepository = timeLogRepository;
         _unitOfWork = unitOfWork;
     }
+
     public async Task<Unit> Handle(UpdateTimeLogCommand request, CancellationToken cancellationToken)
     {
         await _timeLogRepository.UpdateTimeLogAsync(request, cancellationToken);

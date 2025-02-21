@@ -9,5 +9,4 @@ public class GetInvoiceByIdQueryValidator : AbstractValidator<GetInvoiceByIdQuer
     {
         RuleFor(x => x.Id).NotEmpty();
     }
-
 }

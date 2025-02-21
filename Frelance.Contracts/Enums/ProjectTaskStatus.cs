@@ -5,5 +5,5 @@ public enum ProjectTaskStatus
     ToDo,
     InProgress,
     Review,
-    Done,
+    Done
 }

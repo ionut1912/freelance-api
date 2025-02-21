@@ -1,7 +1,6 @@
 using Frelance.Application.Mediatr.Commands.Contracts;
 using Frelance.Application.Mediatr.Queries.Contracts;
 using Frelance.Contracts.Dtos;
-using Frelance.Contracts.Requests.Contracts;
 using Frelance.Contracts.Responses.Common;
 
 namespace Frelance.Application.Repositories;

@@ -16,6 +16,7 @@ public class DeleteFreelancerProfileCommandHandler : IRequestHandler<DeleteFreel
         _repository = repository;
         _unitOfWork = unitOfWork;
     }
+
     public async Task<Unit> Handle(DeleteFreelancerProfileCommand request, CancellationToken cancellationToken)
     {
         await _repository.DeleteFreelancerProfileAsync(request, cancellationToken);

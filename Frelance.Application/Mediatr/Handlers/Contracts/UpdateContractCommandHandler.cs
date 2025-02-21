@@ -15,7 +15,6 @@ public class UpdateContractCommandHandler : IRequestHandler<UpdateContractComman
         ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));
         _contractRepository = contractRepository;
         _unitOfWork = unitOfWork;
-
     }
 
 

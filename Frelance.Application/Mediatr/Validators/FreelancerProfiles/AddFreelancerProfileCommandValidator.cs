@@ -22,7 +22,5 @@ public class AddFreelancerProfileCommandValidator : AbstractValidator<CreateFree
         RuleFor(x => x.CreateFreelancerProfileRequest.Currency).NotEmpty();
         RuleFor(x => x.CreateFreelancerProfileRequest.Rating).NotEmpty();
         RuleFor(x => x.CreateFreelancerProfileRequest.PortfolioUrl).NotEmpty();
-
     }
-
 }

@@ -23,5 +23,4 @@ public class CreateProjectCommandHandler : IRequestHandler<CreateProjectCommand,
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;
     }
-
 }

@@ -12,7 +12,6 @@ public class GetInvoiceByIdQueryHandler : IRequestHandler<GetInvoiceByIdQuery, I
     public GetInvoiceByIdQueryHandler(IInvoiceRepository invoiceRepository)
     {
         _invoiceRepository = invoiceRepository;
-
     }
 
     public async Task<InvoicesDto> Handle(GetInvoiceByIdQuery request, CancellationToken cancellationToken)

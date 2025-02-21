@@ -9,5 +9,4 @@ public class DeleteInvoiceCommandValidator : AbstractValidator<DeleteInvoiceComm
     {
         RuleFor(x => x.Id).NotEmpty();
     }
-
 }

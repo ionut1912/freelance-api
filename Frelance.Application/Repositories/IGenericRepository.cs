@@ -7,5 +7,4 @@ public interface IGenericRepository<T> where T : class
     Task AddRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken);
     void Update(T entity);
     void Delete(T entity);
-
 }

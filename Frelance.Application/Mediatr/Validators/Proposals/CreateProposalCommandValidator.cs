@@ -10,5 +10,4 @@ public class CreateProposalCommandValidator : AbstractValidator<CreateProposalCo
         RuleFor(x => x.CreateProposalRequest.ProjectName).NotEmpty();
         RuleFor(x => x.CreateProposalRequest.ProposedBudget).NotEmpty();
     }
-
 }

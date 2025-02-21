@@ -1,7 +1,5 @@
-using Frelance.Application.Mediatr.Commands.FreelancerProfiles;
 using Frelance.Application.Mediatr.Commands.Invoices;
 using Frelance.Application.Mediatr.Queries.Invoices;
-using Frelance.Contracts.Dtos;
 using Frelance.Contracts.Requests.Common;
 using Frelance.Contracts.Requests.Invoices;
 using Frelance.Web.Extensions;
@@ -25,33 +23,31 @@ public static class InvoicesModule
             .WithTags("Invoices")
             .RequireAuthorization("FreelancerRole");
         app.MapGet("/api/invoices/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
-                    {
-                        var invoice = await mediator.Send(new GetInvoiceByIdQuery(id), ct);
-                        return Results.Ok(invoice);
-                    }).WithTags("Invoices").
-                    RequireAuthorization();
-        app.MapGet("/api/invoices", async (IMediator mediator, [FromQuery] int pageSize, [FromQuery] int pageNumber, CancellationToken ct) =>
+        {
+            var invoice = await mediator.Send(new GetInvoiceByIdQuery(id), ct);
+            return Results.Ok(invoice);
+        }).WithTags("Invoices").RequireAuthorization();
+        app.MapGet("/api/invoices",
+            async (IMediator mediator, [FromQuery] int pageSize, [FromQuery] int pageNumber, CancellationToken ct) =>
             {
                 var paginatedInvoices = await mediator.Send(new GetInvoicesQuery
                     (new PaginationParams { PageSize = pageSize, PageNumber = pageNumber }), ct);
                 return Results.Extensions.OkPaginationResult(paginatedInvoices.PageSize, paginatedInvoices.CurrentPage,
                     paginatedInvoices.TotalCount, paginatedInvoices.TotalPages, paginatedInvoices.Items);
-            }).WithTags("Invoices").
-            RequireAuthorization();
+            }).WithTags("Invoices").RequireAuthorization();
         app.MapPut("/api/invoices/{id}", async (IMediator mediator, int id,
-                    UpdateInvoiceRequest updateInvoiceRequest, CancellationToken ct) =>
-               {
-                   var command = updateInvoiceRequest.Adapt<UpdateInvoiceCommand>() with { Id = id };
-                   var result = await mediator.Send(command, ct);
-                   return Results.Ok(result);
-               }).WithTags("Invoices")
-                   .RequireAuthorization();
-        app.MapDelete("/api/invoices/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
+                UpdateInvoiceRequest updateInvoiceRequest, CancellationToken ct) =>
             {
-                var command = new DeleteInvoiceCommand(id);
+                var command = updateInvoiceRequest.Adapt<UpdateInvoiceCommand>() with { Id = id };
                 var result = await mediator.Send(command, ct);
                 return Results.Ok(result);
-            }).WithTags("Invoices").
-            RequireAuthorization();
+            }).WithTags("Invoices")
+            .RequireAuthorization();
+        app.MapDelete("/api/invoices/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
+        {
+            var command = new DeleteInvoiceCommand(id);
+            var result = await mediator.Send(command, ct);
+            return Results.Ok(result);
+        }).WithTags("Invoices").RequireAuthorization();
     }
 }

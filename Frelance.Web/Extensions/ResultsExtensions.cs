@@ -1,6 +1,7 @@
 using System.Text.Json;
 
 namespace Frelance.Web.Extensions;
+
 public static class ResultsExtensions
 {
     public static IResult OkPaginationResult(this IResultExtensions resultExtensions,

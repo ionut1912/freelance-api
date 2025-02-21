@@ -9,5 +9,4 @@ public class GetContractByIdQueryValidator : AbstractValidator<GetContractByIdQu
     {
         RuleFor(x => x.Id).NotEmpty();
     }
-
 }

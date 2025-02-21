@@ -5,7 +5,6 @@ using MediatR;
 
 namespace Frelance.Application.Behaviors;
 
-
 public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : notnull
 {
@@ -30,10 +29,7 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
             .Select(x => new ValidationError(x.PropertyName, x.ErrorMessage))
             .ToList();
 
-        if (failures.Count > 0)
-        {
-            throw new CustomValidationException(failures);
-        }
+        if (failures.Count > 0) throw new CustomValidationException(failures);
 
         var response = await next();
         return response;

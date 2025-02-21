@@ -11,7 +11,5 @@ public class UpdateProjectCommandValidator : AbstractValidator<UpdateProjectComm
         RuleFor(x => x.UpdateProjectRequest.Title).MaximumLength(40);
         RuleFor(x => x.UpdateProjectRequest.Description).MaximumLength(500);
         RuleFor(x => x.UpdateProjectRequest.Budget).GreaterThan(0);
-
     }
-
 }

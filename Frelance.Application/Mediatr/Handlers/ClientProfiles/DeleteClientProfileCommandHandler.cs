@@ -1,4 +1,3 @@
-
 using Frelance.Application.Mediatr.Commands.ClientProfiles;
 using Frelance.Application.Repositories;
 using MediatR;
@@ -17,6 +16,7 @@ public class DeleteClientProfileCommandHandler : IRequestHandler<DeleteClientPro
         _clientProfileRepository = clientProfileRepository;
         _unitOfWork = unitOfWork;
     }
+
     public async Task<Unit> Handle(DeleteClientProfileCommand request, CancellationToken cancellationToken)
     {
         await _clientProfileRepository.DeleteClientProfileAsync(request, cancellationToken);

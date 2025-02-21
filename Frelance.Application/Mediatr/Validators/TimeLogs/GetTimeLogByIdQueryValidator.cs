@@ -9,5 +9,4 @@ public class GetTimeLogByIdQueryValidator : AbstractValidator<GetTimeLogByIdQuer
     {
         RuleFor(x => x.Id).NotEmpty();
     }
-
 }
