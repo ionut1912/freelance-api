@@ -112,7 +112,7 @@ public class FreelancerProfileRepository : IFreelancerProfileRepository
         return profile.Adapt<FreelancerProfileDto>();
     }
 
-    public async Task<FreelancerProfileDto?> GetLoggedInFreelancerProfileAsync(
+    public async Task<FreelancerProfileDto> GetLoggedInFreelancerProfileAsync(
         GetLoggedInFreelancerProfileQuery getLoggedInFreelancerProfileQuery,
         CancellationToken cancellationToken)
     {

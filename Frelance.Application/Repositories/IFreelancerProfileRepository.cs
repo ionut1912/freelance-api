@@ -13,7 +13,7 @@ public interface IFreelancerProfileRepository
     Task<FreelancerProfileDto> GetFreelancerProfileByIdAsync(
         GetFreelancerProfileByIdQuery getFreelancerProfileByIdQuery, CancellationToken cancellationToken);
 
-    Task<FreelancerProfileDto?> GetLoggedInFreelancerProfileAsync(
+    Task<FreelancerProfileDto> GetLoggedInFreelancerProfileAsync(
         GetLoggedInFreelancerProfileQuery getLoggedInFreelancerProfileQuery, CancellationToken cancellationToken);
 
     Task<PaginatedList<FreelancerProfileDto>> GetAllFreelancerProfilesAsync(

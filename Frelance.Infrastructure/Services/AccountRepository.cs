@@ -17,7 +17,7 @@ public class AccountRepository : IAccountRepository
     private readonly TokenService _tokenService;
     private readonly UserManager<Users> _userManager;
 
-    public AccountRepository(FrelanceDbContext dbContext, UserManager<Users> userManager, TokenService tokenService)
+    public AccountRepository(UserManager<Users> userManager, TokenService tokenService)
     {
         ArgumentNullException.ThrowIfNull(userManager, nameof(userManager));
         ArgumentNullException.ThrowIfNull(tokenService, nameof(tokenService));
