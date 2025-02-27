@@ -10,4 +10,5 @@ public class ClientProfileDto
     public List<ProjectDto>? Projects { get; set; }
     public List<InvoicesDto>? Invoices { get; set; }
     public required string Image { get; set; }
+    public bool IsVerified { get; set; }
 }

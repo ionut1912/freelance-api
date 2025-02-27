@@ -62,6 +62,7 @@ public class MappingConfig
                     StreetNumber = src.AddressStreetNumber,
                     ZipCode = src.AddressZip
                 };
+                dest.IsVerified = false;
             });
 
         TypeAdapterConfig<ClientProfiles, ClientProfileDto>
@@ -73,7 +74,8 @@ public class MappingConfig
             .Map(dest => dest.Contracts, src => src.Contracts.Adapt<List<ContractsDto>>())
             .Map(dest => dest.Invoices, src => src.Invoices.Adapt<List<InvoicesDto>>())
             .Map(dest => dest.Projects, src => src.Projects.Adapt<List<ProjectDto>>())
-            .Map(dest => dest.Image, src => src.Image);
+            .Map(dest => dest.Image, src => src.Image)
+            .Map(dest => dest.IsVerified, src => src.IsVerified);
 
         TypeAdapterConfig<Users, UserProfileDto>
             .NewConfig()
@@ -182,6 +184,7 @@ public class MappingConfig
                 dest.Bio = !string.IsNullOrEmpty(src.Bio) ? src.Bio : dest.Bio;
                 dest.Image = !string.IsNullOrEmpty(src.Image) ? src.Image : dest.Image;
                 dest.UpdatedAt = DateTime.UtcNow;
+                dest.IsVerified = true;
             });
 
         TypeAdapterConfig<CreateContractRequest, CreateContractCommand>
@@ -253,6 +256,7 @@ public class MappingConfig
                     .ToList();
                 dest.CreatedAt = DateTime.UtcNow;
                 dest.IsAvailable = true;
+                dest.IsVerified = false;
             });
 
 
@@ -296,6 +300,7 @@ public class MappingConfig
                 dest.PortfolioUrl = src.PortfolioUrl ?? dest.PortfolioUrl;
                 dest.Image = !string.IsNullOrWhiteSpace(src.Image) ? src.Image : dest.Image;
                 dest.UpdatedAt = DateTime.UtcNow;
+                dest.IsVerified = true;
             });
 
         TypeAdapterConfig<CreateInvoiceRequest, CreateInvoiceCommand>
@@ -473,7 +478,8 @@ public class MappingConfig
             .Map(dest => dest.Currency, src => src.Currency)
             .Map(dest => dest.Rating, src => src.Rating)
             .Map(dest => dest.PortfolioUrl, src => src.PortfolioUrl)
-            .Map(dest => dest.Image, src => src.Image);
+            .Map(dest => dest.Image, src => src.Image)
+            .Map(dest => dest.IsVerified, src => src.IsVerified);
 
         TypeAdapterConfig<List<Skills>, List<SkillDto>>
             .NewConfig()
