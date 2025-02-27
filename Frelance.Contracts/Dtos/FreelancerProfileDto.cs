@@ -15,4 +15,5 @@ public record FreelancerProfileDto(
     string Currency,
     int Rating,
     string Image,
+    bool IsVerified,
     string PortfolioUrl);
