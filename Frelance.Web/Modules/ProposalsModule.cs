@@ -16,8 +16,8 @@ public static class ProposalsModule
         app.MapPost("/api/proposals", async (IMediator mediator, CreateProposalRequest createProposalRequest,
                 CancellationToken ct) =>
             {
-                var result = await mediator.Send(createProposalRequest.Adapt<CreateProposalCommand>(), ct);
-                return Results.Ok(result);
+                await mediator.Send(createProposalRequest.Adapt<CreateProposalCommand>(), ct);
+                return Results.Created();
             }).WithTags("Proposals")
             .RequireAuthorization();
         app.MapGet("/api/proposals/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
@@ -41,15 +41,15 @@ public static class ProposalsModule
                 UpdateProposalRequest updateProposalRequest, CancellationToken ct) =>
             {
                 var command = updateProposalRequest.Adapt<UpdateProposalCommand>() with { Id = id };
-                var result = await mediator.Send(command, ct);
-                return Results.Ok(result);
+                await mediator.Send(command, ct);
+                return Results.NoContent();
             }).WithTags("Proposals")
             .RequireAuthorization();
         app.MapDelete("/api/proposals/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
             {
                 var command = new DeleteProposalCommand(id);
-                var result = await mediator.Send(command, ct);
-                return Results.Ok(result);
+                await mediator.Send(command, ct);
+                return Results.NoContent();
             }).WithTags("Proposals")
             .RequireAuthorization();
     }

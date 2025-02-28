@@ -17,8 +17,8 @@ public static class InvoicesModule
                 async (IMediator mediator, CreateInvoiceRequest createInvoiceRequest,
                     CancellationToken ct) =>
                 {
-                    var result = await mediator.Send(createInvoiceRequest.Adapt<CreateInvoiceCommand>(), ct);
-                    return Results.Ok(result);
+                    await mediator.Send(createInvoiceRequest.Adapt<CreateInvoiceCommand>(), ct);
+                    return Results.Created();
                 })
             .WithTags("Invoices")
             .RequireAuthorization("FreelancerRole");
@@ -39,15 +39,15 @@ public static class InvoicesModule
                 UpdateInvoiceRequest updateInvoiceRequest, CancellationToken ct) =>
             {
                 var command = updateInvoiceRequest.Adapt<UpdateInvoiceCommand>() with { Id = id };
-                var result = await mediator.Send(command, ct);
-                return Results.Ok(result);
+                await mediator.Send(command, ct);
+                return Results.NoContent();
             }).WithTags("Invoices")
             .RequireAuthorization();
         app.MapDelete("/api/invoices/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
         {
             var command = new DeleteInvoiceCommand(id);
-            var result = await mediator.Send(command, ct);
-            return Results.Ok(result);
+            await mediator.Send(command, ct);
+            return Results.NoContent();
         }).WithTags("Invoices").RequireAuthorization();
     }
 }

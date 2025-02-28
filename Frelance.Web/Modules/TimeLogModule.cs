@@ -35,8 +35,8 @@ public static class TimeLogModule
         app.MapPost("/api/timeLogs", async (IMediator mediator, CreateTimeLogRequest createTimeLogRequest,
                 CancellationToken ct) =>
             {
-                var result = await mediator.Send(createTimeLogRequest.Adapt<CreateTimeLogCommand>(), ct);
-                return Results.Ok(result);
+                await mediator.Send(createTimeLogRequest.Adapt<CreateTimeLogCommand>(), ct);
+                return Results.Created();
             }).WithTags("TimeLogs")
             .RequireAuthorization("FreelancerRole");
 
@@ -44,16 +44,16 @@ public static class TimeLogModule
                 UpdateTimeLogRequest updateTimeLogRequest, CancellationToken ct) =>
             {
                 var command = updateTimeLogRequest.Adapt<UpdateTimeLogCommand>() with { Id = id };
-                var result = await mediator.Send(command, ct);
-                return Results.Ok(result);
+                await mediator.Send(command, ct);
+                return Results.NoContent();
             }).WithTags("TimeLogs")
             .RequireAuthorization("FreelancerRole");
 
         app.MapDelete("/api/timeLog/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
             {
                 var command = new DeleteTimeLogCommand(id);
-                var result = await mediator.Send(command, ct);
-                return Results.Ok(result);
+                await mediator.Send(command, ct);
+                return Results.NoContent();
             }).WithTags("TimeLogs")
             .RequireAuthorization("FreelancerRole");
     }

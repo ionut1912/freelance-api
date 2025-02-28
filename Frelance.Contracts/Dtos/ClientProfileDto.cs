@@ -1,6 +1,6 @@
 namespace Frelance.Contracts.Dtos;
 
-public class ClientProfileDto:BaseProfileDto
+public class ClientProfileDto : BaseProfileDto
 {
 
 

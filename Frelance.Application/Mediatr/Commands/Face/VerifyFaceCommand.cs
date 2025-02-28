@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Commands.Face;
 
-public record VerifyFaceCommand(Role Role,string Base64Face):IRequest<VerifyFaceResult>;
+public record VerifyFaceCommand(Role Role, string Base64Face) : IRequest<VerifyFaceResult>;

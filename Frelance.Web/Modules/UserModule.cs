@@ -12,8 +12,8 @@ public static class UserModule
         app.MapPost("/api/register", async (IMediator mediator, RegisterDto registerDto,
             CancellationToken ct) =>
         {
-            var result = await mediator.Send(registerDto.Adapt<CreateUserCommand>(), ct);
-            return Results.Ok(result);
+            await mediator.Send(registerDto.Adapt<CreateUserCommand>(), ct);
+            return Results.Created();
         }).WithTags("Users");
         app.MapPost("/api/login", async (IMediator mediator, LoginDto loginDto,
             CancellationToken ct) =>

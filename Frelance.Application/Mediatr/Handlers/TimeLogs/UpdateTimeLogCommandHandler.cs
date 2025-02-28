@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.TimeLogs;
 
-public class UpdateTimeLogCommandHandler : IRequestHandler<UpdateTimeLogCommand, Unit>
+public class UpdateTimeLogCommandHandler : IRequestHandler<UpdateTimeLogCommand>
 {
     private readonly ITimeLogRepository _timeLogRepository;
     private readonly IUnitOfWork _unitOfWork;
@@ -17,10 +17,9 @@ public class UpdateTimeLogCommandHandler : IRequestHandler<UpdateTimeLogCommand,
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Unit> Handle(UpdateTimeLogCommand request, CancellationToken cancellationToken)
+    public async Task Handle(UpdateTimeLogCommand request, CancellationToken cancellationToken)
     {
         await _timeLogRepository.UpdateTimeLogAsync(request, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-        return Unit.Value;
     }
 }

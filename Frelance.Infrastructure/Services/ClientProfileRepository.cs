@@ -57,7 +57,7 @@ public class ClientProfileRepository : IClientProfileRepository
         CancellationToken cancellationToken)
     {
         var clientProfile = await _clientProfileRepository.Query()
-            .Where(x => x.Id ==id)
+            .Where(x => x.Id == id)
             .Include(cp => cp.Users)
             .ThenInclude(u => u!.Reviews)
             .Include(cp => cp.Users)
@@ -107,22 +107,22 @@ public class ClientProfileRepository : IClientProfileRepository
 
         var pageNumber = paginationParams.PageNumber;
         var pageSize = paginationParams.PageSize;
-        
+
         var count = await clientsQuery.CountAsync(cancellationToken);
         var items = await clientsQuery
-            .Skip((pageNumber - 1) *pageSize)
+            .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
 
-        return new PaginatedList<ClientProfileDto>(items, count,pageNumber,
+        return new PaginatedList<ClientProfileDto>(items, count, pageNumber,
             pageSize);
     }
 
-    public async Task UpdateClientProfileAsync(int id,UpdateClientProfileRequest updateClientProfileRequest,
+    public async Task UpdateClientProfileAsync(int id, UpdateClientProfileRequest updateClientProfileRequest,
         CancellationToken cancellationToken)
     {
         var clientToUpdate = await _clientProfileRepository.Query()
-            .Where(x => x.Id ==id)
+            .Where(x => x.Id == id)
             .AsNoTracking()
             .Include(x => x.Addresses)
             .FirstOrDefaultAsync(cancellationToken);
@@ -132,6 +132,20 @@ public class ClientProfileRepository : IClientProfileRepository
                 $"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Id)} : '{id}' does not exist");
         clientToUpdate = updateClientProfileRequest.Adapt<ClientProfiles>();
         _clientProfileRepository.Update(clientToUpdate);
+    }
+
+    public async Task VerifyProfileAsync(int id, CancellationToken cancellationToken)
+    {
+        var client = await _clientProfileRepository.Query()
+            .Where(x => x.Id == id)
+            .FirstOrDefaultAsync(cancellationToken);
+        if (client is null)
+        {
+            throw new NotFoundException($"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Id)} : '{id}' does not exist");
+        }
+
+        client.IsVerified = true;
+        _clientProfileRepository.Update(client);
     }
 
     public async Task DeleteClientProfileAsync(int id,

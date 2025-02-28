@@ -16,8 +16,8 @@ public static class ReviewsModule
         app.MapPost("/api/reviews", async (IMediator mediator, CreateReviewRequest addReviewRequest,
                 CancellationToken ct) =>
             {
-                var result = await mediator.Send(addReviewRequest.Adapt<CreateReviewCommand>(), ct);
-                return Results.Ok(result);
+                await mediator.Send(addReviewRequest.Adapt<CreateReviewCommand>(), ct);
+                return Results.Created();
             }).WithTags("Reviews")
             .RequireAuthorization();
         app.MapGet("/api/reviews/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
@@ -42,15 +42,15 @@ public static class ReviewsModule
                 UpdateReviewRequest updateReviewRequest, CancellationToken ct) =>
             {
                 var command = updateReviewRequest.Adapt<UpdateReviewCommand>() with { Id = id };
-                var result = await mediator.Send(command, ct);
-                return Results.Ok(result);
+                await mediator.Send(command, ct);
+                return Results.NoContent();
             }).WithTags("Reviews")
             .RequireAuthorization();
         app.MapDelete("/api/reviews/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
             {
                 var command = new DeleteReviewCommand(id);
-                var result = await mediator.Send(command, ct);
-                return Results.Ok(result);
+                await mediator.Send(command, ct);
+                return Results.NoContent();
             }).WithTags("Reviews")
             .RequireAuthorization();
     }

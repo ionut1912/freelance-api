@@ -1,17 +1,19 @@
 using Frelance.Application.Mediatr.Commands.UserProfile;
 using Frelance.Application.Repositories;
 using Frelance.Contracts.Enums;
+using Frelance.Contracts.Requests.ClientProfile;
+using Frelance.Contracts.Requests.FreelancerProfiles;
 using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.UserProfile;
 
-public class DeleteUserProfileCommandHandler : IRequestHandler<DeleteUserProfileCommand>
+public class VerifyUserProfileCommandHandler : IRequestHandler<VerifyUserProfileCommand>
 {
     private readonly IFreelancerProfileRepository _freelancerProfileRepository;
     private readonly IClientProfileRepository _clientProfileRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public DeleteUserProfileCommandHandler(IFreelancerProfileRepository freelancerProfileRepository,
+    public VerifyUserProfileCommandHandler(IFreelancerProfileRepository freelancerProfileRepository,
         IClientProfileRepository clientProfileRepository,
         IUnitOfWork unitOfWork)
     {
@@ -21,16 +23,18 @@ public class DeleteUserProfileCommandHandler : IRequestHandler<DeleteUserProfile
         _freelancerProfileRepository = freelancerProfileRepository;
         _clientProfileRepository = clientProfileRepository;
         _unitOfWork = unitOfWork;
+
     }
 
-    public async Task Handle(DeleteUserProfileCommand request, CancellationToken cancellationToken)
+    public async Task Handle(VerifyUserProfileCommand request, CancellationToken cancellationToken)
     {
         var repoTask = request.Role switch
         {
-            Role.Client => _clientProfileRepository.DeleteClientProfileAsync(request.Id, cancellationToken),
-            Role.Freelancer => _freelancerProfileRepository.DeleteFreelancerProfileAsync(request.Id, cancellationToken),
+            Role.Freelancer => _freelancerProfileRepository.VerifyProfileAsync(request.Id, cancellationToken),
+            Role.Client => _clientProfileRepository.VerifyProfileAsync(request.Id, cancellationToken),
             _ => throw new InvalidOperationException("Invalid request")
         };
+
         await repoTask;
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }

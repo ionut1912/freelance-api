@@ -5,21 +5,21 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.UserProfile;
 
-public class GetCurrentUserProfileQueryHandler:IRequestHandler<GetCurrentUserProfileQuery, object>
+public class GetCurrentUserProfileQueryHandler : IRequestHandler<GetCurrentUserProfileQuery, object>
 {
     private readonly IClientProfileRepository _clientProfileRepository;
     private readonly IFreelancerProfileRepository _freelancerProfileRepository;
 
     public GetCurrentUserProfileQueryHandler(IClientProfileRepository clientProfileRepository, IFreelancerProfileRepository freelancerProfileRepository)
     {
-        ArgumentNullException.ThrowIfNull(clientProfileRepository,nameof(clientProfileRepository));
+        ArgumentNullException.ThrowIfNull(clientProfileRepository, nameof(clientProfileRepository));
         ArgumentNullException.ThrowIfNull(freelancerProfileRepository, nameof(freelancerProfileRepository));
         _clientProfileRepository = clientProfileRepository;
         _freelancerProfileRepository = freelancerProfileRepository;
-        
-        
+
+
     }
-    
+
     public async Task<object> Handle(GetCurrentUserProfileQuery request, CancellationToken cancellationToken)
     {
         var repoTask = request.Role switch
@@ -28,7 +28,7 @@ public class GetCurrentUserProfileQueryHandler:IRequestHandler<GetCurrentUserPro
                 .GetLoggedInClientProfileAsync(cancellationToken)
                 .ContinueWith(object (t) => t.Result, cancellationToken),
             Role.Freelancer => _freelancerProfileRepository
-                .GetLoggedInFreelancerProfileAsync( cancellationToken)
+                .GetLoggedInFreelancerProfileAsync(cancellationToken)
                 .ContinueWith(object (t) => t.Result, cancellationToken),
             _ => throw new InvalidOperationException("Invalid request")
         };

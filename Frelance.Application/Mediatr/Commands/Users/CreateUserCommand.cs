@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Commands.Users;
 
-public record CreateUserCommand(RegisterDto RegisterDto) : IRequest<Unit>;
+public record CreateUserCommand(RegisterDto RegisterDto) : IRequest;

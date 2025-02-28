@@ -155,7 +155,7 @@ public class FreelancerProfileRepository : IFreelancerProfileRepository
             .Take(pageSize)
             .ToListAsync(cancellationToken);
 
-        return new PaginatedList<FreelancerProfileDto>(items, count,pageNumber,
+        return new PaginatedList<FreelancerProfileDto>(items, count, pageNumber,
             pageSize);
     }
 
@@ -223,7 +223,7 @@ public class FreelancerProfileRepository : IFreelancerProfileRepository
         if (updateFreelancerProfileRequest.ForeignLanguages is { } newForeignLangs)
         {
             var existingForeignLanguages = await _freelancerForeignLanguageRepository.Query()
-                .Where(x => x.FreelancerProfileId ==id)
+                .Where(x => x.FreelancerProfileId == id)
                 .ToListAsync(cancellationToken);
 
             var languagesToAdd = newForeignLangs
@@ -246,12 +246,25 @@ public class FreelancerProfileRepository : IFreelancerProfileRepository
         _freelancerProfilesRepository.Update(freelancerProfile);
     }
 
+    public async Task VerifyProfileAsync(int id, CancellationToken cancellationToken)
+    {
+        var freelancer = await _freelancerProfilesRepository.Query()
+            .Where(x => x.Id == id)
+            .FirstOrDefaultAsync(cancellationToken);
+        if (freelancer is null)
+        {
+            throw new NotFoundException($"{nameof(FreelancerProfiles)} with {nameof(id)}: '{id}' does not exist");
+        }
+        freelancer.IsVerified = true;
+        _freelancerProfilesRepository.Update(freelancer);
+    }
+
 
     public async Task DeleteFreelancerProfileAsync(int id,
         CancellationToken cancellationToken)
     {
         var freelancerToDelete = await _freelancerProfilesRepository.Query()
-            .Where(x => x.Id ==id)
+            .Where(x => x.Id == id)
             .FirstOrDefaultAsync(cancellationToken);
 
         if (freelancerToDelete is null)

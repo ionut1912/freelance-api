@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Commands.Proposals;
 
-public record CreateProposalCommand(CreateProposalRequest CreateProposalRequest) : IRequest<Unit>;
+public record CreateProposalCommand(CreateProposalRequest CreateProposalRequest) : IRequest;

@@ -78,7 +78,7 @@ namespace Frelance.Infrastructure.Services.ML
             var embedding = result.ToArray<float>();
             return embedding;
         }
-        
+
         private static double ComputeCosineSimilarity(float[] vectorA, float[] vectorB)
         {
             if (vectorA.Length != vectorB.Length)

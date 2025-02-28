@@ -7,14 +7,14 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.UserProfile;
 
-public class CreateUserProfileCommandHandler:IRequestHandler<CreateUserProfileCommand,Unit>
+public class CreateUserProfileCommandHandler : IRequestHandler<CreateUserProfileCommand>
 {
     private readonly IClientProfileRepository _clientProfileRepository;
     private readonly IFreelancerProfileRepository _freelancerProfileRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public CreateUserProfileCommandHandler(IClientProfileRepository clientProfileRepository,
-        IFreelancerProfileRepository freelancerProfileRepository, 
+        IFreelancerProfileRepository freelancerProfileRepository,
         IUnitOfWork unitOfWork)
     {
         ArgumentNullException.ThrowIfNull(clientProfileRepository, nameof(clientProfileRepository));
@@ -24,8 +24,8 @@ public class CreateUserProfileCommandHandler:IRequestHandler<CreateUserProfileCo
         _freelancerProfileRepository = freelancerProfileRepository;
         _unitOfWork = unitOfWork;
     }
-    
-    public async Task<Unit> Handle(CreateUserProfileCommand request, CancellationToken cancellationToken)
+
+    public async Task Handle(CreateUserProfileCommand request, CancellationToken cancellationToken)
     {
         var repoTask = request.Role switch
         {
@@ -35,9 +35,8 @@ public class CreateUserProfileCommandHandler:IRequestHandler<CreateUserProfileCo
                 _clientProfileRepository.CreateClientProfileAsync(clientProfileRequest, cancellationToken),
             _ => throw new InvalidOperationException("Invalid request")
         };
-        
+
         await repoTask;
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-        return Unit.Value;
     }
 }

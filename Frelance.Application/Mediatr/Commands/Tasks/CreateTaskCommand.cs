@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Commands.Tasks;
 
-public record CreateTaskCommand(CreateProjectTaskRequest CreateProjectTaskRequest) : IRequest<Unit>;
+public record CreateTaskCommand(CreateProjectTaskRequest CreateProjectTaskRequest) : IRequest;
