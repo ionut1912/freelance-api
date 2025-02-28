@@ -17,8 +17,8 @@ public static class ContractsModule
                 async (IMediator mediator, CreateContractRequest addContractRequest, CancellationToken ct) =>
                 {
                     var command = addContractRequest.Adapt<CreateContractCommand>();
-                    var result = await mediator.Send(command, ct);
-                    return Results.Ok(result);
+                    await mediator.Send(command, ct);
+                    return Results.Created();
                 })
             .WithTags("Contracts")
             .RequireAuthorization("ClientRole");
@@ -40,14 +40,14 @@ public static class ContractsModule
             UpdateContractRequest updateContractRequest, CancellationToken ct) =>
         {
             var command = updateContractRequest.Adapt<UpdateContractCommand>() with { Id = id };
-            var result = await mediator.Send(command, ct);
-            return Results.Ok(result);
+            await mediator.Send(command, ct);
+            return Results.NoContent();
         }).WithTags("Contracts").RequireAuthorization();
         app.MapDelete("/api/contracts/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
         {
             var command = new DeleteContractCommand(id);
-            var result = await mediator.Send(command, ct);
-            return Results.Ok(result);
+            await mediator.Send(command, ct);
+            return Results.NoContent();
         }).WithTags("Contracts").RequireAuthorization();
     }
 }

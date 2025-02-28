@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.TimeLogs;
 
-public class DeleteTimeLogCommandHandler : IRequestHandler<DeleteTimeLogCommand, Unit>
+public class DeleteTimeLogCommandHandler : IRequestHandler<DeleteTimeLogCommand>
 {
     private readonly ITimeLogRepository _timeLogRepository;
     private readonly IUnitOfWork _unitOfWork;
@@ -17,10 +17,9 @@ public class DeleteTimeLogCommandHandler : IRequestHandler<DeleteTimeLogCommand,
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Unit> Handle(DeleteTimeLogCommand request, CancellationToken cancellationToken)
+    public async Task Handle(DeleteTimeLogCommand request, CancellationToken cancellationToken)
     {
         await _timeLogRepository.DeleteTimeLogAsync(request, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-        return Unit.Value;
     }
 }

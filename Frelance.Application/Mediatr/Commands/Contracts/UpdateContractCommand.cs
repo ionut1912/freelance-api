@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Commands.Contracts;
 
-public record UpdateContractCommand(int Id, UpdateContractRequest UpdateContractRequest) : IRequest<Unit>;
+public record UpdateContractCommand(int Id, UpdateContractRequest UpdateContractRequest) : IRequest;

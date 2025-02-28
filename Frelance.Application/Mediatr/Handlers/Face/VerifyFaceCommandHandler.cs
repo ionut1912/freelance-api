@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.Face;
 
-public class VerifyFaceCommandHandler:IRequestHandler<VerifyFaceCommand,VerifyFaceResult>
+public class VerifyFaceCommandHandler : IRequestHandler<VerifyFaceCommand, VerifyFaceResult>
 {
     private readonly IClientProfileRepository _clientProfileRepository;
     private readonly IFreelancerProfileRepository _freelancerProfileRepository;
@@ -26,9 +26,9 @@ public class VerifyFaceCommandHandler:IRequestHandler<VerifyFaceCommand,VerifyFa
         _clientProfileRepository = clientProfileRepository;
         _freelancerProfileRepository = freelancerProfileRepository;
         _faceComparisionService = faceComparisionService;
-        
+
     }
-    
+
     public async Task<VerifyFaceResult> Handle(VerifyFaceCommand request, CancellationToken cancellationToken)
     {
         BaseProfileDto userProfile = request.Role switch

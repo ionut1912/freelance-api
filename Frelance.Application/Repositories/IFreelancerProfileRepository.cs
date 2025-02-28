@@ -16,7 +16,8 @@ public interface IFreelancerProfileRepository
 
     Task<PaginatedList<FreelancerProfileDto>> GetAllFreelancerProfilesAsync(PaginationParams paginationParams, CancellationToken cancellationToken);
 
-    Task UpdateFreelancerProfileAsync(int id, UpdateFreelancerProfileRequest updateFreelancerProfileRequest,CancellationToken cancellationToken);
+    Task UpdateFreelancerProfileAsync(int id, UpdateFreelancerProfileRequest updateFreelancerProfileRequest, CancellationToken cancellationToken);
+    Task VerifyProfileAsync(int id, CancellationToken cancellationToken);
 
-    Task DeleteFreelancerProfileAsync(int id,CancellationToken cancellationToken);
+    Task DeleteFreelancerProfileAsync(int id, CancellationToken cancellationToken);
 }

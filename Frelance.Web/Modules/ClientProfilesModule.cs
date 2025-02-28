@@ -16,76 +16,60 @@ public static class ClientProfilesModule
     public static void AddClientProfilesEndpoints(this IEndpointRouteBuilder app)
     {
         app.MapPost("/api/clientProfiles",
-                async (IMediator mediator, CreateClientProfileRequest createClientProfileRequest,HttpContext httpContext,
+                async (IMediator mediator, CreateClientProfileRequest createClientProfileRequest,
                     CancellationToken ct) =>
                 {
-                    var role=httpContext.User.FindFirst(ClaimTypes.Role)?.Value;
-                    var result = role switch
-                    {
-                        "Client" => await mediator.Send(new CreateUserProfileCommand(Role.Client,createClientProfileRequest), ct),
-                        _ => throw new InvalidOperationException("Invalid role.")
-                    };
-                    return Results.Ok(result);
+                    await mediator.Send(new CreateUserProfileCommand(Role.Client, createClientProfileRequest), ct);
+                    return Results.Created();
                 })
             .WithTags("ClientProfiles")
             .RequireAuthorization("ClientRole");
-        app.MapGet("/api/clientProfiles/{id}", async (IMediator mediator, int id,HttpContext httpContext, CancellationToken ct) =>
-        {
-            var role=httpContext.User.FindFirst(ClaimTypes.Role)?.Value;
-            var result = role switch
+        app.MapGet("/api/clientProfiles/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
             {
-                "Client" => await mediator.Send(new GetUserProfileByIdQuery(Role.Client,id), ct),
-                _ => throw new InvalidOperationException("Invalid role.")
-            };
-            return Results.Ok(result);
-        }).WithTags("ClientProfiles").RequireAuthorization();
+                var result = await mediator.Send(new GetUserProfileByIdQuery(Role.Client, id), ct);
+                return Results.Ok(result);
+            }).WithTags("ClientProfiles")
+            .RequireAuthorization("ClientRole");
         app.MapGet("/api/clientProfiles",
-            async (IMediator mediator, [FromQuery] int pageSize, [FromQuery] int pageNumber,HttpContext httpContext, CancellationToken ct) =>
+            async (IMediator mediator, [FromQuery] int pageSize, [FromQuery] int pageNumber, CancellationToken ct) =>
             {
-                var role=httpContext.User.FindFirst(ClaimTypes.Role)?.Value;
-                var paginatedResult = role switch
-                {
-                    "Client" => await mediator.Send(new GetUserProfilesQuery(Role.Client,new PaginationParams{PageSize = pageSize,PageNumber = pageNumber}), ct),
-                    _ => throw new InvalidOperationException("Invalid role.")
-                };
-
+                var paginatedResult =
+                    await mediator.Send(
+                        new GetUserProfilesQuery(Role.Client,
+                            new PaginationParams { PageSize = pageSize, PageNumber = pageNumber }), ct);
                 return Results.Extensions.OkPaginationResult(paginatedResult.PageSize,
                     paginatedResult.CurrentPage,
                     paginatedResult.TotalCount, paginatedResult.TotalPages,
                     paginatedResult.Items);
-            }).WithTags("ClientProfiles").RequireAuthorization();
+            }).WithTags("ClientProfiles")
+            .RequireAuthorization("ClientRole");
         app.MapGet("/api/current/clientProfiles",
-                async (IMediator mediator,HttpContext httpContext, CancellationToken ct) =>
+                async (IMediator mediator, CancellationToken ct) =>
                 {
-                var role=httpContext.User.FindFirst(ClaimTypes.Role)?.Value;
-                var result = role switch
-                {
-                    "Client" => await mediator.Send(new GetCurrentUserProfileQuery(Role.Client), ct),
-                    _ => throw new InvalidOperationException("Invalid role.")
-                };
+                    var result = await mediator.Send(new GetCurrentUserProfileQuery(Role.Client), ct);
                     return Results.Ok(result);
                 }).WithTags("ClientProfiles")
             .RequireAuthorization("ClientRole");
         app.MapPut("/api/clientProfiles/{id}", async (IMediator mediator, int id,
-            UpdateClientProfileRequest updateClientProfileRequest, HttpContext httpContext,CancellationToken ct) =>
-        {
-            var role=httpContext.User.FindFirst(ClaimTypes.Role)?.Value;
-            var result = role switch
+            UpdateClientProfileRequest updateClientProfileRequest, CancellationToken ct) =>
             {
-                "Client" => await mediator.Send(new UpdateUserProfileCommand(id,Role.Client,updateClientProfileRequest), ct),
-                _ => throw new InvalidOperationException("Invalid role.")
-            };
-            return Results.Ok(result);
-        }).WithTags("ClientProfiles").RequireAuthorization("ClientRole");
-        app.MapDelete("/api/clientProfiles/{id}", async (IMediator mediator,HttpContext httpContext, int id, CancellationToken ct) =>
-        {
-            var role=httpContext.User.FindFirst(ClaimTypes.Role)?.Value;
-            var result = role switch
+                await mediator.Send(new UpdateUserProfileCommand(id, Role.Client, updateClientProfileRequest), ct);
+                return Results.NoContent();
+            }).WithTags("ClientProfiles")
+            .RequireAuthorization("ClientRole");
+
+        app.MapPatch("/api/clientProfiles/verify/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
             {
-                "Client" => await mediator.Send(new DeleteUserProfileCommand(Role.Client,id), ct),
-                _ => throw new InvalidOperationException("Invalid role.")
-            };
-            return Results.Ok(result);
-        }).WithTags("ClientProfiles").RequireAuthorization("ClientRole");
+                await mediator.Send(new VerifyUserProfileCommand(id, Role.Client), ct);
+                return Results.NoContent();
+            }).WithTags("ClientProfiles")
+            .RequireAuthorization("ClientRole");
+
+        app.MapDelete("/api/clientProfiles/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
+            {
+                await mediator.Send(new DeleteUserProfileCommand(Role.Client, id), ct);
+                return Results.NoContent();
+            }).WithTags("ClientProfiles")
+            .RequireAuthorization("ClientRole");
     }
 }

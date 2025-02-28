@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.UserProfile;
 
-public class UpdateUserProfileCommandHandler:IRequestHandler<UpdateUserProfileCommand,Unit>
+public class UpdateUserProfileCommandHandler : IRequestHandler<UpdateUserProfileCommand>
 {
     private readonly IClientProfileRepository _clientProfileRepository;
     private readonly IFreelancerProfileRepository _freelancerProfileRepository;
@@ -23,22 +23,21 @@ public class UpdateUserProfileCommandHandler:IRequestHandler<UpdateUserProfileCo
         _freelancerProfileRepository = freelancerProfileRepository;
         _clientProfileRepository = clientProfileRepository;
         _unitOfWork = unitOfWork;
-        
+
     }
-    
-    public async Task<Unit> Handle(UpdateUserProfileCommand request, CancellationToken cancellationToken)
+
+    public async Task Handle(UpdateUserProfileCommand request, CancellationToken cancellationToken)
     {
         var repoTask = request.Role switch
         {
             Role.Freelancer when request.UpdateProfileRequest is UpdateFreelancerProfileRequest updateFreelancerProfileRequest =>
-                _freelancerProfileRepository.UpdateFreelancerProfileAsync(request.Id,updateFreelancerProfileRequest, cancellationToken),
+                _freelancerProfileRepository.UpdateFreelancerProfileAsync(request.Id, updateFreelancerProfileRequest, cancellationToken),
             Role.Client when request.UpdateProfileRequest is UpdateClientProfileRequest updateClientProfileRequest =>
-                _clientProfileRepository.UpdateClientProfileAsync(request.Id,updateClientProfileRequest, cancellationToken),
+                _clientProfileRepository.UpdateClientProfileAsync(request.Id, updateClientProfileRequest, cancellationToken),
             _ => throw new InvalidOperationException("Invalid request")
         };
-        
+
         await repoTask;
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-        return Unit.Value;
     }
 }

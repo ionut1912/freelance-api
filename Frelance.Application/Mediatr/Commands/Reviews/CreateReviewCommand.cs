@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Commands.Reviews;
 
-public record CreateReviewCommand(CreateReviewRequest CreateReviewRequest) : IRequest<Unit>;
+public record CreateReviewCommand(CreateReviewRequest CreateReviewRequest) : IRequest;

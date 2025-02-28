@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.Projects;
 
-public class CreateProjectCommandHandler : IRequestHandler<CreateProjectCommand, Unit>
+public class CreateProjectCommandHandler : IRequestHandler<CreateProjectCommand>
 {
     private readonly IProjectRepository _projectRepository;
     private readonly IUnitOfWork _unitOfWork;
@@ -17,10 +17,9 @@ public class CreateProjectCommandHandler : IRequestHandler<CreateProjectCommand,
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Unit> Handle(CreateProjectCommand request, CancellationToken cancellationToken)
+    public async Task Handle(CreateProjectCommand request, CancellationToken cancellationToken)
     {
         await _projectRepository.CreateProjectAsync(request, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-        return Unit.Value;
     }
 }

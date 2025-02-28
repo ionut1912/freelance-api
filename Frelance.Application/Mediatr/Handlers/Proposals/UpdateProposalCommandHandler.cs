@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.Proposals;
 
-public class UpdateProposalCommandHandler : IRequestHandler<UpdateProposalCommand, Unit>
+public class UpdateProposalCommandHandler : IRequestHandler<UpdateProposalCommand>
 {
     private readonly IProposalRepository _repository;
     private readonly IUnitOfWork _unitOfWork;
@@ -17,10 +17,9 @@ public class UpdateProposalCommandHandler : IRequestHandler<UpdateProposalComman
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Unit> Handle(UpdateProposalCommand request, CancellationToken cancellationToken)
+    public async Task Handle(UpdateProposalCommand request, CancellationToken cancellationToken)
     {
         await _repository.UpdateProposalAsync(request, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-        return Unit.Value;
     }
 }

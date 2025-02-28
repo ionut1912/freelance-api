@@ -5,4 +5,4 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Queries.UserProfile;
 
-public record GetUserProfilesQuery(Role Role,PaginationParams PaginationParams) : IRequest<PaginatedList<object>>;
+public record GetUserProfilesQuery(Role Role, PaginationParams PaginationParams) : IRequest<PaginatedList<object>>;

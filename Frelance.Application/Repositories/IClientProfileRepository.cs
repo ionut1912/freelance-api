@@ -17,6 +17,7 @@ public interface IClientProfileRepository
     Task<PaginatedList<ClientProfileDto>> GetClientProfilesAsync(PaginationParams paginationParams,
         CancellationToken cancellationToken);
 
-    Task UpdateClientProfileAsync(int id,UpdateClientProfileRequest updateClientProfileRequest, CancellationToken cancellationToken);
-    Task DeleteClientProfileAsync( int id, CancellationToken cancellationToken);
+    Task UpdateClientProfileAsync(int id, UpdateClientProfileRequest updateClientProfileRequest, CancellationToken cancellationToken);
+    Task VerifyProfileAsync(int id, CancellationToken cancellationToken);
+    Task DeleteClientProfileAsync(int id, CancellationToken cancellationToken);
 }

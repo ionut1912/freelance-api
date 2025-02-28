@@ -17,79 +17,66 @@ public static class FreelancerProfilesModule
     {
         app.MapPost("/api/freelancerProfiles",
                 async (IMediator mediator, CreateFreelancerProfileRequest createFreelancerProfileRequest,
-                    HttpContext httpContext,
                     CancellationToken ct) =>
                 {
-                    var role=httpContext.User.FindFirst(ClaimTypes.Role)?.Value;
-                    var result = role switch
-                    {
-                        "Freelancer" => await mediator.Send(new CreateUserProfileCommand(Role.Freelancer,createFreelancerProfileRequest), ct),
-                        _ => throw new InvalidOperationException("Invalid role.")
-                    };
-                    return Results.Ok(result);
+                    await mediator.Send(
+                        new CreateUserProfileCommand(Role.Freelancer, createFreelancerProfileRequest), ct);
+                    return Results.Created();
                 })
             .WithTags("FreelancerProfiles")
             .RequireAuthorization("FreelancerRole");
-        app.MapGet("/api/freelancerProfiles/{id}", async (IMediator mediator,HttpContext httpContext, int id, CancellationToken ct) =>
-        {
-            var role=httpContext.User.FindFirst(ClaimTypes.Role)?.Value;
-            var result = role switch
+        app.MapGet("/api/freelancerProfiles/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
             {
-                "Freelancer" => await mediator.Send(new GetUserProfileByIdQuery(Role.Freelancer,id), ct),
-                _ => throw new InvalidOperationException("Invalid role.")
-            };
-            return Results.Ok(result);
-        }).WithTags("FreelancerProfiles").RequireAuthorization();
-        app.MapGet("/api/freelancerProfiles", async (IMediator mediator, [FromQuery] int pageSize,
-            HttpContext httpContext,
-            [FromQuery] int pageNumber, CancellationToken ct) =>
-        {
-            var role=httpContext.User.FindFirst(ClaimTypes.Role)?.Value;
-            var paginatedResult = role switch
-            {
-                "Freelancer" => await mediator.Send(new GetUserProfilesQuery(Role.Freelancer,new PaginationParams{PageSize = pageSize,PageNumber = pageNumber}), ct),
-                _ => throw new InvalidOperationException("Invalid role.")
-            };
 
-            return Results.Extensions.OkPaginationResult(paginatedResult.PageSize,
-                paginatedResult.CurrentPage,
-                paginatedResult.TotalCount, paginatedResult.TotalPages,
-                paginatedResult.Items);
-        }).WithTags("FreelancerProfiles").RequireAuthorization();
+                var result = await mediator.Send(new GetUserProfileByIdQuery(Role.Freelancer, id), ct);
+                return Results.Ok(result);
+            }).WithTags("FreelancerProfiles")
+            .RequireAuthorization("FreelancerRole");
+        app.MapGet("/api/freelancerProfiles", async (IMediator mediator, [FromQuery] int pageSize,
+            [FromQuery] int pageNumber, CancellationToken ct) =>
+            {
+                var paginatedResult =
+                    await mediator.Send(
+                        new GetUserProfilesQuery(Role.Freelancer,
+                            new PaginationParams { PageSize = pageSize, PageNumber = pageNumber }), ct);
+
+                return Results.Extensions.OkPaginationResult(paginatedResult.PageSize,
+                    paginatedResult.CurrentPage,
+                    paginatedResult.TotalCount, paginatedResult.TotalPages,
+                    paginatedResult.Items);
+            }).WithTags("FreelancerProfiles")
+            .RequireAuthorization("FreelancerRole");
 
         app.MapGet("/api/current/freelancerProfiles",
-                async (IMediator mediator,HttpContext httpContext, CancellationToken ct) =>
+                async (IMediator mediator, CancellationToken ct) =>
                 {
-                    var role=httpContext.User.FindFirst(ClaimTypes.Role)?.Value;
-                    var result = role switch
-                    {
-                        "Freelancer" => await mediator.Send(new GetCurrentUserProfileQuery(Role.Freelancer), ct),
-                        _ => throw new InvalidOperationException("Invalid role.")
-                    };
+                    var result = await mediator.Send(new GetCurrentUserProfileQuery(Role.Freelancer), ct);
                     return Results.Ok(result);
                 }).WithTags("FreelancerProfiles")
             .RequireAuthorization("FreelancerRole");
 
         app.MapPut("/api/freelancerProfiles/{id}", async (IMediator mediator, int id,
-            HttpContext httpContext,
             UpdateFreelancerProfileRequest updateFreelancerProfileRequest, CancellationToken ct) =>
         {
-            var role=httpContext.User.FindFirst(ClaimTypes.Role)?.Value;
-            var result = role switch
+            await mediator.Send(new UpdateUserProfileCommand(id, Role.Freelancer, updateFreelancerProfileRequest),
+                    ct);
+            return Results.NoContent();
+        }).WithTags("FreelancerProfiles")
+            .RequireAuthorization("FreelancerRole");
+
+        app.MapPatch("/api/freelancerProfiles/verify/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
             {
-                "Freelancer" => await mediator.Send(new UpdateUserProfileCommand(id,Role.Freelancer,updateFreelancerProfileRequest), ct),
-                _ => throw new InvalidOperationException("Invalid role.")
-            };
-            return Results.Ok(result);
-        }).WithTags("FreelancerProfiles").RequireAuthorization("FreelancerRole");
-        app.MapDelete("/api/freelancerProfiles/{id}", async (IMediator mediator, HttpContext httpContext,int id, CancellationToken ct) =>
-        { var role=httpContext.User.FindFirst(ClaimTypes.Role)?.Value;
-            var result = role switch
-            {
-                "Freelancer" => await mediator.Send(new DeleteUserProfileCommand(Role.Freelancer,id), ct),
-                _ => throw new InvalidOperationException("Invalid role.")
-            };
-            return Results.Ok(result);
-        }).WithTags("FreelancerProfiles").RequireAuthorization("FreelancerRole");
+                await mediator.Send(new VerifyUserProfileCommand(id, Role.Freelancer),
+                    ct);
+                return Results.NoContent();
+            }).WithTags("FreelancerProfiles")
+            .RequireAuthorization("FreelancerRole");
+
+        app.MapDelete("/api/freelancerProfiles/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
+        {
+            await mediator.Send(new DeleteUserProfileCommand(Role.Freelancer, id), ct);
+            return Results.NoContent();
+        }).WithTags("FreelancerProfiles")
+            .RequireAuthorization("FreelancerRole");
     }
 }

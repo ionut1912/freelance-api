@@ -40,7 +40,7 @@ public class MappingConfig
         TypeAdapterConfig<LoginDto, LoginCommand>
             .NewConfig()
             .Map(dest => dest.LoginDto, src => src);
-        
+
 
         TypeAdapterConfig<CreateClientProfileRequest, ClientProfiles>
             .NewConfig()
@@ -156,7 +156,7 @@ public class MappingConfig
         TypeAdapterConfig<TimeLogs, TimeLogDto>
             .NewConfig()
             .Map(dest => dest, src => src);
-        
+
 
         TypeAdapterConfig<UpdateClientProfileRequest, ClientProfiles>
             .NewConfig()
@@ -203,7 +203,7 @@ public class MappingConfig
                 dest.ContractFile = src.ContractFile ?? dest.ContractFile;
                 dest.UpdatedAt = DateTime.UtcNow;
             });
-        
+
 
         TypeAdapterConfig<string, FreelancerForeignLanguage>
             .NewConfig()
@@ -251,7 +251,7 @@ public class MappingConfig
         TypeAdapterConfig<List<SkillRequest>, List<Skills>>
             .NewConfig()
             .Map(src => src, dest => dest);
-        
+
         TypeAdapterConfig<UpdateFreelancerProfileRequest, FreelancerProfiles>
             .NewConfig()
             .AfterMapping((src, dest) =>
@@ -456,8 +456,8 @@ public class MappingConfig
             .Map(dest => dest.Skills, src => src.Skills.Adapt<List<SkillDto>>())
             .Map(dest => dest.ForeignLanguages, src => src.ForeignLanguages.Adapt<List<ForeignLanguageDto>>())
             .Map(dest => dest.Projects, src => src.Projects.Adapt<List<ProjectDto>>())
-            .Map(dest=>dest.Contracts,src=>src.Contracts.Adapt<List<ContractsDto>>())
-            .Map(dest=>dest.Invoices, src=>src.Invoices.Adapt<List<InvoicesDto>>())
+            .Map(dest => dest.Contracts, src => src.Contracts.Adapt<List<ContractsDto>>())
+            .Map(dest => dest.Invoices, src => src.Invoices.Adapt<List<InvoicesDto>>())
             .Map(dest => dest.IsAvailable, src => src.IsAvailable)
             .Map(dest => dest.Experience, src => src.Experience)
             .Map(dest => dest.Rate, src => src.Rate)

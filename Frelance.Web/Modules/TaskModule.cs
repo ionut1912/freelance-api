@@ -35,8 +35,8 @@ public static class TaskModule
         app.MapPost("/api/tasks", async (IMediator mediator, CreateProjectTaskRequest createProjectTaskRequest,
                 CancellationToken ct) =>
             {
-                var result = await mediator.Send(createProjectTaskRequest.Adapt<CreateTaskCommand>(), ct);
-                return Results.Ok(result);
+                await mediator.Send(createProjectTaskRequest.Adapt<CreateTaskCommand>(), ct);
+                return Results.Created();
             }).WithTags("Tasks")
             .RequireAuthorization();
 
@@ -44,16 +44,16 @@ public static class TaskModule
                 UpdateProjectTaskRequest updateTaskRequest, CancellationToken ct) =>
             {
                 var command = updateTaskRequest.Adapt<UpdateTaskCommand>() with { Id = id };
-                var result = await mediator.Send(command, ct);
-                return Results.Ok(result);
+                await mediator.Send(command, ct);
+                return Results.NoContent();
             }).WithTags("Tasks")
             .RequireAuthorization();
 
         app.MapDelete("/api/task/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
             {
                 var command = new DeleteTaskCommand(id);
-                var result = await mediator.Send(command, ct);
-                return Results.Ok(result);
+                await mediator.Send(command, ct);
+                return Results.NoContent();
             }).WithTags("Tasks")
             .RequireAuthorization("ClientRole");
     }

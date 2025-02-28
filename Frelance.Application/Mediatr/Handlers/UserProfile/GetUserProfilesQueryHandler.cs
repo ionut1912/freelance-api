@@ -5,12 +5,12 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.UserProfile;
 
-public class GetUserProfilesQueryHandler:IRequestHandler<GetUserProfilesQuery,object>
+public class GetUserProfilesQueryHandler : IRequestHandler<GetUserProfilesQuery, object>
 {
     private readonly IFreelancerProfileRepository _freelancerProfileRepository;
     private readonly IClientProfileRepository _clientProfileRepository;
 
-    public GetUserProfilesQueryHandler(IFreelancerProfileRepository freelancerProfileRepository, 
+    public GetUserProfilesQueryHandler(IFreelancerProfileRepository freelancerProfileRepository,
         IClientProfileRepository clientProfileRepository)
     {
         ArgumentNullException.ThrowIfNull(freelancerProfileRepository, nameof(freelancerProfileRepository));
@@ -18,7 +18,7 @@ public class GetUserProfilesQueryHandler:IRequestHandler<GetUserProfilesQuery,ob
         _freelancerProfileRepository = freelancerProfileRepository;
         _clientProfileRepository = clientProfileRepository;
     }
-    
+
     public async Task<object> Handle(GetUserProfilesQuery request, CancellationToken cancellationToken)
     {
         var repoTask = request.Role switch

@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Commands.Invoices;
 
-public record CreateInvoiceCommand(CreateInvoiceRequest CreateInvoiceRequest) : IRequest<Unit>;
+public record CreateInvoiceCommand(CreateInvoiceRequest CreateInvoiceRequest) : IRequest;

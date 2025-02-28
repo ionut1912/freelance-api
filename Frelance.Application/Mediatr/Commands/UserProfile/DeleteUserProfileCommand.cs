@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Frelance.Application.Mediatr.Commands.UserProfile;
 
-public record DeleteUserProfileCommand(Role Role, int Id) : IRequest<Unit>;
+public record DeleteUserProfileCommand(Role Role, int Id) : IRequest;
