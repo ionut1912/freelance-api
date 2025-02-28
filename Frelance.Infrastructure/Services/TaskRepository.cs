@@ -29,7 +29,7 @@ public class TaskRepository : ITaskRepository
         _freelancerRepository = freelancerRepository;
     }
 
-    public async Task AddTaskAsync(CreateTaskCommand createTaskCommand, CancellationToken cancellationToken)
+    public async Task CreateTaskAsync(CreateTaskCommand createTaskCommand, CancellationToken cancellationToken)
     {
         var taskProject = await _projectsRepository.Query()
             .Where(x => x.Title == createTaskCommand.CreateProjectTaskRequest.ProjectTitle)
@@ -51,7 +51,7 @@ public class TaskRepository : ITaskRepository
         task.ProjectId = taskProject.Id;
         task.Status = ProjectTaskStatus.ToDo.ToString();
         task.FreelancerProfileId = freelancerProfile.Id;
-        await _tasksRepository.AddAsync(task, cancellationToken);
+        await _tasksRepository.CreateAsync(task, cancellationToken);
     }
 
     public async Task UpdateTaskAsync(UpdateTaskCommand updateTaskCommand, CancellationToken cancellationToken)

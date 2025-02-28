@@ -33,7 +33,7 @@ public class ProposalRepository : IProposalRepository
         _projectRepository = projectRepository;
     }
 
-    public async Task AddProposalAsync(CreateProposalCommand createProposalCommand, CancellationToken cancellationToken)
+    public async Task CreateProposalAsync(CreateProposalCommand createProposalCommand, CancellationToken cancellationToken)
     {
         var user = await _userRepository.Query()
             .Where(x => x.UserName == _userAccessor.GetUsername())
@@ -53,7 +53,7 @@ public class ProposalRepository : IProposalRepository
         proposal.ProjectId = project.Id;
         proposal.ProposerId = user.Id;
         proposal.Status = "Created";
-        await _proposalRepository.AddAsync(proposal, cancellationToken);
+        await _proposalRepository.CreateAsync(proposal, cancellationToken);
     }
 
     public async Task<ProposalsDto> GetProposalByIdAsync(GetProposalByIdQuery getProposalByIdQuery,

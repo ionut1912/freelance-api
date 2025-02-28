@@ -68,4 +68,5 @@ app.AddReviewsEndpoints();
 app.AddContractEndpoints();
 app.AddInvoicesEndpoints();
 app.AddProposalEndpoints();
+app.AddFaceEndpoints();
 app.Run();

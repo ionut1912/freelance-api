@@ -21,12 +21,12 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         return _dbSet.AsNoTracking();
     }
 
-    public async Task AddAsync(T entity, CancellationToken cancellationToken)
+    public async Task CreateAsync(T entity, CancellationToken cancellationToken)
     {
         await _dbSet.AddAsync(entity, cancellationToken);
     }
 
-    public async Task AddRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken)
+    public async Task CreateRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken)
     {
         await _dbSet.AddRangeAsync(entities, cancellationToken);
     }

@@ -1,27 +1,22 @@
-using Frelance.Application.Mediatr.Commands.FreelancerProfiles;
-using Frelance.Application.Mediatr.Queries.FreelancerProfiles;
 using Frelance.Contracts.Dtos;
+using Frelance.Contracts.Requests.Common;
+using Frelance.Contracts.Requests.FreelancerProfiles;
 using Frelance.Contracts.Responses.Common;
 
 namespace Frelance.Application.Repositories;
 
 public interface IFreelancerProfileRepository
 {
-    Task AddFreelancerProfileAsync(CreateFreelancerProfileCommand createFreelancerProfileCommand,
+    Task CreateFreelancerProfileAsync(CreateFreelancerProfileRequest createFreelancerProfileRequest,
         CancellationToken cancellationToken);
 
-    Task<FreelancerProfileDto> GetFreelancerProfileByIdAsync(
-        GetFreelancerProfileByIdQuery getFreelancerProfileByIdQuery, CancellationToken cancellationToken);
+    Task<FreelancerProfileDto> GetFreelancerProfileByIdAsync(int id, CancellationToken cancellationToken);
 
-    Task<FreelancerProfileDto> GetLoggedInFreelancerProfileAsync(
-        GetLoggedInFreelancerProfileQuery getLoggedInFreelancerProfileQuery, CancellationToken cancellationToken);
+    Task<FreelancerProfileDto> GetLoggedInFreelancerProfileAsync(CancellationToken cancellationToken);
 
-    Task<PaginatedList<FreelancerProfileDto>> GetAllFreelancerProfilesAsync(
-        GetFreelancerProfilesQuery getFreelancerProfilesQuery, CancellationToken cancellationToken);
+    Task<PaginatedList<FreelancerProfileDto>> GetAllFreelancerProfilesAsync(PaginationParams paginationParams, CancellationToken cancellationToken);
 
-    Task UpdateFreelancerProfileAsync(UpdateFreelancerProfileCommand updateFreelancerProfileCommand,
-        CancellationToken cancellationToken);
+    Task UpdateFreelancerProfileAsync(int id, UpdateFreelancerProfileRequest updateFreelancerProfileRequest,CancellationToken cancellationToken);
 
-    Task DeleteFreelancerProfileAsync(DeleteFreelancerProfileCommand deleteFreelancerProfileCommand,
-        CancellationToken cancellationToken);
+    Task DeleteFreelancerProfileAsync(int id,CancellationToken cancellationToken);
 }

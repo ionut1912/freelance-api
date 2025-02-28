@@ -19,7 +19,7 @@ public class CreateTaskCommandHandler : IRequestHandler<CreateTaskCommand, Unit>
 
     public async Task<Unit> Handle(CreateTaskCommand request, CancellationToken cancellationToken)
     {
-        await _taskRepository.AddTaskAsync(request, cancellationToken);
+        await _taskRepository.CreateTaskAsync(request, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;
     }

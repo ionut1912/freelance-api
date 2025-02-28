@@ -7,7 +7,7 @@ namespace Frelance.Application.Repositories;
 
 public interface ITimeLogRepository
 {
-    Task AddTimeLogAsync(CreateTimeLogCommand createTimeLogCommand, CancellationToken cancellationToken);
+    Task CreateTimeLogAsync(CreateTimeLogCommand createTimeLogCommand, CancellationToken cancellationToken);
     Task UpdateTimeLogAsync(UpdateTimeLogCommand updateTimeLogCommand, CancellationToken cancellationToken);
     Task DeleteTimeLogAsync(DeleteTimeLogCommand deleteTimeLogCommand, CancellationToken cancellationToken);
     Task<TimeLogDto> GetTimeLogByIdAsync(GetTimeLogByIdQuery getTimeLogByIdQuery, CancellationToken cancellationToken);

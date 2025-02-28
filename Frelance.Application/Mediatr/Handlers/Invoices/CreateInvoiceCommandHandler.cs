@@ -19,7 +19,7 @@ public class CreateInvoiceCommandHandler : IRequestHandler<CreateInvoiceCommand,
 
     public async Task<Unit> Handle(CreateInvoiceCommand request, CancellationToken cancellationToken)
     {
-        await _invoiceRepository.AddInvoiceAsync(request, cancellationToken);
+        await _invoiceRepository.CreateInvoiceAsync(request, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;
     }

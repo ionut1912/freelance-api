@@ -1,6 +1,4 @@
-using Frelance.Application.Mediatr.Commands.ClientProfiles;
 using Frelance.Application.Mediatr.Commands.Contracts;
-using Frelance.Application.Mediatr.Commands.FreelancerProfiles;
 using Frelance.Application.Mediatr.Commands.Invoices;
 using Frelance.Application.Mediatr.Commands.Projects;
 using Frelance.Application.Mediatr.Commands.Proposals;
@@ -37,15 +35,12 @@ public class MappingConfig
             .Map(dest => dest.Email, src => src.RegisterDto.Email)
             .Map(dest => dest.UserName, src => src.RegisterDto.Username)
             .Map(dest => dest.PhoneNumber, src => src.RegisterDto.PhoneNumber)
-            .AfterMapping((src, dest) => { dest.CreatedAt = DateTime.UtcNow; });
+            .AfterMapping((_, dest) => { dest.CreatedAt = DateTime.UtcNow; });
 
         TypeAdapterConfig<LoginDto, LoginCommand>
             .NewConfig()
             .Map(dest => dest.LoginDto, src => src);
-
-        TypeAdapterConfig<CreateClientProfileRequest, CreateClientProfileCommand>
-            .NewConfig()
-            .Map(dest => dest.CreateClientProfileRequest, src => src);
+        
 
         TypeAdapterConfig<CreateClientProfileRequest, ClientProfiles>
             .NewConfig()
@@ -161,10 +156,7 @@ public class MappingConfig
         TypeAdapterConfig<TimeLogs, TimeLogDto>
             .NewConfig()
             .Map(dest => dest, src => src);
-
-        TypeAdapterConfig<UpdateClientProfileRequest, UpdateClientProfileCommand>
-            .NewConfig()
-            .Map(dest => dest.UpdateClientProfileRequest, src => src);
+        
 
         TypeAdapterConfig<UpdateClientProfileRequest, ClientProfiles>
             .NewConfig()
@@ -184,7 +176,6 @@ public class MappingConfig
                 dest.Bio = !string.IsNullOrEmpty(src.Bio) ? src.Bio : dest.Bio;
                 dest.Image = !string.IsNullOrEmpty(src.Image) ? src.Image : dest.Image;
                 dest.UpdatedAt = DateTime.UtcNow;
-                dest.IsVerified = true;
             });
 
         TypeAdapterConfig<CreateContractRequest, CreateContractCommand>
@@ -197,7 +188,7 @@ public class MappingConfig
             .Map(dest => dest.EndDate, src => src.EndDate)
             .Map(dest => dest.Amount, src => src.Amount)
             .Map(dest => dest.ContractFile, src => src.ContractFile)
-            .AfterMapping((src, dest) => { dest.CreatedAt = DateTime.UtcNow; });
+            .AfterMapping((_, dest) => { dest.CreatedAt = DateTime.UtcNow; });
 
         TypeAdapterConfig<UpdateContractRequest, UpdateContractCommand>
             .NewConfig()
@@ -212,10 +203,7 @@ public class MappingConfig
                 dest.ContractFile = src.ContractFile ?? dest.ContractFile;
                 dest.UpdatedAt = DateTime.UtcNow;
             });
-
-        TypeAdapterConfig<CreateFreelancerProfileRequest, CreateFreelancerProfileCommand>
-            .NewConfig()
-            .Map(dest => dest.CreateFreelancerProfileRequest, src => src);
+        
 
         TypeAdapterConfig<string, FreelancerForeignLanguage>
             .NewConfig()
@@ -263,10 +251,7 @@ public class MappingConfig
         TypeAdapterConfig<List<SkillRequest>, List<Skills>>
             .NewConfig()
             .Map(src => src, dest => dest);
-        TypeAdapterConfig<UpdateFreelancerProfileCommand, UpdateFreelancerProfileRequest>
-            .NewConfig()
-            .Map(dest => dest, src => src.UpdateFreelancerProfileRequest);
-
+        
         TypeAdapterConfig<UpdateFreelancerProfileRequest, FreelancerProfiles>
             .NewConfig()
             .AfterMapping((src, dest) =>
@@ -277,7 +262,7 @@ public class MappingConfig
                 dest.Addresses.City = src.AddressCity ?? dest.Addresses.City;
                 dest.Addresses.ZipCode = src.AddressZip ?? dest.Addresses.ZipCode;
                 dest.Bio = src.Bio ?? dest.Bio;
-                if (src.ProgrammingLanguages != null && src.Areas != null)
+                if (src is { ProgrammingLanguages: not null, Areas: not null })
                 {
                     dest.Skills = [];
                     var count = Math.Min(src.ProgrammingLanguages.Count, src.Areas.Count);
@@ -300,7 +285,6 @@ public class MappingConfig
                 dest.PortfolioUrl = src.PortfolioUrl ?? dest.PortfolioUrl;
                 dest.Image = !string.IsNullOrWhiteSpace(src.Image) ? src.Image : dest.Image;
                 dest.UpdatedAt = DateTime.UtcNow;
-                dest.IsVerified = true;
             });
 
         TypeAdapterConfig<CreateInvoiceRequest, CreateInvoiceCommand>
@@ -311,7 +295,7 @@ public class MappingConfig
             .NewConfig()
             .Map(dest => dest.Amount, src => src.Amount)
             .Map(dest => dest.InvoiceFile, src => src.InvoiceFile)
-            .AfterMapping((src, dest) => { dest.CreatedAt = DateTime.UtcNow; });
+            .AfterMapping((_, dest) => { dest.CreatedAt = DateTime.UtcNow; });
 
         TypeAdapterConfig<UpdateInvoiceRequest, UpdateInvoiceCommand>
             .NewConfig()
@@ -376,7 +360,7 @@ public class MappingConfig
         TypeAdapterConfig<CreateProposalRequest, Proposals>
             .NewConfig()
             .Map(dest => dest.ProposedBudget, src => src.ProposedBudget)
-            .AfterMapping((src, dest) => { dest.CreatedAt = DateTime.UtcNow; });
+            .AfterMapping((_, dest) => { dest.CreatedAt = DateTime.UtcNow; });
 
         TypeAdapterConfig<UpdateProposalCommand, UpdateProposalRequest>
             .NewConfig()
@@ -398,7 +382,7 @@ public class MappingConfig
         TypeAdapterConfig<CreateReviewRequest, Reviews>
             .NewConfig()
             .Map(dest => dest.ReviewText, src => src.ReviewText)
-            .AfterMapping((src, dest) => { dest.CreatedAt = DateTime.UtcNow; });
+            .AfterMapping((_, dest) => { dest.CreatedAt = DateTime.UtcNow; });
 
         TypeAdapterConfig<UpdateReviewRequest, UpdateReviewCommand>
             .NewConfig()
@@ -420,7 +404,7 @@ public class MappingConfig
             .NewConfig()
             .Map(dest => dest.StartTime, src => src.StartTime)
             .Map(dest => dest.EndTime, src => src.EndTime)
-            .AfterMapping((src, dest) => { dest.CreatedAt = DateTime.UtcNow; });
+            .AfterMapping((_, dest) => { dest.CreatedAt = DateTime.UtcNow; });
 
         TypeAdapterConfig<UpdateTimeLogRequest, UpdateTimeLogCommand>
             .NewConfig()
@@ -445,7 +429,7 @@ public class MappingConfig
             .Map(dest => dest.Title, src => src.Title)
             .Map(dest => dest.Description, src => src.Description)
             .Map(dest => dest.Priority, src => src.Priority)
-            .AfterMapping((src, dest) => { dest.CreatedAt = DateTime.UtcNow; });
+            .AfterMapping((_, dest) => { dest.CreatedAt = DateTime.UtcNow; });
 
         TypeAdapterConfig<UpdateProjectTaskRequest, UpdateTaskCommand>
             .NewConfig()
@@ -465,13 +449,15 @@ public class MappingConfig
         TypeAdapterConfig<FreelancerProfiles, FreelancerProfileDto>
             .NewConfig()
             .Map(dest => dest.Id, src => src.Id)
-            .Map(dest => dest.UserProfile, src => src.Users.Adapt<UserProfileDto>())
+            .Map(dest => dest.User, src => src.Users.Adapt<UserProfileDto>())
             .Map(dest => dest.Address, src => src.Addresses.Adapt<AddressDto>())
             .Map(dest => dest.Bio, src => src.Bio)
             .Map(dest => dest.Tasks, src => src.Tasks.Adapt<List<TaskDto>>())
             .Map(dest => dest.Skills, src => src.Skills.Adapt<List<SkillDto>>())
             .Map(dest => dest.ForeignLanguages, src => src.ForeignLanguages.Adapt<List<ForeignLanguageDto>>())
             .Map(dest => dest.Projects, src => src.Projects.Adapt<List<ProjectDto>>())
+            .Map(dest=>dest.Contracts,src=>src.Contracts.Adapt<List<ContractsDto>>())
+            .Map(dest=>dest.Invoices, src=>src.Invoices.Adapt<List<InvoicesDto>>())
             .Map(dest => dest.IsAvailable, src => src.IsAvailable)
             .Map(dest => dest.Experience, src => src.Experience)
             .Map(dest => dest.Rate, src => src.Rate)
