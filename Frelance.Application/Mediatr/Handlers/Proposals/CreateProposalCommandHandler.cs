@@ -19,7 +19,7 @@ public class CreateProposalCommandHandler : IRequestHandler<CreateProposalComman
 
     public async Task<Unit> Handle(CreateProposalCommand request, CancellationToken cancellationToken)
     {
-        await _proposalRepository.AddProposalAsync(request, cancellationToken);
+        await _proposalRepository.CreateProposalAsync(request, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;
     }

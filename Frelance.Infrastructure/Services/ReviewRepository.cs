@@ -28,7 +28,7 @@ public class ReviewRepository : IReviewRepository
         _reviewRepository = reviewRepository;
     }
 
-    public async Task AddReviewAsync(CreateReviewCommand createReviewCommand, CancellationToken cancellationToken)
+    public async Task CreateReviewAsync(CreateReviewCommand createReviewCommand, CancellationToken cancellationToken)
     {
         var user = await _userRepository.Query()
             .Where(x => x.UserName == _userAccessor.GetUsername())
@@ -39,7 +39,7 @@ public class ReviewRepository : IReviewRepository
 
         var review = createReviewCommand.CreateReviewRequest.Adapt<Reviews>();
         review.ReviewerId = user.Id;
-        await _reviewRepository.AddAsync(review, cancellationToken);
+        await _reviewRepository.CreateAsync(review, cancellationToken);
     }
 
     public async Task<ReviewsDto> GetReviewsByIdAsync(GetReviewByIdQuery getReviewById,

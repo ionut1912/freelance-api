@@ -32,7 +32,7 @@ public class TimeLogRepository : ITimeLogRepository
         _timeLogsRepository = timeLogsRepository;
     }
 
-    public async Task AddTimeLogAsync(CreateTimeLogCommand createTimeLogCommand, CancellationToken cancellationToken)
+    public async Task CreateTimeLogAsync(CreateTimeLogCommand createTimeLogCommand, CancellationToken cancellationToken)
     {
         var timeLogTask = await _projectTasksRepository.Query()
             .Where(x => x.Title == createTimeLogCommand.CreateTimeLogRequest.TaskTitle)
@@ -51,7 +51,7 @@ public class TimeLogRepository : ITimeLogRepository
             .Include(x => x.Users)
             .FirstOrDefaultAsync(cancellationToken);
         timeLog.FreelancerProfileId = freelancerProfile.Id;
-        await _timeLogsRepository.AddAsync(timeLog, cancellationToken);
+        await _timeLogsRepository.CreateAsync(timeLog, cancellationToken);
     }
 
     public async Task UpdateTimeLogAsync(UpdateTimeLogCommand updateTimeLogCommand, CancellationToken cancellationToken)

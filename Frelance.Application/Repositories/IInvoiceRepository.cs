@@ -7,7 +7,7 @@ namespace Frelance.Application.Repositories;
 
 public interface IInvoiceRepository
 {
-    Task AddInvoiceAsync(CreateInvoiceCommand createInvoiceCommand, CancellationToken cancellationToken);
+    Task CreateInvoiceAsync(CreateInvoiceCommand createInvoiceCommand, CancellationToken cancellationToken);
     Task<InvoicesDto> GetInvoiceByIdAsync(GetInvoiceByIdQuery query, CancellationToken cancellationToken);
     Task<PaginatedList<InvoicesDto>> GetInvoicesAsync(GetInvoicesQuery query, CancellationToken cancellationToken);
     Task UpdateInvoiceAsync(UpdateInvoiceCommand updateInvoiceCommand, CancellationToken cancellationToken);

@@ -20,7 +20,7 @@ public class CreateTimeLogCommandHandler : IRequestHandler<CreateTimeLogCommand,
 
     public async Task<Unit> Handle(CreateTimeLogCommand request, CancellationToken cancellationToken)
     {
-        await _timeLogRepository.AddTimeLogAsync(request, cancellationToken);
+        await _timeLogRepository.CreateTimeLogAsync(request, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;
     }

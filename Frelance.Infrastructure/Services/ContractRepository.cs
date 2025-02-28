@@ -37,7 +37,7 @@ public class ContractRepository : IContractRepository
         _userAccessor = userAccessor;
     }
 
-    public async Task AddContractAsync(CreateContractCommand createContractCommand, CancellationToken cancellationToken)
+    public async Task CreateContractAsync(CreateContractCommand createContractCommand, CancellationToken cancellationToken)
     {
         var freelancer = await _freelancerProfilesRepository.Query()
             .Where(x => x.Users!.UserName == createContractCommand.CreateContractRequest.FreelancerName)
@@ -68,7 +68,7 @@ public class ContractRepository : IContractRepository
         contract.ClientId = client.Id;
         contract.FreelancerId = freelancer.Id;
         contract.Status = "Signed";
-        await _contractsRepository.AddAsync(contract, cancellationToken);
+        await _contractsRepository.CreateAsync(contract, cancellationToken);
     }
 
     public async Task<ContractsDto> GetContractByIdAsync(GetContractByIdQuery query,

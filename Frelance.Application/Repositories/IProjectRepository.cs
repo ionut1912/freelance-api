@@ -7,7 +7,7 @@ namespace Frelance.Application.Repositories;
 
 public interface IProjectRepository
 {
-    Task AddProjectAsync(CreateProjectCommand createProjectCommand, CancellationToken cancellationToken);
+    Task CreateProjectAsync(CreateProjectCommand createProjectCommand, CancellationToken cancellationToken);
     Task UpdateProjectAsync(UpdateProjectCommand updateProjectCommand, CancellationToken cancellationToken);
     Task DeleteProjectAsync(DeleteProjectCommand deleteProjectCommand, CancellationToken cancellationToken);
     Task<ProjectDto> FindProjectByIdAsync(GetProjectByIdQuery getProjectByIdQuery, CancellationToken cancellationToken);

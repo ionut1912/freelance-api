@@ -28,10 +28,10 @@ public class ProjectRepository : IProjectRepository
         _unitOfWork = unitOfWork;
     }
 
-    public async Task AddProjectAsync(CreateProjectCommand createProjectCommand, CancellationToken cancellationToken)
+    public async Task CreateProjectAsync(CreateProjectCommand createProjectCommand, CancellationToken cancellationToken)
     {
         var project = createProjectCommand.CreateProjectRequest.Adapt<Projects>();
-        await _projectRepository.AddAsync(project, cancellationToken);
+        await _projectRepository.CreateAsync(project, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         if (project.Technologies.Count != 0)
@@ -41,7 +41,7 @@ public class ProjectRepository : IProjectRepository
                 tech.ProjectId = project.Id;
                 tech.Id = 0;
             });
-            await _projectTechnologyRepository.AddRangeAsync(project.Technologies, cancellationToken);
+            await _projectTechnologyRepository.CreateRangeAsync(project.Technologies, cancellationToken);
         }
     }
 

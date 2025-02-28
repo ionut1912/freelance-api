@@ -37,7 +37,7 @@ public class InvoiceRepository : IInvoiceRepository
         _projectRepository = projectRepository;
     }
 
-    public async Task AddInvoiceAsync(CreateInvoiceCommand createInvoiceCommand, CancellationToken cancellationToken)
+    public async Task CreateInvoiceAsync(CreateInvoiceCommand createInvoiceCommand, CancellationToken cancellationToken)
     {
         var client = await _clientProfileRepository.Query()
             .Where(x => x.Users!.UserName == createInvoiceCommand.CreateInvoiceRequest.ClientName)
@@ -71,7 +71,7 @@ public class InvoiceRepository : IInvoiceRepository
         invoice.ClientId = client.Id;
         invoice.FreelancerId = freelancer.Id;
         invoice.Status = "Submitted";
-        await _invoiceRepository.AddAsync(invoice, cancellationToken);
+        await _invoiceRepository.CreateAsync(invoice, cancellationToken);
     }
 
     public async Task<InvoicesDto> GetInvoiceByIdAsync(GetInvoiceByIdQuery query, CancellationToken cancellationToken)

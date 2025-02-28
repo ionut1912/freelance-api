@@ -1,8 +1,8 @@
-using Frelance.Application.Mediatr.Commands.ClientProfiles;
-using Frelance.Application.Mediatr.Queries.ClientProfiles;
 using Frelance.Application.Repositories;
 using Frelance.Contracts.Dtos;
 using Frelance.Contracts.Exceptions;
+using Frelance.Contracts.Requests.ClientProfile;
+using Frelance.Contracts.Requests.Common;
 using Frelance.Contracts.Responses.Common;
 using Frelance.Infrastructure.Entities;
 using Mapster;
@@ -36,28 +36,28 @@ public class ClientProfileRepository : IClientProfileRepository
         _userAccessor = userAccessor;
     }
 
-    public async Task AddClientProfileAsync(CreateClientProfileCommand clientProfileCommand,
+    public async Task CreateClientProfileAsync(CreateClientProfileRequest createClientProfileRequest,
         CancellationToken cancellationToken)
     {
         var user = await _userRepository.Query()
             .FirstOrDefaultAsync(x => x.UserName == _userAccessor.GetUsername(), cancellationToken);
         if (user == null) throw new InvalidOperationException("User not found.");
 
-        var clientProfile = clientProfileCommand.CreateClientProfileRequest.Adapt<ClientProfiles>();
+        var clientProfile = createClientProfileRequest.Adapt<ClientProfiles>();
         if (clientProfile.Addresses is null) throw new NotFoundException("Address not found.");
 
-        await _addressRepository.AddAsync(clientProfile.Addresses, cancellationToken);
+        await _addressRepository.CreateAsync(clientProfile.Addresses, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         clientProfile.UserId = user.Id;
         clientProfile.AddressId = clientProfile.Addresses.Id;
-        await _clientProfileRepository.AddAsync(clientProfile, cancellationToken);
+        await _clientProfileRepository.CreateAsync(clientProfile, cancellationToken);
     }
 
-    public async Task<ClientProfileDto> GetClientProfileByIdAsync(GetClientProfileByIdQuery query,
+    public async Task<ClientProfileDto> GetClientProfileByIdAsync(int id,
         CancellationToken cancellationToken)
     {
         var clientProfile = await _clientProfileRepository.Query()
-            .Where(x => x.Id == query.Id)
+            .Where(x => x.Id ==id)
             .Include(cp => cp.Users)
             .ThenInclude(u => u!.Reviews)
             .Include(cp => cp.Users)
@@ -70,13 +70,12 @@ public class ClientProfileRepository : IClientProfileRepository
 
         if (clientProfile is null)
             throw new NotFoundException(
-                $"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Id)} : '{query.Id}' does not exist");
+                $"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Id)} : '{id}' does not exist");
 
         return clientProfile.Adapt<ClientProfileDto>();
     }
 
-    public async Task<ClientProfileDto?> GetLoggedInClientProfileAsync(
-        GetLoggedInClientProfileQuery loggedInClientProfileQuery,
+    public async Task<ClientProfileDto> GetLoggedInClientProfileAsync(
         CancellationToken cancellationToken)
     {
         var profile = await _clientProfileRepository.Query()
@@ -93,8 +92,7 @@ public class ClientProfileRepository : IClientProfileRepository
         return profile.Adapt<ClientProfileDto>();
     }
 
-    public async Task<PaginatedList<ClientProfileDto>> GetClientProfilesAsync(
-        GetClientProfilesQuery clientProfilesQuery, CancellationToken cancellationToken)
+    public async Task<PaginatedList<ClientProfileDto>> GetClientProfilesAsync(PaginationParams paginationParams, CancellationToken cancellationToken)
     {
         var clientsQuery = _clientProfileRepository.Query()
             .Include(x => x.Users)
@@ -107,41 +105,44 @@ public class ClientProfileRepository : IClientProfileRepository
             .Include(x => x.Projects)
             .ProjectToType<ClientProfileDto>();
 
+        var pageNumber = paginationParams.PageNumber;
+        var pageSize = paginationParams.PageSize;
+        
         var count = await clientsQuery.CountAsync(cancellationToken);
         var items = await clientsQuery
-            .Skip((clientProfilesQuery.PaginationParams.PageNumber - 1) * clientProfilesQuery.PaginationParams.PageSize)
-            .Take(clientProfilesQuery.PaginationParams.PageSize)
+            .Skip((pageNumber - 1) *pageSize)
+            .Take(pageSize)
             .ToListAsync(cancellationToken);
 
-        return new PaginatedList<ClientProfileDto>(items, count, clientProfilesQuery.PaginationParams.PageNumber,
-            clientProfilesQuery.PaginationParams.PageSize);
+        return new PaginatedList<ClientProfileDto>(items, count,pageNumber,
+            pageSize);
     }
 
-    public async Task UpdateClientProfileAsync(UpdateClientProfileCommand clientProfileCommand,
+    public async Task UpdateClientProfileAsync(int id,UpdateClientProfileRequest updateClientProfileRequest,
         CancellationToken cancellationToken)
     {
         var clientToUpdate = await _clientProfileRepository.Query()
-            .Where(x => x.Id == clientProfileCommand.Id)
+            .Where(x => x.Id ==id)
             .AsNoTracking()
             .Include(x => x.Addresses)
             .FirstOrDefaultAsync(cancellationToken);
 
         if (clientToUpdate is null)
             throw new NotFoundException(
-                $"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Id)} : '{clientProfileCommand.Id}' does not exist");
-        clientToUpdate = clientProfileCommand.UpdateClientProfileRequest.Adapt<ClientProfiles>();
+                $"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Id)} : '{id}' does not exist");
+        clientToUpdate = updateClientProfileRequest.Adapt<ClientProfiles>();
         _clientProfileRepository.Update(clientToUpdate);
     }
 
-    public async Task DeleteClientProfileAsync(DeleteClientProfileCommand clientProfileCommand,
+    public async Task DeleteClientProfileAsync(int id,
         CancellationToken cancellationToken)
     {
         var clientToDelete = await _clientProfileRepository.Query()
-            .Where(x => x.Id == clientProfileCommand.Id)
+            .Where(x => x.Id == id)
             .FirstOrDefaultAsync(cancellationToken);
         if (clientToDelete is null)
             throw new NotFoundException(
-                $"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Id)} : '{clientProfileCommand.Id}' does not exist");
+                $"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Id)} : '{id}' does not exist");
         _clientProfileRepository.Delete(clientToDelete);
     }
 }

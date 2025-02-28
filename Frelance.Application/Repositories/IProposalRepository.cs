@@ -7,7 +7,7 @@ namespace Frelance.Application.Repositories;
 
 public interface IProposalRepository
 {
-    Task AddProposalAsync(CreateProposalCommand createProposalCommand, CancellationToken cancellationToken);
+    Task CreateProposalAsync(CreateProposalCommand createProposalCommand, CancellationToken cancellationToken);
 
     Task<ProposalsDto> GetProposalByIdAsync(GetProposalByIdQuery getProposalByIdQuery,
         CancellationToken cancellationToken);

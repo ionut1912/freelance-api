@@ -7,7 +7,7 @@ namespace Frelance.Application.Repositories;
 
 public interface ITaskRepository
 {
-    Task AddTaskAsync(CreateTaskCommand createTaskCommand, CancellationToken cancellationToken);
+    Task CreateTaskAsync(CreateTaskCommand createTaskCommand, CancellationToken cancellationToken);
     Task UpdateTaskAsync(UpdateTaskCommand updateTaskCommand, CancellationToken cancellationToken);
     Task DeleteTaskAsync(DeleteTaskCommand deleteTaskCommand, CancellationToken cancellationToken);
     Task<TaskDto> GetTaskByIdAsync(GetTaskByIdQuery getTaskByIdQuery, CancellationToken cancellationToken);
