@@ -26,7 +26,7 @@ namespace Frelance.Infrastructure.Services.ML
             var faceRecognitionModelPath = Path.Combine(modelDir, "openface.nn4.small2.v1.t7");
             if (!File.Exists(faceRecognitionModelPath))
                 throw new FileNotFoundException("Face recognition model not found", faceRecognitionModelPath);
-            
+
             _faceRecognitionNet = CvDnn.ReadNetFromTorch(faceRecognitionModelPath)
                                   ?? throw new Exception("Failed to load face recognition model.");
         }

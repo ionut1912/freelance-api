@@ -60,11 +60,52 @@ public class AccountRepository : IAccountRepository
 
         if (user.Email != loginDto.Email) modelState.AddModelError("Email", "email is invalid");
 
+        if (await _userManager.IsLockedOutAsync(user))
+            modelState.AddModelError("Account", "The account is locked");
+
         GenerateException(modelState);
-
-
         return new UserDto(user.PhoneNumber!, await _tokenService.GenerateToken(user), user.UserName!, user.Email!,
             user.CreatedAt);
+    }
+
+    public async Task LockAccountAsync(BlockAccountCommand command, CancellationToken cancellationToken)
+    {
+        var modelState = new ModelStateDictionary();
+        var user = await _userManager.FindByIdAsync(command.UserId);
+        if (user is null)
+        {
+            throw new NotFoundException($"{nameof(Users)} with id {command.UserId} not found");
+        }
+        var lockoutEnd = DateTimeOffset.UtcNow.AddHours(1);
+        var result = await _userManager.SetLockoutEndDateAsync(user, lockoutEnd);
+        if (!result.Succeeded)
+        {
+            modelState.AddModelError("User", "Failed to lock account");
+            GenerateException(modelState);
+        }
+
+
+    }
+
+    public async Task DeleteAccountAsync(DeleteAccountCommand command, CancellationToken cancellationToken)
+    {
+        var modelState = new ModelStateDictionary();
+        var user = await _userManager.FindByIdAsync(command.UserId);
+        if (user is null)
+        {
+            throw new NotFoundException($"{nameof(Users)} with id {command.UserId} not found");
+        }
+        var result = await _userManager.DeleteAsync(user);
+        if (!result.Succeeded)
+        {
+            modelState.AddModelError("User", "Failed to delete account");
+            GenerateException(modelState);
+        }
+        var roles = await _userManager.GetRolesAsync(user);
+        foreach (var role in roles)
+        {
+            await _userManager.RemoveFromRoleAsync(user, role);
+        }
     }
 
     private static void AddErrorToModelState(IdentityResult result, ModelStateDictionary modelState)
