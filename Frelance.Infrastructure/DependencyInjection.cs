@@ -1,10 +1,12 @@
 using System.Reflection;
 using System.Text;
 using Frelance.Application.Repositories;
+using Frelance.Application.Repositories.ML;
 using Frelance.Infrastructure.Context;
 using Frelance.Infrastructure.Entities;
 using Frelance.Infrastructure.Mappings;
 using Frelance.Infrastructure.Services;
+using Frelance.Infrastructure.Services.ML;
 using Frelance.Infrastructure.Settings;
 using Mapster;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -74,6 +76,7 @@ public static class DependencyInjection
             services.AddScoped<IInvoiceRepository, InvoiceRepository>();
             services.AddScoped<IProposalRepository, ProposalRepository>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            services.AddScoped<IFaceComparisionService, FaceRecognitionFaceComparisonService>();
 
             services.AddIdentityCore<Users>(opt => opt.User.RequireUniqueEmail = true)
                 .AddRoles<Roles>()
