@@ -9,17 +9,28 @@ public static class UserModule
 {
     public static void AddUserEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/register", async (IMediator mediator, RegisterDto registerDto,
+        app.MapPost("/api/auth/register", async (IMediator mediator, RegisterDto registerDto,
             CancellationToken ct) =>
         {
             await mediator.Send(registerDto.Adapt<CreateUserCommand>(), ct);
             return Results.Created();
         }).WithTags("Users");
-        app.MapPost("/api/login", async (IMediator mediator, LoginDto loginDto,
+        app.MapPost("/api/auth/login", async (IMediator mediator, LoginDto loginDto,
             CancellationToken ct) =>
         {
             var result = await mediator.Send(loginDto.Adapt<LoginCommand>(), ct);
             return Results.Ok(result);
         }).WithTags("Users");
+
+        app.MapPost("/api/auth/block/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
+            {
+                await mediator.Send(new BlockAccountCommand(id.ToString()), ct);
+            }).WithTags("Users")
+            .RequireAuthorization();
+        app.MapDelete("/api/auth/account/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
+        {
+            await mediator.Send(new DeleteAccountCommand(id.ToString()), ct);
+        }).WithTags("Users")
+            .RequireAuthorization();
     }
 }
