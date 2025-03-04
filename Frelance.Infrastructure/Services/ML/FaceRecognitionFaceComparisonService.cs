@@ -3,7 +3,6 @@ using Frelance.Contracts.Exceptions;
 using Frelance.Contracts.Responses;
 using OpenCvSharp;
 using OpenCvSharp.Dnn;
-using System.Linq;
 
 namespace Frelance.Infrastructure.Services.ML
 {
@@ -16,7 +15,7 @@ namespace Frelance.Infrastructure.Services.ML
         public FaceRecognitionFaceComparisonService()
         {
             var baseDir = AppContext.BaseDirectory;
-            var modelDir = Path.GetFullPath(Path.Combine(baseDir, "..", "..", "..", "..", "..", "models"));
+            var modelDir = Path.GetFullPath(Path.Combine(baseDir, "..", "..", "..", "..", "models"));
 
             var faceCascadePath = Path.Combine(modelDir, "haarcascade_frontalface_default.xml");
             if (!File.Exists(faceCascadePath))
