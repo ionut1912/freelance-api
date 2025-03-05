@@ -130,7 +130,7 @@ public class ClientProfileRepository : IClientProfileRepository
         if (clientToUpdate is null)
             throw new NotFoundException(
                 $"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Id)} : '{id}' does not exist");
-        clientToUpdate = updateClientProfileRequest.Adapt<ClientProfiles>();
+        updateClientProfileRequest.Adapt(clientToUpdate);
         _clientProfileRepository.Update(clientToUpdate);
     }
 

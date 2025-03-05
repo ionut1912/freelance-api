@@ -55,7 +55,7 @@ public class ProjectRepository : IProjectRepository
             throw new NotFoundException(
                 $"{nameof(Projects)} with {nameof(Projects.Id)} : '{updateProjectCommand.Id}' does not exist");
 
-        projectToUpdate = updateProjectCommand.UpdateProjectRequest.Adapt<Projects>();
+        updateProjectCommand.UpdateProjectRequest.Adapt(projectToUpdate);
         _projectRepository.Update(projectToUpdate);
     }
 

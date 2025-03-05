@@ -99,7 +99,7 @@ public class ProposalRepository : IProposalRepository
         if (proposalToUpdate is null)
             throw new NotFoundException(
                 $"{nameof(Proposals)}  with {nameof(Proposals.Id)}:{updateProposalCommand.Id} not found");
-        proposalToUpdate = updateProposalCommand.UpdateProposalRequest.Adapt<Proposals>();
+        updateProposalCommand.UpdateProposalRequest.Adapt(proposalToUpdate);
         _proposalRepository.Update(proposalToUpdate);
     }
 

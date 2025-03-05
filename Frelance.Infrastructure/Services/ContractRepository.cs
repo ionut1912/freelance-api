@@ -112,7 +112,7 @@ public class ContractRepository : IContractRepository
     public async Task UpdateContractAsync(UpdateContractCommand updateContractCommand,
         CancellationToken cancellationToken)
     {
-        var contract = await _contractsRepository.Query()
+        var contractToUpdate = await _contractsRepository.Query()
             .Where(x => x.Id == updateContractCommand.Id)
             .Include(x => x.Project)
             .Include(x => x.Client)
@@ -120,23 +120,24 @@ public class ContractRepository : IContractRepository
             .Include(x => x.Freelancer)
             .ThenInclude(x => x.Projects)
             .FirstOrDefaultAsync(cancellationToken);
-        if (contract is null)
+        if (contractToUpdate is null)
             throw new NotFoundException(
                 $"nameof(Entities.Contracts) with {nameof(Entities.Contracts.Id)}: {updateContractCommand.Id} doe not exist.");
 
-        updateContractCommand.UpdateContractRequest.Adapt(contract);
+        updateContractCommand.UpdateContractRequest.Adapt(contractToUpdate);
 
         if (updateContractCommand.UpdateContractRequest.Status == "Signed"
-            && contract.Freelancer.Projects is not null
-            && contract.Client.Projects is not null)
+            && contractToUpdate.Freelancer.Projects is not null
+            && contractToUpdate.Client.Projects is not null)
         {
-            contract.Freelancer.Projects.Add(contract.Project);
-            contract.Client.Projects.Add(contract.Project);
+            contractToUpdate.Freelancer.Projects.Add(contractToUpdate.Project);
+            contractToUpdate.Client.Projects.Add(contractToUpdate.Project);
+            contractToUpdate.Freelancer.IsAvailable = false;
         }
 
-        _contractsRepository.Update(contract);
-        _clientProfilesRepository.Update(contract.Client);
-        _freelancerProfilesRepository.Update(contract.Freelancer);
+        _contractsRepository.Update(contractToUpdate);
+        _clientProfilesRepository.Update(contractToUpdate.Client);
+        _freelancerProfilesRepository.Update(contractToUpdate.Freelancer);
     }
 
 
