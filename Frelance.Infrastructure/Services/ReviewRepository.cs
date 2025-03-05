@@ -79,7 +79,7 @@ public class ReviewRepository : IReviewRepository
         if (reviewToUpdate is null)
             throw new NotFoundException(
                 $"{nameof(Reviews)} with {nameof(Reviews.Id)}: '{updateReviewCommand.Id}' does not exist");
-        reviewToUpdate = updateReviewCommand.UpdateReviewRequest.Adapt<Reviews>();
+        updateReviewCommand.UpdateReviewRequest.Adapt(reviewToUpdate);
         _reviewRepository.Update(reviewToUpdate);
     }
 

@@ -63,7 +63,7 @@ public class TaskRepository : ITaskRepository
             throw new NotFoundException(
                 $"{nameof(ProjectTasks)} with {nameof(ProjectTasks.Id)}: '{updateTaskCommand.Id}' does not exist");
 
-        projectTaskToUpdate = updateTaskCommand.UpdateProjectTaskRequest.Adapt<ProjectTasks>();
+        updateTaskCommand.UpdateProjectTaskRequest.Adapt(projectTaskToUpdate);
         _tasksRepository.Update(projectTaskToUpdate);
     }
 

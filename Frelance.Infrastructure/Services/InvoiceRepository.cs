@@ -121,7 +121,7 @@ public class InvoiceRepository : IInvoiceRepository
         if (invoiceToUpdate is null)
             throw new NotFoundException(
                 $"{nameof(Invoices)} with {nameof(Invoices.Id)}: {updateInvoiceCommand.Id} not found");
-        updateInvoiceCommand.UpdateInvoiceRequest.Adapt<Invoices>();
+        updateInvoiceCommand.UpdateInvoiceRequest.Adapt(invoiceToUpdate);
         _invoiceRepository.Update(invoiceToUpdate);
     }
 
