@@ -45,7 +45,7 @@ public class FrelanceDbContext : IdentityDbContext<Users, Roles, int>
             .HasOne(fld => fld.FreelancerProfile)
             .WithMany(x => x.ForeignLanguages)
             .HasForeignKey(fld => fld.FreelancerProfileId)
-            .OnDelete(DeleteBehavior.NoAction);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.Entity<ProjectTasks>()
             .HasOne(p => p.Projects)
