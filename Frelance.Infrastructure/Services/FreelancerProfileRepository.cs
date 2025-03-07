@@ -130,7 +130,8 @@ public class FreelancerProfileRepository : IFreelancerProfileRepository
         return profile.Adapt<FreelancerProfileDto>();
     }
 
-    public async Task<PaginatedList<FreelancerProfileDto>> GetAllFreelancerProfilesAsync(PaginationParams paginationParams,
+    public async Task<PaginatedList<FreelancerProfileDto>> GetAllFreelancerProfilesAsync(
+        PaginationParams paginationParams,
         CancellationToken cancellationToken)
     {
         var freelancersProfilesQuery = _freelancerProfilesRepository.Query()
@@ -159,7 +160,8 @@ public class FreelancerProfileRepository : IFreelancerProfileRepository
             pageSize);
     }
 
-    public async Task UpdateFreelancerProfileAsync(int id, UpdateFreelancerProfileRequest updateFreelancerProfileRequest,
+    public async Task UpdateFreelancerProfileAsync(int id,
+        UpdateFreelancerProfileRequest updateFreelancerProfileRequest,
         CancellationToken cancellationToken)
     {
         var freelancerProfile = await _freelancerProfilesRepository.Query()
@@ -252,9 +254,7 @@ public class FreelancerProfileRepository : IFreelancerProfileRepository
             .Where(x => x.Id == id)
             .FirstOrDefaultAsync(cancellationToken);
         if (freelancer is null)
-        {
             throw new NotFoundException($"{nameof(FreelancerProfiles)} with {nameof(id)}: '{id}' does not exist");
-        }
         freelancer.IsVerified = true;
         _freelancerProfilesRepository.Update(freelancer);
     }

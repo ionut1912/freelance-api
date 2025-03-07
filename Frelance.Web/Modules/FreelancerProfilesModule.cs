@@ -1,11 +1,9 @@
-using System.Security.Claims;
 using Frelance.Application.Mediatr.Commands.UserProfile;
 using Frelance.Application.Mediatr.Queries.UserProfile;
 using Frelance.Contracts.Enums;
 using Frelance.Contracts.Requests.Common;
 using Frelance.Contracts.Requests.FreelancerProfiles;
 using Frelance.Web.Extensions;
-using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,13 +25,12 @@ public static class FreelancerProfilesModule
             .RequireAuthorization("FreelancerRole");
         app.MapGet("/api/freelancerProfiles/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
             {
-
                 var result = await mediator.Send(new GetUserProfileByIdQuery(Role.Freelancer, id), ct);
                 return Results.Ok(result);
             }).WithTags("FreelancerProfiles")
             .RequireAuthorization("FreelancerRole");
         app.MapGet("/api/freelancerProfiles", async (IMediator mediator, [FromQuery] int pageSize,
-            [FromQuery] int pageNumber, CancellationToken ct) =>
+                [FromQuery] int pageNumber, CancellationToken ct) =>
             {
                 var paginatedResult =
                     await mediator.Send(
@@ -56,12 +53,12 @@ public static class FreelancerProfilesModule
             .RequireAuthorization("FreelancerRole");
 
         app.MapPut("/api/freelancerProfiles/{id}", async (IMediator mediator, int id,
-            UpdateFreelancerProfileRequest updateFreelancerProfileRequest, CancellationToken ct) =>
-        {
-            await mediator.Send(new UpdateUserProfileCommand(id, Role.Freelancer, updateFreelancerProfileRequest),
+                UpdateFreelancerProfileRequest updateFreelancerProfileRequest, CancellationToken ct) =>
+            {
+                await mediator.Send(new UpdateUserProfileCommand(id, Role.Freelancer, updateFreelancerProfileRequest),
                     ct);
-            return Results.NoContent();
-        }).WithTags("FreelancerProfiles")
+                return Results.NoContent();
+            }).WithTags("FreelancerProfiles")
             .RequireAuthorization("FreelancerRole");
 
         app.MapPatch("/api/freelancerProfiles/verify/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
@@ -73,10 +70,10 @@ public static class FreelancerProfilesModule
             .RequireAuthorization("FreelancerRole");
 
         app.MapDelete("/api/freelancerProfiles/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
-        {
-            await mediator.Send(new DeleteUserProfileCommand(Role.Freelancer, id), ct);
-            return Results.NoContent();
-        }).WithTags("FreelancerProfiles")
+            {
+                await mediator.Send(new DeleteUserProfileCommand(Role.Freelancer, id), ct);
+                return Results.NoContent();
+            }).WithTags("FreelancerProfiles")
             .RequireAuthorization("FreelancerRole");
     }
 }

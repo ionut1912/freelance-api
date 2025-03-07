@@ -20,6 +20,7 @@ public class UpdateInvoiceCommandHandler : IRequestHandler<UpdateInvoiceCommand>
     public async Task Handle(UpdateInvoiceCommand request, CancellationToken cancellationToken)
     {
         await _invoiceRepository.UpdateInvoiceAsync(request, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken); ;
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        ;
     }
 }

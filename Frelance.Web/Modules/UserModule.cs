@@ -22,15 +22,17 @@ public static class UserModule
             return Results.Ok(result);
         }).WithTags("Users");
 
-        app.MapPost("/api/auth/block/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
-            {
-                await mediator.Send(new BlockAccountCommand(id.ToString()), ct);
-            }).WithTags("Users")
+        app.MapPost("/api/auth/block/{id}",
+                async (IMediator mediator, int id, CancellationToken ct) =>
+                {
+                    await mediator.Send(new BlockAccountCommand(id.ToString()), ct);
+                }).WithTags("Users")
             .RequireAuthorization();
-        app.MapDelete("/api/auth/account/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
-        {
-            await mediator.Send(new DeleteAccountCommand(id.ToString()), ct);
-        }).WithTags("Users")
+        app.MapDelete("/api/auth/account/{id}",
+                async (IMediator mediator, int id, CancellationToken ct) =>
+                {
+                    await mediator.Send(new DeleteAccountCommand(id.ToString()), ct);
+                }).WithTags("Users")
             .RequireAuthorization();
     }
 }

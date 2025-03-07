@@ -37,7 +37,8 @@ public class ContractRepository : IContractRepository
         _userAccessor = userAccessor;
     }
 
-    public async Task CreateContractAsync(CreateContractCommand createContractCommand, CancellationToken cancellationToken)
+    public async Task CreateContractAsync(CreateContractCommand createContractCommand,
+        CancellationToken cancellationToken)
     {
         var freelancer = await _freelancerProfilesRepository.Query()
             .Where(x => x.Users!.UserName == createContractCommand.CreateContractRequest.FreelancerName)

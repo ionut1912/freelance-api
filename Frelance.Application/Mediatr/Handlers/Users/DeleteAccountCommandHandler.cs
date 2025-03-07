@@ -10,10 +10,8 @@ public class DeleteAccountCommandHandler : IRequestHandler<DeleteAccountCommand>
 
     public DeleteAccountCommandHandler(IAccountRepository accountRepository)
     {
-
         ArgumentNullException.ThrowIfNull(accountRepository, nameof(accountRepository));
         _accountRepository = accountRepository;
-
     }
 
     public async Task Handle(DeleteAccountCommand request, CancellationToken cancellationToken)
