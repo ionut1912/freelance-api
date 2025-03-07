@@ -3,7 +3,6 @@ using Frelance.Application.Repositories;
 using Frelance.Contracts.Dtos;
 using Frelance.Contracts.Errors;
 using Frelance.Contracts.Exceptions;
-using Frelance.Infrastructure.Context;
 using Frelance.Infrastructure.Entities;
 using Mapster;
 using Microsoft.AspNetCore.Identity;
@@ -72,10 +71,7 @@ public class AccountRepository : IAccountRepository
     {
         var modelState = new ModelStateDictionary();
         var user = await _userManager.FindByIdAsync(command.UserId);
-        if (user is null)
-        {
-            throw new NotFoundException($"{nameof(Users)} with id {command.UserId} not found");
-        }
+        if (user is null) throw new NotFoundException($"{nameof(Users)} with id {command.UserId} not found");
         var lockoutEnd = DateTimeOffset.UtcNow.AddHours(1);
         var result = await _userManager.SetLockoutEndDateAsync(user, lockoutEnd);
         if (!result.Succeeded)
@@ -83,29 +79,22 @@ public class AccountRepository : IAccountRepository
             modelState.AddModelError("User", "Failed to lock account");
             GenerateException(modelState);
         }
-
-
     }
 
     public async Task DeleteAccountAsync(DeleteAccountCommand command, CancellationToken cancellationToken)
     {
         var modelState = new ModelStateDictionary();
         var user = await _userManager.FindByIdAsync(command.UserId);
-        if (user is null)
-        {
-            throw new NotFoundException($"{nameof(Users)} with id {command.UserId} not found");
-        }
+        if (user is null) throw new NotFoundException($"{nameof(Users)} with id {command.UserId} not found");
         var result = await _userManager.DeleteAsync(user);
         if (!result.Succeeded)
         {
             modelState.AddModelError("User", "Failed to delete account");
             GenerateException(modelState);
         }
+
         var roles = await _userManager.GetRolesAsync(user);
-        foreach (var role in roles)
-        {
-            await _userManager.RemoveFromRoleAsync(user, role);
-        }
+        foreach (var role in roles) await _userManager.RemoveFromRoleAsync(user, role);
     }
 
     private static void AddErrorToModelState(IdentityResult result, ModelStateDictionary modelState)

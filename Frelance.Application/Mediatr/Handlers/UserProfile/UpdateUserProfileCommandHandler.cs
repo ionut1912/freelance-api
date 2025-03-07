@@ -23,17 +23,19 @@ public class UpdateUserProfileCommandHandler : IRequestHandler<UpdateUserProfile
         _freelancerProfileRepository = freelancerProfileRepository;
         _clientProfileRepository = clientProfileRepository;
         _unitOfWork = unitOfWork;
-
     }
 
     public async Task Handle(UpdateUserProfileCommand request, CancellationToken cancellationToken)
     {
         var repoTask = request.Role switch
         {
-            Role.Freelancer when request.UpdateProfileRequest is UpdateFreelancerProfileRequest updateFreelancerProfileRequest =>
-                _freelancerProfileRepository.UpdateFreelancerProfileAsync(request.Id, updateFreelancerProfileRequest, cancellationToken),
+            Role.Freelancer when request.UpdateProfileRequest is UpdateFreelancerProfileRequest
+                    updateFreelancerProfileRequest =>
+                _freelancerProfileRepository.UpdateFreelancerProfileAsync(request.Id, updateFreelancerProfileRequest,
+                    cancellationToken),
             Role.Client when request.UpdateProfileRequest is UpdateClientProfileRequest updateClientProfileRequest =>
-                _clientProfileRepository.UpdateClientProfileAsync(request.Id, updateClientProfileRequest, cancellationToken),
+                _clientProfileRepository.UpdateClientProfileAsync(request.Id, updateClientProfileRequest,
+                    cancellationToken),
             _ => throw new InvalidOperationException("Invalid request")
         };
 

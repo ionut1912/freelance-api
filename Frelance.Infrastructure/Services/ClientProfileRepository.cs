@@ -92,7 +92,8 @@ public class ClientProfileRepository : IClientProfileRepository
         return profile.Adapt<ClientProfileDto>();
     }
 
-    public async Task<PaginatedList<ClientProfileDto>> GetClientProfilesAsync(PaginationParams paginationParams, CancellationToken cancellationToken)
+    public async Task<PaginatedList<ClientProfileDto>> GetClientProfilesAsync(PaginationParams paginationParams,
+        CancellationToken cancellationToken)
     {
         var clientsQuery = _clientProfileRepository.Query()
             .Include(x => x.Users)
@@ -140,9 +141,8 @@ public class ClientProfileRepository : IClientProfileRepository
             .Where(x => x.Id == id)
             .FirstOrDefaultAsync(cancellationToken);
         if (client is null)
-        {
-            throw new NotFoundException($"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Id)} : '{id}' does not exist");
-        }
+            throw new NotFoundException(
+                $"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Id)} : '{id}' does not exist");
 
         client.IsVerified = true;
         _clientProfileRepository.Update(client);

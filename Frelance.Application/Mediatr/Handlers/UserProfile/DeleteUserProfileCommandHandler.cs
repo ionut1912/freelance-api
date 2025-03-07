@@ -7,8 +7,8 @@ namespace Frelance.Application.Mediatr.Handlers.UserProfile;
 
 public class DeleteUserProfileCommandHandler : IRequestHandler<DeleteUserProfileCommand>
 {
-    private readonly IFreelancerProfileRepository _freelancerProfileRepository;
     private readonly IClientProfileRepository _clientProfileRepository;
+    private readonly IFreelancerProfileRepository _freelancerProfileRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public DeleteUserProfileCommandHandler(IFreelancerProfileRepository freelancerProfileRepository,

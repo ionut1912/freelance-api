@@ -11,17 +11,17 @@ public static class FaceModule
 {
     public static void AddFaceEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapPost("api/verifyFace", async (IMediator mediator, [FromBody] FaceVerificationRequest faceVerificationRequest, HttpContext httpContext, CancellationToken cancellationToken) =>
+        app.MapPost("api/verifyFace", async (IMediator mediator,
+                [FromBody] FaceVerificationRequest faceVerificationRequest, HttpContext httpContext,
+                CancellationToken cancellationToken) =>
             {
                 var role = httpContext.User.FindFirst(ClaimTypes.Role)?.Value;
                 var commandRole = role == "Client" ? Role.Client : Role.Freelancer;
                 var command = new VerifyFaceCommand(commandRole, faceVerificationRequest.FaceBase64Image);
                 var result = await mediator.Send(command, cancellationToken);
                 return Results.Ok(result);
-
             })
             .WithTags("FaceRecognition")
             .RequireAuthorization();
     }
-
 }

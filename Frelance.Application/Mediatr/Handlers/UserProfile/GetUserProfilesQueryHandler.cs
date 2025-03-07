@@ -7,8 +7,8 @@ namespace Frelance.Application.Mediatr.Handlers.UserProfile;
 
 public class GetUserProfilesQueryHandler : IRequestHandler<GetUserProfilesQuery, object>
 {
-    private readonly IFreelancerProfileRepository _freelancerProfileRepository;
     private readonly IClientProfileRepository _clientProfileRepository;
+    private readonly IFreelancerProfileRepository _freelancerProfileRepository;
 
     public GetUserProfilesQueryHandler(IFreelancerProfileRepository freelancerProfileRepository,
         IClientProfileRepository clientProfileRepository)

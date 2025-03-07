@@ -12,7 +12,6 @@ public class BlockAccountCommandHandler : IRequestHandler<BlockAccountCommand>
     {
         ArgumentNullException.ThrowIfNull(accountRepository, nameof(accountRepository));
         _accountRepository = accountRepository;
-
     }
 
     public async Task Handle(BlockAccountCommand request, CancellationToken cancellationToken)

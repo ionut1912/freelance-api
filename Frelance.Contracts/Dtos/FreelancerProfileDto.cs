@@ -1,4 +1,5 @@
 namespace Frelance.Contracts.Dtos;
+
 public class FreelancerProfileDto : BaseProfileDto
 {
     public List<TaskDto> Tasks { get; set; } = new();

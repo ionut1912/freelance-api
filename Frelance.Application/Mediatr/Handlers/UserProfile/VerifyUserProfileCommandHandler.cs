@@ -1,16 +1,14 @@
 using Frelance.Application.Mediatr.Commands.UserProfile;
 using Frelance.Application.Repositories;
 using Frelance.Contracts.Enums;
-using Frelance.Contracts.Requests.ClientProfile;
-using Frelance.Contracts.Requests.FreelancerProfiles;
 using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.UserProfile;
 
 public class VerifyUserProfileCommandHandler : IRequestHandler<VerifyUserProfileCommand>
 {
-    private readonly IFreelancerProfileRepository _freelancerProfileRepository;
     private readonly IClientProfileRepository _clientProfileRepository;
+    private readonly IFreelancerProfileRepository _freelancerProfileRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public VerifyUserProfileCommandHandler(IFreelancerProfileRepository freelancerProfileRepository,
@@ -23,7 +21,6 @@ public class VerifyUserProfileCommandHandler : IRequestHandler<VerifyUserProfile
         _freelancerProfileRepository = freelancerProfileRepository;
         _clientProfileRepository = clientProfileRepository;
         _unitOfWork = unitOfWork;
-
     }
 
     public async Task Handle(VerifyUserProfileCommand request, CancellationToken cancellationToken)

@@ -10,14 +10,13 @@ public class GetCurrentUserProfileQueryHandler : IRequestHandler<GetCurrentUserP
     private readonly IClientProfileRepository _clientProfileRepository;
     private readonly IFreelancerProfileRepository _freelancerProfileRepository;
 
-    public GetCurrentUserProfileQueryHandler(IClientProfileRepository clientProfileRepository, IFreelancerProfileRepository freelancerProfileRepository)
+    public GetCurrentUserProfileQueryHandler(IClientProfileRepository clientProfileRepository,
+        IFreelancerProfileRepository freelancerProfileRepository)
     {
         ArgumentNullException.ThrowIfNull(clientProfileRepository, nameof(clientProfileRepository));
         ArgumentNullException.ThrowIfNull(freelancerProfileRepository, nameof(freelancerProfileRepository));
         _clientProfileRepository = clientProfileRepository;
         _freelancerProfileRepository = freelancerProfileRepository;
-
-
     }
 
     public async Task<object> Handle(GetCurrentUserProfileQuery request, CancellationToken cancellationToken)

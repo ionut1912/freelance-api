@@ -33,7 +33,8 @@ public class ProposalRepository : IProposalRepository
         _projectRepository = projectRepository;
     }
 
-    public async Task CreateProposalAsync(CreateProposalCommand createProposalCommand, CancellationToken cancellationToken)
+    public async Task CreateProposalAsync(CreateProposalCommand createProposalCommand,
+        CancellationToken cancellationToken)
     {
         var user = await _userRepository.Query()
             .Where(x => x.UserName == _userAccessor.GetUsername())
