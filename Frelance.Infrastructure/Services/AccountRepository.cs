@@ -61,7 +61,7 @@ public class AccountRepository : IAccountRepository
         if (user.Email != loginDto.Email) modelState.AddModelError("Email", "email is invalid");
 
         if (await _userManager.IsLockedOutAsync(user))
-            modelState.AddModelError("Account", "The account is locked");
+            modelState.AddModelError("Account", "Your account is locked for one hour");
 
         GenerateException(modelState);
         return new UserDto(user.PhoneNumber!, await _tokenService.GenerateToken(user), user.UserName!, user.Email!,
