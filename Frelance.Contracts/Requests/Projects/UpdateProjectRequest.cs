@@ -1,5 +1,7 @@
 ﻿using JetBrains.Annotations;
 
+namespace Frelance.Contracts.Requests.Projects;
+
 [UsedImplicitly]
 public record UpdateProjectRequest(
     string? Title,

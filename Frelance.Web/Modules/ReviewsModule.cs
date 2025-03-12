@@ -20,7 +20,7 @@ public static class ReviewsModule
                 return Results.Created();
             }).WithTags("Reviews")
             .RequireAuthorization();
-        app.MapGet("/api/reviews/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
+        app.MapGet("/api/reviews/{id:int}", async (IMediator mediator, int id, CancellationToken ct) =>
             {
                 var project = await mediator.Send(new GetReviewByIdQuery(id), ct);
                 return Results.Ok(project);
@@ -38,7 +38,7 @@ public static class ReviewsModule
                         paginatedReviews.TotalCount, paginatedReviews.TotalPages, paginatedReviews.Items);
                 }).WithTags("Reviews")
             .RequireAuthorization();
-        app.MapPut("/api/reviews/{id}", async (IMediator mediator, int id,
+        app.MapPut("/api/reviews/{id:int}", async (IMediator mediator, int id,
                 UpdateReviewRequest updateReviewRequest, CancellationToken ct) =>
             {
                 var command = updateReviewRequest.Adapt<UpdateReviewCommand>() with { Id = id };
@@ -46,7 +46,7 @@ public static class ReviewsModule
                 return Results.NoContent();
             }).WithTags("Reviews")
             .RequireAuthorization();
-        app.MapDelete("/api/reviews/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
+        app.MapDelete("/api/reviews/{id:int}", async (IMediator mediator, int id, CancellationToken ct) =>
             {
                 var command = new DeleteReviewCommand(id);
                 await mediator.Send(command, ct);

@@ -217,7 +217,6 @@ public abstract class MappingConfig
             .Map(dest => dest.Experience, src => src.Experience)
             .Map(dest => dest.Rate, src => src.Rate)
             .Map(dest => dest.Currency, src => src.Currency)
-            .Map(dest => dest.Rating, src => src.Rating)
             .Map(dest => dest.PortfolioUrl, src => src.PortfolioUrl)
             .Map(dest => dest.Image, src => src.Image)
             .Ignore(dest => dest.Skills)
@@ -340,7 +339,7 @@ public abstract class MappingConfig
 
         TypeAdapterConfig<UpdateProjectRequest, Projects>
             .NewConfig()
-            .Ignore(dest=> dest.Technologies)
+            .Ignore(dest => dest.Technologies)
             .AfterMapping((src, dest) =>
             {
                 dest.Title = src.Title ?? dest.Title;
@@ -452,7 +451,7 @@ public abstract class MappingConfig
                 src.Tasks.Adapt<List<TaskDto>>(),
                 src.Skills.Adapt<List<SkillDto>>(),
                 src.ForeignLanguages.Adapt<List<ForeignLanguageDto>>(),
-                src.IsAvailable, src.Experience, src.Rate, src.Currency, src.Rating, src.PortfolioUrl));
+                src.IsAvailable, src.Experience, src.Rate, src.Currency, src.Rating ?? 0, src.PortfolioUrl));
 
         TypeAdapterConfig<List<Skills>, List<SkillDto>>
             .NewConfig()

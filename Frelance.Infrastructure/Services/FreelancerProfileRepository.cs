@@ -64,7 +64,7 @@ public class FreelancerProfileRepository : IFreelancerProfileRepository
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         freelancerProfile.AddressId = freelancerProfile.Addresses.Id;
         var skillsInDb = await _skillsRepository.Query().ToListAsync(cancellationToken);
-        var requestSkills = freelancerProfile.Skills?.Adapt<List<SkillRequest>>() ?? [];
+        var requestSkills = freelancerProfile.Skills.Adapt<List<SkillRequest>>();
         ValidateSkills(skillsInDb, requestSkills);
 
         try
@@ -200,8 +200,7 @@ public class FreelancerProfileRepository : IFreelancerProfileRepository
             .Ignore(dest => dest.Addresses!);
         updateFreelancerProfileRequest.Adapt(freelancerProfile, tempConfig);
 
-        if (updateFreelancerProfileRequest.ProgrammingLanguages is { } progLangs &&
-            updateFreelancerProfileRequest.Areas is { } areas)
+        if (updateFreelancerProfileRequest is { ProgrammingLanguages: { } progLangs, Areas: { } areas })
         {
             var skills = Enumerable.Range(0, Math.Min(progLangs.Count, areas.Count))
                 .Select(i => new SkillRequest(progLangs[i], areas[i]))
