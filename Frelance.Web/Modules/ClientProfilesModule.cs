@@ -4,6 +4,7 @@ using Frelance.Contracts.Enums;
 using Frelance.Contracts.Requests.ClientProfile;
 using Frelance.Contracts.Requests.Common;
 using Frelance.Web.Extensions;
+using Frelance.Web.Modules.Utils;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,33 +23,33 @@ public static class ClientProfilesModule
                 })
             .WithTags("ClientProfiles")
             .RequireAuthorization("ClientRole");
-        app.MapGet("/api/clientProfiles/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
+        app.MapGet("/api/clientProfiles/{id}",
+            async (IMediator mediator, int id, HttpContext httpContext, CancellationToken ct) =>
             {
-                var result = await mediator.Send(new GetUserProfileByIdQuery(Role.Client, id), ct);
+                var commandRole = ModulesUtils.GetRole(httpContext);
+                var result = await mediator.Send(new GetUserProfileByIdQuery(commandRole, id), ct);
                 return Results.Ok(result);
-            }).WithTags("ClientProfiles")
-            .RequireAuthorization("ClientRole");
+            }).WithTags("ClientProfiles");
         app.MapGet("/api/clientProfiles",
-                async (IMediator mediator, [FromQuery] int pageSize, [FromQuery] int pageNumber,
-                    CancellationToken ct) =>
-                {
-                    var paginatedResult =
-                        await mediator.Send(
-                            new GetUserProfilesQuery(Role.Client,
-                                new PaginationParams { PageSize = pageSize, PageNumber = pageNumber }), ct);
-                    return Results.Extensions.OkPaginationResult(paginatedResult.PageSize,
-                        paginatedResult.CurrentPage,
-                        paginatedResult.TotalCount, paginatedResult.TotalPages,
-                        paginatedResult.Items);
-                }).WithTags("ClientProfiles")
-            .RequireAuthorization("ClientRole");
+            async (IMediator mediator, HttpContext httpContext, [FromQuery] int pageSize, [FromQuery] int pageNumber,
+                CancellationToken ct) =>
+            {
+                var commandRole = ModulesUtils.GetRole(httpContext);
+                var paginatedResult =
+                    await mediator.Send(
+                        new GetUserProfilesQuery(commandRole,
+                            new PaginationParams { PageSize = pageSize, PageNumber = pageNumber }), ct);
+                return Results.Extensions.OkPaginationResult(paginatedResult.PageSize,
+                    paginatedResult.CurrentPage,
+                    paginatedResult.TotalCount, paginatedResult.TotalPages,
+                    paginatedResult.Items);
+            }).WithTags("ClientProfiles");
         app.MapGet("/api/current/clientProfiles",
-                async (IMediator mediator, CancellationToken ct) =>
-                {
-                    var result = await mediator.Send(new GetCurrentUserProfileQuery(Role.Client), ct);
-                    return Results.Ok(result);
-                }).WithTags("ClientProfiles")
-            .RequireAuthorization("ClientRole");
+            async (IMediator mediator, HttpContext httpContext, CancellationToken ct) =>
+            {
+                var result = await mediator.Send(new GetCurrentUserProfileQuery(ModulesUtils.GetRole(httpContext)), ct);
+                return Results.Ok(result);
+            }).WithTags("ClientProfiles");
         app.MapPut("/api/clientProfiles/{id}", async (IMediator mediator, int id,
                 UpdateClientProfileRequest updateClientProfileRequest, CancellationToken ct) =>
             {

@@ -2,9 +2,9 @@
 
 public class PaginatedList<T>(IEnumerable<T> items, int count, int pageNumber, int pageSize)
 {
-    public int TotalPages { get; set; } = (int)Math.Ceiling(count / (double)pageSize);
-    public int PageSize { get; set; } = pageSize;
-    public int TotalCount { get; set; } = count;
-    public int CurrentPage { get; set; } = pageNumber;
-    public IEnumerable<T> Items { get; set; } = items;
+    public int TotalPages { get; } = (int)Math.Ceiling(count / (double)pageSize);
+    public int PageSize { get; } = pageSize;
+    public int TotalCount { get; } = count;
+    public int CurrentPage { get; } = pageNumber;
+    public IEnumerable<T> Items { get; } = items;
 }

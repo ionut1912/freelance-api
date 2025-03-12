@@ -1,8 +1,10 @@
 using FluentValidation;
 using Frelance.Application.Mediatr.Commands.Tasks;
+using JetBrains.Annotations;
 
 namespace Frelance.Application.Mediatr.Validators.Tasks;
 
+[UsedImplicitly]
 public class CreateTaskCommandValidator : AbstractValidator<CreateTaskCommand>
 {
     public CreateTaskCommandValidator()

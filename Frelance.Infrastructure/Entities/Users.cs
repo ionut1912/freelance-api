@@ -1,14 +1,19 @@
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Identity;
 
 namespace Frelance.Infrastructure.Entities;
 
-public class Users : IdentityUser<int>
+[UsedImplicitly]
+public class Users(FreelancerProfiles? freelancerProfiles, ClientProfiles? clientProfiles)
+    : IdentityUser<int>
 {
-    public FreelancerProfiles? FreelancerProfiles { get; set; }
-    public ClientProfiles? ClientProfiles { get; set; }
-    public List<Reviews> Reviews { get; set; } = [];
+    public Users() : this(null, null)
+    {
+    }
 
-    public List<Proposals> Proposals { get; set; } = [];
-
+    public FreelancerProfiles? FreelancerProfiles { get; } = freelancerProfiles;
+    public ClientProfiles? ClientProfiles { get; } = clientProfiles;
+    public List<Reviews> Reviews { get; } = new();
+    public List<Proposals> Proposals { get; } = new();
     public DateTime CreatedAt { get; set; }
 }

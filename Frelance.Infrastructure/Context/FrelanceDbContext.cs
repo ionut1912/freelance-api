@@ -5,13 +5,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Frelance.Infrastructure.Context;
 
-public class FrelanceDbContext : IdentityDbContext<Users, Roles, int>
+public class FrelanceDbContext(DbContextOptions<FrelanceDbContext> options)
+    : IdentityDbContext<Users, Roles, int>(options)
 {
-    public FrelanceDbContext(DbContextOptions<FrelanceDbContext> options)
-        : base(options)
-    {
-    }
-
     public DbSet<Projects> Projects { get; set; }
     public DbSet<ProjectTasks> Tasks { get; set; }
     public DbSet<TimeLogs> TimeLogs { get; set; }
@@ -47,8 +43,24 @@ public class FrelanceDbContext : IdentityDbContext<Users, Roles, int>
             .HasForeignKey(fld => fld.FreelancerProfileId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        builder.Entity<FreelancerProfiles>()
+            .HasMany(fp => fp.Skills)
+            .WithMany(s => s.FreelancerProfiles)
+            .UsingEntity<Dictionary<string, object>>(
+                "FreelancerProfileSkill",
+                j => j.HasOne<Skills>()
+                    .WithMany()
+                    .HasForeignKey("SkillId")
+                    .HasConstraintName("FK_FreelancerProfileSkill_SkillId")
+                    .OnDelete(DeleteBehavior.Cascade),
+                j => j.HasOne<FreelancerProfiles>()
+                    .WithMany()
+                    .HasForeignKey("FreelancerProfileId")
+                    .HasConstraintName("FK_FreelancerProfileSkill_FreelancerProfileId")
+                    .OnDelete(DeleteBehavior.Cascade));
+        
         builder.Entity<ProjectTasks>()
-            .HasOne(p => p.Projects)
+            .HasOne<Projects>()
             .WithMany(p => p.Tasks)
             .HasForeignKey(p => p.ProjectId)
             .OnDelete(DeleteBehavior.NoAction);
@@ -210,5 +222,88 @@ public class FrelanceDbContext : IdentityDbContext<Users, Roles, int>
             .WithOne()
             .HasForeignKey<ClientProfiles>(cp => cp.AddressId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<Skills>(entity =>
+        {
+            entity.Property(p => p.ProgrammingLanguage)
+                .HasMaxLength(100);
+            entity.Property(p => p.Area)
+                .HasMaxLength(100);
+        });
+
+        builder.Entity<Reviews>()
+            .Property(p => p.ReviewText)
+            .HasMaxLength(100);
+
+        builder.Entity<Proposals>()
+            .Property(p => p.Status)
+            .HasMaxLength(100);
+
+        builder.Entity<ProjectTechnologies>()
+            .Property(p => p.Technology)
+            .HasMaxLength(100);
+
+        builder.Entity<ProjectTasks>(entity =>
+        {
+            entity.Property(p => p.Title)
+                .HasMaxLength(100);
+            entity.Property(p => p.Description)
+                .HasMaxLength(100);
+            entity.Property(p => p.Status)
+                .HasMaxLength(100);
+            entity.Property(p => p.Priority)
+                .HasMaxLength(100);
+        });
+
+        builder.Entity<Projects>(entity =>
+        {
+            entity.Property(p => p.Title)
+                .HasMaxLength(100);
+            entity.Property(p => p.Description)
+                .HasMaxLength(100);
+        });
+
+        builder.Entity<Invoices>(entity =>
+        {
+            entity.Property(p => p.Status)
+                .HasMaxLength(100);
+            entity.Property(p => p.InvoiceFile)
+                .HasMaxLength(205000);
+        });
+        builder.Entity<FreelancerProfiles>(entity =>
+        {
+            entity.Property(p => p.PortfolioUrl)
+                .HasMaxLength(100);
+            entity.Property(p => p.Currency)
+                .HasMaxLength(100);
+            entity.Property(p => p.Experience)
+                .HasMaxLength(100);
+        });
+
+        builder.Entity<FreelancerForeignLanguage>()
+            .Property(p => p.Language)
+            .HasMaxLength(100);
+
+        builder.Entity<Entities.Contracts>(entity =>
+        {
+            entity.Property(p => p.Status)
+                .HasMaxLength(100);
+            entity.Property(p => p.ContractFile)
+                .HasMaxLength(205000);
+        });
+
+        builder.Entity<Addresses>(entity =>
+        {
+            entity.Property(p => p.Country)
+                .HasMaxLength(100);
+            entity.Property(p => p.City)
+                .HasMaxLength(100);
+            entity.Property(p => p.Street)
+                .HasMaxLength(100);
+            entity.Property(p => p.StreetNumber)
+                .HasMaxLength(100);
+            entity.Property(p => p.ZipCode)
+                .HasMaxLength(100);
+        });
     }
 }

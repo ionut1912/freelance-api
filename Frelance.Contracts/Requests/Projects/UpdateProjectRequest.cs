@@ -1,10 +1,10 @@
-﻿namespace Frelance.Contracts.Requests.Projects;
+﻿using JetBrains.Annotations;
 
-public class UpdateProjectRequest
-{
-    public string? Title { get; set; }
-    public string? Description { get; set; }
-    public DateTime? Deadline { get; set; }
-    public List<string>? Technologies { get; set; }
-    public decimal? Budget { get; set; }
-}
+[UsedImplicitly]
+public record UpdateProjectRequest(
+    string? Title,
+    string? Description,
+    DateTime? Deadline,
+    List<string>? Technologies,
+    decimal? Budget
+);

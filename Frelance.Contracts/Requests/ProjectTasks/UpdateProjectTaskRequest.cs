@@ -1,9 +1,20 @@
-﻿namespace Frelance.Contracts.Requests.ProjectTasks;
+﻿using JetBrains.Annotations;
 
+namespace Frelance.Contracts.Requests.ProjectTasks;
+
+[UsedImplicitly]
 public record UpdateProjectTaskRequest
 {
-    public string? Title { get; set; }
-    public string? Description { get; set; }
-    public string? Status { get; set; }
-    public string? Priority { get; set; }
+    public UpdateProjectTaskRequest(string title, string description, string status, string priority)
+    {
+        Title = title;
+        Description = description;
+        Status = status;
+        Priority = priority;
+    }
+
+    public string? Title { get; }
+    public string? Description { get; }
+    public string? Status { get; }
+    public string? Priority { get; }
 }

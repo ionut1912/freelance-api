@@ -1,9 +1,7 @@
-namespace Frelance.Contracts.Requests.TimeLogs;
+using JetBrains.Annotations;
 
-public class UpdateTimeLogRequest
+namespace Frelance.Contracts.Requests.TimeLogs
 {
-    public string? TaskTitle { get; set; }
-    public DateTime? StartTime { get; set; }
-    public DateTime? EndTime { get; set; }
-    public int? TotalHours { get; set; }
+    [UsedImplicitly]
+    public record UpdateTimeLogRequest(string? TaskTitle, DateTime? StartTime, DateTime? EndTime, int? TotalHours);
 }

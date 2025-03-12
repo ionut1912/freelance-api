@@ -21,7 +21,7 @@ namespace Frelance.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    public static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         MappingConfig.Configure();
         var config = TypeAdapterConfig.GlobalSettings;
@@ -95,10 +95,8 @@ public static class DependencyInjection
         }
         catch (Exception ex)
         {
-            logger.LogError($"Error configuring infrastructure: {ex.Message}");
+            logger.LogError(ex, "Error configuring infrastructure: {ErrorMessage}", ex.Message);
             throw;
         }
-
-        return services;
     }
 }

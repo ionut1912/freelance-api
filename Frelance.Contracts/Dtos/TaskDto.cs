@@ -1,5 +1,8 @@
-﻿namespace Frelance.Contracts.Dtos;
+﻿using JetBrains.Annotations;
 
+namespace Frelance.Contracts.Dtos;
+
+[UsedImplicitly]
 public record TaskDto(
     int Id,
     string Title,

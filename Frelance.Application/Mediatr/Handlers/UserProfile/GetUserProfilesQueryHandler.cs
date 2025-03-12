@@ -1,11 +1,12 @@
 using Frelance.Application.Mediatr.Queries.UserProfile;
 using Frelance.Application.Repositories;
 using Frelance.Contracts.Enums;
+using Frelance.Contracts.Responses.Common;
 using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.UserProfile;
 
-public class GetUserProfilesQueryHandler : IRequestHandler<GetUserProfilesQuery, object>
+public class GetUserProfilesQueryHandler : IRequestHandler<GetUserProfilesQuery, PaginatedList<object>>
 {
     private readonly IClientProfileRepository _clientProfileRepository;
     private readonly IFreelancerProfileRepository _freelancerProfileRepository;
@@ -19,18 +20,33 @@ public class GetUserProfilesQueryHandler : IRequestHandler<GetUserProfilesQuery,
         _clientProfileRepository = clientProfileRepository;
     }
 
-    public async Task<object> Handle(GetUserProfilesQuery request, CancellationToken cancellationToken)
+    public async Task<PaginatedList<object>> Handle(GetUserProfilesQuery request, CancellationToken cancellationToken)
     {
-        var repoTask = request.Role switch
+        switch (request.Role)
         {
-            Role.Client => _clientProfileRepository
-                .GetClientProfilesAsync(request.PaginationParams, cancellationToken)
-                .ContinueWith(object (t) => t.Result, cancellationToken),
-            Role.Freelancer => _freelancerProfileRepository
-                .GetAllFreelancerProfilesAsync(request.PaginationParams, cancellationToken)
-                .ContinueWith(object (t) => t.Result, cancellationToken),
-            _ => throw new InvalidOperationException("Invalid request")
-        };
-        return await repoTask;
+            case Role.Client:
+            {
+                var clientProfiles =
+                    await _clientProfileRepository.GetClientProfilesAsync(request.PaginationParams, cancellationToken);
+                return new PaginatedList<object>(
+                    clientProfiles.Items.Cast<object>().ToList(),
+                    clientProfiles.TotalCount,
+                    clientProfiles.CurrentPage,
+                    clientProfiles.PageSize);
+            }
+            case Role.Freelancer:
+            {
+                var freelancerProfiles =
+                    await _freelancerProfileRepository.GetAllFreelancerProfilesAsync(request.PaginationParams,
+                        cancellationToken);
+                return new PaginatedList<object>(
+                    freelancerProfiles.Items.Cast<object>().ToList(),
+                    freelancerProfiles.TotalCount,
+                    freelancerProfiles.CurrentPage,
+                    freelancerProfiles.PageSize);
+            }
+            default:
+                throw new InvalidOperationException("Invalid request");
+        }
     }
 }

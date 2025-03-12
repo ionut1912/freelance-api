@@ -1,8 +1,10 @@
 using FluentValidation;
 using Frelance.Application.Mediatr.Commands.Contracts;
+using JetBrains.Annotations;
 
 namespace Frelance.Application.Mediatr.Validators.Contracts;
 
+[UsedImplicitly]
 public class AddContractCommandValidator : AbstractValidator<CreateContractCommand>
 {
     public AddContractCommandValidator()

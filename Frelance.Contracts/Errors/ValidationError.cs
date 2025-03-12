@@ -1,5 +1,6 @@
-﻿namespace Frelance.Contracts.Errors;
+﻿using JetBrains.Annotations;
 
-public record ValidationError(string Property, string ErrorMessage)
-{
-}
+namespace Frelance.Contracts.Errors;
+
+[UsedImplicitly]
+public record ValidationError(string Property, string ErrorMessage);

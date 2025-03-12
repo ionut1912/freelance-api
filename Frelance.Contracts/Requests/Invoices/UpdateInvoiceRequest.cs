@@ -1,8 +1,11 @@
+using JetBrains.Annotations;
+
 namespace Frelance.Contracts.Requests.Invoices;
 
-public class UpdateInvoiceRequest
+[UsedImplicitly]
+public class UpdateInvoiceRequest(decimal amount, string status, string invoiceFile)
 {
-    public decimal? Amount { get; set; }
-    public string? Status { get; set; }
-    public string? InvoiceFile { get; set; }
+    public decimal? Amount { get; } = amount;
+    public string? Status { get; } = status;
+    public string? InvoiceFile { get; } = invoiceFile;
 }

@@ -1,13 +1,22 @@
+using JetBrains.Annotations;
+
 namespace Frelance.Contracts.Dtos;
 
-public class UserProfileDto
+[UsedImplicitly]
+public class UserProfileDto(
+    int id,
+    string username,
+    string email,
+    string phoneNumber,
+    List<ReviewsDto> reviews,
+    List<ProposalsDto> proposals,
+    DateTime createdAt)
 {
-    public int Id { get; set; }
-    public required string Username { get; set; }
-    public required string Email { get; set; }
-    public required string PhoneNumber { get; set; }
-    public required List<ReviewsDto> Reviews { get; set; }
-    public required List<ProposalsDto> Proposals { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public required string Image { get; set; }
+    public int Id { get; } = id;
+    public required string Username { get; init; } = username;
+    public required string Email { get; init; } = email;
+    public required string PhoneNumber { get; init; } = phoneNumber;
+    public required List<ReviewsDto> Reviews { get; init; } = reviews;
+    public required List<ProposalsDto> Proposals { get; init; } = proposals;
+    public DateTime CreatedAt { get; } = createdAt;
 }

@@ -2,7 +2,6 @@ using Frelance.Application;
 using Frelance.Infrastructure;
 using Frelance.Web.Handlers;
 using Frelance.Web.Modules;
-using Frelance.Web.SwaggerFilters;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,7 +33,6 @@ builder.Services.AddSwaggerGen(options =>
             []
         }
     });
-    options.OperationFilter<FileUploadOperationFilter>();
 });
 
 builder.Services.AddCors();

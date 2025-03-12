@@ -1,9 +1,12 @@
+using JetBrains.Annotations;
+
 namespace Frelance.Contracts.Requests.Contracts;
 
-public class UpdateContractRequest
+[UsedImplicitly]
+public class UpdateContractRequest(DateOnly endDate, decimal amount, string status, string contractFile)
 {
-    public DateOnly? EndDate { get; set; }
-    public decimal? Amount { get; set; }
-    public string? Status { get; set; }
-    public string? ContractFile { get; set; }
+    public DateOnly? EndDate { get; } = endDate;
+    public decimal? Amount { get; } = amount;
+    public string? Status { get; } = status;
+    public string? ContractFile { get; } = contractFile;
 }

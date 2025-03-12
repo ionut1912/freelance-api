@@ -32,17 +32,6 @@ public class ProjectRepository : IProjectRepository
     {
         var project = createProjectCommand.CreateProjectRequest.Adapt<Projects>();
         await _projectRepository.CreateAsync(project, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-        if (project.Technologies.Count != 0)
-        {
-            project.Technologies.ForEach(tech =>
-            {
-                tech.ProjectId = project.Id;
-                tech.Id = 0;
-            });
-            await _projectTechnologyRepository.CreateRangeAsync(project.Technologies, cancellationToken);
-        }
     }
 
 
@@ -50,12 +39,21 @@ public class ProjectRepository : IProjectRepository
     {
         var projectToUpdate = await _projectRepository.Query()
             .Where(x => x.Id == updateProjectCommand.Id)
+            .Include(x=>x.Technologies)
             .FirstOrDefaultAsync(cancellationToken);
         if (projectToUpdate is null)
             throw new NotFoundException(
                 $"{nameof(Projects)} with {nameof(Projects.Id)} : '{updateProjectCommand.Id}' does not exist");
 
         updateProjectCommand.UpdateProjectRequest.Adapt(projectToUpdate);
+        foreach (var projectTechnology in updateProjectCommand.UpdateProjectRequest!.Technologies!.Select(technology => new ProjectTechnologies
+                 {
+                     Technology = technology,
+                     ProjectId = projectToUpdate.Id
+                 }))
+        {
+            projectToUpdate.Technologies.Add(projectTechnology);
+        }
         _projectRepository.Update(projectToUpdate);
     }
 
@@ -76,9 +74,11 @@ public class ProjectRepository : IProjectRepository
         var project = await _projectRepository.Query()
             .Where(x => x.Id == getProjectByIdQuery.Id)
             .Include(x => x.Tasks)
+            .ThenInclude(x=>x.TimeLogs)
             .Include(x => x.Proposals)
             .Include(x => x.Contracts)
             .Include(x => x.Invoices)
+            .Include(x=>x.Technologies)
             .FirstOrDefaultAsync(cancellationToken);
         if (project is null)
             throw new NotFoundException(
@@ -92,9 +92,11 @@ public class ProjectRepository : IProjectRepository
     {
         var projectQuery = _projectRepository.Query()
             .Include(x => x.Tasks)
+            .ThenInclude(x=>x.TimeLogs)
             .Include(x => x.Invoices)
             .Include(x => x.Contracts)
             .Include(x => x.Proposals)
+            .Include(x=>x.Technologies)
             .ProjectToType<ProjectDto>();
         var count = await projectQuery.CountAsync(cancellationToken);
         var items = await projectQuery

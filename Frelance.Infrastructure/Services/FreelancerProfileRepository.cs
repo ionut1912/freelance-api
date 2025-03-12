@@ -217,8 +217,11 @@ public class FreelancerProfileRepository : IFreelancerProfileRepository
             var newSkills = skills
                 .Select(s => s.Adapt<Skills>())
                 .Where(s => !existingSkillLanguages.Contains(s.ProgrammingLanguage))
+                .GroupBy(s => s.ProgrammingLanguage, StringComparer.OrdinalIgnoreCase)
+                .Select(g => g.First())
                 .ToList();
 
+            freelancerProfile.Skills = [];
             foreach (var newSkill in newSkills) freelancerProfile.Skills.Add(newSkill);
         }
 

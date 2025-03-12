@@ -1,5 +1,8 @@
+using JetBrains.Annotations;
+
 namespace Frelance.Contracts.Requests.ClientProfile;
 
+[UsedImplicitly]
 public record CreateClientProfileRequest(
     string AddressCountry,
     string AddressStreet,
