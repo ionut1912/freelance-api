@@ -1,8 +1,10 @@
 using FluentValidation;
 using Frelance.Application.Mediatr.Commands.Users;
+using JetBrains.Annotations;
 
 namespace Frelance.Application.Mediatr.Validators.Users;
 
+[UsedImplicitly]
 public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
 {
     public CreateUserCommandValidator()

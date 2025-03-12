@@ -1,7 +1,10 @@
+using JetBrains.Annotations;
+
 namespace Frelance.Contracts.Requests.Proposals;
 
-public class UpdateProposalRequest
+[UsedImplicitly]
+public class UpdateProposalRequest(decimal proposedBudget, string status)
 {
-    public decimal ProposedBudget { get; set; }
-    public string? Status { get; set; }
+    public decimal ProposedBudget { get; } = proposedBudget;
+    public string? Status { get; } = status;
 }

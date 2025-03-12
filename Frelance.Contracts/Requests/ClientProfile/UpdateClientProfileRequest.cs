@@ -1,12 +1,22 @@
+using JetBrains.Annotations;
+
 namespace Frelance.Contracts.Requests.ClientProfile;
 
-public class UpdateClientProfileRequest
+[UsedImplicitly]
+public class UpdateClientProfileRequest(
+    string addressCountry,
+    string addressStreet,
+    string addressStreetNumber,
+    string addressCity,
+    string addressZip,
+    string bio,
+    string image)
 {
-    public string? AddressCountry { get; set; }
-    public string? AddressStreet { get; set; }
-    public string? AddressStreetNumber { get; set; }
-    public string? AddressCity { get; set; }
-    public string? AddressZip { get; set; }
-    public string? Bio { get; set; }
-    public string? Image { get; set; }
+    public string? AddressCountry { get; } = addressCountry;
+    public string? AddressStreet { get; } = addressStreet;
+    public string? AddressStreetNumber { get; } = addressStreetNumber;
+    public string? AddressCity { get; } = addressCity;
+    public string? AddressZip { get; } = addressZip;
+    public string? Bio { get; } = bio;
+    public string? Image { get; } = image;
 }

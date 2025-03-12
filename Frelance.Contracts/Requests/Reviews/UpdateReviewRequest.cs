@@ -1,6 +1,9 @@
+using JetBrains.Annotations;
+
 namespace Frelance.Contracts.Requests.Reviews;
 
-public class UpdateReviewRequest
+[UsedImplicitly]
+public class UpdateReviewRequest(string reviewText)
 {
-    public string? ReviewText { get; set; }
+    public string? ReviewText { get; } = reviewText;
 }

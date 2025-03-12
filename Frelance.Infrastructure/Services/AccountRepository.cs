@@ -54,7 +54,7 @@ public class AccountRepository : IAccountRepository
 
         if (user!.UserName != loginDto.Username) modelState.AddModelError("Username", "username is invalid");
 
-        if (!await _userManager.CheckPasswordAsync(user!, loginDto.Password))
+        if (!await _userManager.CheckPasswordAsync(user, loginDto.Password))
             modelState.AddModelError("Password", "password is invalid");
 
         if (user.Email != loginDto.Email) modelState.AddModelError("Email", "email is invalid");
@@ -67,7 +67,7 @@ public class AccountRepository : IAccountRepository
             user.CreatedAt);
     }
 
-    public async Task LockAccountAsync(BlockAccountCommand command, CancellationToken cancellationToken)
+    public async Task LockAccountAsync(BlockAccountCommand command)
     {
         var modelState = new ModelStateDictionary();
         var user = await _userManager.FindByIdAsync(command.UserId);
@@ -81,7 +81,7 @@ public class AccountRepository : IAccountRepository
         }
     }
 
-    public async Task DeleteAccountAsync(DeleteAccountCommand command, CancellationToken cancellationToken)
+    public async Task DeleteAccountAsync(DeleteAccountCommand command)
     {
         var modelState = new ModelStateDictionary();
         var user = await _userManager.FindByIdAsync(command.UserId);

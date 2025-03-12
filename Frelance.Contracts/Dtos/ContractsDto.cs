@@ -1,5 +1,8 @@
+using JetBrains.Annotations;
+
 namespace Frelance.Contracts.Dtos;
 
+[UsedImplicitly]
 public record ContractsDto(
     int Id,
     ProjectDto Project,

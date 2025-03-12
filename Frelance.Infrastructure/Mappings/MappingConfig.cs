@@ -22,7 +22,7 @@ using Mapster;
 
 namespace Frelance.Infrastructure.Mappings;
 
-public class MappingConfig
+public abstract class MappingConfig
 {
     public static void Configure()
     {
@@ -62,15 +62,17 @@ public class MappingConfig
 
         TypeAdapterConfig<ClientProfiles, ClientProfileDto>
             .NewConfig()
-            .Map(dest => dest.Id, src => src.Id)
-            .Map(dest => dest.User, src => src.Users.Adapt<UserProfileDto>())
-            .Map(dest => dest.Address, src => src.Addresses.Adapt<AddressDto>())
-            .Map(dest => dest.Bio, src => src.Bio)
-            .Map(dest => dest.Contracts, src => src.Contracts.Adapt<List<ContractsDto>>())
-            .Map(dest => dest.Invoices, src => src.Invoices.Adapt<List<InvoicesDto>>())
-            .Map(dest => dest.Projects, src => src.Projects.Adapt<List<ProjectDto>>())
-            .Map(dest => dest.Image, src => src.Image)
-            .Map(dest => dest.IsVerified, src => src.IsVerified);
+            .ConstructUsing(src => new ClientProfileDto(
+                src.Id,
+                src.Users.Adapt<UserProfileDto>(),
+                src.Addresses.Adapt<AddressDto>(),
+                src.Bio,
+                src.Projects.Adapt<List<ProjectDto>>(),
+                src.Contracts.Adapt<List<ContractsDto>>(),
+                src.Invoices.Adapt<List<InvoicesDto>>(),
+                src.Image,
+                src.IsVerified));
+
 
         TypeAdapterConfig<Users, UserProfileDto>
             .NewConfig()
@@ -134,9 +136,9 @@ public class MappingConfig
             .Map(dest => dest.CreatedAt.Date, src => src.CreatedAt)
             .Map(dest => dest.UpdatedAt, src => src.UpdatedAt)
             .Map(dest => dest.Deadline, src => src.Deadline)
-            .Map(dest => dest.Technologies, src => src.Technologies.Adapt<ProjectTechnologiesDto>())
+            .Map(dest => dest.Technologies, src => src.Technologies.Adapt<List<ProjectTechnologiesDto>>())
             .Map(dest => dest.Budget, src => src.Budget)
-            .Map(dest => dest.Tasks, src => src.Tasks.Adapt<TaskDto>());
+            .Map(dest => dest.Tasks, src => src.Tasks.Adapt<List<TaskDto>>());
 
         TypeAdapterConfig<ProjectTechnologies, ProjectTechnologiesDto>
             .NewConfig()
@@ -149,7 +151,7 @@ public class MappingConfig
             .Map(dest => dest.Description, src => src.Description)
             .Map(dest => dest.ProjectTaskStatus, src => src.Status)
             .Map(dest => dest.Priority, src => src.Priority)
-            .Map(dest => dest.TimeLogs, src => src.TimeLogs.Adapt<TimeLogDto>())
+            .Map(dest => dest.TimeLogs, src => src.TimeLogs.Adapt<List<TimeLogDto>>())
             .Map(dest => dest.CreatedAt, src => src.CreatedAt)
             .Map(dest => dest.UpdatedAt, src => src.UpdatedAt);
 
@@ -338,18 +340,13 @@ public class MappingConfig
 
         TypeAdapterConfig<UpdateProjectRequest, Projects>
             .NewConfig()
+            .Ignore(dest=> dest.Technologies)
             .AfterMapping((src, dest) =>
             {
                 dest.Title = src.Title ?? dest.Title;
                 dest.Description = src.Description ?? dest.Description;
                 dest.Deadline = src.Deadline ?? dest.Deadline;
                 dest.Budget = src.Budget ?? dest.Budget;
-                if (src.Technologies is not null)
-                    dest.Technologies = src.Technologies
-                        .Select(tech => new ProjectTechnologies { Technology = tech })
-                        .ToList();
-
-                dest.Technologies = dest.Technologies;
                 dest.UpdatedAt = DateTime.UtcNow;
             });
 
@@ -448,24 +445,14 @@ public class MappingConfig
 
         TypeAdapterConfig<FreelancerProfiles, FreelancerProfileDto>
             .NewConfig()
-            .Map(dest => dest.Id, src => src.Id)
-            .Map(dest => dest.User, src => src.Users.Adapt<UserProfileDto>())
-            .Map(dest => dest.Address, src => src.Addresses.Adapt<AddressDto>())
-            .Map(dest => dest.Bio, src => src.Bio)
-            .Map(dest => dest.Tasks, src => src.Tasks.Adapt<List<TaskDto>>())
-            .Map(dest => dest.Skills, src => src.Skills.Adapt<List<SkillDto>>())
-            .Map(dest => dest.ForeignLanguages, src => src.ForeignLanguages.Adapt<List<ForeignLanguageDto>>())
-            .Map(dest => dest.Projects, src => src.Projects.Adapt<List<ProjectDto>>())
-            .Map(dest => dest.Contracts, src => src.Contracts.Adapt<List<ContractsDto>>())
-            .Map(dest => dest.Invoices, src => src.Invoices.Adapt<List<InvoicesDto>>())
-            .Map(dest => dest.IsAvailable, src => src.IsAvailable)
-            .Map(dest => dest.Experience, src => src.Experience)
-            .Map(dest => dest.Rate, src => src.Rate)
-            .Map(dest => dest.Currency, src => src.Currency)
-            .Map(dest => dest.Rating, src => src.Rating)
-            .Map(dest => dest.PortfolioUrl, src => src.PortfolioUrl)
-            .Map(dest => dest.Image, src => src.Image)
-            .Map(dest => dest.IsVerified, src => src.IsVerified);
+            .ConstructUsing(src => new FreelancerProfileDto(src.Id, src.Users.Adapt<UserProfileDto>(),
+                src.Addresses.Adapt<AddressDto>(), src.Bio, src.Projects.Adapt<List<ProjectDto>>(),
+                src.Contracts.Adapt<List<ContractsDto>>(), src.Invoices.Adapt<List<InvoicesDto>>(), src.Image,
+                src.IsVerified,
+                src.Tasks.Adapt<List<TaskDto>>(),
+                src.Skills.Adapt<List<SkillDto>>(),
+                src.ForeignLanguages.Adapt<List<ForeignLanguageDto>>(),
+                src.IsAvailable, src.Experience, src.Rate, src.Currency, src.Rating, src.PortfolioUrl));
 
         TypeAdapterConfig<List<Skills>, List<SkillDto>>
             .NewConfig()

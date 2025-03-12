@@ -21,6 +21,5 @@ public class UpdateInvoiceCommandHandler : IRequestHandler<UpdateInvoiceCommand>
     {
         await _invoiceRepository.UpdateInvoiceAsync(request, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-        ;
     }
 }

@@ -2,12 +2,7 @@
 
 namespace Frelance.Contracts.Exceptions;
 
-public class CustomValidationException : Exception
+public class CustomValidationException(List<ValidationError> validationErrors) : Exception
 {
-    public CustomValidationException(List<ValidationError> validationErrors)
-    {
-        ValidationErrors = validationErrors;
-    }
-
-    public List<ValidationError> ValidationErrors { get; set; }
+    public List<ValidationError> ValidationErrors { get; } = validationErrors;
 }

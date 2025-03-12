@@ -6,14 +6,12 @@ namespace Frelance.Infrastructure.Services;
 
 public class GenericRepository<T> : IGenericRepository<T> where T : class
 {
-    private readonly FrelanceDbContext _dbContext;
     private readonly DbSet<T> _dbSet;
 
     public GenericRepository(FrelanceDbContext dbContext)
     {
         ArgumentNullException.ThrowIfNull(dbContext, nameof(dbContext));
-        _dbContext = dbContext;
-        _dbSet = _dbContext.Set<T>();
+        _dbSet = dbContext.Set<T>();
     }
 
     public IQueryable<T> Query()

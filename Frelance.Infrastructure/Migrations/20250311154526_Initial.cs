@@ -19,11 +19,11 @@ namespace Frelance.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Country = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    City = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Street = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    StreetNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ZipCode = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Country = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    City = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Street = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    StreetNumber = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    ZipCode = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -51,6 +51,7 @@ namespace Frelance.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -77,8 +78,8 @@ namespace Frelance.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ProgrammingLanguage = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Area = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    ProgrammingLanguage = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Area = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -199,8 +200,11 @@ namespace Frelance.Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     AddressId = table.Column<int>(type: "int", nullable: false),
-                    Bio = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ProfileImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Bio = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Image = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsVerified = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -224,17 +228,19 @@ namespace Frelance.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ForeignLanguages = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsAvailable = table.Column<bool>(type: "bit", nullable: false),
-                    Experience = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Experience = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Rate = table.Column<int>(type: "int", nullable: false),
-                    Currency = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Currency = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Rating = table.Column<int>(type: "int", nullable: false),
-                    PortfolioUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PortfolioUrl = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     AddressId = table.Column<int>(type: "int", nullable: false),
-                    Bio = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ProfileImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Bio = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Image = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsVerified = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -259,7 +265,9 @@ namespace Frelance.Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ReviewerId = table.Column<int>(type: "int", nullable: false),
-                    ReviewText = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    ReviewText = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -272,24 +280,44 @@ namespace Frelance.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "FreelancerProfilesSkiills",
+                name: "FreelancerForeignLanguage",
                 columns: table => new
                 {
-                    FreelancerProfilesId = table.Column<int>(type: "int", nullable: false),
-                    SkillsId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Language = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    FreelancerProfileId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FreelancerProfilesSkiills", x => new { x.FreelancerProfilesId, x.SkillsId });
+                    table.PrimaryKey("PK_FreelancerForeignLanguage", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_FreelancerProfilesSkiills_FreelancerProfiles_FreelancerProfilesId",
-                        column: x => x.FreelancerProfilesId,
+                        name: "FK_FreelancerForeignLanguage_FreelancerProfiles_FreelancerProfileId",
+                        column: x => x.FreelancerProfileId,
+                        principalTable: "FreelancerProfiles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FreelancerProfileSkill",
+                columns: table => new
+                {
+                    FreelancerProfileId = table.Column<int>(type: "int", nullable: false),
+                    SkillId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FreelancerProfileSkill", x => new { x.FreelancerProfileId, x.SkillId });
+                    table.ForeignKey(
+                        name: "FK_FreelancerProfileSkill_FreelancerProfileId",
+                        column: x => x.FreelancerProfileId,
                         principalTable: "FreelancerProfiles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_FreelancerProfilesSkiills_Skills_SkillsId",
-                        column: x => x.SkillsId,
+                        name: "FK_FreelancerProfileSkill_SkillId",
+                        column: x => x.SkillId,
                         principalTable: "Skills",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -302,19 +330,25 @@ namespace Frelance.Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Title = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Deadline = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Technologies = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FreelancerProfileId = table.Column<int>(type: "int", nullable: false),
-                    Budget = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false)
+                    Budget = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    ClientProfilesId = table.Column<int>(type: "int", nullable: true),
+                    FreelancerProfilesId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Projects", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Projects_FreelancerProfiles_FreelancerProfileId",
-                        column: x => x.FreelancerProfileId,
+                        name: "FK_Projects_ClientProfiles_ClientProfilesId",
+                        column: x => x.ClientProfilesId,
+                        principalTable: "ClientProfiles",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Projects_FreelancerProfiles_FreelancerProfilesId",
+                        column: x => x.FreelancerProfilesId,
                         principalTable: "FreelancerProfiles",
                         principalColumn: "Id");
                 });
@@ -331,8 +365,10 @@ namespace Frelance.Infrastructure.Migrations
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
-                    ContractFileUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Status = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ContractFile = table.Column<string>(type: "nvarchar(max)", maxLength: 205000, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -363,10 +399,11 @@ namespace Frelance.Infrastructure.Migrations
                     ProjectId = table.Column<int>(type: "int", nullable: false),
                     ClientId = table.Column<int>(type: "int", nullable: false),
                     FreelancerId = table.Column<int>(type: "int", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
-                    InvoiceFileUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Status = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    InvoiceFile = table.Column<string>(type: "nvarchar(max)", maxLength: 205000, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -389,6 +426,26 @@ namespace Frelance.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ProjectTechnologies",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Technology = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    ProjectId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProjectTechnologies", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProjectTechnologies_Projects_ProjectId",
+                        column: x => x.ProjectId,
+                        principalTable: "Projects",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Proposals",
                 columns: table => new
                 {
@@ -397,8 +454,9 @@ namespace Frelance.Infrastructure.Migrations
                     ProjectId = table.Column<int>(type: "int", nullable: false),
                     ProposerId = table.Column<int>(type: "int", nullable: false),
                     ProposedBudget = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Status = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -422,12 +480,13 @@ namespace Frelance.Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ProjectId = table.Column<int>(type: "int", nullable: false),
-                    ProjectsId = table.Column<int>(type: "int", nullable: true),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Title = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     FreelancerProfileId = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Priority = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Status = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Priority = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -438,8 +497,8 @@ namespace Frelance.Infrastructure.Migrations
                         principalTable: "FreelancerProfiles",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Tasks_Projects_ProjectsId",
-                        column: x => x.ProjectsId,
+                        name: "FK_Tasks_Projects_ProjectId",
+                        column: x => x.ProjectId,
                         principalTable: "Projects",
                         principalColumn: "Id");
                 });
@@ -453,18 +512,14 @@ namespace Frelance.Infrastructure.Migrations
                     TaskId = table.Column<int>(type: "int", nullable: false),
                     StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
                     FreelancerProfileId = table.Column<int>(type: "int", nullable: false),
-                    TotalHours = table.Column<int>(type: "int", nullable: false)
+                    TotalHours = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_TimeLogs", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_TimeLogs_FreelancerProfiles_FreelancerProfileId",
-                        column: x => x.FreelancerProfileId,
-                        principalTable: "FreelancerProfiles",
-                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_TimeLogs_Tasks_TaskId",
                         column: x => x.TaskId,
@@ -562,6 +617,11 @@ namespace Frelance.Infrastructure.Migrations
                 column: "ProjectId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_FreelancerForeignLanguage_FreelancerProfileId",
+                table: "FreelancerForeignLanguage",
+                column: "FreelancerProfileId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_FreelancerProfiles_AddressId",
                 table: "FreelancerProfiles",
                 column: "AddressId",
@@ -574,9 +634,9 @@ namespace Frelance.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_FreelancerProfilesSkiills_SkillsId",
-                table: "FreelancerProfilesSkiills",
-                column: "SkillsId");
+                name: "IX_FreelancerProfileSkill_SkillId",
+                table: "FreelancerProfileSkill",
+                column: "SkillId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Invoices_ClientId",
@@ -594,9 +654,19 @@ namespace Frelance.Infrastructure.Migrations
                 column: "ProjectId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Projects_FreelancerProfileId",
+                name: "IX_Projects_ClientProfilesId",
                 table: "Projects",
-                column: "FreelancerProfileId");
+                column: "ClientProfilesId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Projects_FreelancerProfilesId",
+                table: "Projects",
+                column: "FreelancerProfilesId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProjectTechnologies_ProjectId",
+                table: "ProjectTechnologies",
+                column: "ProjectId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Proposals_ProjectId",
@@ -619,14 +689,9 @@ namespace Frelance.Infrastructure.Migrations
                 column: "FreelancerProfileId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Tasks_ProjectsId",
+                name: "IX_Tasks_ProjectId",
                 table: "Tasks",
-                column: "ProjectsId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_TimeLogs_FreelancerProfileId",
-                table: "TimeLogs",
-                column: "FreelancerProfileId");
+                column: "ProjectId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TimeLogs_TaskId",
@@ -656,10 +721,16 @@ namespace Frelance.Infrastructure.Migrations
                 name: "Contracts");
 
             migrationBuilder.DropTable(
-                name: "FreelancerProfilesSkiills");
+                name: "FreelancerForeignLanguage");
+
+            migrationBuilder.DropTable(
+                name: "FreelancerProfileSkill");
 
             migrationBuilder.DropTable(
                 name: "Invoices");
+
+            migrationBuilder.DropTable(
+                name: "ProjectTechnologies");
 
             migrationBuilder.DropTable(
                 name: "Proposals");
@@ -677,13 +748,13 @@ namespace Frelance.Infrastructure.Migrations
                 name: "Skills");
 
             migrationBuilder.DropTable(
-                name: "ClientProfiles");
-
-            migrationBuilder.DropTable(
                 name: "Tasks");
 
             migrationBuilder.DropTable(
                 name: "Projects");
+
+            migrationBuilder.DropTable(
+                name: "ClientProfiles");
 
             migrationBuilder.DropTable(
                 name: "FreelancerProfiles");

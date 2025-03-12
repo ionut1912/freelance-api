@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Frelance.Infrastructure.Migrations
 {
     [DbContext(typeof(FrelanceDbContext))]
-    [Migration("20250214092756_Update Tasks Table")]
-    partial class UpdateTasksTable
+    [Migration("20250311154526_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,19 +25,19 @@ namespace Frelance.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("FreelancerProfilesSkiills", b =>
+            modelBuilder.Entity("FreelancerProfileSkill", b =>
                 {
-                    b.Property<int>("FreelancerProfilesId")
+                    b.Property<int>("FreelancerProfileId")
                         .HasColumnType("int");
 
-                    b.Property<int>("SkillsId")
+                    b.Property<int>("SkillId")
                         .HasColumnType("int");
 
-                    b.HasKey("FreelancerProfilesId", "SkillsId");
+                    b.HasKey("FreelancerProfileId", "SkillId");
 
-                    b.HasIndex("SkillsId");
+                    b.HasIndex("SkillId");
 
-                    b.ToTable("FreelancerProfilesSkiills");
+                    b.ToTable("FreelancerProfileSkill");
                 });
 
             modelBuilder.Entity("Frelance.Infrastructure.Entities.Addresses", b =>
@@ -49,19 +49,29 @@ namespace Frelance.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("City")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Country")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Street")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("StreetNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("ZipCode")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
 
@@ -80,10 +90,21 @@ namespace Frelance.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Bio")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ProfileImageUrl")
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Image")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsVerified")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -114,7 +135,9 @@ namespace Frelance.Infrastructure.Migrations
                     b.Property<int>("ClientId")
                         .HasColumnType("int");
 
-                    b.Property<string>("ContractFileUrl")
+                    b.Property<string>("ContractFile")
+                        .IsRequired()
+                        .HasMaxLength(205000)
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
@@ -133,7 +156,9 @@ namespace Frelance.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -149,6 +174,29 @@ namespace Frelance.Infrastructure.Migrations
                     b.ToTable("Contracts");
                 });
 
+            modelBuilder.Entity("Frelance.Infrastructure.Entities.FreelancerForeignLanguage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("FreelancerProfileId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FreelancerProfileId");
+
+                    b.ToTable("FreelancerForeignLanguage");
+                });
+
             modelBuilder.Entity("Frelance.Infrastructure.Entities.FreelancerProfiles", b =>
                 {
                     b.Property<int>("Id")
@@ -161,31 +209,45 @@ namespace Frelance.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Bio")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Currency")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Experience")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("ForeignLanguages")
+                    b.Property<string>("Image")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsAvailable")
                         .HasColumnType("bit");
 
-                    b.Property<string>("PortfolioUrl")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<bool>("IsVerified")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("ProfileImageUrl")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("PortfolioUrl")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("Rate")
                         .HasColumnType("int");
 
                     b.Property<int>("Rating")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -222,14 +284,18 @@ namespace Frelance.Infrastructure.Migrations
                     b.Property<int>("FreelancerId")
                         .HasColumnType("int");
 
-                    b.Property<string>("InvoiceFileUrl")
+                    b.Property<string>("InvoiceFile")
+                        .IsRequired()
+                        .HasMaxLength(205000)
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
 
                     b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -253,23 +319,37 @@ namespace Frelance.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("FreelancerProfileId")
                         .HasColumnType("int");
 
                     b.Property<string>("Priority")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
 
                     b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Title")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -278,6 +358,28 @@ namespace Frelance.Infrastructure.Migrations
                     b.HasIndex("ProjectId");
 
                     b.ToTable("Tasks");
+                });
+
+            modelBuilder.Entity("Frelance.Infrastructure.Entities.ProjectTechnologies", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Technology")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("ProjectTechnologies");
                 });
 
             modelBuilder.Entity("Frelance.Infrastructure.Entities.Projects", b =>
@@ -292,6 +394,9 @@ namespace Frelance.Infrastructure.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int?>("ClientProfilesId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -299,15 +404,26 @@ namespace Frelance.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("Technologies")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("FreelancerProfilesId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Title")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ClientProfilesId");
+
+                    b.HasIndex("FreelancerProfilesId");
 
                     b.ToTable("Projects");
                 });
@@ -334,7 +450,9 @@ namespace Frelance.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -356,11 +474,19 @@ namespace Frelance.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("ReviewText")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("ReviewerId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -413,7 +539,7 @@ namespace Frelance.Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Frelance.Infrastructure.Entities.Skiills", b =>
+            modelBuilder.Entity("Frelance.Infrastructure.Entities.Skills", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -422,10 +548,14 @@ namespace Frelance.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Area")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("ProgrammingLanguage")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
 
@@ -478,16 +608,13 @@ namespace Frelance.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("Date")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("FreelancerProfileId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("FreelancerProfilesId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("StartTime")
@@ -499,9 +626,10 @@ namespace Frelance.Infrastructure.Migrations
                     b.Property<int>("TotalHours")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
-                    b.HasIndex("FreelancerProfilesId");
+                    b.HasKey("Id");
 
                     b.HasIndex("TaskId");
 
@@ -522,6 +650,9 @@ namespace Frelance.Infrastructure.Migrations
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -679,19 +810,21 @@ namespace Frelance.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("FreelancerProfilesSkiills", b =>
+            modelBuilder.Entity("FreelancerProfileSkill", b =>
                 {
                     b.HasOne("Frelance.Infrastructure.Entities.FreelancerProfiles", null)
                         .WithMany()
-                        .HasForeignKey("FreelancerProfilesId")
+                        .HasForeignKey("FreelancerProfileId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("FK_FreelancerProfileSkill_FreelancerProfileId");
 
-                    b.HasOne("Frelance.Infrastructure.Entities.Skiills", null)
+                    b.HasOne("Frelance.Infrastructure.Entities.Skills", null)
                         .WithMany()
-                        .HasForeignKey("SkillsId")
+                        .HasForeignKey("SkillId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("FK_FreelancerProfileSkill_SkillId");
                 });
 
             modelBuilder.Entity("Frelance.Infrastructure.Entities.ClientProfiles", b =>
@@ -738,6 +871,17 @@ namespace Frelance.Infrastructure.Migrations
                     b.Navigation("Freelancer");
 
                     b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("Frelance.Infrastructure.Entities.FreelancerForeignLanguage", b =>
+                {
+                    b.HasOne("Frelance.Infrastructure.Entities.FreelancerProfiles", "FreelancerProfile")
+                        .WithMany("ForeignLanguages")
+                        .HasForeignKey("FreelancerProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FreelancerProfile");
                 });
 
             modelBuilder.Entity("Frelance.Infrastructure.Entities.FreelancerProfiles", b =>
@@ -794,15 +938,35 @@ namespace Frelance.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Frelance.Infrastructure.Entities.Projects", "Projects")
+                    b.HasOne("Frelance.Infrastructure.Entities.Projects", null)
                         .WithMany("Tasks")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("FreelancerProfiles");
+                });
+
+            modelBuilder.Entity("Frelance.Infrastructure.Entities.ProjectTechnologies", b =>
+                {
+                    b.HasOne("Frelance.Infrastructure.Entities.Projects", "Projects")
+                        .WithMany("Technologies")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Projects");
+                });
+
+            modelBuilder.Entity("Frelance.Infrastructure.Entities.Projects", b =>
+                {
+                    b.HasOne("Frelance.Infrastructure.Entities.ClientProfiles", null)
+                        .WithMany("Projects")
+                        .HasForeignKey("ClientProfilesId");
+
+                    b.HasOne("Frelance.Infrastructure.Entities.FreelancerProfiles", null)
+                        .WithMany("Projects")
+                        .HasForeignKey("FreelancerProfilesId");
                 });
 
             modelBuilder.Entity("Frelance.Infrastructure.Entities.Proposals", b =>
@@ -837,17 +1001,11 @@ namespace Frelance.Infrastructure.Migrations
 
             modelBuilder.Entity("Frelance.Infrastructure.Entities.TimeLogs", b =>
                 {
-                    b.HasOne("Frelance.Infrastructure.Entities.FreelancerProfiles", "FreelancerProfiles")
-                        .WithMany()
-                        .HasForeignKey("FreelancerProfilesId");
-
                     b.HasOne("Frelance.Infrastructure.Entities.ProjectTasks", "Task")
                         .WithMany("TimeLogs")
                         .HasForeignKey("TaskId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("FreelancerProfiles");
 
                     b.Navigation("Task");
                 });
@@ -908,13 +1066,19 @@ namespace Frelance.Infrastructure.Migrations
                     b.Navigation("Contracts");
 
                     b.Navigation("Invoices");
+
+                    b.Navigation("Projects");
                 });
 
             modelBuilder.Entity("Frelance.Infrastructure.Entities.FreelancerProfiles", b =>
                 {
                     b.Navigation("Contracts");
 
+                    b.Navigation("ForeignLanguages");
+
                     b.Navigation("Invoices");
+
+                    b.Navigation("Projects");
 
                     b.Navigation("Tasks");
                 });
@@ -933,6 +1097,8 @@ namespace Frelance.Infrastructure.Migrations
                     b.Navigation("Proposals");
 
                     b.Navigation("Tasks");
+
+                    b.Navigation("Technologies");
                 });
 
             modelBuilder.Entity("Frelance.Infrastructure.Entities.Users", b =>

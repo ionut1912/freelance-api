@@ -16,6 +16,6 @@ public class BlockAccountCommandHandler : IRequestHandler<BlockAccountCommand>
 
     public async Task Handle(BlockAccountCommand request, CancellationToken cancellationToken)
     {
-        await _accountRepository.LockAccountAsync(request, cancellationToken);
+        await _accountRepository.LockAccountAsync(request);
     }
 }
