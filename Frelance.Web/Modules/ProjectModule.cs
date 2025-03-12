@@ -25,7 +25,7 @@ public static class ProjectModule
                 }).WithTags("Projects")
             .RequireAuthorization();
 
-        app.MapGet("/api/projects/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
+        app.MapGet("/api/projects/{id:int}", async (IMediator mediator, int id, CancellationToken ct) =>
             {
                 var project = await mediator.Send(new GetProjectByIdQuery(id), ct);
                 return Results.Ok(project);
@@ -40,7 +40,7 @@ public static class ProjectModule
             }).WithTags("Projects")
             .RequireAuthorization("ClientRole");
 
-        app.MapPut("/api/projects/{id}", async (IMediator mediator, int id,
+        app.MapPut("/api/projects/{id:int}", async (IMediator mediator, int id,
                 UpdateProjectRequest updateProjectRequest, CancellationToken ct) =>
             {
                 var command = updateProjectRequest.Adapt<UpdateProjectCommand>() with { Id = id };
@@ -49,7 +49,7 @@ public static class ProjectModule
             }).WithTags("Projects")
             .RequireAuthorization("ClientRole");
 
-        app.MapDelete("/api/projects/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
+        app.MapDelete("/api/projects/{id:int}", async (IMediator mediator, int id, CancellationToken ct) =>
             {
                 var command = new DeleteProjectCommand(id);
                 await mediator.Send(command, ct);

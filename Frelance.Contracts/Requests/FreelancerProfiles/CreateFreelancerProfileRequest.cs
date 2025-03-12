@@ -16,7 +16,6 @@ public class CreateFreelancerProfileRequest(
     string experience,
     int rate,
     string currency,
-    int rating,
     string portfolioUrl,
     string image)
 {
@@ -35,7 +34,6 @@ public class CreateFreelancerProfileRequest(
     public required string Experience { get; init; } = experience;
     public int Rate { get; } = rate;
     public required string Currency { get; init; } = currency;
-    public int Rating { get; } = rating;
     public required string PortfolioUrl { get; init; } = portfolioUrl;
     public required string Image { get; init; } = image;
 }

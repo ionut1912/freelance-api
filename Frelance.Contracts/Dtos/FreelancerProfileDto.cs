@@ -26,13 +26,21 @@ public class FreelancerProfileDto(
     string portfolioUrl)
     : BaseProfileDto(id, userProfile, address, bio, projects, contracts, invoices, image, isVerified)
 {
-    public List<TaskDto> Tasks { get; } = tasks;
-    public List<SkillDto> Skills { get; } = skills;
-    public List<ForeignLanguageDto> ForeignLanguages { get; } = foreignLanguage;
-    public bool IsAvailable { get; } = isAvailable;
-    public required string Experience { get; init; } = experience;
-    public int Rate { get; } = rate;
-    public required string Currency { get; init; } = currency;
-    public int Rating { get; } = rating;
-    public required string PortfolioUrl { get; init; } = portfolioUrl;
+    [UsedImplicitly] public List<TaskDto> Tasks { get; } = tasks;
+
+    [UsedImplicitly] public List<SkillDto> Skills { get; } = skills;
+
+    [UsedImplicitly] public List<ForeignLanguageDto> ForeignLanguages { get; } = foreignLanguage;
+
+    [UsedImplicitly] public bool IsAvailable { get; } = isAvailable;
+
+    [UsedImplicitly] public required string Experience { get; init; } = experience;
+
+    [UsedImplicitly] public int Rate { get; } = rate;
+
+    [UsedImplicitly] public required string Currency { get; init; } = currency;
+
+    [UsedImplicitly] public int Rating { get; } = rating;
+
+    [UsedImplicitly] public required string PortfolioUrl { get; init; } = portfolioUrl;
 }

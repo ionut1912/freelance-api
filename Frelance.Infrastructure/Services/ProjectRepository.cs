@@ -13,19 +13,11 @@ namespace Frelance.Infrastructure.Services;
 public class ProjectRepository : IProjectRepository
 {
     private readonly IGenericRepository<Projects> _projectRepository;
-    private readonly IGenericRepository<ProjectTechnologies> _projectTechnologyRepository;
-    private readonly IUnitOfWork _unitOfWork;
 
-    public ProjectRepository(IGenericRepository<Projects> projectRepository,
-        IGenericRepository<ProjectTechnologies> projectTechnologyRepository,
-        IUnitOfWork unitOfWork)
+    public ProjectRepository(IGenericRepository<Projects> projectRepository)
     {
         ArgumentNullException.ThrowIfNull(projectRepository, nameof(projectRepository));
-        ArgumentNullException.ThrowIfNull(projectTechnologyRepository, nameof(projectTechnologyRepository));
-        ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));
         _projectRepository = projectRepository;
-        _projectTechnologyRepository = projectTechnologyRepository;
-        _unitOfWork = unitOfWork;
     }
 
     public async Task CreateProjectAsync(CreateProjectCommand createProjectCommand, CancellationToken cancellationToken)
@@ -39,21 +31,20 @@ public class ProjectRepository : IProjectRepository
     {
         var projectToUpdate = await _projectRepository.Query()
             .Where(x => x.Id == updateProjectCommand.Id)
-            .Include(x=>x.Technologies)
+            .Include(x => x.Technologies)
             .FirstOrDefaultAsync(cancellationToken);
         if (projectToUpdate is null)
             throw new NotFoundException(
                 $"{nameof(Projects)} with {nameof(Projects.Id)} : '{updateProjectCommand.Id}' does not exist");
 
         updateProjectCommand.UpdateProjectRequest.Adapt(projectToUpdate);
-        foreach (var projectTechnology in updateProjectCommand.UpdateProjectRequest!.Technologies!.Select(technology => new ProjectTechnologies
-                 {
-                     Technology = technology,
-                     ProjectId = projectToUpdate.Id
-                 }))
-        {
+        foreach (var projectTechnology in updateProjectCommand.UpdateProjectRequest.Technologies!.Select(technology =>
+                     new ProjectTechnologies
+                     {
+                         Technology = technology,
+                         ProjectId = projectToUpdate.Id
+                     }))
             projectToUpdate.Technologies.Add(projectTechnology);
-        }
         _projectRepository.Update(projectToUpdate);
     }
 
@@ -74,11 +65,11 @@ public class ProjectRepository : IProjectRepository
         var project = await _projectRepository.Query()
             .Where(x => x.Id == getProjectByIdQuery.Id)
             .Include(x => x.Tasks)
-            .ThenInclude(x=>x.TimeLogs)
+            .ThenInclude(x => x.TimeLogs)
             .Include(x => x.Proposals)
             .Include(x => x.Contracts)
             .Include(x => x.Invoices)
-            .Include(x=>x.Technologies)
+            .Include(x => x.Technologies)
             .FirstOrDefaultAsync(cancellationToken);
         if (project is null)
             throw new NotFoundException(
@@ -92,11 +83,11 @@ public class ProjectRepository : IProjectRepository
     {
         var projectQuery = _projectRepository.Query()
             .Include(x => x.Tasks)
-            .ThenInclude(x=>x.TimeLogs)
+            .ThenInclude(x => x.TimeLogs)
             .Include(x => x.Invoices)
             .Include(x => x.Contracts)
             .Include(x => x.Proposals)
-            .Include(x=>x.Technologies)
+            .Include(x => x.Technologies)
             .ProjectToType<ProjectDto>();
         var count = await projectQuery.CountAsync(cancellationToken);
         var items = await projectQuery

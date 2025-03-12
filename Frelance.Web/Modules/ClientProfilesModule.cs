@@ -23,7 +23,7 @@ public static class ClientProfilesModule
                 })
             .WithTags("ClientProfiles")
             .RequireAuthorization("ClientRole");
-        app.MapGet("/api/clientProfiles/{id}",
+        app.MapGet("/api/clientProfiles/{id:int}",
             async (IMediator mediator, int id, HttpContext httpContext, CancellationToken ct) =>
             {
                 var commandRole = ModulesUtils.GetRole(httpContext);
@@ -50,7 +50,7 @@ public static class ClientProfilesModule
                 var result = await mediator.Send(new GetCurrentUserProfileQuery(ModulesUtils.GetRole(httpContext)), ct);
                 return Results.Ok(result);
             }).WithTags("ClientProfiles");
-        app.MapPut("/api/clientProfiles/{id}", async (IMediator mediator, int id,
+        app.MapPut("/api/clientProfiles/{id:int}", async (IMediator mediator, int id,
                 UpdateClientProfileRequest updateClientProfileRequest, CancellationToken ct) =>
             {
                 await mediator.Send(new UpdateUserProfileCommand(id, Role.Client, updateClientProfileRequest), ct);
@@ -58,14 +58,14 @@ public static class ClientProfilesModule
             }).WithTags("ClientProfiles")
             .RequireAuthorization("ClientRole");
 
-        app.MapPatch("/api/clientProfiles/verify/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
+        app.MapPatch("/api/clientProfiles/verify/{id:int}", async (IMediator mediator, int id, CancellationToken ct) =>
             {
                 await mediator.Send(new VerifyUserProfileCommand(id, Role.Client), ct);
                 return Results.NoContent();
             }).WithTags("ClientProfiles")
             .RequireAuthorization("ClientRole");
 
-        app.MapDelete("/api/clientProfiles/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
+        app.MapDelete("/api/clientProfiles/{id:int}", async (IMediator mediator, int id, CancellationToken ct) =>
             {
                 await mediator.Send(new DeleteUserProfileCommand(Role.Client, id), ct);
                 return Results.NoContent();

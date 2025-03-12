@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using JetBrains.Annotations;
 
 namespace Frelance.Contracts.Dtos;
 
@@ -14,13 +15,21 @@ public class BaseProfileDto(
     string image,
     bool isVerified)
 {
-    public int Id { get; } = id;
-    public required UserProfileDto User { get; init; } = user;
-    public required AddressDto Address { get; init; } = address;
-    public required string Bio { get; init; } = bio;
-    public List<ProjectDto>? Projects { get; } = projects;
-    public List<ContractsDto>? Contracts { get; } = contracts;
-    public List<InvoicesDto>? Invoices { get; } = invoices;
-    public required string Image { get; init; } = image;
-    public bool IsVerified { get; } = isVerified;
+    [UsedImplicitly] public int Id { get; } = id;
+
+    [UsedImplicitly] public required UserProfileDto User { get; init; } = user;
+
+    [UsedImplicitly] public required AddressDto Address { get; init; } = address;
+
+    [UsedImplicitly] public required string Bio { get; init; } = bio;
+
+    [UsedImplicitly] public List<ProjectDto>? Projects { get; } = projects;
+
+    [UsedImplicitly] public List<ContractsDto>? Contracts { get; } = contracts;
+
+    [UsedImplicitly] public List<InvoicesDto>? Invoices { get; } = invoices;
+
+    [UsedImplicitly] public required string Image { get; init; } = image;
+
+    [UsedImplicitly] public bool IsVerified { get; } = isVerified;
 }
