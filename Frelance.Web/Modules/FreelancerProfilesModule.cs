@@ -25,33 +25,37 @@ public static class FreelancerProfilesModule
             .WithTags("FreelancerProfiles")
             .RequireAuthorization("FreelancerRole");
         app.MapGet("/api/freelancerProfiles/{id:int}",
-            async (IMediator mediator, HttpContext httpContext, int id, CancellationToken ct) =>
-            {
-                var result = await mediator.Send(new GetUserProfileByIdQuery(ModulesUtils.GetRole(httpContext), id),
-                    ct);
-                return Results.Ok(result);
-            }).WithTags("FreelancerProfiles");
+                async (IMediator mediator, HttpContext httpContext, int id, CancellationToken ct) =>
+                {
+                    var result = await mediator.Send(new GetUserProfileByIdQuery(ModulesUtils.GetRole(httpContext), id),
+                        ct);
+                    return Results.Ok(result);
+                }).WithTags("FreelancerProfiles")
+            .RequireAuthorization();
         app.MapGet("/api/freelancerProfiles", async (IMediator mediator, HttpContext httpContext,
-            [FromQuery] int pageSize,
-            [FromQuery] int pageNumber, CancellationToken ct) =>
-        {
-            var paginatedResult =
-                await mediator.Send(
-                    new GetUserProfilesQuery(ModulesUtils.GetRole(httpContext),
-                        new PaginationParams { PageSize = pageSize, PageNumber = pageNumber }), ct);
+                [FromQuery] int pageSize,
+                [FromQuery] int pageNumber, CancellationToken ct) =>
+            {
+                var paginatedResult =
+                    await mediator.Send(
+                        new GetUserProfilesQuery(ModulesUtils.GetRole(httpContext),
+                            new PaginationParams { PageSize = pageSize, PageNumber = pageNumber }), ct);
 
-            return Results.Extensions.OkPaginationResult(paginatedResult.PageSize,
-                paginatedResult.CurrentPage,
-                paginatedResult.TotalCount, paginatedResult.TotalPages,
-                paginatedResult.Items);
-        }).WithTags("FreelancerProfiles");
+                return Results.Extensions.OkPaginationResult(paginatedResult.PageSize,
+                    paginatedResult.CurrentPage,
+                    paginatedResult.TotalCount, paginatedResult.TotalPages,
+                    paginatedResult.Items);
+            }).WithTags("FreelancerProfiles")
+            .RequireAuthorization();
 
         app.MapGet("/api/current/freelancerProfiles",
-            async (IMediator mediator, HttpContext httpContext, CancellationToken ct) =>
-            {
-                var result = await mediator.Send(new GetCurrentUserProfileQuery(ModulesUtils.GetRole(httpContext)), ct);
-                return Results.Ok(result);
-            }).WithTags("FreelancerProfiles");
+                async (IMediator mediator, HttpContext httpContext, CancellationToken ct) =>
+                {
+                    var result = await mediator.Send(new GetCurrentUserProfileQuery(ModulesUtils.GetRole(httpContext)),
+                        ct);
+                    return Results.Ok(result);
+                }).WithTags("FreelancerProfiles")
+            .RequireAuthorization();
 
         app.MapPut("/api/freelancerProfiles/{id:int}", async (IMediator mediator, int id,
                 UpdateFreelancerProfileRequest updateFreelancerProfileRequest, CancellationToken ct) =>
