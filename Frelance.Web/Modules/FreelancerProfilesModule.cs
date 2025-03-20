@@ -1,11 +1,5 @@
 using Frelance.Application.Mediatr.Commands.UserProfile;
-using Frelance.Application.Mediatr.Queries.UserProfile;
 using Frelance.Contracts.Dtos;
-using Frelance.Contracts.Enums;
-using Frelance.Contracts.Requests.Common;
-using Frelance.Contracts.Requests.FreelancerProfiles;
-using Frelance.Web.Extensions;
-using Frelance.Web.Modules.Utils;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

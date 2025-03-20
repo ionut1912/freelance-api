@@ -130,11 +130,8 @@ public class ClientProfileRepository : IClientProfileRepository
             throw new NotFoundException(
                 $"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Id)} : '{patchAddressCommand.Id}' does not exist");
         var addresses = clientProfile.Addresses;
-        if (addresses is null)
-        {
-            throw new NotFoundException($"{nameof(Addresses)} is not found");
-        }
-        
+        if (addresses is null) throw new NotFoundException($"{nameof(Addresses)} is not found");
+
         addresses.Country = patchAddressCommand.AddressDto.Country;
         addresses.City = patchAddressCommand.AddressDto.City;
         addresses.Street = patchAddressCommand.AddressDto.Street;
