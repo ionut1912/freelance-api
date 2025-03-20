@@ -149,10 +149,7 @@ public class FreelancerProfileRepository : IFreelancerProfileRepository
             throw new NotFoundException(
                 $"{nameof(FreelancerProfiles)} with {nameof(FreelancerProfiles.Id)} : '{patchAddressCommand.Id}' does not exist");
         var addresses = freelancerProfile.Addresses;
-        if (addresses is null)
-        {
-            throw new NotFoundException($"{nameof(Addresses)} is not found");
-        }
+        if (addresses is null) throw new NotFoundException($"{nameof(Addresses)} is not found");
         addresses.Country = patchAddressCommand.AddressDto.Country;
         addresses.City = patchAddressCommand.AddressDto.City;
         addresses.Street = patchAddressCommand.AddressDto.Street;
