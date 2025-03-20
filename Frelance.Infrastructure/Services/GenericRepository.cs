@@ -24,11 +24,6 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         await _dbSet.AddAsync(entity, cancellationToken);
     }
 
-    public async Task CreateRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken)
-    {
-        await _dbSet.AddRangeAsync(entities, cancellationToken);
-    }
-
     public void Update(T entity)
     {
         _dbSet.Update(entity);

@@ -1,3 +1,4 @@
+using Frelance.Application.Mediatr.Commands.UserProfile;
 using Frelance.Contracts.Dtos;
 using Frelance.Contracts.Requests.ClientProfile;
 using Frelance.Contracts.Requests.Common;
@@ -18,9 +19,8 @@ public interface IClientProfileRepository
     Task<PaginatedList<ClientProfileDto>> GetClientProfilesAsync(PaginationParams paginationParams,
         CancellationToken cancellationToken);
 
-    Task UpdateClientProfileAsync(int id, UpdateClientProfileRequest updateClientProfileRequest,
-        CancellationToken cancellationToken);
-
+    Task PatchAddressAsync(PatchAddressCommand patchAddressCommand, CancellationToken cancellationToken);
+    Task PatchUserDetailsAsync(PatchUserDetailsCommand patchUserDetailsCommand, CancellationToken cancellationToken);
     Task VerifyProfileAsync(int id, CancellationToken cancellationToken);
     Task DeleteClientProfileAsync(int id, CancellationToken cancellationToken);
 }

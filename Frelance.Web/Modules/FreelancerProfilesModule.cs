@@ -1,5 +1,6 @@
 using Frelance.Application.Mediatr.Commands.UserProfile;
 using Frelance.Application.Mediatr.Queries.UserProfile;
+using Frelance.Contracts.Dtos;
 using Frelance.Contracts.Enums;
 using Frelance.Contracts.Requests.Common;
 using Frelance.Contracts.Requests.FreelancerProfiles;
@@ -56,12 +57,26 @@ public static class FreelancerProfilesModule
                     return Results.Ok(result);
                 }).WithTags("FreelancerProfiles")
             .RequireAuthorization();
+        app.MapPatch("/api/freelancerProfiles/address/{id:int}",
+                async (IMediator mediator, int id, [FromBody] AddressDto addressDto, CancellationToken ct) =>
+                {
+                    await mediator.Send(new PatchAddressCommand(Role.Freelancer, id, addressDto), ct);
+                    return Results.NoContent();
+                }).WithTags("FreelancerProfiles")
+            .RequireAuthorization("FreelancerRole");
 
-        app.MapPut("/api/freelancerProfiles/{id:int}", async (IMediator mediator, int id,
-                UpdateFreelancerProfileRequest updateFreelancerProfileRequest, CancellationToken ct) =>
+        app.MapPatch("/api/freelancerProfiles/userDetails/{id:int}", async (IMediator mediator, int id,
+                [FromBody] UserDetailsDto userDetailsDto, CancellationToken ct) =>
             {
-                await mediator.Send(new UpdateUserProfileCommand(id, Role.Freelancer, updateFreelancerProfileRequest),
-                    ct);
+                await mediator.Send(new PatchUserDetailsCommand(Role.Freelancer, id, userDetailsDto), ct);
+                return Results.NoContent();
+            }).WithTags("FreelancerProfiles")
+            .RequireAuthorization("FreelancerRole");
+
+        app.MapPatch("/api/freelancerProfiles/freelancerDetails/{id:int}", async (IMediator mediator, int id,
+                [FromBody] FreelancerProfileData freelancerProfileData, CancellationToken ct) =>
+            {
+                await mediator.Send(new PatchFreelancerDataCommand(id, freelancerProfileData), ct);
                 return Results.NoContent();
             }).WithTags("FreelancerProfiles")
             .RequireAuthorization("FreelancerRole");
