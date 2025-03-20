@@ -1,3 +1,4 @@
+using Frelance.Application.Mediatr.Commands.UserProfile;
 using Frelance.Application.Repositories;
 using Frelance.Contracts.Dtos;
 using Frelance.Contracts.Errors;
@@ -15,7 +16,6 @@ namespace Frelance.Infrastructure.Services;
 public class FreelancerProfileRepository : IFreelancerProfileRepository
 {
     private readonly IGenericRepository<Addresses> _addressRepository;
-    private readonly IGenericRepository<FreelancerForeignLanguage> _freelancerForeignLanguageRepository;
     private readonly IGenericRepository<FreelancerProfiles> _freelancerProfilesRepository;
     private readonly IGenericRepository<Skills> _skillsRepository;
     private readonly IUnitOfWork _unitOfWork;
@@ -28,7 +28,6 @@ public class FreelancerProfileRepository : IFreelancerProfileRepository
         IGenericRepository<Users> userRepository,
         IGenericRepository<Addresses> addressRepository,
         IGenericRepository<Skills> skillsRepository,
-        IGenericRepository<FreelancerForeignLanguage> freelancerForeignLanguageRepository,
         IUnitOfWork unitOfWork)
     {
         ArgumentNullException.ThrowIfNull(userAccessor, nameof(userAccessor));
@@ -36,15 +35,12 @@ public class FreelancerProfileRepository : IFreelancerProfileRepository
         ArgumentNullException.ThrowIfNull(userRepository, nameof(userRepository));
         ArgumentNullException.ThrowIfNull(addressRepository, nameof(addressRepository));
         ArgumentNullException.ThrowIfNull(skillsRepository, nameof(skillsRepository));
-        ArgumentNullException.ThrowIfNull(freelancerForeignLanguageRepository,
-            nameof(freelancerForeignLanguageRepository));
         ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));
         _userAccessor = userAccessor;
         _freelancerProfilesRepository = freelancerProfilesRepository;
         _userRepository = userRepository;
         _addressRepository = addressRepository;
         _skillsRepository = skillsRepository;
-        _freelancerForeignLanguageRepository = freelancerForeignLanguageRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -66,24 +62,7 @@ public class FreelancerProfileRepository : IFreelancerProfileRepository
         var skillsInDb = await _skillsRepository.Query().ToListAsync(cancellationToken);
         var requestSkills = freelancerProfile.Skills.Adapt<List<SkillRequest>>();
         ValidateSkills(skillsInDb, requestSkills);
-
-        try
-        {
-            await _freelancerProfilesRepository.CreateAsync(freelancerProfile, cancellationToken);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-            foreach (var fl in freelancerProfile.ForeignLanguages)
-            {
-                fl.FreelancerProfileId = freelancerProfile.Id;
-                fl.Id = 0;
-                await _freelancerForeignLanguageRepository.CreateAsync(fl, cancellationToken);
-            }
-        }
-        catch (Exception)
-        {
-            _freelancerProfilesRepository.Delete(freelancerProfile);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-            throw;
-        }
+        await _freelancerProfilesRepository.CreateAsync(freelancerProfile, cancellationToken);
     }
 
     public async Task<FreelancerProfileDto> GetFreelancerProfileByIdAsync(int id,
@@ -160,93 +139,72 @@ public class FreelancerProfileRepository : IFreelancerProfileRepository
             pageSize);
     }
 
-    public async Task UpdateFreelancerProfileAsync(int id,
-        UpdateFreelancerProfileRequest updateFreelancerProfileRequest,
-        CancellationToken cancellationToken)
+    public async Task PatchAddressAsync(PatchAddressCommand patchAddressCommand, CancellationToken cancellationToken)
     {
         var freelancerProfile = await _freelancerProfilesRepository.Query()
-            .Where(x => x.Id == id)
-            .Include(fp => fp.Addresses)
-            .Include(fp => fp.Skills)
-            .Include(fp => fp.ForeignLanguages)
+            .Where(x => x.Id == patchAddressCommand.Id)
+            .Include(x => x.Addresses)
             .FirstOrDefaultAsync(cancellationToken);
         if (freelancerProfile is null)
             throw new NotFoundException(
-                $"{nameof(FreelancerProfiles)} with {nameof(FreelancerProfiles.Id)}: '{id}' does not exist");
-
-        if (updateFreelancerProfileRequest.AddressCountry is not null
-            && updateFreelancerProfileRequest.AddressCity is not null
-            && updateFreelancerProfileRequest.AddressStreet is not null
-            && updateFreelancerProfileRequest.AddressStreetNumber is not null
-            && updateFreelancerProfileRequest.AddressZip is not null)
+                $"{nameof(FreelancerProfiles)} with {nameof(FreelancerProfiles.Id)} : '{patchAddressCommand.Id}' does not exist");
+        var addresses = freelancerProfile.Addresses;
+        if (addresses is null)
         {
-            var updatedAddress = new Addresses
-            {
-                Id = freelancerProfile.Addresses!.Id,
-                Country = updateFreelancerProfileRequest.AddressCountry!,
-                City = updateFreelancerProfileRequest.AddressCity,
-                Street = updateFreelancerProfileRequest.AddressStreet,
-                StreetNumber = updateFreelancerProfileRequest.AddressStreetNumber,
-                ZipCode = updateFreelancerProfileRequest.AddressZip
-            };
-            _addressRepository.Update(freelancerProfile.Addresses);
-            freelancerProfile.AddressId = updatedAddress.Id;
+            throw new NotFoundException($"{nameof(Addresses)} is not found");
         }
+        addresses.Country = patchAddressCommand.AddressDto.Country;
+        addresses.City = patchAddressCommand.AddressDto.City;
+        addresses.Street = patchAddressCommand.AddressDto.Street;
+        addresses.StreetNumber = patchAddressCommand.AddressDto.StreetNumber;
+        addresses.ZipCode = patchAddressCommand.AddressDto.ZipCode;
+        _addressRepository.Update(addresses);
+        freelancerProfile.Addresses = addresses;
+        _freelancerProfilesRepository.Update(freelancerProfile);
+    }
 
-        var tempConfig = new TypeAdapterConfig();
-        tempConfig.ForType<UpdateFreelancerProfileRequest, FreelancerProfiles>()
-            .Ignore(dest => dest.Skills)
-            .Ignore(dest => dest.ForeignLanguages)
-            .Ignore(dest => dest.Addresses!);
-        updateFreelancerProfileRequest.Adapt(freelancerProfile, tempConfig);
+    public async Task PatchUserDetailsAsync(PatchUserDetailsCommand patchUserDetailsCommand,
+        CancellationToken cancellationToken)
+    {
+        var freelancerProfile = await _freelancerProfilesRepository.Query()
+            .Where(x => x.Id == patchUserDetailsCommand.Id)
+            .FirstOrDefaultAsync(cancellationToken);
+        if (freelancerProfile is null)
+            throw new NotFoundException(
+                $"{nameof(FreelancerProfiles)} with {nameof(FreelancerProfiles.Id)} : '{patchUserDetailsCommand.Id}' does not exist");
 
-        if (updateFreelancerProfileRequest is { ProgrammingLanguages: { } progLangs, Areas: { } areas })
-        {
-            var skills = Enumerable.Range(0, Math.Min(progLangs.Count, areas.Count))
-                .Select(i => new SkillRequest(progLangs[i], areas[i]))
-                .ToList();
+        freelancerProfile.Bio = patchUserDetailsCommand.UserDetails.Bio;
+        freelancerProfile.Image = patchUserDetailsCommand.UserDetails.Image;
+        _freelancerProfilesRepository.Update(freelancerProfile);
+    }
 
-            var skillsInDb = await _skillsRepository.Query().ToListAsync(cancellationToken);
-            ValidateSkills(skillsInDb, skills);
+    public async Task PatchFreelancerDetailsAsync(PatchFreelancerDataCommand patchFreelancerDataCommand,
+        CancellationToken cancellationToken)
+    {
+        var freelancerProfile = await _freelancerProfilesRepository.Query()
+            .Where(x => x.Id == patchFreelancerDataCommand.Id)
+            .Include(x => x.ForeignLanguages)
+            .Include(x => x.Skills)
+            .FirstOrDefaultAsync(cancellationToken);
+        if (freelancerProfile is null)
+            throw new NotFoundException(
+                $"{nameof(FreelancerProfiles)} with {nameof(FreelancerProfiles.Id)} : '{patchFreelancerDataCommand.Id}' does not exist");
 
-            var existingSkillLanguages = freelancerProfile.Skills
-                .Select(s => s.ProgrammingLanguage)
-                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        foreach (var freelancerLanguage in patchFreelancerDataCommand.FreelancerProfileData.ForeignLanguages.Select(
+                     foreignLanguage => new FreelancerForeignLanguage
+                     {
+                         Language = foreignLanguage,
+                         FreelancerProfileId = patchFreelancerDataCommand.Id
+                     }))
+            freelancerProfile.ForeignLanguages.Add(freelancerLanguage);
 
-            var newSkills = skills
-                .Select(s => s.Adapt<Skills>())
-                .Where(s => !existingSkillLanguages.Contains(s.ProgrammingLanguage))
-                .GroupBy(s => s.ProgrammingLanguage, StringComparer.OrdinalIgnoreCase)
-                .Select(g => g.First())
-                .ToList();
-
-            freelancerProfile.Skills = [];
-            foreach (var newSkill in newSkills) freelancerProfile.Skills.Add(newSkill);
-        }
-
-        if (updateFreelancerProfileRequest.ForeignLanguages is { } newForeignLangs)
-        {
-            var existingForeignLanguages = await _freelancerForeignLanguageRepository.Query()
-                .Where(x => x.FreelancerProfileId == id)
-                .ToListAsync(cancellationToken);
-
-            var languagesToAdd = newForeignLangs
-                .Where(lang =>
-                    !existingForeignLanguages.Any(x => x.Language.Equals(lang, StringComparison.OrdinalIgnoreCase)))
-                .Select(lang => new FreelancerForeignLanguage
-                {
-                    Language = lang,
-                    FreelancerProfileId = id
-                })
-                .ToList();
-
-            if (languagesToAdd.Count != 0)
-            {
-                await _freelancerForeignLanguageRepository.CreateRangeAsync(languagesToAdd, cancellationToken);
-                freelancerProfile.ForeignLanguages.AddRange(languagesToAdd);
-            }
-        }
-
+        var skills = patchFreelancerDataCommand.FreelancerProfileData.ProgrammingLanguages.Zip(
+            patchFreelancerDataCommand.FreelancerProfileData.Areas,
+            (pl, area) => new Skills { ProgrammingLanguage = pl, Area = area }).ToList();
+        freelancerProfile.Skills.AddRange(skills);
+        freelancerProfile.Experience = patchFreelancerDataCommand.FreelancerProfileData.Experience;
+        freelancerProfile.Rate = patchFreelancerDataCommand.FreelancerProfileData.Rate;
+        freelancerProfile.PortfolioUrl = patchFreelancerDataCommand.FreelancerProfileData.PortfolioUrl;
         _freelancerProfilesRepository.Update(freelancerProfile);
     }
 

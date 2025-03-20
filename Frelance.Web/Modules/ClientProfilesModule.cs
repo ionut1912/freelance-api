@@ -1,5 +1,6 @@
 using Frelance.Application.Mediatr.Commands.UserProfile;
 using Frelance.Application.Mediatr.Queries.UserProfile;
+using Frelance.Contracts.Dtos;
 using Frelance.Contracts.Enums;
 using Frelance.Contracts.Requests.ClientProfile;
 using Frelance.Contracts.Requests.Common;
@@ -55,10 +56,19 @@ public static class ClientProfilesModule
                     return Results.Ok(result);
                 }).WithTags("ClientProfiles")
             .RequireAuthorization();
-        app.MapPut("/api/clientProfiles/{id:int}", async (IMediator mediator, int id,
-                UpdateClientProfileRequest updateClientProfileRequest, CancellationToken ct) =>
+
+        app.MapPatch("/api/clientProfiles/address/{id:int}",
+                async (IMediator mediator, int id, [FromBody] AddressDto addressDto, CancellationToken ct) =>
+                {
+                    await mediator.Send(new PatchAddressCommand(Role.Client, id, addressDto), ct);
+                    return Results.NoContent();
+                }).WithTags("ClientProfiles")
+            .RequireAuthorization("ClientRole");
+
+        app.MapPatch("/api/clientProfiles/userDetails/{id:int}", async (IMediator mediator, int id,
+                [FromBody] UserDetailsDto userDetailsDto, CancellationToken ct) =>
             {
-                await mediator.Send(new UpdateUserProfileCommand(id, Role.Client, updateClientProfileRequest), ct);
+                await mediator.Send(new PatchUserDetailsCommand(Role.Client, id, userDetailsDto), ct);
                 return Results.NoContent();
             }).WithTags("ClientProfiles")
             .RequireAuthorization("ClientRole");

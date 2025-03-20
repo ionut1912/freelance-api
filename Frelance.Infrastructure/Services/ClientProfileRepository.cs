@@ -1,3 +1,4 @@
+using Frelance.Application.Mediatr.Commands.UserProfile;
 using Frelance.Application.Repositories;
 using Frelance.Contracts.Dtos;
 using Frelance.Contracts.Exceptions;
@@ -119,20 +120,44 @@ public class ClientProfileRepository : IClientProfileRepository
             pageSize);
     }
 
-    public async Task UpdateClientProfileAsync(int id, UpdateClientProfileRequest updateClientProfileRequest,
-        CancellationToken cancellationToken)
+    public async Task PatchAddressAsync(PatchAddressCommand patchAddressCommand, CancellationToken cancellationToken)
     {
-        var clientToUpdate = await _clientProfileRepository.Query()
-            .Where(x => x.Id == id)
-            .AsNoTracking()
+        var clientProfile = await _clientProfileRepository.Query()
+            .Where(x => x.Id == patchAddressCommand.Id)
             .Include(x => x.Addresses)
             .FirstOrDefaultAsync(cancellationToken);
-
-        if (clientToUpdate is null)
+        if (clientProfile is null)
             throw new NotFoundException(
-                $"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Id)} : '{id}' does not exist");
-        updateClientProfileRequest.Adapt(clientToUpdate);
-        _clientProfileRepository.Update(clientToUpdate);
+                $"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Id)} : '{patchAddressCommand.Id}' does not exist");
+        var addresses = clientProfile.Addresses;
+        if (addresses is null)
+        {
+            throw new NotFoundException($"{nameof(Addresses)} is not found");
+        }
+        
+        addresses.Country = patchAddressCommand.AddressDto.Country;
+        addresses.City = patchAddressCommand.AddressDto.City;
+        addresses.Street = patchAddressCommand.AddressDto.Street;
+        addresses.StreetNumber = patchAddressCommand.AddressDto.StreetNumber;
+        addresses.ZipCode = patchAddressCommand.AddressDto.ZipCode;
+        _addressRepository.Update(addresses);
+        clientProfile.Addresses = addresses;
+        _clientProfileRepository.Update(clientProfile);
+    }
+
+    public async Task PatchUserDetailsAsync(PatchUserDetailsCommand patchUserDetailsCommand,
+        CancellationToken cancellationToken)
+    {
+        var clientProfile = await _clientProfileRepository.Query()
+            .Where(x => x.Id == patchUserDetailsCommand.Id)
+            .FirstOrDefaultAsync(cancellationToken);
+        if (clientProfile is null)
+            throw new NotFoundException(
+                $"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Id)} : '{patchUserDetailsCommand.Id}' does not exist");
+
+        clientProfile.Bio = patchUserDetailsCommand.UserDetails.Bio;
+        clientProfile.Image = patchUserDetailsCommand.UserDetails.Image;
+        _clientProfileRepository.Update(clientProfile);
     }
 
     public async Task VerifyProfileAsync(int id, CancellationToken cancellationToken)

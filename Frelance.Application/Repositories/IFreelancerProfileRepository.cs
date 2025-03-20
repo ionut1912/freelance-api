@@ -1,3 +1,4 @@
+using Frelance.Application.Mediatr.Commands.UserProfile;
 using Frelance.Contracts.Dtos;
 using Frelance.Contracts.Requests.Common;
 using Frelance.Contracts.Requests.FreelancerProfiles;
@@ -17,7 +18,10 @@ public interface IFreelancerProfileRepository
     Task<PaginatedList<FreelancerProfileDto>> GetAllFreelancerProfilesAsync(PaginationParams paginationParams,
         CancellationToken cancellationToken);
 
-    Task UpdateFreelancerProfileAsync(int id, UpdateFreelancerProfileRequest updateFreelancerProfileRequest,
+    Task PatchAddressAsync(PatchAddressCommand patchAddressCommand, CancellationToken cancellationToken);
+    Task PatchUserDetailsAsync(PatchUserDetailsCommand patchUserDetailsCommand, CancellationToken cancellationToken);
+
+    Task PatchFreelancerDetailsAsync(PatchFreelancerDataCommand patchFreelancerDataCommand,
         CancellationToken cancellationToken);
 
     Task VerifyProfileAsync(int id, CancellationToken cancellationToken);

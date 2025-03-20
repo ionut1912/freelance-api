@@ -1,21 +1,18 @@
 using Frelance.Application.Mediatr.Commands.UserProfile;
 using Frelance.Application.Repositories;
 using Frelance.Contracts.Enums;
-using Frelance.Contracts.Requests.ClientProfile;
-using Frelance.Contracts.Requests.FreelancerProfiles;
 using MediatR;
 
 namespace Frelance.Application.Mediatr.Handlers.UserProfile;
 
-public class UpdateUserProfileCommandHandler : IRequestHandler<UpdateUserProfileCommand>
+public class PatchUserDetailsCommandHandler : IRequestHandler<PatchUserDetailsCommand>
 {
     private readonly IClientProfileRepository _clientProfileRepository;
     private readonly IFreelancerProfileRepository _freelancerProfileRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public UpdateUserProfileCommandHandler(IFreelancerProfileRepository freelancerProfileRepository,
-        IClientProfileRepository clientProfileRepository,
-        IUnitOfWork unitOfWork)
+    public PatchUserDetailsCommandHandler(IFreelancerProfileRepository freelancerProfileRepository,
+        IClientProfileRepository clientProfileRepository, IUnitOfWork unitOfWork)
     {
         ArgumentNullException.ThrowIfNull(freelancerProfileRepository, nameof(freelancerProfileRepository));
         ArgumentNullException.ThrowIfNull(clientProfileRepository, nameof(clientProfileRepository));
@@ -25,17 +22,12 @@ public class UpdateUserProfileCommandHandler : IRequestHandler<UpdateUserProfile
         _unitOfWork = unitOfWork;
     }
 
-    public async Task Handle(UpdateUserProfileCommand request, CancellationToken cancellationToken)
+    public async Task Handle(PatchUserDetailsCommand request, CancellationToken cancellationToken)
     {
         var repoTask = request.Role switch
         {
-            Role.Freelancer when request.UpdateProfileRequest is UpdateFreelancerProfileRequest
-                    updateFreelancerProfileRequest =>
-                _freelancerProfileRepository.UpdateFreelancerProfileAsync(request.Id, updateFreelancerProfileRequest,
-                    cancellationToken),
-            Role.Client when request.UpdateProfileRequest is UpdateClientProfileRequest updateClientProfileRequest =>
-                _clientProfileRepository.UpdateClientProfileAsync(request.Id, updateClientProfileRequest,
-                    cancellationToken),
+            Role.Freelancer => _freelancerProfileRepository.PatchUserDetailsAsync(request, cancellationToken),
+            Role.Client => _clientProfileRepository.PatchUserDetailsAsync(request, cancellationToken),
             _ => throw new InvalidOperationException("Invalid request")
         };
 
