@@ -60,7 +60,7 @@ app.AddTasksEndpoints();
 app.AddTimeLogsEndpoints();
 app.AddUserEndpoints();
 app.AddSkillsEndpoint();
-app.AddClientProfilesEndpoints();
+app.AddUserProfileEndpoints();
 app.AddFreelancerProfilesEndpoints();
 app.AddReviewsEndpoints();
 app.AddContractEndpoints();
