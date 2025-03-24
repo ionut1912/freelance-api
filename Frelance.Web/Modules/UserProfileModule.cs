@@ -14,17 +14,6 @@ public static class UserProfileModule
 {
     public static void AddUserProfileEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/userProfiles",
-                async (IMediator mediator, CreateClientProfileRequest createClientProfileRequest,
-                    HttpContext httpContext,
-                    CancellationToken ct) =>
-                {
-                    await mediator.Send(new CreateUserProfileCommand(httpContext.GetRole(), createClientProfileRequest),
-                        ct);
-                    return Results.Created();
-                })
-            .WithTags("UserProfiles")
-            .RequireAuthorization();
 
         app.MapGet("/api/userProfiles/{id:int}",
                 async (IMediator mediator, int id, HttpContext httpContext, CancellationToken ct) =>

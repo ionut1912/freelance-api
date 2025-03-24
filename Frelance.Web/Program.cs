@@ -49,7 +49,7 @@ app.UseSwaggerUI();
 app.UseExceptionHandler(_ => { });
 app.UseCors(opt =>
 {
-    opt.WithOrigins("http://localhost:4200", "https://freelance-client.azurewebsites.net").AllowAnyHeader()
+    opt.WithOrigins("http://localhost:4200").AllowAnyHeader()
         .AllowAnyMethod().AllowCredentials();
 });
 app.UseHttpsRedirection();
@@ -60,6 +60,7 @@ app.AddTasksEndpoints();
 app.AddTimeLogsEndpoints();
 app.AddUserEndpoints();
 app.AddSkillsEndpoint();
+app.AddClientProfileEndpoints();
 app.AddUserProfileEndpoints();
 app.AddFreelancerProfilesEndpoints();
 app.AddReviewsEndpoints();
