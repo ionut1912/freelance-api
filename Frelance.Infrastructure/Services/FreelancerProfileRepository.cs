@@ -50,7 +50,9 @@ public class FreelancerProfileRepository : IFreelancerProfileRepository
         var user = await _userRepository.Query()
             .Where(x => x.UserName == _userAccessor.GetUsername())
             .FirstOrDefaultAsync(cancellationToken);
-        if (user == null) throw new InvalidOperationException("User not found.");
+        if (user == null)
+            throw new NotFoundException(
+                $"{nameof(Users)} with {nameof(Users.UserName)} :{_userAccessor.GetUsername()} not found.");
 
         var freelancerProfile = createFreelancerProfileRequest.Adapt<FreelancerProfiles>();
         freelancerProfile.UserId = user.Id;
