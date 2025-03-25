@@ -1,7 +1,6 @@
 using Frelance.Application.Mediatr.Commands.UserProfile;
 using Frelance.Contracts.Enums;
 using Frelance.Contracts.Requests.ClientProfile;
-using Frelance.Web.Modules.Utils;
 using MediatR;
 
 namespace Frelance.Web.Modules;
@@ -21,5 +20,4 @@ public static class ClientProfileModule
             .WithTags("ClientProfiles")
             .RequireAuthorization("ClientRole");
     }
-
 }

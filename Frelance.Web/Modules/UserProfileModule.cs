@@ -1,7 +1,6 @@
 using Frelance.Application.Mediatr.Commands.UserProfile;
 using Frelance.Application.Mediatr.Queries.UserProfile;
 using Frelance.Contracts.Dtos;
-using Frelance.Contracts.Requests.ClientProfile;
 using Frelance.Contracts.Requests.Common;
 using Frelance.Web.Extensions;
 using Frelance.Web.Modules.Utils;
@@ -14,7 +13,6 @@ public static class UserProfileModule
 {
     public static void AddUserProfileEndpoints(this IEndpointRouteBuilder app)
     {
-
         app.MapGet("/api/userProfiles/{id:int}",
                 async (IMediator mediator, int id, HttpContext httpContext, CancellationToken ct) =>
                 {

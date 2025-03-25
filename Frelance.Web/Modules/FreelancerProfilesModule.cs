@@ -21,7 +21,7 @@ public static class FreelancerProfilesModule
                 })
             .WithTags("FreelancerProfiles")
             .RequireAuthorization("FreelancerRole");
-        
+
         app.MapPatch("/api/freelancerProfiles/freelancerDetails/{id:int}", async (IMediator mediator, int id,
                 [FromBody] FreelancerProfileData freelancerProfileData, CancellationToken ct) =>
             {
