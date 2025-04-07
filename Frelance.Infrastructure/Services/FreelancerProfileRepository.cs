@@ -65,7 +65,7 @@ public class FreelancerProfileRepository : IFreelancerProfileRepository
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         freelancerProfile.AddressId = freelancerProfile.Addresses.Id;
         var skillsInDb = await _skillsRepository.Query().ToListAsync(cancellationToken);
-        for (var i = 0; i <createFreelancerProfileRequest.ProgrammingLanguages.Count; i++)
+        for (var i = 0; i < createFreelancerProfileRequest.ProgrammingLanguages.Count; i++)
         {
             var progLang = createFreelancerProfileRequest.ProgrammingLanguages[i].Trim().ToLowerInvariant();
             var area = createFreelancerProfileRequest.Areas[i].Trim().ToLowerInvariant();
@@ -187,62 +187,66 @@ public class FreelancerProfileRepository : IFreelancerProfileRepository
         _freelancerProfilesRepository.Update(freelancerProfile);
     }
 
-public async Task PatchFreelancerDetailsAsync(PatchFreelancerDataCommand patchFreelancerDataCommand,
-    CancellationToken cancellationToken)
-{
-    var freelancerProfile = await _freelancerProfilesRepository.Query().AsTracking()
-        .Where(x => x.Id == patchFreelancerDataCommand.Id)
-        .Include(x => x.ForeignLanguages)
-        .Include(x => x.FreelancerProfileSkills)
-        .ThenInclude(fps => fps.Skill)
-        .FirstOrDefaultAsync(cancellationToken);
-    if (freelancerProfile is null)
-        throw new NotFoundException(
-            $"{nameof(FreelancerProfiles)} with {nameof(FreelancerProfiles.Id)} : '{patchFreelancerDataCommand.Id}' does not exist");
-
-    foreach (var language in patchFreelancerDataCommand.FreelancerProfileData.ForeignLanguages.Distinct(StringComparer.OrdinalIgnoreCase))
+    public async Task PatchFreelancerDetailsAsync(PatchFreelancerDataCommand patchFreelancerDataCommand,
+        CancellationToken cancellationToken)
     {
-        if (freelancerProfile.ForeignLanguages.Any(fl =>
-                fl.Language.Trim().ToLower() == language.Trim().ToLower()))
-            continue;
-        var foreignLanguage = new FreelancerForeignLanguage
-        {
-            Language = language,
-            FreelancerProfileId = freelancerProfile.Id
-        };
-        await _freelancerForeignLanguageRepository.CreateAsync(foreignLanguage, cancellationToken);
-        freelancerProfile.ForeignLanguages.Add(foreignLanguage);
-    }
-
-    for (var i = 0; i < patchFreelancerDataCommand.FreelancerProfileData.ProgrammingLanguages.Count; i++)
-    {
-        var programmingLanguage = patchFreelancerDataCommand.FreelancerProfileData.ProgrammingLanguages[i].Trim().ToLower();
-        var skillArea = await _skillsRepository.Query()
-            .Where(x => x.ProgrammingLanguage == patchFreelancerDataCommand.FreelancerProfileData.ProgrammingLanguages[i])
+        var freelancerProfile = await _freelancerProfilesRepository.Query().AsTracking()
+            .Where(x => x.Id == patchFreelancerDataCommand.Id)
+            .Include(x => x.ForeignLanguages)
+            .Include(x => x.FreelancerProfileSkills)
+            .ThenInclude(fps => fps.Skill)
             .FirstOrDefaultAsync(cancellationToken);
-        var area = skillArea!.Area.ToLower();
-        if (freelancerProfile.FreelancerProfileSkills.Any(fps =>
-                (fps.Skill?.ProgrammingLanguage ?? "").Trim().ToLower() == programmingLanguage &&
-                (fps.Skill?.Area ?? "").Trim().ToLower() == area))
-            continue;
-        var existingSkill = await _skillsRepository.Query()
-            .FirstOrDefaultAsync(x =>
-                x.ProgrammingLanguage.ToLower() == programmingLanguage &&
-                x.Area.ToLower() == area, cancellationToken);
-        if (existingSkill != null)
-            freelancerProfile.FreelancerProfileSkills.Add(new FreelancerProfileSkill
-                { FreelancerProfileId = freelancerProfile.Id, SkillId = existingSkill.Id });
+        if (freelancerProfile is null)
+            throw new NotFoundException(
+                $"{nameof(FreelancerProfiles)} with {nameof(FreelancerProfiles.Id)} : '{patchFreelancerDataCommand.Id}' does not exist");
+
+        foreach (var language in patchFreelancerDataCommand.FreelancerProfileData.ForeignLanguages.Distinct(
+                     StringComparer.OrdinalIgnoreCase))
+        {
+            if (freelancerProfile.ForeignLanguages.Any(fl =>
+                    fl.Language.Trim().Equals(language.Trim(), StringComparison.CurrentCultureIgnoreCase)))
+                continue;
+            var foreignLanguage = new FreelancerForeignLanguage
+            {
+                Language = language,
+                FreelancerProfileId = freelancerProfile.Id
+            };
+            await _freelancerForeignLanguageRepository.CreateAsync(foreignLanguage, cancellationToken);
+            freelancerProfile.ForeignLanguages.Add(foreignLanguage);
+        }
+
+        for (var i = 0; i < patchFreelancerDataCommand.FreelancerProfileData.ProgrammingLanguages.Count; i++)
+        {
+            var programmingLanguage = patchFreelancerDataCommand.FreelancerProfileData.ProgrammingLanguages[i].Trim()
+                .ToLower();
+            var skillArea = await _skillsRepository.Query()
+                .Where(x => x.ProgrammingLanguage ==
+                            patchFreelancerDataCommand.FreelancerProfileData.ProgrammingLanguages[i])
+                .FirstOrDefaultAsync(cancellationToken);
+            var area = skillArea!.Area.ToLower();
+            if (freelancerProfile.FreelancerProfileSkills.Any(fps =>
+                    (fps.Skill?.ProgrammingLanguage ?? "").Trim()
+                    .Equals(programmingLanguage, StringComparison.CurrentCultureIgnoreCase) &&
+                    (fps.Skill?.Area ?? "").Trim().Equals(area, StringComparison.CurrentCultureIgnoreCase)))
+                continue;
+            var existingSkill = await _skillsRepository.Query()
+                .FirstOrDefaultAsync(x =>
+                    x.ProgrammingLanguage.Equals(programmingLanguage, StringComparison.CurrentCultureIgnoreCase) &&
+                    x.Area.Equals(area, StringComparison.CurrentCultureIgnoreCase), cancellationToken);
+            if (existingSkill != null)
+                freelancerProfile.FreelancerProfileSkills.Add(new FreelancerProfileSkill
+                    { FreelancerProfileId = freelancerProfile.Id, SkillId = existingSkill.Id });
+        }
+
+        freelancerProfile.Experience = patchFreelancerDataCommand.FreelancerProfileData.Experience;
+        freelancerProfile.Rate = patchFreelancerDataCommand.FreelancerProfileData.Rate;
+        freelancerProfile.Currency = patchFreelancerDataCommand.FreelancerProfileData.Currency;
+        freelancerProfile.PortfolioUrl = patchFreelancerDataCommand.FreelancerProfileData.PortfolioUrl;
+        _freelancerProfilesRepository.Update(freelancerProfile);
     }
 
-    freelancerProfile.Experience = patchFreelancerDataCommand.FreelancerProfileData.Experience;
-    freelancerProfile.Rate = patchFreelancerDataCommand.FreelancerProfileData.Rate;
-    freelancerProfile.Currency = patchFreelancerDataCommand.FreelancerProfileData.Currency;
-    freelancerProfile.PortfolioUrl = patchFreelancerDataCommand.FreelancerProfileData.PortfolioUrl;
-    _freelancerProfilesRepository.Update(freelancerProfile);
-}
 
-
-public async Task VerifyProfileAsync(int id, CancellationToken cancellationToken)
+    public async Task VerifyProfileAsync(int id, CancellationToken cancellationToken)
     {
         var freelancer = await _freelancerProfilesRepository.Query()
             .Where(x => x.Id == id)
