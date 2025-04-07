@@ -23,10 +23,6 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
         await _dbSet.AddAsync(entity, cancellationToken);
     }
-    public IQueryable<T> QueryTracking()
-    {
-        return _dbSet;
-    }
 
     public void Update(T entity)
     {
