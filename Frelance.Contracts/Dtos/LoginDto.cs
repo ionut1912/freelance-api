@@ -1,7 +1,7 @@
-using System.ComponentModel.DataAnnotations;
 using JetBrains.Annotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Frelance.Contracts.Dtos;
 
 [UsedImplicitly]
-public record LoginDto([Required] string Username, [Required] [EmailAddress] string Email, [Required] string Password);
+public record LoginDto([Required] string Username, [Required] string Password);

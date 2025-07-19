@@ -14,3 +14,5 @@ terraform/terraform.tfstate
 terraform/.terraform.tfstate.lock.info
 terraform/.terraform.lock.hcl
 terraform/terraform.tfstate.backup
+/.vs/Frelance.API
+/.vs/ProjectEvaluation

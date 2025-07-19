@@ -60,12 +60,8 @@ public class InvoiceRepository : IInvoiceRepository
 
         var project = await _projectRepository.Query()
             .Where(x => x.Title == createInvoiceCommand.CreateInvoiceRequest.ProjectName)
-            .FirstOrDefaultAsync(cancellationToken);
-
-        if (project is null)
-            throw new NotFoundException(
+            .FirstOrDefaultAsync(cancellationToken) ?? throw new NotFoundException(
                 $"{nameof(Projects)} with {nameof(Projects.Title)}: {createInvoiceCommand.CreateInvoiceRequest.ProjectName} not found");
-
         var invoice = createInvoiceCommand.CreateInvoiceRequest.Adapt<Invoices>();
         invoice.ProjectId = project.Id;
         invoice.ClientId = client.Id;
@@ -85,10 +81,9 @@ public class InvoiceRepository : IInvoiceRepository
             .ThenInclude(x => x!.Users)
             .FirstOrDefaultAsync(cancellationToken);
 
-        if (invoice is null)
-            throw new NotFoundException($"{nameof(Invoices)} with {nameof(Invoices.Id)}: {query.Id} not found");
-
-        return invoice.Adapt<InvoicesDto>();
+        return invoice is null
+            ? throw new NotFoundException($"{nameof(Invoices)} with {nameof(Invoices.Id)}: {query.Id} not found")
+            : invoice.Adapt<InvoicesDto>();
     }
 
     public async Task<PaginatedList<InvoicesDto>> GetInvoicesAsync(GetInvoicesQuery query,

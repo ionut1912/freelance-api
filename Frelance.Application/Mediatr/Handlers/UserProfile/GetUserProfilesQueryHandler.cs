@@ -25,26 +25,26 @@ public class GetUserProfilesQueryHandler : IRequestHandler<GetUserProfilesQuery,
         switch (request.Role)
         {
             case Role.Client:
-            {
-                var clientProfiles =
-                    await _clientProfileRepository.GetClientProfilesAsync(request.PaginationParams, cancellationToken);
-                return new PaginatedList<object>(
-                    clientProfiles.Items.Cast<object>().ToList(),
-                    clientProfiles.TotalCount,
-                    clientProfiles.CurrentPage,
-                    clientProfiles.PageSize);
-            }
+                {
+                    var clientProfiles =
+                        await _clientProfileRepository.GetClientProfilesAsync(request.PaginationParams, cancellationToken);
+                    return new PaginatedList<object>(
+                        clientProfiles.Items.Cast<object>().ToList(),
+                        clientProfiles.TotalCount,
+                        clientProfiles.CurrentPage,
+                        clientProfiles.PageSize);
+                }
             case Role.Freelancer:
-            {
-                var freelancerProfiles =
-                    await _freelancerProfileRepository.GetAllFreelancerProfilesAsync(request.PaginationParams,
-                        cancellationToken);
-                return new PaginatedList<object>(
-                    freelancerProfiles.Items.Cast<object>().ToList(),
-                    freelancerProfiles.TotalCount,
-                    freelancerProfiles.CurrentPage,
-                    freelancerProfiles.PageSize);
-            }
+                {
+                    var freelancerProfiles =
+                        await _freelancerProfileRepository.GetAllFreelancerProfilesAsync(request.PaginationParams,
+                            cancellationToken);
+                    return new PaginatedList<object>(
+                        freelancerProfiles.Items.Cast<object>().ToList(),
+                        freelancerProfiles.TotalCount,
+                        freelancerProfiles.CurrentPage,
+                        freelancerProfiles.PageSize);
+                }
             default:
                 throw new InvalidOperationException("Invalid request");
         }

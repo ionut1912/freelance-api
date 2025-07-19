@@ -22,11 +22,14 @@ public static class ContractsModule
                 })
             .WithTags("Contracts")
             .RequireAuthorization("ClientRole");
+
         app.MapGet("/api/contracts/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
         {
             var contract = await mediator.Send(new GetContractByIdQuery(id), ct);
             return Results.Ok(contract);
-        }).WithTags("Contracts").RequireAuthorization();
+        }).WithTags("Contracts")
+        .RequireAuthorization();
+
         app.MapGet("/api/contracts",
             async (IMediator mediator, [FromQuery] int pageSize, [FromQuery] int pageNumber, CancellationToken ct) =>
             {
@@ -35,19 +38,24 @@ public static class ContractsModule
                 return Results.Extensions.OkPaginationResult(paginatedContracts.PageSize,
                     paginatedContracts.CurrentPage,
                     paginatedContracts.TotalCount, paginatedContracts.TotalPages, paginatedContracts.Items);
-            }).WithTags("Contracts").RequireAuthorization();
+            }).WithTags("Contracts")
+            .RequireAuthorization();
+
         app.MapPut("/api/contracts/{id}", async (IMediator mediator, int id,
             UpdateContractRequest updateContractRequest, CancellationToken ct) =>
         {
             var command = updateContractRequest.Adapt<UpdateContractCommand>() with { Id = id };
             await mediator.Send(command, ct);
             return Results.NoContent();
-        }).WithTags("Contracts").RequireAuthorization();
+        }).WithTags("Contracts")
+        .RequireAuthorization();
+
         app.MapDelete("/api/contracts/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
         {
             var command = new DeleteContractCommand(id);
             await mediator.Send(command, ct);
             return Results.NoContent();
-        }).WithTags("Contracts").RequireAuthorization();
+        }).WithTags("Contracts")
+        .RequireAuthorization();
     }
 }

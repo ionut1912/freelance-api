@@ -1,9 +1,9 @@
-using System.Security.Claims;
 using Frelance.Application.Mediatr.Commands.Face;
 using Frelance.Contracts.Enums;
 using Frelance.Contracts.Requests.FaceVerification;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Frelance.Web.Modules;
 
