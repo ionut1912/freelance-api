@@ -52,18 +52,12 @@ public class ContractRepository : IContractRepository
         var client = await _clientProfilesRepository.Query()
             .Where(x => x.Users!.UserName == _userAccessor.GetUsername())
             .Include(x => x.Users)
-            .FirstOrDefaultAsync(cancellationToken);
-        if (client is null)
-            throw new NotFoundException(
+            .FirstOrDefaultAsync(cancellationToken) ?? throw new NotFoundException(
                 $"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Users.UserName)}: {_userAccessor.GetUsername()} doe not exist.");
-
         var project = await _projectsRepository.Query()
             .Where(x => x.Title == createContractCommand.CreateContractRequest.ProjectName)
-            .FirstOrDefaultAsync(cancellationToken);
-        if (project is null)
-            throw new NotFoundException(
+            .FirstOrDefaultAsync(cancellationToken) ?? throw new NotFoundException(
                 $"{nameof(Projects)} with {nameof(Projects.Title)}: {createContractCommand.CreateContractRequest.ProjectName} doe not exist.");
-
         var contract = createContractCommand.CreateContractRequest.Adapt<Entities.Contracts>();
         contract.ProjectId = project.Id;
         contract.ClientId = client.Id;
@@ -83,11 +77,10 @@ public class ContractRepository : IContractRepository
             .Include(x => x.Freelancer)
             .ThenInclude(f => f.Users)
             .FirstOrDefaultAsync(cancellationToken);
-        if (contract is null)
-            throw new NotFoundException(
-                $"{nameof(Entities.Contracts)} with {nameof(Entities.Contracts.Id)}: {query.Id} doe not exist.");
-
-        return contract.Adapt<ContractsDto>();
+        return contract is null
+            ? throw new NotFoundException(
+                $"{nameof(Entities.Contracts)} with {nameof(Entities.Contracts.Id)}: {query.Id} doe not exist.")
+            : contract.Adapt<ContractsDto>();
     }
 
     public async Task<PaginatedList<ContractsDto>> GetContractsAsync(GetContractsQuery query,
@@ -120,11 +113,8 @@ public class ContractRepository : IContractRepository
             .ThenInclude(x => x.Projects)
             .Include(x => x.Freelancer)
             .ThenInclude(x => x.Projects)
-            .FirstOrDefaultAsync(cancellationToken);
-        if (contractToUpdate is null)
-            throw new NotFoundException(
+            .FirstOrDefaultAsync(cancellationToken) ?? throw new NotFoundException(
                 $"nameof(Entities.Contracts) with {nameof(Entities.Contracts.Id)}: {updateContractCommand.Id} doe not exist.");
-
         updateContractCommand.UpdateContractRequest.Adapt(contractToUpdate);
 
         if (updateContractCommand.UpdateContractRequest.Status == "Signed"

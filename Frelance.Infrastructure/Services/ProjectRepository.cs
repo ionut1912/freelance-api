@@ -71,11 +71,10 @@ public class ProjectRepository : IProjectRepository
             .Include(x => x.Invoices)
             .Include(x => x.Technologies)
             .FirstOrDefaultAsync(cancellationToken);
-        if (project is null)
-            throw new NotFoundException(
-                $"{nameof(Projects)} with {nameof(Projects.Id)} : '{getProjectByIdQuery.Id}' does not exist");
-
-        return project.Adapt<ProjectDto>();
+        return project is null
+            ? throw new NotFoundException(
+                $"{nameof(Projects)} with {nameof(Projects.Id)} : '{getProjectByIdQuery.Id}' does not exist")
+            : project.Adapt<ProjectDto>();
     }
 
     public async Task<PaginatedList<ProjectDto>> FindProjectsAsync(GetProjectsQuery getProjectsQuery,

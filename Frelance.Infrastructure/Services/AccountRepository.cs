@@ -50,28 +50,27 @@ public class AccountRepository : IAccountRepository
         var modelState = new ModelStateDictionary();
         var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.Username,
             cancellationToken);
-        if (user is null) modelState.AddModelError("Username", "The given user data is not found");
-
-        if (user!.UserName != loginDto.Username) modelState.AddModelError("Username", "username is invalid");
-
-        if (!await _userManager.CheckPasswordAsync(user, loginDto.Password))
+        if (user is null)
+        {
+            modelState.AddModelError("Username", $"User with username {loginDto.Username} is not found");
+            GenerateException(modelState);
+        }
+    
+        if (!await _userManager.CheckPasswordAsync(user!, loginDto.Password))
             modelState.AddModelError("Password", "password is invalid");
 
-        if (user.Email != loginDto.Email) modelState.AddModelError("Email", "email is invalid");
-
-        if (await _userManager.IsLockedOutAsync(user))
+        if (await _userManager.IsLockedOutAsync(user!))
             modelState.AddModelError("Account", "Your account is locked for one hour");
 
         GenerateException(modelState);
-        return new UserDto(user.PhoneNumber!, await _tokenService.GenerateToken(user), user.UserName!, user.Email!,
+        return new UserDto(user!.PhoneNumber!, await _tokenService.GenerateToken(user), user.UserName!, user.Email!,
             user.CreatedAt);
     }
 
     public async Task LockAccountAsync(BlockAccountCommand command)
     {
         var modelState = new ModelStateDictionary();
-        var user = await _userManager.FindByIdAsync(command.UserId);
-        if (user is null) throw new NotFoundException($"{nameof(Users)} with id {command.UserId} not found");
+        var user = await _userManager.FindByIdAsync(command.UserId) ?? throw new NotFoundException($"{nameof(Users)} with id {command.UserId} not found");
         var lockoutEnd = DateTimeOffset.UtcNow.AddHours(1);
         var result = await _userManager.SetLockoutEndDateAsync(user, lockoutEnd);
         if (!result.Succeeded)
@@ -84,8 +83,7 @@ public class AccountRepository : IAccountRepository
     public async Task DeleteAccountAsync(DeleteAccountCommand command)
     {
         var modelState = new ModelStateDictionary();
-        var user = await _userManager.FindByIdAsync(command.UserId);
-        if (user is null) throw new NotFoundException($"{nameof(Users)} with id {command.UserId} not found");
+        var user = await _userManager.FindByIdAsync(command.UserId) ?? throw new NotFoundException($"{nameof(Users)} with id {command.UserId} not found");
         var result = await _userManager.DeleteAsync(user);
         if (!result.Succeeded)
         {

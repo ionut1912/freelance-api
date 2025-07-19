@@ -1,5 +1,3 @@
-using System.Reflection;
-using System.Text;
 using Frelance.Application.Repositories;
 using Frelance.Application.Repositories.ML;
 using Frelance.Infrastructure.Context;
@@ -16,6 +14,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using System.Reflection;
+using System.Text;
 
 namespace Frelance.Infrastructure;
 
