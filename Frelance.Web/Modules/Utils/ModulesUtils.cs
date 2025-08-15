@@ -1,5 +1,5 @@
-using Frelance.Contracts.Enums;
 using System.Security.Claims;
+using Frelance.Contracts.Enums;
 
 namespace Frelance.Web.Modules.Utils;
 

@@ -55,7 +55,7 @@ public class AccountRepository : IAccountRepository
             modelState.AddModelError("Username", $"User with username {loginDto.Username} is not found");
             GenerateException(modelState);
         }
-    
+
         if (!await _userManager.CheckPasswordAsync(user!, loginDto.Password))
             modelState.AddModelError("Password", "password is invalid");
 
@@ -70,7 +70,8 @@ public class AccountRepository : IAccountRepository
     public async Task LockAccountAsync(BlockAccountCommand command)
     {
         var modelState = new ModelStateDictionary();
-        var user = await _userManager.FindByIdAsync(command.UserId) ?? throw new NotFoundException($"{nameof(Users)} with id {command.UserId} not found");
+        var user = await _userManager.FindByIdAsync(command.UserId) ??
+                   throw new NotFoundException($"{nameof(Users)} with id {command.UserId} not found");
         var lockoutEnd = DateTimeOffset.UtcNow.AddHours(1);
         var result = await _userManager.SetLockoutEndDateAsync(user, lockoutEnd);
         if (!result.Succeeded)
@@ -83,7 +84,8 @@ public class AccountRepository : IAccountRepository
     public async Task DeleteAccountAsync(DeleteAccountCommand command)
     {
         var modelState = new ModelStateDictionary();
-        var user = await _userManager.FindByIdAsync(command.UserId) ?? throw new NotFoundException($"{nameof(Users)} with id {command.UserId} not found");
+        var user = await _userManager.FindByIdAsync(command.UserId) ??
+                   throw new NotFoundException($"{nameof(Users)} with id {command.UserId} not found");
         var result = await _userManager.DeleteAsync(user);
         if (!result.Succeeded)
         {

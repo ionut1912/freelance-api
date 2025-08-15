@@ -61,7 +61,7 @@ public class InvoiceRepository : IInvoiceRepository
         var project = await _projectRepository.Query()
             .Where(x => x.Title == createInvoiceCommand.CreateInvoiceRequest.ProjectName)
             .FirstOrDefaultAsync(cancellationToken) ?? throw new NotFoundException(
-                $"{nameof(Projects)} with {nameof(Projects.Title)}: {createInvoiceCommand.CreateInvoiceRequest.ProjectName} not found");
+            $"{nameof(Projects)} with {nameof(Projects.Title)}: {createInvoiceCommand.CreateInvoiceRequest.ProjectName} not found");
         var invoice = createInvoiceCommand.CreateInvoiceRequest.Adapt<Invoices>();
         invoice.ProjectId = project.Id;
         invoice.ClientId = client.Id;
