@@ -75,7 +75,7 @@ public class FreelancerProfileRepository : IFreelancerProfileRepository
             if (existingSkill == null)
                 throw new CustomValidationException([new ValidationError("Skills", "Skill not found.")]);
             freelancerProfile.FreelancerProfileSkills.Add(new FreelancerProfileSkill
-            { FreelancerProfileId = freelancerProfile.Id, SkillId = existingSkill.Id });
+                { FreelancerProfileId = freelancerProfile.Id, SkillId = existingSkill.Id });
         }
 
         await _freelancerProfilesRepository.CreateAsync(freelancerProfile, cancellationToken);
@@ -235,7 +235,7 @@ public class FreelancerProfileRepository : IFreelancerProfileRepository
                     x.Area.Equals(area, StringComparison.CurrentCultureIgnoreCase), cancellationToken);
             if (existingSkill != null)
                 freelancerProfile.FreelancerProfileSkills.Add(new FreelancerProfileSkill
-                { FreelancerProfileId = freelancerProfile.Id, SkillId = existingSkill.Id });
+                    { FreelancerProfileId = freelancerProfile.Id, SkillId = existingSkill.Id });
         }
 
         freelancerProfile.Experience = patchFreelancerDataCommand.FreelancerProfileData.Experience;

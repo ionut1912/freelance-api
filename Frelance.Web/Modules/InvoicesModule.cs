@@ -24,11 +24,11 @@ public static class InvoicesModule
             .RequireAuthorization("FreelancerRole");
 
         app.MapGet("/api/invoices/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
-        {
-            var invoice = await mediator.Send(new GetInvoiceByIdQuery(id), ct);
-            return Results.Ok(invoice);
-        }).WithTags("Invoices")
-        .RequireAuthorization();
+            {
+                var invoice = await mediator.Send(new GetInvoiceByIdQuery(id), ct);
+                return Results.Ok(invoice);
+            }).WithTags("Invoices")
+            .RequireAuthorization();
 
         app.MapGet("/api/invoices",
             async (IMediator mediator, [FromQuery] int pageSize, [FromQuery] int pageNumber, CancellationToken ct) =>

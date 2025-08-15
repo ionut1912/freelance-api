@@ -53,11 +53,11 @@ public class ContractRepository : IContractRepository
             .Where(x => x.Users!.UserName == _userAccessor.GetUsername())
             .Include(x => x.Users)
             .FirstOrDefaultAsync(cancellationToken) ?? throw new NotFoundException(
-                $"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Users.UserName)}: {_userAccessor.GetUsername()} doe not exist.");
+            $"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Users.UserName)}: {_userAccessor.GetUsername()} doe not exist.");
         var project = await _projectsRepository.Query()
             .Where(x => x.Title == createContractCommand.CreateContractRequest.ProjectName)
             .FirstOrDefaultAsync(cancellationToken) ?? throw new NotFoundException(
-                $"{nameof(Projects)} with {nameof(Projects.Title)}: {createContractCommand.CreateContractRequest.ProjectName} doe not exist.");
+            $"{nameof(Projects)} with {nameof(Projects.Title)}: {createContractCommand.CreateContractRequest.ProjectName} doe not exist.");
         var contract = createContractCommand.CreateContractRequest.Adapt<Entities.Contracts>();
         contract.ProjectId = project.Id;
         contract.ClientId = client.Id;
@@ -114,7 +114,7 @@ public class ContractRepository : IContractRepository
             .Include(x => x.Freelancer)
             .ThenInclude(x => x.Projects)
             .FirstOrDefaultAsync(cancellationToken) ?? throw new NotFoundException(
-                $"nameof(Entities.Contracts) with {nameof(Entities.Contracts.Id)}: {updateContractCommand.Id} doe not exist.");
+            $"nameof(Entities.Contracts) with {nameof(Entities.Contracts.Id)}: {updateContractCommand.Id} doe not exist.");
         updateContractCommand.UpdateContractRequest.Adapt(contractToUpdate);
 
         if (updateContractCommand.UpdateContractRequest.Status == "Signed"

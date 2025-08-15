@@ -6,7 +6,8 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-#region Swagger
+
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -37,17 +38,17 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 });
-#endregion
 
-// 1️⃣  CORS registration with a named policy
-const string FrontendOrigin = "_frontendOrigin";
+
+
+const string frontendOrigin = "_frontendOrigin";
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(FrontendOrigin, policy =>
-        policy.WithOrigins("http://localhost:3000")   // exact origin
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials());                  // only if you need cookies/Auth
+    options.AddPolicy(frontendOrigin, policy =>
+        policy.WithOrigins("http://localhost:3000") 
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials()); 
 });
 
 builder.Services.AddAuthorization();
@@ -63,14 +64,12 @@ app.UseSwagger();
 app.UseSwaggerUI();
 app.UseExceptionHandler(_ => { });
 
-// 2️⃣  Apply the policy early (before auth)
-app.UseCors(FrontendOrigin);
+app.UseCors(frontendOrigin);
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// 3️⃣  Optional: make every endpoint group require this policy
 app.AddProjectsEndpoints();
 app.AddTasksEndpoints();
 app.AddTimeLogsEndpoints();

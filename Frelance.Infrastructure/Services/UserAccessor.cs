@@ -1,8 +1,8 @@
+using System.Security.Claims;
 using Frelance.Application.Repositories;
 using Frelance.Contracts.Exceptions;
 using Frelance.Infrastructure.Entities;
 using Microsoft.AspNetCore.Http;
-using System.Security.Claims;
 
 namespace Frelance.Infrastructure.Services;
 
