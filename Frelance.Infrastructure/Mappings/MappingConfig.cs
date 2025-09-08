@@ -40,18 +40,18 @@ public abstract class MappingConfig
             .Map(dest => dest.LoginDto, src => src);
         TypeAdapterConfig<CreateClientProfileRequest, ClientProfiles>
             .NewConfig()
-            .Map(dest => dest.Bio, src => src.Bio)
-            .Map(dest => dest.Image, src => src.Image)
+            .Map(dest => dest.Bio, src => src.User.Bio)
+            .Map(dest => dest.Image, src => src.User.Image)
             .AfterMapping((src, dest) =>
             {
                 dest.CreatedAt = DateTime.UtcNow;
                 dest.Addresses = new Addresses
                 {
-                    Country = src.AddressCountry,
-                    City = src.AddressCity,
-                    Street = src.AddressStreet,
-                    StreetNumber = src.AddressStreetNumber,
-                    ZipCode = src.AddressZip
+                    Country = src.Address.AddressCountry,
+                    City = src.Address.AddressCity,
+                    Street = src.Address.AddressStreet,
+                    StreetNumber = src.Address.AddressStreetNumber,
+                    ZipCode = src.Address.AddressZip
                 };
                 dest.IsVerified = false;
             });
@@ -142,25 +142,6 @@ public abstract class MappingConfig
         TypeAdapterConfig<TimeLogs, TimeLogDto>
             .NewConfig()
             .Map(dest => dest, src => src);
-        TypeAdapterConfig<UpdateClientProfileRequest, ClientProfiles>
-            .NewConfig()
-            .AfterMapping((src, dest) =>
-            {
-                dest.Addresses!.Country = !string.IsNullOrEmpty(src.AddressCountry)
-                    ? src.AddressCountry
-                    : dest.Addresses.Country;
-                dest.Addresses.Street =
-                    !string.IsNullOrEmpty(src.AddressStreet) ? src.AddressStreet : dest.Addresses.Street;
-                dest.Addresses.StreetNumber = !string.IsNullOrEmpty(src.AddressStreetNumber)
-                    ? src.AddressStreetNumber
-                    : dest.Addresses.StreetNumber;
-                dest.Addresses.City = !string.IsNullOrEmpty(src.AddressCity) ? src.AddressCity : dest.Addresses.City;
-                dest.Addresses.ZipCode =
-                    !string.IsNullOrEmpty(src.AddressZip) ? src.AddressZip : dest.Addresses.ZipCode;
-                dest.Bio = !string.IsNullOrEmpty(src.Bio) ? src.Bio : dest.Bio;
-                dest.Image = !string.IsNullOrEmpty(src.Image) ? src.Image : dest.Image;
-                dest.UpdatedAt = DateTime.UtcNow;
-            });
         TypeAdapterConfig<CreateContractRequest, CreateContractCommand>
             .NewConfig()
             .Map(dest => dest.CreateContractRequest, src => src);
@@ -188,25 +169,25 @@ public abstract class MappingConfig
             .Map(dest => dest.Language, src => src);
         TypeAdapterConfig<CreateFreelancerProfileRequest, FreelancerProfiles>
             .NewConfig()
-            .Map(dest => dest.Bio, src => src.Bio)
-            .Map(dest => dest.Experience, src => src.Experience)
-            .Map(dest => dest.Rate, src => src.Rate)
-            .Map(dest => dest.Currency, src => src.Currency)
-            .Map(dest => dest.PortfolioUrl, src => src.PortfolioUrl)
-            .Map(dest => dest.Image, src => src.Image)
+            .Map(dest => dest.Bio, src => src.User.Bio)
+            .Map(dest => dest.Experience, src => src.Freelancer.Experience)
+            .Map(dest => dest.Rate, src => src.Freelancer.Rate)
+            .Map(dest => dest.Currency, src => src.Freelancer.Currency)
+            .Map(dest => dest.PortfolioUrl, src => src.Freelancer.PortfolioUrl)
+            .Map(dest => dest.Image, src => src.User.Image)
             .Ignore(dest => dest.FreelancerProfileSkills)
             .Ignore(dest => dest.ForeignLanguages)
             .AfterMapping((src, dest) =>
             {
                 dest.Addresses = new Addresses
                 {
-                    Country = src.AddressCountry,
-                    Street = src.AddressStreet,
-                    StreetNumber = src.AddressStreetNumber,
-                    City = src.AddressCity,
-                    ZipCode = src.AddressZip
+                    Country = src.Address.AddressCountry,
+                    Street = src.Address.AddressStreet,
+                    StreetNumber = src.Address.AddressStreetNumber,
+                    City = src.Address.AddressCity,
+                    ZipCode = src.Address.AddressZip
                 };
-                dest.ForeignLanguages = src.ForeignLanguages
+                dest.ForeignLanguages = src.Freelancer.ForeignLanguages
                     .Select(lang => new FreelancerForeignLanguage { Language = lang })
                     .ToList();
                 dest.IsAvailable = true;
@@ -216,42 +197,6 @@ public abstract class MappingConfig
         TypeAdapterConfig<List<SkillRequest>, List<Skills>>
             .NewConfig()
             .Map(src => src, dest => dest);
-        TypeAdapterConfig<UpdateFreelancerProfileRequest, FreelancerProfiles>
-            .NewConfig()
-            .AfterMapping((src, dest) =>
-            {
-                dest.Addresses!.Country = src.AddressCountry ?? dest.Addresses.Country;
-                dest.Addresses.Street = src.AddressStreet ?? dest.Addresses.Street;
-                dest.Addresses.StreetNumber = src.AddressStreetNumber ?? dest.Addresses.StreetNumber;
-                dest.Addresses.City = src.AddressCity ?? dest.Addresses.City;
-                dest.Addresses.ZipCode = src.AddressZip ?? dest.Addresses.ZipCode;
-                dest.Bio = src.Bio ?? dest.Bio;
-                if (src is { ProgrammingLanguages: not null, Areas: not null })
-                {
-                    dest.FreelancerProfileSkills.Clear();
-                    var count = Math.Min(src.ProgrammingLanguages.Count, src.Areas.Count);
-                    for (var i = 0; i < count; i++)
-                        dest.FreelancerProfileSkills.Add(new FreelancerProfileSkill
-                        {
-                            Skill = new Skills
-                            {
-                                ProgrammingLanguage = src.ProgrammingLanguages[i],
-                                Area = src.Areas[i]
-                            }
-                        });
-                }
-
-                if (src.ForeignLanguages != null)
-                    dest.ForeignLanguages = src.ForeignLanguages
-                        .Select(lang => new FreelancerForeignLanguage { Language = lang }).ToList();
-                dest.Experience = src.Experience ?? dest.Experience;
-                dest.Rate = src.Rate;
-                dest.Currency = src.Currency ?? dest.Currency;
-                dest.Rating = src.Rating;
-                dest.PortfolioUrl = src.PortfolioUrl ?? dest.PortfolioUrl;
-                dest.Image = !string.IsNullOrWhiteSpace(src.Image) ? src.Image : dest.Image;
-                dest.UpdatedAt = DateTime.UtcNow;
-            });
         TypeAdapterConfig<CreateInvoiceRequest, CreateInvoiceCommand>
             .NewConfig()
             .Map(dest => dest.CreateInvoiceRequest, src => src);
