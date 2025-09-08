@@ -65,10 +65,10 @@ public class FreelancerProfileRepository : IFreelancerProfileRepository
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         freelancerProfile.AddressId = freelancerProfile.Addresses.Id;
         var skillsInDb = await _skillsRepository.Query().ToListAsync(cancellationToken);
-        for (var i = 0; i < createFreelancerProfileRequest.ProgrammingLanguages.Count; i++)
+        for (var i = 0; i < createFreelancerProfileRequest.Freelancer.ProgrammingLanguages.Count; i++)
         {
-            var progLang = createFreelancerProfileRequest.ProgrammingLanguages[i].Trim().ToLowerInvariant();
-            var area = createFreelancerProfileRequest.Areas[i].Trim().ToLowerInvariant();
+            var progLang = createFreelancerProfileRequest.Freelancer.ProgrammingLanguages[i].Trim().ToLowerInvariant();
+            var area = createFreelancerProfileRequest.Freelancer.Areas[i].Trim().ToLowerInvariant();
             var existingSkill = skillsInDb.FirstOrDefault(x =>
                 x.ProgrammingLanguage.Equals(progLang, StringComparison.InvariantCultureIgnoreCase) &&
                 x.Area.Equals(area, StringComparison.InvariantCultureIgnoreCase));
