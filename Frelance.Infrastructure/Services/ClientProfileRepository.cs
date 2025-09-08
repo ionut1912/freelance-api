@@ -15,25 +15,21 @@ public class ClientProfileRepository : IClientProfileRepository
 {
     private readonly IGenericRepository<Addresses> _addressRepository;
     private readonly IGenericRepository<ClientProfiles> _clientProfileRepository;
-    private readonly IUnitOfWork _unitOfWork;
     private readonly IUserAccessor _userAccessor;
     private readonly IGenericRepository<Users> _userRepository;
 
     public ClientProfileRepository(IGenericRepository<Users> userRepository,
         IGenericRepository<Addresses> addressRepository,
         IGenericRepository<ClientProfiles> clientProfileRepository,
-        IUnitOfWork unitOfWork,
         IUserAccessor userAccessor)
     {
         ArgumentNullException.ThrowIfNull(userRepository, nameof(userRepository));
         ArgumentNullException.ThrowIfNull(addressRepository, nameof(addressRepository));
         ArgumentNullException.ThrowIfNull(clientProfileRepository, nameof(clientProfileRepository));
         ArgumentNullException.ThrowIfNull(userAccessor, nameof(userAccessor));
-        ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));
         _userRepository = userRepository;
         _addressRepository = addressRepository;
         _clientProfileRepository = clientProfileRepository;
-        _unitOfWork = unitOfWork;
         _userAccessor = userAccessor;
     }
 
@@ -46,9 +42,7 @@ public class ClientProfileRepository : IClientProfileRepository
 
         var clientProfile = createClientProfileRequest.Adapt<ClientProfiles>();
         if (clientProfile.Addresses is null) throw new NotFoundException("Address not found.");
-
         await _addressRepository.CreateAsync(clientProfile.Addresses, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
         clientProfile.UserId = user.Id;
         clientProfile.AddressId = clientProfile.Addresses.Id;
         await _clientProfileRepository.CreateAsync(clientProfile, cancellationToken);

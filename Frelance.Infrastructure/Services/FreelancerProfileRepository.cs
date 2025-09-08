@@ -18,7 +18,6 @@ public class FreelancerProfileRepository : IFreelancerProfileRepository
     private readonly IGenericRepository<FreelancerForeignLanguage> _freelancerForeignLanguageRepository;
     private readonly IGenericRepository<FreelancerProfiles> _freelancerProfilesRepository;
     private readonly IGenericRepository<Skills> _skillsRepository;
-    private readonly IUnitOfWork _unitOfWork;
     private readonly IUserAccessor _userAccessor;
     private readonly IGenericRepository<Users> _userRepository;
 
@@ -28,15 +27,13 @@ public class FreelancerProfileRepository : IFreelancerProfileRepository
         IGenericRepository<Users> userRepository,
         IGenericRepository<Addresses> addressRepository,
         IGenericRepository<Skills> skillsRepository,
-        IGenericRepository<FreelancerForeignLanguage> freelancerForeignLanguageRepository,
-        IUnitOfWork unitOfWork)
+        IGenericRepository<FreelancerForeignLanguage> freelancerForeignLanguageRepository)
     {
         ArgumentNullException.ThrowIfNull(userAccessor, nameof(userAccessor));
         ArgumentNullException.ThrowIfNull(freelancerProfilesRepository, nameof(freelancerProfilesRepository));
         ArgumentNullException.ThrowIfNull(userRepository, nameof(userRepository));
         ArgumentNullException.ThrowIfNull(addressRepository, nameof(addressRepository));
         ArgumentNullException.ThrowIfNull(skillsRepository, nameof(skillsRepository));
-        ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));
         ArgumentNullException.ThrowIfNull(freelancerForeignLanguageRepository,
             nameof(freelancerForeignLanguageRepository));
         _userAccessor = userAccessor;
@@ -45,7 +42,6 @@ public class FreelancerProfileRepository : IFreelancerProfileRepository
         _addressRepository = addressRepository;
         _skillsRepository = skillsRepository;
         _freelancerForeignLanguageRepository = freelancerForeignLanguageRepository;
-        _unitOfWork = unitOfWork;
     }
 
     public async Task CreateFreelancerProfileAsync(CreateFreelancerProfileRequest createFreelancerProfileRequest,
@@ -62,7 +58,6 @@ public class FreelancerProfileRepository : IFreelancerProfileRepository
         if (freelancerProfile.Addresses is null)
             throw new NotFoundException("Addresses not found.");
         await _addressRepository.CreateAsync(freelancerProfile.Addresses, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
         freelancerProfile.AddressId = freelancerProfile.Addresses.Id;
         var skillsInDb = await _skillsRepository.Query().ToListAsync(cancellationToken);
         for (var i = 0; i < createFreelancerProfileRequest.Freelancer.ProgrammingLanguages.Count; i++)
