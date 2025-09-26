@@ -7,7 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Emgu.CV" Version="4.10.0.5680"/>
         <PackageReference Include="JetBrains.Annotations" Version="2025.1.0-eap1"/>
         <PackageReference Include="Mapster" Version="7.4.1-pre01"/>
         <PackageReference Include="Mapster.DependencyInjection" Version="1.0.2-pre01"/>
