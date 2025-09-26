@@ -38,9 +38,12 @@ public class FaceRecognitionFaceComparisonService : IFaceComparisionService
         using var face1 = PreprocessFace(mat1);
         using var face2 = PreprocessFace(mat2);
 
-        if (face1.Empty() || face2.Empty())
-            throw new NotFoundException("Face not detected in one or both images");
+        if (face1.Empty())
+            throw new NotFoundException("Face not detected in face1");
 
+        if (face2.Empty())
+            throw new NotFoundException("Face not detected in face2");
+        
         var inputSize = new Size(96, 96);
         using var resized1 = new Mat();
         using var resized2 = new Mat();
