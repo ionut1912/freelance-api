@@ -1,5 +1,6 @@
 using Frelance.Application.Mediatr.Commands.Users;
 using Frelance.Contracts.Dtos;
+using Frelance.Web.Modules.Utils;
 using Mapster;
 using MediatR;
 
@@ -28,10 +29,11 @@ public static class UserModule
                     await mediator.Send(new BlockAccountCommand(id.ToString()), ct);
                 }).WithTags("Users")
             .RequireAuthorization();
-        app.MapDelete("/api/auth/account/{id:int}",
-                async (IMediator mediator, int id, CancellationToken ct) =>
+        
+        app.MapDelete("/api/auth/account/current",
+                async (IMediator mediator, HttpContext httpContext,CancellationToken ct) =>
                 {
-                    await mediator.Send(new DeleteAccountCommand(id.ToString()), ct);
+                    await mediator.Send(new DeleteCurrentAccountCommand(httpContext.GetRole()), ct);
                 }).WithTags("Users")
             .RequireAuthorization();
     }

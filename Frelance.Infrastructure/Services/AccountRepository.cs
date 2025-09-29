@@ -15,13 +15,16 @@ public class AccountRepository : IAccountRepository
 {
     private readonly TokenService _tokenService;
     private readonly UserManager<Users> _userManager;
+    private readonly IUserAccessor _userAccessor;
 
-    public AccountRepository(UserManager<Users> userManager, TokenService tokenService)
+    public AccountRepository(UserManager<Users> userManager, TokenService tokenService,IUserAccessor userAccessor)
     {
         ArgumentNullException.ThrowIfNull(userManager, nameof(userManager));
         ArgumentNullException.ThrowIfNull(tokenService, nameof(tokenService));
+        ArgumentNullException.ThrowIfNull(userAccessor,nameof(userAccessor));
         _userManager = userManager;
         _tokenService = tokenService;
+        _userAccessor = userAccessor;
     }
 
     public async Task RegisterAsync(CreateUserCommand createUserCommand)
@@ -81,20 +84,24 @@ public class AccountRepository : IAccountRepository
         }
     }
 
-    public async Task DeleteAccountAsync(DeleteAccountCommand command)
+    public async Task DeleteCurrentAccountAsync(DeleteCurrentAccountCommand command, CancellationToken cancellationToken)
     {
         var modelState = new ModelStateDictionary();
-        var user = await _userManager.FindByIdAsync(command.UserId) ??
-                   throw new NotFoundException($"{nameof(Users)} with id {command.UserId} not found");
+
+        var user = await _userManager.Users
+                       .FirstOrDefaultAsync(x => x.UserName == _userAccessor.GetUsername(), cancellationToken)
+                   ?? throw new NotFoundException($"Users with username {_userAccessor.GetUsername()} not found");
+
+        var roles = await _userManager.GetRolesAsync(user);
+        foreach (var role in roles)
+            await _userManager.RemoveFromRoleAsync(user, role);
+
         var result = await _userManager.DeleteAsync(user);
         if (!result.Succeeded)
         {
-            modelState.AddModelError("User", "Failed to delete account");
+            modelState.AddModelError("User", string.Join("; ", result.Errors.Select(e => e.Description)));
             GenerateException(modelState);
         }
-
-        var roles = await _userManager.GetRolesAsync(user);
-        foreach (var role in roles) await _userManager.RemoveFromRoleAsync(user, role);
     }
 
     private static void AddErrorToModelState(IdentityResult result, ModelStateDictionary modelState)

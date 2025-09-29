@@ -8,5 +8,5 @@ public interface IAccountRepository
     Task RegisterAsync(CreateUserCommand createUserCommand);
     Task<UserDto> LoginAsync(LoginDto loginDto, CancellationToken cancellationToken);
     Task LockAccountAsync(BlockAccountCommand command);
-    Task DeleteAccountAsync(DeleteAccountCommand command);
+    Task DeleteCurrentAccountAsync(DeleteCurrentAccountCommand command,CancellationToken cancellationToken);
 }
