@@ -101,7 +101,7 @@ public class FreelancerProfileRepository : IFreelancerProfileRepository
 
     public async Task<FreelancerProfileDto> GetLoggedInFreelancerProfileAsync(CancellationToken cancellationToken)
     {
-        var profile = await _freelancerProfilesRepository.Query().AsTracking()
+        var profile = await _freelancerProfilesRepository.Query()
             .Where(x => x.Users!.UserName == _userAccessor.GetUsername())
             .Include(fp => fp.Users)
             .ThenInclude(u => u!.Reviews)
@@ -185,7 +185,7 @@ public class FreelancerProfileRepository : IFreelancerProfileRepository
     public async Task PatchFreelancerDetailsAsync(PatchFreelancerDataCommand patchFreelancerDataCommand,
         CancellationToken cancellationToken)
     {
-        var freelancerProfile = await _freelancerProfilesRepository.Query().AsTracking()
+        var freelancerProfile = await _freelancerProfilesRepository.Query()
             .Where(x => x.Id == patchFreelancerDataCommand.Id)
             .Include(x => x.ForeignLanguages)
             .Include(x => x.FreelancerProfileSkills)
