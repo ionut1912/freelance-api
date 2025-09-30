@@ -1,0 +1,60 @@
+﻿using Freelance.Application.Mediatr.Commands.Tasks;
+using Freelance.Application.Mediatr.Queries.Tasks;
+using Freelance.Contracts.Requests.Common;
+using Freelance.Contracts.Requests.ProjectTasks;
+using Freelance.Web.Extensions;
+using Mapster;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Freelance.Web.Modules;
+
+public static class TaskModule
+{
+    public static void AddTasksEndpoints(this IEndpointRouteBuilder app)
+    {
+        app.MapGet("/api/tasks",
+                async (IMediator mediator, [FromQuery] int pageSize, [FromQuery] int pageNumber,
+                    CancellationToken ct) =>
+                {
+                    var paginatedProjectDtos = await mediator.Send(new GetTasksQuery
+                        (new PaginationParams { PageSize = pageSize, PageNumber = pageNumber }), ct);
+                    return Results.Extensions.OkPaginationResult(paginatedProjectDtos.PageSize,
+                        paginatedProjectDtos.CurrentPage,
+                        paginatedProjectDtos.TotalCount, paginatedProjectDtos.TotalPages, paginatedProjectDtos.Items);
+                }).WithTags("Tasks")
+            .RequireAuthorization();
+
+        app.MapGet("/api/tasks/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
+            {
+                var task = await mediator.Send(new GetTaskByIdQuery(id), ct);
+                return Results.Ok(task);
+            }).WithTags("Tasks")
+            .RequireAuthorization();
+
+        app.MapPost("/api/tasks", async (IMediator mediator, CreateProjectTaskRequest createProjectTaskRequest,
+                CancellationToken ct) =>
+            {
+                await mediator.Send(createProjectTaskRequest.Adapt<CreateTaskCommand>(), ct);
+                return Results.Created();
+            }).WithTags("Tasks")
+            .RequireAuthorization();
+
+        app.MapPut("/api/tasks/{id}", async (IMediator mediator, int id,
+                UpdateProjectTaskRequest updateTaskRequest, CancellationToken ct) =>
+            {
+                var command = updateTaskRequest.Adapt<UpdateTaskCommand>() with { Id = id };
+                await mediator.Send(command, ct);
+                return Results.NoContent();
+            }).WithTags("Tasks")
+            .RequireAuthorization();
+
+        app.MapDelete("/api/task/{id}", async (IMediator mediator, int id, CancellationToken ct) =>
+            {
+                var command = new DeleteTaskCommand(id);
+                await mediator.Send(command, ct);
+                return Results.NoContent();
+            }).WithTags("Tasks")
+            .RequireAuthorization("ClientRole");
+    }
+}
