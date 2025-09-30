@@ -1,6 +1,6 @@
 namespace Freelance.Infrastructure.Entities;
 
-public class Reviews:BaseEntity
+public class Reviews : BaseEntity
 {
     public int Id { get; init; }
     public int ReviewerId { get; set; }

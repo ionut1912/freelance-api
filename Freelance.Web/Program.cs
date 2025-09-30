@@ -17,19 +17,21 @@ builder.Services.AddSwaggerGen(options =>
         Scheme = "Bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "Enter 'Bearer' [space] and then your valid JWT token.\nExample: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+        Description =
+            "Enter 'Bearer' [space] and then your valid JWT token.\nExample: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
     });
 
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
-        { new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" } }, Array.Empty<string>() }
+        {
+            new OpenApiSecurityScheme
+                { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" } },
+            Array.Empty<string>()
+        }
     });
 });
 
-builder.Services.AddSignalR(options =>
-{
-    options.MaximumReceiveMessageSize = 10 * 1024 * 1024;
-});
+builder.Services.AddSignalR(options => { options.MaximumReceiveMessageSize = 10 * 1024 * 1024; });
 builder.Services.AddControllers();
 
 const string frontendOrigin = "_frontendOrigin";

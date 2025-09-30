@@ -43,7 +43,7 @@ public class FaceRecognitionFaceComparisonService : IFaceComparisionService
 
         if (face2.Empty())
             throw new NotFoundException("Face not detected in face2");
-        
+
         var inputSize = new Size(96, 96);
         using var resized1 = new Mat();
         using var resized2 = new Mat();

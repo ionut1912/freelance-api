@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Freelance.Infrastructure.Context.Configurations;
 
-
 public class ProjectTechnologiesConfiguration : BaseEntityConfiguration<ProjectTechnologies>
 {
     public override void Configure(EntityTypeBuilder<ProjectTechnologies> builder)

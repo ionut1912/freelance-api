@@ -12,7 +12,7 @@ public class InvoicesConfiguration : BaseEntityConfiguration<Invoices>
 
         builder.Property(p => p.Status).MaxLength100();
         builder.Property(p => p.InvoiceFile).MaxLength205000();
-        builder.Property(p => p.Amount).HasPrecision(18,2);
+        builder.Property(p => p.Amount).HasPrecision(18, 2);
 
         builder.HasOne(i => i.Project)
             .WithMany(p => p.Invoices)

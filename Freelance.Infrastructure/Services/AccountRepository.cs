@@ -14,14 +14,14 @@ namespace Freelance.Infrastructure.Services;
 public class AccountRepository : IAccountRepository
 {
     private readonly TokenService _tokenService;
-    private readonly UserManager<Users> _userManager;
     private readonly IUserAccessor _userAccessor;
+    private readonly UserManager<Users> _userManager;
 
-    public AccountRepository(UserManager<Users> userManager, TokenService tokenService,IUserAccessor userAccessor)
+    public AccountRepository(UserManager<Users> userManager, TokenService tokenService, IUserAccessor userAccessor)
     {
         ArgumentNullException.ThrowIfNull(userManager, nameof(userManager));
         ArgumentNullException.ThrowIfNull(tokenService, nameof(tokenService));
-        ArgumentNullException.ThrowIfNull(userAccessor,nameof(userAccessor));
+        ArgumentNullException.ThrowIfNull(userAccessor, nameof(userAccessor));
         _userManager = userManager;
         _tokenService = tokenService;
         _userAccessor = userAccessor;
@@ -84,7 +84,8 @@ public class AccountRepository : IAccountRepository
         }
     }
 
-    public async Task DeleteCurrentAccountAsync(DeleteCurrentAccountCommand command, CancellationToken cancellationToken)
+    public async Task DeleteCurrentAccountAsync(DeleteCurrentAccountCommand command,
+        CancellationToken cancellationToken)
     {
         var modelState = new ModelStateDictionary();
 

@@ -120,9 +120,7 @@ public class ContractRepository : IContractRepository
         if (updateContractCommand.UpdateContractRequest.Status == "Signed"
             && contractToUpdate.Freelancer.Projects is not null
             && contractToUpdate.Client.Projects is not null)
-        {
             contractToUpdate.Freelancer.Projects.Add(contractToUpdate.Project);
-        }
 
         _contractsRepository.Update(contractToUpdate);
         _clientProfilesRepository.Update(contractToUpdate.Client);

@@ -10,7 +10,7 @@ public class CreateFreelancerProfileRequest(
     FreelancerData freelancer
 )
 {
-    public required AddressData Address { get; init; }=address;
-    public UserData User { get; }=user;
-    public FreelancerData Freelancer { get; }=freelancer;
+    public required AddressData Address { get; init; } = address;
+    public UserData User { get; } = user;
+    public FreelancerData Freelancer { get; } = freelancer;
 }

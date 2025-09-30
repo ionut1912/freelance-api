@@ -1,7 +1,6 @@
 using Freelance.Application.Mediatr.Commands.UserProfile;
 using Freelance.Application.Repositories;
 using Freelance.Contracts.Dtos;
-using Freelance.Contracts.Errors;
 using Freelance.Contracts.Exceptions;
 using Freelance.Contracts.Requests.Common;
 using Freelance.Contracts.Requests.FreelancerProfiles;
@@ -61,12 +60,13 @@ public class FreelancerProfileRepository : IFreelancerProfileRepository
         await _addressRepository.CreateAsync(freelancerProfile.Addresses, cancellationToken);
         freelancerProfile.AddressId = freelancerProfile.Addresses.Id;
         var skillsInDb = await _skillsRepository.Query().ToListAsync(cancellationToken);
-        foreach (var skill in createFreelancerProfileRequest.Freelancer.ProgrammingLanguages.Select(t => skillsInDb.FirstOrDefault(x => x.ProgrammingLanguage == t)))
+        foreach (var skill in createFreelancerProfileRequest.Freelancer.ProgrammingLanguages.Select(t =>
+                     skillsInDb.FirstOrDefault(x => x.ProgrammingLanguage == t)))
         {
-            if(skill is null)
+            if (skill is null)
                 throw new NotFoundException("Skill not found");
             freelancerProfile.FreelancerProfileSkills.Add(new FreelancerProfileSkill
-                { FreelancerProfileId = freelancerProfile.Id, SkillId = skill.Id,CreatedAt = DateTime.UtcNow});
+                { FreelancerProfileId = freelancerProfile.Id, SkillId = skill.Id, CreatedAt = DateTime.UtcNow });
         }
 
         await _freelancerProfilesRepository.CreateAsync(freelancerProfile, cancellationToken);

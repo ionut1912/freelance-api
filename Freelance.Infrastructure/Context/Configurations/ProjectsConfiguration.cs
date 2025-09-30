@@ -12,7 +12,7 @@ public class ProjectsConfiguration : BaseEntityConfiguration<Projects>
 
         builder.Property(p => p.Title).MaxLength100();
         builder.Property(p => p.Description).MaxLength100();
-        builder.Property(p => p.Budget).HasPrecision(18,2);
+        builder.Property(p => p.Budget).HasPrecision(18, 2);
 
         builder.HasMany(p => p.Tasks)
             .WithOne(t => t.Project)

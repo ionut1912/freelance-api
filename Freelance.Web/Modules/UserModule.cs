@@ -29,9 +29,9 @@ public static class UserModule
                     await mediator.Send(new BlockAccountCommand(id.ToString()), ct);
                 }).WithTags("Users")
             .RequireAuthorization();
-        
+
         app.MapDelete("/api/auth/account/current",
-                async (IMediator mediator, HttpContext httpContext,CancellationToken ct) =>
+                async (IMediator mediator, HttpContext httpContext, CancellationToken ct) =>
                 {
                     await mediator.Send(new DeleteCurrentAccountCommand(httpContext.GetRole()), ct);
                 }).WithTags("Users")

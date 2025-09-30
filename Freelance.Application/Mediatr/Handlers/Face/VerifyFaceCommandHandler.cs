@@ -14,7 +14,7 @@ public class VerifyFaceCommandHandler : IRequestHandler<VerifyFaceCommand, Verif
     private readonly IClientProfileRepository _clientProfileRepository;
     private readonly IFaceComparisionService _faceComparisionService;
     private readonly IFreelancerProfileRepository _freelancerProfileRepository;
-    
+
     public VerifyFaceCommandHandler(IClientProfileRepository clientProfileRepository,
         IFreelancerProfileRepository freelancerProfileRepository,
         IFaceComparisionService faceComparisionService)
@@ -26,7 +26,7 @@ public class VerifyFaceCommandHandler : IRequestHandler<VerifyFaceCommand, Verif
         _freelancerProfileRepository = freelancerProfileRepository;
         _faceComparisionService = faceComparisionService;
     }
-    
+
     public async Task<VerifyFaceResult> Handle(VerifyFaceCommand request, CancellationToken cancellationToken)
     {
         BaseProfileDto userProfile = request.Role switch

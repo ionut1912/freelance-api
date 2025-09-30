@@ -3,7 +3,8 @@
 namespace Freelance.Contracts.Requests.FreelancerProfiles;
 
 [UsedImplicitly]
-public record FreelancerData(    List<string> ProgrammingLanguages,
+public record FreelancerData(
+    List<string> ProgrammingLanguages,
     List<string> ForeignLanguages,
     string Experience,
     int Rate,

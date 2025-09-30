@@ -10,7 +10,7 @@ public class ProposalsConfiguration : BaseEntityConfiguration<Proposals>
     {
         base.Configure(builder);
         builder.Property(p => p.Status).MaxLength100();
-        builder.Property(p => p.ProposedBudget).HasPrecision(18,2);
+        builder.Property(p => p.ProposedBudget).HasPrecision(18, 2);
 
         builder.HasOne(p => p.Project)
             .WithMany(pj => pj.Proposals)

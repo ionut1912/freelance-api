@@ -1,6 +1,6 @@
 namespace Freelance.Infrastructure.Entities;
 
-public class TimeLogs:BaseEntity
+public class TimeLogs : BaseEntity
 {
     public int Id { get; init; }
     public int TaskId { get; set; }
