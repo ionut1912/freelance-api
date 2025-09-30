@@ -1,0 +1,27 @@
+using System.Security.Claims;
+using Freelance.Application.Mediatr.Commands.Face;
+using Freelance.Contracts.Enums;
+using Freelance.Contracts.Requests.FaceVerification;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Freelance.Web.Modules;
+
+public static class FaceModule
+{
+    public static void AddFaceEndpoints(this IEndpointRouteBuilder app)
+    {
+        app.MapPost("api/verifyFace", async (IMediator mediator,
+                [FromBody] FaceVerificationRequest faceVerificationRequest, HttpContext httpContext,
+                CancellationToken cancellationToken) =>
+            {
+                var role = httpContext.User.FindFirst(ClaimTypes.Role)?.Value;
+                var commandRole = role == "Client" ? Role.Client : Role.Freelancer;
+                var command = new VerifyFaceCommand(commandRole, faceVerificationRequest.FaceBase64Image);
+                var result = await mediator.Send(command, cancellationToken);
+                return Results.Ok(result);
+            })
+            .WithTags("FaceRecognition")
+            .RequireAuthorization();
+    }
+}

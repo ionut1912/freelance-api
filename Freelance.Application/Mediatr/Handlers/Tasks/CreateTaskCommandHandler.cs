@@ -1,0 +1,25 @@
+using Freelance.Application.Mediatr.Commands.Tasks;
+using Freelance.Application.Repositories;
+using MediatR;
+
+namespace Freelance.Application.Mediatr.Handlers.Tasks;
+
+public class CreateTaskCommandHandler : IRequestHandler<CreateTaskCommand>
+{
+    private readonly ITaskRepository _taskRepository;
+    private readonly IUnitOfWork _unitOfWork;
+
+    public CreateTaskCommandHandler(ITaskRepository taskRepository, IUnitOfWork unitOfWork)
+    {
+        ArgumentNullException.ThrowIfNull(taskRepository, nameof(taskRepository));
+        ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));
+        _taskRepository = taskRepository;
+        _unitOfWork = unitOfWork;
+    }
+
+    public async Task Handle(CreateTaskCommand request, CancellationToken cancellationToken)
+    {
+        await _taskRepository.CreateTaskAsync(request, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+}
