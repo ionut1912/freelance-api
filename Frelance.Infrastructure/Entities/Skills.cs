@@ -2,7 +2,7 @@
 
 namespace Frelance.Infrastructure.Entities;
 
-public class Skills
+public class Skills:BaseEntity
 {
     public int Id { get; init; }
     public required string ProgrammingLanguage { get; init; }

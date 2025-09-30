@@ -13,16 +13,30 @@ namespace Frelance.Infrastructure.Services;
 public class ProjectRepository : IProjectRepository
 {
     private readonly IGenericRepository<Projects> _projectRepository;
-
-    public ProjectRepository(IGenericRepository<Projects> projectRepository)
+    private readonly IGenericRepository<ClientProfiles> _clientProfilesRepository;
+    private readonly IUserAccessor  _userAccessor;
+    public ProjectRepository(IGenericRepository<Projects> projectRepository, IGenericRepository<ClientProfiles> clientProfilesRepository,IUserAccessor userAccessor)
     {
         ArgumentNullException.ThrowIfNull(projectRepository, nameof(projectRepository));
+        ArgumentNullException.ThrowIfNull(clientProfilesRepository, nameof(clientProfilesRepository));
+        ArgumentNullException.ThrowIfNull(userAccessor, nameof(userAccessor));
         _projectRepository = projectRepository;
+        _clientProfilesRepository = clientProfilesRepository;
+        _userAccessor = userAccessor;
     }
 
     public async Task CreateProjectAsync(CreateProjectCommand createProjectCommand, CancellationToken cancellationToken)
     {
         var project = createProjectCommand.CreateProjectRequest.Adapt<Projects>();
+        var clientProfile = await _clientProfilesRepository.Query()
+            .Include(x => x.Users)
+            .Where(x => x.Users!.UserName == _userAccessor.GetUsername())
+            .FirstOrDefaultAsync(cancellationToken)??throw new NotFoundException($"Profile for user with username ${_userAccessor.GetUsername()} not found");
+        clientProfile.Projects!.Add(project);
+        foreach (var technology in project.Technologies)
+        {
+            technology.CreatedAt=DateTime.UtcNow;
+        }
         await _projectRepository.CreateAsync(project, cancellationToken);
     }
 

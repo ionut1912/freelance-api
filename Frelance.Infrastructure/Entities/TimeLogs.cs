@@ -1,6 +1,6 @@
 namespace Frelance.Infrastructure.Entities;
 
-public class TimeLogs
+public class TimeLogs:BaseEntity
 {
     public int Id { get; init; }
     public int TaskId { get; set; }
@@ -9,6 +9,4 @@ public class TimeLogs
     public DateTime EndTime { get; set; }
     public int FreelancerProfileId { get; set; }
     public int TotalHours { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public DateTime? UpdatedAt { get; set; }
 }
