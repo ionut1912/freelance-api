@@ -188,9 +188,8 @@ public abstract class MappingConfig
                     ZipCode = src.Address.AddressZip
                 };
                 dest.ForeignLanguages = src.Freelancer.ForeignLanguages
-                    .Select(lang => new FreelancerForeignLanguage { Language = lang })
+                    .Select(lang => new FreelancerForeignLanguage { Language = lang,CreatedAt = DateTime.UtcNow})
                     .ToList();
-                dest.IsAvailable = true;
                 dest.IsVerified = false;
                 dest.CreatedAt = DateTime.UtcNow;
             });
@@ -340,7 +339,6 @@ public abstract class MappingConfig
                 src.Tasks.Adapt<List<TaskDto>>(),
                 src.FreelancerProfileSkills.Select(fps => fps.Skill).Adapt<List<SkillDto>>(),
                 src.ForeignLanguages.Adapt<List<ForeignLanguageDto>>(),
-                src.IsAvailable,
                 src.Experience,
                 src.Rate,
                 src.Currency,

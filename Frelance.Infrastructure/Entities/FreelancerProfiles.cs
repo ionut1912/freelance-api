@@ -13,7 +13,6 @@ public class FreelancerProfiles : BaseUserProfile
     public List<ProjectTasks> Tasks { get; init; } = [];
     public List<FreelancerProfileSkill> FreelancerProfileSkills { get; init; } = [];
     public List<FreelancerForeignLanguage> ForeignLanguages { get; set; } = [];
-    public bool IsAvailable { get; set; }
     public required string Experience { get; set; }
     public int Rate { get; set; }
     public required string Currency { get; set; }

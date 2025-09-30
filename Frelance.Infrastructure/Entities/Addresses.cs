@@ -1,6 +1,6 @@
 ﻿namespace Frelance.Infrastructure.Entities;
 
-public class Addresses
+public class Addresses:BaseEntity
 {
     public int Id { get; init; }
     public required string Country { get; set; }

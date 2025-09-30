@@ -57,20 +57,16 @@ public class FreelancerProfileRepository : IFreelancerProfileRepository
         freelancerProfile.UserId = user.Id;
         if (freelancerProfile.Addresses is null)
             throw new NotFoundException("Addresses not found.");
+        freelancerProfile.Addresses.CreatedAt = DateTime.UtcNow;
         await _addressRepository.CreateAsync(freelancerProfile.Addresses, cancellationToken);
         freelancerProfile.AddressId = freelancerProfile.Addresses.Id;
         var skillsInDb = await _skillsRepository.Query().ToListAsync(cancellationToken);
-        for (var i = 0; i < createFreelancerProfileRequest.Freelancer.ProgrammingLanguages.Count; i++)
+        foreach (var skill in createFreelancerProfileRequest.Freelancer.ProgrammingLanguages.Select(t => skillsInDb.FirstOrDefault(x => x.ProgrammingLanguage == t)))
         {
-            var progLang = createFreelancerProfileRequest.Freelancer.ProgrammingLanguages[i].Trim().ToLowerInvariant();
-            var area = createFreelancerProfileRequest.Freelancer.Areas[i].Trim().ToLowerInvariant();
-            var existingSkill = skillsInDb.FirstOrDefault(x =>
-                x.ProgrammingLanguage.Equals(progLang, StringComparison.InvariantCultureIgnoreCase) &&
-                x.Area.Equals(area, StringComparison.InvariantCultureIgnoreCase));
-            if (existingSkill == null)
-                throw new CustomValidationException([new ValidationError("Skills", "Skill not found.")]);
+            if(skill is null)
+                throw new NotFoundException("Skill not found");
             freelancerProfile.FreelancerProfileSkills.Add(new FreelancerProfileSkill
-                { FreelancerProfileId = freelancerProfile.Id, SkillId = existingSkill.Id });
+                { FreelancerProfileId = freelancerProfile.Id, SkillId = skill.Id,CreatedAt = DateTime.UtcNow});
         }
 
         await _freelancerProfilesRepository.CreateAsync(freelancerProfile, cancellationToken);

@@ -122,8 +122,6 @@ public class ContractRepository : IContractRepository
             && contractToUpdate.Client.Projects is not null)
         {
             contractToUpdate.Freelancer.Projects.Add(contractToUpdate.Project);
-            contractToUpdate.Client.Projects.Add(contractToUpdate.Project);
-            contractToUpdate.Freelancer.IsAvailable = false;
         }
 
         _contractsRepository.Update(contractToUpdate);

@@ -18,7 +18,6 @@ public class FreelancerProfileDto(
     List<TaskDto> tasks,
     List<SkillDto> skills,
     List<ForeignLanguageDto> foreignLanguage,
-    bool isAvailable,
     string experience,
     int rate,
     string currency,
@@ -31,8 +30,6 @@ public class FreelancerProfileDto(
     [UsedImplicitly] public List<SkillDto> Skills { get; } = skills;
 
     [UsedImplicitly] public List<ForeignLanguageDto> ForeignLanguages { get; } = foreignLanguage;
-
-    [UsedImplicitly] public bool IsAvailable { get; } = isAvailable;
 
     [UsedImplicitly] public required string Experience { get; init; } = experience;
 
