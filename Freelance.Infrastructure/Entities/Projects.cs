@@ -1,12 +1,12 @@
 namespace Freelance.Infrastructure.Entities;
 
-public class Projects:BaseEntity
+public class Projects : BaseEntity
 {
     public int Id { get; init; }
     public required string Title { get; set; }
     public required string Description { get; set; }
     public DateTime Deadline { get; set; }
-    public int ClientId{get;set;}
+    public int ClientId { get; set; }
     public ClientProfiles ClientProfiles { get; set; }
     public int FreelancerId { get; set; }
     public FreelancerProfiles FreelancerProfiles { get; set; }

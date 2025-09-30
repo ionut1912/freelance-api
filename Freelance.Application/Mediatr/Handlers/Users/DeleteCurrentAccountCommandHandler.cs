@@ -8,12 +8,13 @@ namespace Freelance.Application.Mediatr.Handlers.Users;
 
 public class DeleteCurrentAccountCommandHandler : IRequestHandler<DeleteCurrentAccountCommand>
 {
-    private readonly IUnitOfWork _unitOfWork;
     private readonly IAccountRepository _accountRepository;
     private readonly IClientProfileRepository _clientProfileRepository;
     private readonly IFreelancerProfileRepository _freelancerProfileRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public DeleteCurrentAccountCommandHandler(IUnitOfWork unitOfWork, IAccountRepository accountRepository, IClientProfileRepository clientProfileRepository, IFreelancerProfileRepository freelancerProfileRepository)
+    public DeleteCurrentAccountCommandHandler(IUnitOfWork unitOfWork, IAccountRepository accountRepository,
+        IClientProfileRepository clientProfileRepository, IFreelancerProfileRepository freelancerProfileRepository)
     {
         ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));
         ArgumentNullException.ThrowIfNull(accountRepository, nameof(accountRepository));
@@ -34,10 +35,10 @@ public class DeleteCurrentAccountCommandHandler : IRequestHandler<DeleteCurrentA
             _ => throw new InvalidOperationException("Invalid request")
         };
         if (request.Role == Role.Client)
-                await _clientProfileRepository.DeleteClientProfileAsync(profile.Id, cancellationToken);
+            await _clientProfileRepository.DeleteClientProfileAsync(profile.Id, cancellationToken);
         else
-                await _freelancerProfileRepository.DeleteFreelancerProfileAsync(profile.Id, cancellationToken);
-        
+            await _freelancerProfileRepository.DeleteFreelancerProfileAsync(profile.Id, cancellationToken);
+
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         await _accountRepository.DeleteCurrentAccountAsync(request, cancellationToken);

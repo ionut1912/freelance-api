@@ -1,5 +1,3 @@
-using JetBrains.Annotations;
-
 namespace Freelance.Infrastructure.Entities;
 
 public class BaseUserProfile(Users? users) : BaseEntity
@@ -12,7 +10,7 @@ public class BaseUserProfile(Users? users) : BaseEntity
     public required string Bio { get; set; }
     public List<Contracts> Contracts { get; } = [];
     public List<Invoices> Invoices { get; } = [];
-    
+
     public List<Projects>? Projects { get; } = [];
     public required string Image { get; set; }
     public bool IsVerified { get; set; }

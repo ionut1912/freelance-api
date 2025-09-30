@@ -2,11 +2,16 @@
 
 namespace Freelance.Infrastructure.Hubs;
 
-public class CaptureHub:Hub
+public class CaptureHub : Hub
 
 {
-    public Task Join(string sessionId) => Groups.AddToGroupAsync(Context.ConnectionId, sessionId);
-    
+    public Task Join(string sessionId)
+    {
+        return Groups.AddToGroupAsync(Context.ConnectionId, sessionId);
+    }
+
     public Task SendPhotoDataUrl(string sessionId, string dataUrl)
-        => Clients.Group(sessionId).SendAsync("PhotoReceived", new { dataUrl });
+    {
+        return Clients.Group(sessionId).SendAsync("PhotoReceived", new { dataUrl });
+    }
 }

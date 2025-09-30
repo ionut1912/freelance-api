@@ -6,7 +6,9 @@ namespace Freelance.Infrastructure.Context;
 
 public class FreelanceDbContext : IdentityDbContext<Users, Roles, int>
 {
-    public FreelanceDbContext(DbContextOptions<FreelanceDbContext> options) : base(options) { }
+    public FreelanceDbContext(DbContextOptions<FreelanceDbContext> options) : base(options)
+    {
+    }
 
     public DbSet<Projects> Projects { get; set; }
     public DbSet<ProjectTasks> Tasks { get; set; }

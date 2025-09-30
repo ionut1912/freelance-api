@@ -1,6 +1,6 @@
 namespace Freelance.Infrastructure.Entities;
 
-public class FreelancerProfileSkill:BaseEntity
+public class FreelancerProfileSkill : BaseEntity
 {
     public int FreelancerProfileId { get; init; }
     public FreelancerProfiles? FreelancerProfile { get; init; }

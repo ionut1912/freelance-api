@@ -26,8 +26,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Freelance.Application\Freelance.Application.csproj" />
-        <ProjectReference Include="..\Freelance.Contracts\Freelance.Contracts.csproj" />
+        <ProjectReference Include="..\Freelance.Application\Freelance.Application.csproj"/>
+        <ProjectReference Include="..\Freelance.Contracts\Freelance.Contracts.csproj"/>
     </ItemGroup>
 
 </Project>

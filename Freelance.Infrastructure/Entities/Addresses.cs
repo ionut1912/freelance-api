@@ -1,6 +1,6 @@
 ﻿namespace Freelance.Infrastructure.Entities;
 
-public class Addresses:BaseEntity
+public class Addresses : BaseEntity
 {
     public int Id { get; init; }
     public required string Country { get; set; }

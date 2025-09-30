@@ -14,14 +14,14 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="OpenCvSharp4.Windows" Version="4.11.0.20250507" />
+        <PackageReference Include="OpenCvSharp4.Windows" Version="4.11.0.20250507"/>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Freelance.Application\Freelance.Application.csproj" />
-        <ProjectReference Include="..\Freelance.Contracts\Freelance.Contracts.csproj" />
-        <ProjectReference Include="..\Freelance.Infrastructure\Freelance.Infrastructure.csproj" />
+        <ProjectReference Include="..\Freelance.Application\Freelance.Application.csproj"/>
+        <ProjectReference Include="..\Freelance.Contracts\Freelance.Contracts.csproj"/>
+        <ProjectReference Include="..\Freelance.Infrastructure\Freelance.Infrastructure.csproj"/>
     </ItemGroup>
 
 </Project>

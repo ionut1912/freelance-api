@@ -12,10 +12,12 @@ namespace Freelance.Infrastructure.Services;
 
 public class ProjectRepository : IProjectRepository
 {
-    private readonly IGenericRepository<Projects> _projectRepository;
     private readonly IGenericRepository<ClientProfiles> _clientProfilesRepository;
-    private readonly IUserAccessor  _userAccessor;
-    public ProjectRepository(IGenericRepository<Projects> projectRepository, IGenericRepository<ClientProfiles> clientProfilesRepository,IUserAccessor userAccessor)
+    private readonly IGenericRepository<Projects> _projectRepository;
+    private readonly IUserAccessor _userAccessor;
+
+    public ProjectRepository(IGenericRepository<Projects> projectRepository,
+        IGenericRepository<ClientProfiles> clientProfilesRepository, IUserAccessor userAccessor)
     {
         ArgumentNullException.ThrowIfNull(projectRepository, nameof(projectRepository));
         ArgumentNullException.ThrowIfNull(clientProfilesRepository, nameof(clientProfilesRepository));
@@ -29,14 +31,13 @@ public class ProjectRepository : IProjectRepository
     {
         var project = createProjectCommand.CreateProjectRequest.Adapt<Projects>();
         var clientProfile = await _clientProfilesRepository.Query()
-            .Include(x => x.Users)
-            .Where(x => x.Users!.UserName == _userAccessor.GetUsername())
-            .FirstOrDefaultAsync(cancellationToken)??throw new NotFoundException($"Profile for user with username ${_userAccessor.GetUsername()} not found");
+                                .Include(x => x.Users)
+                                .Where(x => x.Users!.UserName == _userAccessor.GetUsername())
+                                .FirstOrDefaultAsync(cancellationToken) ??
+                            throw new NotFoundException(
+                                $"Profile for user with username ${_userAccessor.GetUsername()} not found");
         clientProfile.Projects!.Add(project);
-        foreach (var technology in project.Technologies)
-        {
-            technology.CreatedAt=DateTime.UtcNow;
-        }
+        foreach (var technology in project.Technologies) technology.CreatedAt = DateTime.UtcNow;
         await _projectRepository.CreateAsync(project, cancellationToken);
     }
 

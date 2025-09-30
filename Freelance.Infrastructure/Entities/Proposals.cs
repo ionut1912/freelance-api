@@ -1,6 +1,6 @@
 namespace Freelance.Infrastructure.Entities;
 
-public class Proposals:BaseEntity
+public class Proposals : BaseEntity
 {
     public int Id { get; init; }
     public int ProjectId { get; set; }

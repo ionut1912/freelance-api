@@ -3,7 +3,8 @@
 namespace Freelance.Contracts.Requests.Common;
 
 [UsedImplicitly]
-public record AddressData(string AddressCountry,
+public record AddressData(
+    string AddressCountry,
     string AddressStreet,
     string AddressStreetNumber,
     string AddressCity,

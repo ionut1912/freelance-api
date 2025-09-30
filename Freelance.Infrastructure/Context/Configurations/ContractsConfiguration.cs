@@ -12,7 +12,7 @@ public class ContractsConfiguration : BaseEntityConfiguration<Entities.Contracts
 
         builder.Property(c => c.Status).MaxLength100();
         builder.Property(c => c.ContractFile).MaxLength205000();
-        builder.Property(c => c.Amount).HasPrecision(18,2);
+        builder.Property(c => c.Amount).HasPrecision(18, 2);
 
         var dateConverter = new ValueConverter<DateOnly, DateTime>(
             d => d.ToDateTime(TimeOnly.MinValue),

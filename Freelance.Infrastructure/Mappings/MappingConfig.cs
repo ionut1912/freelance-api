@@ -188,7 +188,7 @@ public abstract class MappingConfig
                     ZipCode = src.Address.AddressZip
                 };
                 dest.ForeignLanguages = src.Freelancer.ForeignLanguages
-                    .Select(lang => new FreelancerForeignLanguage { Language = lang,CreatedAt = DateTime.UtcNow})
+                    .Select(lang => new FreelancerForeignLanguage { Language = lang, CreatedAt = DateTime.UtcNow })
                     .ToList();
                 dest.IsVerified = false;
                 dest.CreatedAt = DateTime.UtcNow;

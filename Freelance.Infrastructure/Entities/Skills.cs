@@ -2,7 +2,7 @@
 
 namespace Freelance.Infrastructure.Entities;
 
-public class Skills:BaseEntity
+public class Skills : BaseEntity
 {
     public int Id { get; init; }
     public required string ProgrammingLanguage { get; init; }
