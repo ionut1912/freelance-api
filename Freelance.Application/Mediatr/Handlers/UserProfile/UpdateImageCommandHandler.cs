@@ -5,29 +5,28 @@ using MediatR;
 
 namespace Freelance.Application.Mediatr.Handlers.UserProfile;
 
-public class PatchUserDetailsCommandHandler : IRequestHandler<PatchUserDetailsCommand>
+public class UpdateImageCommandHandler:IRequestHandler<UpdateImageCommand>
 {
     private readonly IClientProfileRepository _clientProfileRepository;
     private readonly IFreelancerProfileRepository _freelancerProfileRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public PatchUserDetailsCommandHandler(IFreelancerProfileRepository freelancerProfileRepository,
-        IClientProfileRepository clientProfileRepository, IUnitOfWork unitOfWork)
+    public UpdateImageCommandHandler(IClientProfileRepository clientProfileRepository, IFreelancerProfileRepository freelancerProfileRepository,IUnitOfWork unitOfWork)
     {
-        ArgumentNullException.ThrowIfNull(freelancerProfileRepository, nameof(freelancerProfileRepository));
         ArgumentNullException.ThrowIfNull(clientProfileRepository, nameof(clientProfileRepository));
+        ArgumentNullException.ThrowIfNull(freelancerProfileRepository, nameof(freelancerProfileRepository));
         ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));
-        _freelancerProfileRepository = freelancerProfileRepository;
         _clientProfileRepository = clientProfileRepository;
+        _freelancerProfileRepository = freelancerProfileRepository;
         _unitOfWork = unitOfWork;
     }
-
-    public async Task Handle(PatchUserDetailsCommand request, CancellationToken cancellationToken)
+    
+    public async Task Handle(UpdateImageCommand request, CancellationToken cancellationToken)
     {
         var repoTask = request.Role switch
         {
-            Role.Freelancer => _freelancerProfileRepository.PatchUserDetailsAsync(request, cancellationToken),
-            Role.Client => _clientProfileRepository.PatchUserDetailsAsync(request, cancellationToken),
+            Role.Freelancer => _freelancerProfileRepository.UpdateImageAsync(request.UpdateImageRequest.Image, cancellationToken),
+            Role.Client => _clientProfileRepository.UpdateImageAsync(request.UpdateImageRequest.Image, cancellationToken),
             _ => throw new InvalidOperationException("Invalid request")
         };
 

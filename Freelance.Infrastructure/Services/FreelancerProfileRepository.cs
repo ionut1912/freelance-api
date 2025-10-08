@@ -163,21 +163,7 @@ public class FreelancerProfileRepository : IFreelancerProfileRepository
         freelancerProfile.Addresses = addresses;
         _freelancerProfilesRepository.Update(freelancerProfile);
     }
-
-    public async Task PatchUserDetailsAsync(PatchUserDetailsCommand patchUserDetailsCommand,
-        CancellationToken cancellationToken)
-    {
-        var freelancerProfile = await _freelancerProfilesRepository.Query()
-            .Where(x => x.Id == patchUserDetailsCommand.Id)
-            .FirstOrDefaultAsync(cancellationToken);
-        if (freelancerProfile is null)
-            throw new NotFoundException(
-                $"{nameof(FreelancerProfiles)} with {nameof(FreelancerProfiles.Id)} : '{patchUserDetailsCommand.Id}' does not exist");
-        freelancerProfile.Bio = patchUserDetailsCommand.UserDetails.Bio;
-        freelancerProfile.Image = patchUserDetailsCommand.UserDetails.Image;
-        _freelancerProfilesRepository.Update(freelancerProfile);
-    }
-
+    
     public async Task PatchFreelancerDetailsAsync(PatchFreelancerDataCommand patchFreelancerDataCommand,
         CancellationToken cancellationToken)
     {
@@ -257,5 +243,18 @@ public class FreelancerProfileRepository : IFreelancerProfileRepository
             throw new NotFoundException(
                 $"{nameof(FreelancerProfiles)} with {nameof(FreelancerProfiles.Id)} : '{id}' does not exist");
         _freelancerProfilesRepository.Delete(freelancerToDelete);
+    }
+
+    public async Task UpdateImageAsync(string image, CancellationToken cancellationToken)
+    {
+        var profile = await _freelancerProfilesRepository.Query()
+            .Where(x => x.Users!.UserName == _userAccessor.GetUsername())
+            .Include(fp => fp.Users)
+            .FirstOrDefaultAsync(cancellationToken);
+        if (profile is null)
+            throw new NotFoundException(
+                $"{nameof(FreelancerProfiles)} with {nameof(FreelancerProfiles.Users.UserName)} : '{_userAccessor.GetUsername()}' does not exist");
+
+        profile.Image = image;
     }
 }

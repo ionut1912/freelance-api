@@ -20,7 +20,10 @@ public interface IClientProfileRepository
         CancellationToken cancellationToken);
 
     Task PatchAddressAsync(PatchAddressCommand patchAddressCommand, CancellationToken cancellationToken);
-    Task PatchUserDetailsAsync(PatchUserDetailsCommand patchUserDetailsCommand, CancellationToken cancellationToken);
+    
     Task VerifyProfileAsync(int id, CancellationToken cancellationToken);
+    
     Task DeleteClientProfileAsync(int id, CancellationToken cancellationToken);
+
+    Task UpdateImageAsync(string image, CancellationToken cancellationToken);
 }

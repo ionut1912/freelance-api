@@ -58,17 +58,41 @@ public class AccountRepository : IAccountRepository
             modelState.AddModelError("Username", $"User with username {loginDto.Username} is not found");
             GenerateException(modelState);
         }
-
-        if (!await _userManager.CheckPasswordAsync(user!, loginDto.Password))
-            modelState.AddModelError("Password", "password is invalid");
-
         if (await _userManager.IsLockedOutAsync(user!))
+        {
             modelState.AddModelError("Account", "Your account is locked for one hour");
+            GenerateException(modelState);
+        }
+        
+        if (!await _userManager.CheckPasswordAsync(user!, loginDto.Password))
+        {
+            await _userManager.AccessFailedAsync(user!);
+            
+            if (await _userManager.GetAccessFailedCountAsync(user!) >= 3)
+            {
+                await _userManager.SetLockoutEndDateAsync(user!, DateTimeOffset.UtcNow.AddHours(1));
 
-        GenerateException(modelState);
-        return new UserDto(user!.PhoneNumber!, await _tokenService.GenerateToken(user), user.UserName!, user.Email!,
-            user.CreatedAt);
+                modelState.AddModelError("Account",
+                    "Your account will be blocked for 1h due to 3 wrong passwords attempts");
+
+                GenerateException(modelState);
+            }
+
+            modelState.AddModelError("Password", "Password is invalid");
+            GenerateException(modelState);
+        }
+        
+        await _userManager.ResetAccessFailedCountAsync(user!);
+        
+        return new UserDto(
+            user!.PhoneNumber!,
+            await _tokenService.GenerateToken(user),
+            user.UserName!,
+            user.Email!,
+            user.CreatedAt
+        );
     }
+
 
     public async Task LockAccountAsync(BlockAccountCommand command)
     {
