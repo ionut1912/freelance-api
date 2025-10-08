@@ -135,22 +135,7 @@ public class ClientProfileRepository : IClientProfileRepository
         clientProfile.Addresses = addresses;
         _clientProfileRepository.Update(clientProfile);
     }
-
-    public async Task PatchUserDetailsAsync(PatchUserDetailsCommand patchUserDetailsCommand,
-        CancellationToken cancellationToken)
-    {
-        var clientProfile = await _clientProfileRepository.Query()
-            .Where(x => x.Id == patchUserDetailsCommand.Id)
-            .FirstOrDefaultAsync(cancellationToken);
-        if (clientProfile is null)
-            throw new NotFoundException(
-                $"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Id)} : '{patchUserDetailsCommand.Id}' does not exist");
-
-        clientProfile.Bio = patchUserDetailsCommand.UserDetails.Bio;
-        clientProfile.Image = patchUserDetailsCommand.UserDetails.Image;
-        _clientProfileRepository.Update(clientProfile);
-    }
-
+    
     public async Task VerifyProfileAsync(int id, CancellationToken cancellationToken)
     {
         var client = await _clientProfileRepository.Query()
@@ -174,5 +159,20 @@ public class ClientProfileRepository : IClientProfileRepository
             throw new NotFoundException(
                 $"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Id)} : '{id}' does not exist");
         _clientProfileRepository.Delete(clientToDelete);
+    }
+
+    public async Task UpdateImageAsync(string image, CancellationToken cancellationToken)
+    {
+        var profile = await _clientProfileRepository.Query()
+            .Where(x => x.Users!.UserName == _userAccessor.GetUsername())
+            .Include(fp => fp.Users)
+            .FirstOrDefaultAsync(cancellationToken);
+        
+        if (profile is null)
+            throw new NotFoundException(
+                $"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Users.UserName)} : '{_userAccessor.GetUsername()}' does not exist");
+
+        profile.Image = image;
+        _clientProfileRepository.Update(profile);
     }
 }

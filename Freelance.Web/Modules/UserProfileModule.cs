@@ -1,6 +1,7 @@
 using Freelance.Application.Mediatr.Commands.UserProfile;
 using Freelance.Application.Mediatr.Queries.UserProfile;
 using Freelance.Contracts.Dtos;
+using Freelance.Contracts.Requests;
 using Freelance.Contracts.Requests.Common;
 using Freelance.Web.Extensions;
 using Freelance.Web.Modules.Utils;
@@ -56,14 +57,14 @@ public static class UserProfileModule
                     return Results.NoContent();
                 }).WithTags("UserProfiles")
             .RequireAuthorization();
-
-        app.MapPatch("/api/userProfiles/userDetails/{id:int}", async (IMediator mediator, int id,
-                HttpContext httpContext,
-                [FromBody] UserDetailsDto userDetailsDto, CancellationToken ct) =>
-            {
-                await mediator.Send(new PatchUserDetailsCommand(httpContext.GetRole(), id, userDetailsDto), ct);
-                return Results.NoContent();
-            }).WithTags("UserProfiles")
+        
+        app.MapPatch("/api/userProfiles",
+                async (IMediator mediator, [FromBody] UpdateImageRequest updateImageRequest, HttpContext httpContext,
+                    CancellationToken ct) =>
+                {
+                    await mediator.Send(new UpdateImageCommand(httpContext.GetRole(),updateImageRequest), ct);
+                    return Results.NoContent();
+                }).WithTags("UserProfiles")
             .RequireAuthorization();
 
         app.MapPatch("/api/userProfiles/verify/{id:int}",

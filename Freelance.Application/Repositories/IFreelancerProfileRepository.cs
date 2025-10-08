@@ -19,7 +19,6 @@ public interface IFreelancerProfileRepository
         CancellationToken cancellationToken);
 
     Task PatchAddressAsync(PatchAddressCommand patchAddressCommand, CancellationToken cancellationToken);
-    Task PatchUserDetailsAsync(PatchUserDetailsCommand patchUserDetailsCommand, CancellationToken cancellationToken);
 
     Task PatchFreelancerDetailsAsync(PatchFreelancerDataCommand patchFreelancerDataCommand,
         CancellationToken cancellationToken);
@@ -27,4 +26,6 @@ public interface IFreelancerProfileRepository
     Task VerifyProfileAsync(int id, CancellationToken cancellationToken);
 
     Task DeleteFreelancerProfileAsync(int id, CancellationToken cancellationToken);
+    
+    Task UpdateImageAsync(string image, CancellationToken cancellationToken);
 }
