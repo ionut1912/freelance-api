@@ -5,8 +5,10 @@ using Freelance.Contracts.Exceptions;
 using Freelance.Contracts.Requests.ClientProfile;
 using Freelance.Contracts.Requests.Common;
 using Freelance.Contracts.Responses.Common;
+using Freelance.Infrastructure.Context;
 using Freelance.Infrastructure.Entities;
 using Mapster;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Freelance.Infrastructure.Services;
@@ -16,28 +18,31 @@ public class ClientProfileRepository : IClientProfileRepository
     private readonly IGenericRepository<Addresses> _addressRepository;
     private readonly IGenericRepository<ClientProfiles> _clientProfileRepository;
     private readonly IUserAccessor _userAccessor;
-    private readonly IGenericRepository<Users> _userRepository;
+    private readonly UserManager<Users> _userManager;
+    private readonly FreelanceDbContext _dbContext;
 
-    public ClientProfileRepository(IGenericRepository<Users> userRepository,
+    public ClientProfileRepository(UserManager<Users> userManager,
         IGenericRepository<Addresses> addressRepository,
         IGenericRepository<ClientProfiles> clientProfileRepository,
-        IUserAccessor userAccessor)
+        IUserAccessor userAccessor,
+        FreelanceDbContext dbContext)
     {
-        ArgumentNullException.ThrowIfNull(userRepository, nameof(userRepository));
+        ArgumentNullException.ThrowIfNull(userManager);
         ArgumentNullException.ThrowIfNull(addressRepository, nameof(addressRepository));
         ArgumentNullException.ThrowIfNull(clientProfileRepository, nameof(clientProfileRepository));
         ArgumentNullException.ThrowIfNull(userAccessor, nameof(userAccessor));
-        _userRepository = userRepository;
+        ArgumentNullException.ThrowIfNull(dbContext,nameof(dbContext));
+        _userManager = userManager;
         _addressRepository = addressRepository;
         _clientProfileRepository = clientProfileRepository;
         _userAccessor = userAccessor;
+        _dbContext = dbContext;
     }
 
     public async Task CreateClientProfileAsync(CreateClientProfileRequest createClientProfileRequest,
         CancellationToken cancellationToken)
     {
-        var user = await _userRepository.Query()
-            .FirstOrDefaultAsync(x => x.UserName == _userAccessor.GetUsername(), cancellationToken);
+        var user = await _userManager.FindByNameAsync(_userAccessor.GetUsername());
         if (user == null) throw new InvalidOperationException("User not found.");
 
         var clientProfile = createClientProfileRequest.Adapt<ClientProfiles>();
@@ -159,6 +164,24 @@ public class ClientProfileRepository : IClientProfileRepository
             throw new NotFoundException(
                 $"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Id)} : '{id}' does not exist");
         _clientProfileRepository.Delete(clientToDelete);
+    }
+
+    public async Task UpdateUserDataAsync(UpdateUserRequest updateUserRequest, CancellationToken cancellationToken)
+    {
+        var user = await _userManager.FindByNameAsync(_userAccessor.GetUsername());
+        if (user == null) throw new InvalidOperationException("User not found.");
+        var profile = await _clientProfileRepository.Query()
+            .Where(x => x.Users!.UserName == _userAccessor.GetUsername())
+            .FirstOrDefaultAsync(cancellationToken);
+        if (profile is null)
+            throw new NotFoundException(
+                $"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Users.UserName)} : '{_userAccessor.GetUsername()}' does not exist");
+        user.PhoneNumber=updateUserRequest.PhoneNumber;
+        user.Email=updateUserRequest.Email;
+        user.UserName = updateUserRequest.Username;
+        await _userManager.UpdateAsync(user);
+        profile.Bio = updateUserRequest.Bio;
+        _clientProfileRepository.Update(profile);
     }
 
     public async Task UpdateImageAsync(string image, CancellationToken cancellationToken)

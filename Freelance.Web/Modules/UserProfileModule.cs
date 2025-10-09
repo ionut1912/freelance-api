@@ -67,6 +67,15 @@ public static class UserProfileModule
                 }).WithTags("UserProfiles")
             .RequireAuthorization();
 
+        app.MapPatch("/api/userProfiles/userData",
+                async (IMediator mediator, [FromBody] UpdateUserRequest updateUserRequest, HttpContext httpContext,
+                    CancellationToken ct) =>
+                {
+                    await mediator.Send(new UpdateUserDataCommand(httpContext.GetRole(),updateUserRequest), ct);
+                    return Results.NoContent();
+                }).WithTags("UserProfiles")
+            .RequireAuthorization();
+
         app.MapPatch("/api/userProfiles/verify/{id:int}",
                 async (IMediator mediator, HttpContext httpContext, int id, CancellationToken ct) =>
                 {

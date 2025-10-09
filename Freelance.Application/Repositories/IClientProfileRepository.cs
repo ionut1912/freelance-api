@@ -24,6 +24,8 @@ public interface IClientProfileRepository
     Task VerifyProfileAsync(int id, CancellationToken cancellationToken);
     
     Task DeleteClientProfileAsync(int id, CancellationToken cancellationToken);
+    
+    Task UpdateUserDataAsync(UpdateUserRequest updateUserRequest,CancellationToken cancellationToken);
 
     Task UpdateImageAsync(string image, CancellationToken cancellationToken);
 }

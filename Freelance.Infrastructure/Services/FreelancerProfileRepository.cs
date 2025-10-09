@@ -7,6 +7,7 @@ using Freelance.Contracts.Requests.FreelancerProfiles;
 using Freelance.Contracts.Responses.Common;
 using Freelance.Infrastructure.Entities;
 using Mapster;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Freelance.Infrastructure.Services;
@@ -18,26 +19,26 @@ public class FreelancerProfileRepository : IFreelancerProfileRepository
     private readonly IGenericRepository<FreelancerProfiles> _freelancerProfilesRepository;
     private readonly IGenericRepository<Skills> _skillsRepository;
     private readonly IUserAccessor _userAccessor;
-    private readonly IGenericRepository<Users> _userRepository;
+    private readonly UserManager<Users> _userManager;
 
     public FreelancerProfileRepository(
         IUserAccessor userAccessor,
         IGenericRepository<FreelancerProfiles> freelancerProfilesRepository,
-        IGenericRepository<Users> userRepository,
+        UserManager<Users> userManager,
         IGenericRepository<Addresses> addressRepository,
         IGenericRepository<Skills> skillsRepository,
         IGenericRepository<FreelancerForeignLanguage> freelancerForeignLanguageRepository)
     {
         ArgumentNullException.ThrowIfNull(userAccessor, nameof(userAccessor));
         ArgumentNullException.ThrowIfNull(freelancerProfilesRepository, nameof(freelancerProfilesRepository));
-        ArgumentNullException.ThrowIfNull(userRepository, nameof(userRepository));
+        ArgumentNullException.ThrowIfNull(userManager, nameof(userManager));
         ArgumentNullException.ThrowIfNull(addressRepository, nameof(addressRepository));
         ArgumentNullException.ThrowIfNull(skillsRepository, nameof(skillsRepository));
         ArgumentNullException.ThrowIfNull(freelancerForeignLanguageRepository,
             nameof(freelancerForeignLanguageRepository));
         _userAccessor = userAccessor;
         _freelancerProfilesRepository = freelancerProfilesRepository;
-        _userRepository = userRepository;
+        _userManager = userManager;
         _addressRepository = addressRepository;
         _skillsRepository = skillsRepository;
         _freelancerForeignLanguageRepository = freelancerForeignLanguageRepository;
@@ -46,9 +47,7 @@ public class FreelancerProfileRepository : IFreelancerProfileRepository
     public async Task CreateFreelancerProfileAsync(CreateFreelancerProfileRequest createFreelancerProfileRequest,
         CancellationToken cancellationToken)
     {
-        var user = await _userRepository.Query()
-            .Where(x => x.UserName == _userAccessor.GetUsername())
-            .FirstOrDefaultAsync(cancellationToken);
+        var user = await _userManager.FindByNameAsync(_userAccessor.GetUsername());
         if (user == null)
             throw new NotFoundException(
                 $"{nameof(Users)} with {nameof(Users.UserName)} :{_userAccessor.GetUsername()} not found.");
@@ -245,6 +244,25 @@ public class FreelancerProfileRepository : IFreelancerProfileRepository
         _freelancerProfilesRepository.Delete(freelancerToDelete);
     }
 
+    public async Task UpdateUserDataAsync(UpdateUserRequest updateUserRequest, CancellationToken cancellationToken)
+    {
+        var user = await _userManager.FindByNameAsync(_userAccessor.GetUsername());
+        if (user == null) throw new InvalidOperationException("User not found.");
+        var profile = await _freelancerProfilesRepository.Query()
+            .Where(x => x.Users!.UserName == _userAccessor.GetUsername())
+            .Include(fp => fp.Users)
+            .FirstOrDefaultAsync(cancellationToken);
+        if (profile is null)
+            throw new NotFoundException(
+                $"{nameof(ClientProfiles)} with {nameof(ClientProfiles.Users.UserName)} : '{_userAccessor.GetUsername()}' does not exist");
+        user.PhoneNumber=updateUserRequest.PhoneNumber;
+        user.Email=updateUserRequest.Email;
+        user.UserName = updateUserRequest.Username;
+        profile.Bio = updateUserRequest.Bio;
+        await _userManager.UpdateAsync(user);
+        _freelancerProfilesRepository.Update(profile);
+    }
+
     public async Task UpdateImageAsync(string image, CancellationToken cancellationToken)
     {
         var profile = await _freelancerProfilesRepository.Query()
@@ -256,5 +274,6 @@ public class FreelancerProfileRepository : IFreelancerProfileRepository
                 $"{nameof(FreelancerProfiles)} with {nameof(FreelancerProfiles.Users.UserName)} : '{_userAccessor.GetUsername()}' does not exist");
 
         profile.Image = image;
+        _freelancerProfilesRepository.Update(profile);
     }
 }

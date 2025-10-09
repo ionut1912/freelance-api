@@ -46,8 +46,7 @@ public class AccountRepository : IAccountRepository
 
         await _userManager.AddToRoleAsync(user, createUserCommand.RegisterDto.Role);
     }
-
-
+    
     public async Task<UserDto> LoginAsync(LoginDto loginDto, CancellationToken cancellationToken)
     {
         var modelState = new ModelStateDictionary();
@@ -92,8 +91,7 @@ public class AccountRepository : IAccountRepository
             user.CreatedAt
         );
     }
-
-
+    
     public async Task LockAccountAsync(BlockAccountCommand command)
     {
         var modelState = new ModelStateDictionary();
