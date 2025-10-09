@@ -27,5 +27,7 @@ public interface IFreelancerProfileRepository
 
     Task DeleteFreelancerProfileAsync(int id, CancellationToken cancellationToken);
     
+    Task UpdateUserDataAsync(UpdateUserRequest updateUserRequest,CancellationToken cancellationToken);
+    
     Task UpdateImageAsync(string image, CancellationToken cancellationToken);
 }

@@ -1,3 +1,3 @@
-namespace Freelance.Contracts.Requests;
+namespace Freelance.Contracts.Requests.Common;
 
 public record UpdateImageRequest(string Image);
