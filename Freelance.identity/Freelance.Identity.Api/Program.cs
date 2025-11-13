@@ -13,6 +13,7 @@ using Freelance.Shared.Application.Behaviours;
 using Freelance.Shared.Domain.Interfaces;
 using Frelance.Shared.Infrastructure.Extensions;
 using Frelance.Shared.Infrastructure.Services;
+using Frelance.Shared.Infrastructure.Settings;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;

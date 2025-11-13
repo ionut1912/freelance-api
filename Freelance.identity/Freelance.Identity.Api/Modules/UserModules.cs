@@ -1,7 +1,6 @@
 ﻿using Freelance.Identity.Application.Mediatr.Accounts.Commands;
 using Freelance.Identity.Application.Mediatr.Accounts.Query;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 
 namespace Freelance.Identity.Api.Modules;
 
@@ -9,50 +8,56 @@ public static class UserModules
 {
     public static void AddUserEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/auth/register", async (IMediator mediator, CreateAccountCommand createAccountCommand,
+        var userGroup = app.MapGroup("/api/auth")
+            .WithTags("Users");
+        var authenticatedGroup = app.MapGroup("/api/auth")
+            .WithTags("Users")
+            .RequireAuthorization();
+        
+        userGroup.MapPost("/register", async (IMediator mediator, CreateAccountCommand createAccountCommand,
             CancellationToken ct) =>
         {
             var createdAccount = await mediator.Send(createAccountCommand, ct);
             return Results.Created($"/api/auth/{createdAccount.Id}", createdAccount);
-        }).WithTags("Users");
+        });
 
-        app.MapPost("/api/auth/login", async (IMediator mediator, LoginQuery loginQuery,
+        userGroup.MapPost("/login", async (IMediator mediator, LoginQuery loginQuery,
             CancellationToken ct) =>
         {
             var result = await mediator.Send(loginQuery, ct);
             return Results.Ok(result);
-        }).WithTags("Users");
+        });
 
-        app.MapPost("/api/auth/block/{id:guid}", async (IMediator mediator, Guid id, CancellationToken ct) =>
-        {
-            var blockAccountCommand = new BlockAccountCommand
+        authenticatedGroup.MapPut("/block/{id:guid}",
+            async (IMediator mediator, Guid id, CancellationToken ct) =>
             {
-                AccountId = id
-            };
+                var blockAccountCommand = new BlockAccountCommand
+                {
+                    AccountId = id
+                };
 
-            await mediator.Send(blockAccountCommand, ct);
-            return Results.NoContent();
-        }).WithTags("Users")
-        .RequireAuthorization();
+                await mediator.Send(blockAccountCommand, ct);
+                return Results.NoContent();
+            });
 
-        app.MapGet("/api/auth/current", async (IMediator mediator, HttpContext httpContext, CancellationToken ct) =>
-        {
-            var username = httpContext.User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value;
-            if (string.IsNullOrEmpty(username))
+        authenticatedGroup.MapGet("/current",
+            async (IMediator mediator, HttpContext httpContext, CancellationToken ct) =>
             {
-                return Results.Unauthorized();
-            }
+                var username = httpContext.User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value;
+                if (string.IsNullOrEmpty(username))
+                {
+                    return Results.Unauthorized();
+                }
 
-            var currentUserQuery = new GetCurrentAccountQuery()
-            {
-                Username = username
-            };
-            var result = await mediator.Send(currentUserQuery, ct);
-            return Results.Ok(result);
-        }).WithTags("Users")
-          .RequireAuthorization();
+                var currentUserQuery = new GetCurrentAccountQuery()
+                {
+                    Username = username
+                };
+                var result = await mediator.Send(currentUserQuery, ct);
+                return Results.Ok(result);
+            });
 
-        app.MapPost("/api/auth/unblock/{id:guid}", async (IMediator mediator, Guid id, CancellationToken ct) =>
+        authenticatedGroup.MapPut("/unblock/{id:guid}", async (IMediator mediator, Guid id, CancellationToken ct) =>
         {
             var unblockAccountCommand = new UnblockAccountCommand
             {
@@ -61,10 +66,9 @@ public static class UserModules
 
             await mediator.Send(unblockAccountCommand, ct);
             return Results.NoContent();
-        }).WithTags("Users")
-          .RequireAuthorization();
+        });
 
-        app.MapDelete("/api/auth/{id:guid}", async (IMediator mediator, Guid id, CancellationToken ct) =>
+        authenticatedGroup.MapDelete("/{id:guid}", async (IMediator mediator, Guid id, CancellationToken ct) =>
         {
             var deleteAccountCommand = new DeleteAccountCommand
             {
@@ -73,7 +77,6 @@ public static class UserModules
 
             await mediator.Send(deleteAccountCommand, ct);
             return Results.NoContent();
-        }).WithTags("Users")
-          .RequireAuthorization();
+        });
     }
 }
