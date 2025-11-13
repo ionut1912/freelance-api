@@ -16,7 +16,6 @@ public class CreateAccountCommandValidator:AbstractValidator<CreateAccountComman
           .MaximumLength(10)
           .WithMessage("Phone Number has invalid length");
       
-      RuleFor(x=>x.Address).NotNull().WithMessage("Address is required");
       RuleFor(x => x.Role).NotEmpty().WithMessage("Role is required")
           .Must(role => role == "Client" || role == "Freelancer")
           .WithMessage("Role must be either 'Client' or 'Freelancer'");;

@@ -1,4 +1,4 @@
-﻿namespace Freelance.Identity.Application.Dtos;
+﻿namespace Frelance.Shared.Infrastructure.Settings;
 
 public class JwtSettings
 {

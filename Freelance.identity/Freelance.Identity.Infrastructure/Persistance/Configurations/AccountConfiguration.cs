@@ -12,37 +12,6 @@ public class AccountConfiguration:IEntityTypeConfiguration<Account>
         builder.Property(p => p.Id)
             .ValueGeneratedNever();
         
-        builder.OwnsOne(o => o.Address, address =>
-        {
-            address.Property(a => a.Street)
-                .HasColumnName("Address_Street")
-                .HasMaxLength(200)
-                .IsRequired();
-                
-            address.Property(a => a.City)
-                .HasColumnName("Address_City")
-                .HasMaxLength(100)
-                .IsRequired();
-                
-            address.Property(a => a.State)
-                .HasColumnName("Address_State")
-                .HasMaxLength(100)
-                .IsRequired();
-                
-            address.Property(a => a.ZipCode)
-                .HasColumnName("Address_ZipCode")
-                .HasMaxLength(20)
-                .IsRequired();
-                
-            address.Property(a => a.Country)
-                .HasColumnName("Address_Country")
-                .HasMaxLength(100)
-                .IsRequired();
-            address.Property(a => a.StreetNumber)
-                .HasColumnName("Address_StreetNumber")
-                .HasMaxLength(100)
-                .IsRequired();
-        });
         builder.OwnsOne(p => p.Role, role =>
         {
             role.Property(c => c.Value)

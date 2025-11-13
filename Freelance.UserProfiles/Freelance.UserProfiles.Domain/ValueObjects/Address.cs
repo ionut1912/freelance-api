@@ -1,6 +1,6 @@
 ﻿using Freelance.Shared.Domain.Common;
 
-namespace Freelance.Identity.Domain.ValueObjects;
+namespace Freelance.UserProfiles.Domain.ValueObjects;
 
 public class Address : ValueObject
 {
@@ -29,6 +29,12 @@ public class Address : ValueObject
         string streetNumber)
     {
         return new Address(street, city, state, zipCode, country, streetNumber);
+    }
+
+    public static Address Update(string street, string city, string state, string zipCode, string country,
+        string streetNumber)
+    {
+        return new Address(street,city, state, zipCode, country,streetNumber);
     }
 
     protected override IEnumerable<object?> GetEqualityComponents()

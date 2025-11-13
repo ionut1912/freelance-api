@@ -1,4 +1,4 @@
-﻿namespace Freelance.Identity.Application.Dtos;
+﻿namespace Freelancer.UserProfiles.Application.Dtos;
 
 public class AddressDto
 {

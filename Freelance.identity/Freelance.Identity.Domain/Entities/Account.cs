@@ -11,7 +11,7 @@ public class Account : Entity
     {
     }
 
-    private Account(string email, string password, string phoneNumber, string username, Address address, Role role)
+    private Account(string email, string password, string phoneNumber, string username, Role role)
     {
         if (string.IsNullOrEmpty(email))
             throw new ArgumentNullException("Email cannot be null or empty");
@@ -23,14 +23,11 @@ public class Account : Entity
             throw new ArgumentNullException("Username cannot be null or empty");
         if (string.IsNullOrEmpty(role.Value))
             throw new ArgumentNullException("Role cannot be null or empty");
-        if (address is null)
-            throw new ArgumentNullException("Address cannot be null or empty");
-
+        
         Email = email;
         Password = password;
         PhoneNumber = phoneNumber;
         Username = username;
-        Address = address;
         Role = role;
         IsBlocked = false;
         CreatedAt = DateTime.UtcNow;
@@ -40,15 +37,13 @@ public class Account : Entity
     public string Password { get; private set; }
     public string PhoneNumber { get; private set; }
     public string Username { get; private set; }
-    public Address Address { get; }
     public Role Role { get; private set; }
     public bool IsBlocked { get; private set; }
     public DateTime BlockedAt { get; private set; }
 
-    public static Account Create(string email, string password, string phoneNumber, string username, Address address,
-        Role role)
+    public static Account Create(string email, string password, string phoneNumber, string username, Role role)
     {
-        return new Account(email, password, phoneNumber, username, address, role);
+        return new Account(email, password, phoneNumber, username, role);
     }
 
     public void BlockAccount()

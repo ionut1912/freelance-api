@@ -29,11 +29,8 @@ public class CreateAccountCommandHandler : IRequestHandler<CreateAccountCommand,
             "Freelancer" => Role.Freelancer,
             _ => roleForRepo
         };
-
-        var addressAccount = Address.Create(request.Address.Street, request.Address.City, request.Address.State,
-            request.Address.ZipCode, request.Address.Country, request.Address.StreetNumber);
-        var account = Account.Create(request.Email, request.Password, request.PhoneNumber, request.Username,
-            addressAccount, roleForRepo);
+        
+        var account = Account.Create(request.Email, request.Password, request.PhoneNumber, request.Username,roleForRepo);
         await _accountRepository.RegisterAsync(account, cancellationToken);
         return account;
     }

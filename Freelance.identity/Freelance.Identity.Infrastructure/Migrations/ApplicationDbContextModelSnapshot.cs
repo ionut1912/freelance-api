@@ -67,55 +67,6 @@ namespace Freelance.Identity.Infrastructure.Migrations
 
             modelBuilder.Entity("Freelance.Identity.Domain.Entities.Account", b =>
                 {
-                    b.OwnsOne("Freelance.Identity.Domain.ValueObjects.Address", "Address", b1 =>
-                        {
-                            b1.Property<Guid>("AccountId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<string>("City")
-                                .IsRequired()
-                                .HasMaxLength(100)
-                                .HasColumnType("character varying(100)")
-                                .HasColumnName("Address_City");
-
-                            b1.Property<string>("Country")
-                                .IsRequired()
-                                .HasMaxLength(100)
-                                .HasColumnType("character varying(100)")
-                                .HasColumnName("Address_Country");
-
-                            b1.Property<string>("State")
-                                .IsRequired()
-                                .HasMaxLength(100)
-                                .HasColumnType("character varying(100)")
-                                .HasColumnName("Address_State");
-
-                            b1.Property<string>("Street")
-                                .IsRequired()
-                                .HasMaxLength(200)
-                                .HasColumnType("character varying(200)")
-                                .HasColumnName("Address_Street");
-
-                            b1.Property<string>("StreetNumber")
-                                .IsRequired()
-                                .HasMaxLength(100)
-                                .HasColumnType("character varying(100)")
-                                .HasColumnName("Address_StreetNumber");
-
-                            b1.Property<string>("ZipCode")
-                                .IsRequired()
-                                .HasMaxLength(20)
-                                .HasColumnType("character varying(20)")
-                                .HasColumnName("Address_ZipCode");
-
-                            b1.HasKey("AccountId");
-
-                            b1.ToTable("Accounts");
-
-                            b1.WithOwner()
-                                .HasForeignKey("AccountId");
-                        });
-
                     b.OwnsOne("Freelance.Identity.Domain.ValueObjects.Role", "Role", b1 =>
                         {
                             b1.Property<Guid>("AccountId")
@@ -137,9 +88,6 @@ namespace Freelance.Identity.Infrastructure.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("AccountId");
                         });
-
-                    b.Navigation("Address")
-                        .IsRequired();
 
                     b.Navigation("Role")
                         .IsRequired();
