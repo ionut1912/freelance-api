@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
+using Freelance.Shared.Domain.Common;
 using Freelance.Shared.Domain.Exceptions;
 using MediatR;
-using ValidationError = Freelance.Shared.Domain.Common.ValidationError;
 
 namespace Freelance.Shared.Application.Behaviours;
 

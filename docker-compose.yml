@@ -1,0 +1,72 @@
+version: "3.9"
+
+services:
+
+  # API Gateway
+  gateway:
+    build: ./Freelance.ApiGateway
+    ports:
+      - "9000:8080"  # Host port 9000 → Container port 8080
+    environment:
+      - ASPNETCORE_URLS=http://+:8080
+      - JwtSettings__Key=YourSuperSecretKeyHere123!ChangeItTo32PlusChars
+      - JwtSettings__Issuer=FreelanceApp
+      - JwtSettings__Audience=FreelanceAppUsers
+    depends_on:
+      - freelance_identity
+      - freelance_user_profiles
+    networks:
+      - freelance-network
+
+  # Identity Service
+  freelance_identity:
+    build:
+      context: .
+      dockerfile: Freelance.Identity/Dockerfile
+    environment:
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=FreelanceIdentity;Username=postgres;Password=postgres
+      - JwtSettings__Key=YourSuperSecretKeyHere123!ChangeItTo32PlusChars
+      - JwtSettings__Issuer=FreelanceApp
+      - JwtSettings__Audience=FreelanceAppUsers
+    depends_on:
+      - postgres
+    networks:
+      - freelance-network
+
+  # UserProfiles Service
+  freelance_user_profiles:
+    build:
+      context: .
+      dockerfile: Freelance.UserProfiles/Dockerfile
+    environment:
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=FreelanceUserProfiles;Username=postgres;Password=postgres
+      - JwtSettings__Key=YourSuperSecretKeyHere123!ChangeItTo32PlusChars
+      - JwtSettings__Issuer=FreelanceApp
+      - JwtSettings__Audience=FreelanceAppUsers
+    depends_on:
+      - postgres
+    networks:
+      - freelance-network
+
+  # Shared PostgreSQL Database
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_MULTIPLE_DATABASES: FreelanceUserProfiles,FreelanceIdentity
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - freelance-network
+
+volumes:
+  postgres_data:
+
+networks:
+  freelance-network:
+    driver: bridge

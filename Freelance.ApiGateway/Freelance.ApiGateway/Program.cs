@@ -6,16 +6,21 @@ using MMLib.SwaggerForOcelot.Middleware;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// ✅ Listen on port 8080 inside the container
+builder.WebHost.UseUrls("http://+:8080");
+
+// Load configuration
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
-// ---------- JWT Validation ----------
+// JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
 
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", options =>
     {
-        options.RequireHttpsMetadata = true;
+        options.RequireHttpsMetadata = false; // ✅ Disable HTTPS metadata for container use
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -30,29 +35,23 @@ builder.Services.AddAuthentication("Bearer")
 
 builder.Services.AddAuthorization();
 
-// ---------- Add Swagger Gen (Required for SwaggerForOcelot) ----------
+// Swagger + Ocelot
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-// ---------- Ocelot ----------
 builder.Services.AddOcelot(builder.Configuration);
-
-// ---------- Swagger for Ocelot ----------
 builder.Services.AddSwaggerForOcelot(builder.Configuration);
 
 var app = builder.Build();
 
-app.UseHttpsRedirection();
+app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// ---------- Swagger UI ----------
-app.UseSwaggerForOcelotUI(options =>
+app.UseSwaggerForOcelotUI(opt =>
 {
-    options.PathToSwaggerGenerator = "/swagger/docs"; // Aggregated Swagger JSON
+    opt.PathToSwaggerGenerator = "/swagger/docs";
 });
 
-// ---------- Ocelot Middleware ----------
 await app.UseOcelot();
 
 app.Run();
