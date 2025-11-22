@@ -10,6 +10,7 @@
 
     <ItemGroup>
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.0" />
+        <PackageReference Include="Freelance.Shared.Api" Version="1.0.0" />
         <PackageReference Include="Freelance.Shared.Application" Version="1.0.0" />
         <PackageReference Include="Freelance.Shared.Domain" Version="1.0.1" />
         <PackageReference Include="Freelance.Shared.Infrastructure" Version="1.0.0" />
@@ -20,8 +21,6 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6" />
-        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
     </ItemGroup>
 
     <ItemGroup>

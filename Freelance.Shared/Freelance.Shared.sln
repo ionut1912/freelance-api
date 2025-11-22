@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Freelance.Shared.Infrastruc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Freelance.Shared.Application", "Freelance.Shared.Application\Freelance.Shared.Application.csproj", "{7F964DEC-304D-402B-930B-8C2C818ECB3C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Freelance.Shared.Api", "Freelance.Shared.Api\Freelance.Shared.Api.csproj", "{3D22F3CD-299D-48FD-A9C3-51EA2586D424}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{7F964DEC-304D-402B-930B-8C2C818ECB3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7F964DEC-304D-402B-930B-8C2C818ECB3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7F964DEC-304D-402B-930B-8C2C818ECB3C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D22F3CD-299D-48FD-A9C3-51EA2586D424}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D22F3CD-299D-48FD-A9C3-51EA2586D424}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D22F3CD-299D-48FD-A9C3-51EA2586D424}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D22F3CD-299D-48FD-A9C3-51EA2586D424}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
