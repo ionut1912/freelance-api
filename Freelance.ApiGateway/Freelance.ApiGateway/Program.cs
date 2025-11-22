@@ -7,13 +7,10 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ✅ Listen on port 8080 inside the container
 builder.WebHost.UseUrls("http://+:8080");
 
-// Load configuration
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
-// JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
 
