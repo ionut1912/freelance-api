@@ -24,8 +24,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Freelance.Identity.Domain\Freelance.Identity.Domain.csproj"/>
+      <ProjectReference Include="..\Freelance.Identity.Domain\Freelance.Identity.Domain.csproj" />
     </ItemGroup>
+
 
 
 

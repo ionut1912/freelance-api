@@ -1,4 +1,4 @@
-﻿using Freelance.Shared.Domain.Exceptions;
+﻿using Shared.Domain.Exceptions;
 using Freelance.UserProfiles.Domain.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;

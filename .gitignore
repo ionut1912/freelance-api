@@ -16,3 +16,8 @@ terraform/.terraform.lock.hcl
 terraform/terraform.tfstate.backup
 /.vs/Frelance.API
 /.vs/ProjectEvaluation
+/Freelance.Identity/.vs/Freelance.Identity
+/Freelance.Identity/src/Freelance.Identity.Api/Freelance.Identity.Api.csproj.user
+*.config
+/Freelance.Identity/.vs/ProjectEvaluation
+/Freelance.UserProfiles/.vs/Freelance.UserProfiles

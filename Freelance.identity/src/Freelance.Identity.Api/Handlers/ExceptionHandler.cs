@@ -1,7 +1,7 @@
 ﻿using Freelance.Identity.Domain.Exceptions;
-using Freelance.Shared.Domain.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Domain.Exceptions;
 
 namespace Freelance.Identity.Api.Handlers;
 

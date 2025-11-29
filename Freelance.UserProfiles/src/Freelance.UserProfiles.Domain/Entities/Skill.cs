@@ -1,4 +1,5 @@
-using Freelance.Shared.Domain.Common;
+
+using Shared.Domain.Common;
 
 namespace Freelance.UserProfiles.Domain.Entities;
 

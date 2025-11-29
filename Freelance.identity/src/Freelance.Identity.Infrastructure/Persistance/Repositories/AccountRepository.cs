@@ -1,8 +1,8 @@
 ﻿using Freelance.Identity.Domain.Entities;
 using Freelance.Identity.Domain.Exceptions;
 using Freelance.Identity.Domain.interfaces;
-using Freelance.Shared.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Shared.Domain.Interfaces;
 
 namespace Freelance.Identity.Infrastructure.Persistance.Repositories;
 

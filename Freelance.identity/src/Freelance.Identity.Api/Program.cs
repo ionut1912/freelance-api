@@ -6,12 +6,12 @@ using Freelance.Identity.Application.Validators;
 using Freelance.Identity.Domain.interfaces;
 using Freelance.Identity.Infrastructure.Persistance;
 using Freelance.Identity.Infrastructure.Persistance.Repositories;
-using Freelance.Shared.Domain.Interfaces;
-using Freelance.Shared.Infrastructure.Extensions;
-using Freelance.Shared.Infrastructure.Services;
-using Freelance.Shared.Api.Extensions;
 using Microsoft.AspNetCore.Diagnostics;
-using ServiceCollectionExtensions = Freelance.Shared.Api.Extensions.ServiceCollectionExtensions;
+using Shared.Api.Extensions;
+using Shared.Domain.Interfaces;
+using Shared.Infra.Extensions;
+using Shared.Infra.Services;
+using ServiceCollectionExtensions = Shared.Api.Extensions.ServiceCollectionExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
 

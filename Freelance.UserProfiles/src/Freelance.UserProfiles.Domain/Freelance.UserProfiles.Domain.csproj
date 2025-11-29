@@ -8,7 +8,7 @@
 
 
     <ItemGroup>
-      <PackageReference Include="Freelance.Shared.Domain" Version="1.0.1" />
+      <PackageReference Include="Shared.Domain" Version="1.0.1" />
     </ItemGroup>
 
 </Project>

@@ -1,6 +1,3 @@
-using Freelance.Shared.Domain.Interfaces;
-using Freelance.Shared.Infrastructure.Extensions;
-using Freelance.Shared.Infrastructure.Services;
 using Freelance.UserProfiles.Api.Handlers;
 using Freelance.UserProfiles.Api.Modules;
 using Freelance.UserProfiles.Domain.Interfaces;
@@ -10,8 +7,11 @@ using Freelancer.UserProfiles.Application.Mappings;
 using Freelancer.UserProfiles.Application.Mediatr;
 using Freelancer.UserProfiles.Application.Validators;
 using Microsoft.AspNetCore.Diagnostics;
-using Freelance.Shared.Api.Extensions;
-using ServiceCollectionExtensions = Freelance.Shared.Api.Extensions.ServiceCollectionExtensions;
+using Shared.Api.Extensions;
+using Shared.Domain.Interfaces;
+using Shared.Infra.Extensions;
+using Shared.Infra.Services;
+using ServiceCollectionExtensions = Shared.Api.Extensions.ServiceCollectionExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
 

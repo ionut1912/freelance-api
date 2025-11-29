@@ -1,6 +1,6 @@
-﻿using Freelance.Shared.Domain.Common;
-using Freelance.UserProfiles.Domain.Exceptions;
+﻿using Freelance.UserProfiles.Domain.Exceptions;
 using Freelance.UserProfiles.Domain.ValueObjects;
+using Shared.Domain.Common;
 
 namespace Freelance.UserProfiles.Domain.Entities;
 

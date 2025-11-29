@@ -1,4 +1,4 @@
-﻿using Freelance.Shared.Domain.Interfaces;
+﻿using Shared.Domain.Interfaces;
 using Freelance.UserProfiles.Domain.Entities;
 using Freelance.UserProfiles.Domain.Exceptions;
 using Freelance.UserProfiles.Domain.Interfaces;

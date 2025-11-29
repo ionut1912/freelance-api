@@ -1,4 +1,4 @@
-﻿using Freelance.Shared.Domain.Common;
+﻿using Shared.Domain.Common;
 
 namespace Freelance.Identity.Domain.ValueObjects;
 

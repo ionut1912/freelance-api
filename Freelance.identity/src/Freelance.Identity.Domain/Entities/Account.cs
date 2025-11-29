@@ -1,7 +1,8 @@
 ﻿using Freelance.Identity.Domain.Exceptions;
 using Freelance.Identity.Domain.interfaces;
 using Freelance.Identity.Domain.ValueObjects;
-using Freelance.Shared.Domain.Common;
+using Shared.Domain.Common;
+
 
 namespace Freelance.Identity.Domain.Entities;
 

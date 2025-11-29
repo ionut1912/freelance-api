@@ -10,10 +10,10 @@
 
     <ItemGroup>
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.0" />
-        <PackageReference Include="Freelance.Shared.Api" Version="1.0.0" />
-        <PackageReference Include="Freelance.Shared.Application" Version="1.0.0" />
-        <PackageReference Include="Freelance.Shared.Domain" Version="1.0.1" />
-        <PackageReference Include="Freelance.Shared.Infrastructure" Version="1.0.0" />
+        <PackageReference Include="Shared.Api" Version="1.0.2" />
+        <PackageReference Include="Shared.Application" Version="1.0.2" />
+        <PackageReference Include="Shared.Domain" Version="1.0.1" />
+        <PackageReference Include="Shared.Infra" Version="1.0.1" />
         <PackageReference Include="MediatR" Version="13.1.0" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.11" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.10" />

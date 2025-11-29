@@ -23,10 +23,5 @@
         <ProjectReference Include="..\Freelance.UserProfiles.Domain\Freelance.UserProfiles.Domain.csproj"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <Reference Include="Freelance.Shared.Domain">
-            <HintPath>..\..\Freelance.Shared\Freelance.Shared.Domain\bin\Debug\net9.0\Freelance.Shared.Domain.dll</HintPath>
-        </Reference>
-    </ItemGroup>
 
 </Project>

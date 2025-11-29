@@ -9,30 +9,28 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="FluentValidation" Version="12.1.0" />
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.0" />
-        <PackageReference Include="Freelance.Shared.Api" Version="1.0.0" />
-        <PackageReference Include="Freelance.Shared.Application" Version="1.0.0" />
-        <PackageReference Include="Freelance.Shared.Domain" Version="1.0.1" />
-        <PackageReference Include="Freelance.Shared.Infrastructure" Version="1.0.0" />
         <PackageReference Include="MediatR" Version="13.1.0" />
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.10" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.10">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="Shared.Api" Version="1.0.2" />
+        <PackageReference Include="Shared.Infra" Version="1.0.1" />
     </ItemGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\Freelance.Identity.Application\Freelance.Identity.Application.csproj" />
-        <ProjectReference Include="..\Freelance.Identity.Domain\Freelance.Identity.Domain.csproj" />
-        <ProjectReference Include="..\Freelance.Identity.Infrastructure\Freelance.Identity.Infrastructure.csproj" />
-    </ItemGroup>
 
     <ItemGroup>
         <Content Include="..\.dockerignore">
             <Link>.dockerignore</Link>
         </Content>
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <ProjectReference Include="..\Freelance.Identity.Application\Freelance.Identity.Application.csproj" />
+      <ProjectReference Include="..\Freelance.Identity.Domain\Freelance.Identity.Domain.csproj" />
+      <ProjectReference Include="..\Freelance.Identity.Infrastructure\Freelance.Identity.Infrastructure.csproj" />
     </ItemGroup>
 
 
