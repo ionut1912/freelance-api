@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
@@ -15,8 +15,8 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Shared.Api" Version="1.0.2" />
-        <PackageReference Include="Shared.Infra" Version="1.0.1" />
+        <PackageReference Include="Shared.ApiLayer" Version="1.0.0" />
+        <PackageReference Include="Shared.InfraLayer" Version="1.0.0" />
     </ItemGroup>
 
 

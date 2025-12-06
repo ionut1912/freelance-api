@@ -21,3 +21,7 @@ terraform/terraform.tfstate.backup
 *.config
 /Freelance.Identity/.vs/ProjectEvaluation
 /Freelance.UserProfiles/.vs/Freelance.UserProfiles
+/Freelance.UserProfiles/.vs/ProjectEvaluation
+/Freelance.Web/Freelance.Web.csproj.user
+/.vs/Freelance.API
+/Freelance.Camera/.vs/Freelance.Camera.slnx

@@ -2,6 +2,7 @@
 using Freelance.UserProfiles.Domain.Interfaces;
 using Freelancer.UserProfiles.Application.Mediatr.ClientProfiles.Commands;
 using MediatR;
+using Shared.Rabbit.Repositories;
 
 namespace Freelancer.UserProfiles.Application.Mediatr.ClientProfiles.Handlers;
 

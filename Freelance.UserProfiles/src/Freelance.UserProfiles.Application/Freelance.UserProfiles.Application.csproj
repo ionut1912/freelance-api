@@ -8,13 +8,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AutoMapper" Version="15.1.0"/>
-        <PackageReference Include="FluentValidation" Version="12.1.0"/>
-        <PackageReference Include="MediatR" Version="13.1.0"/>
+        <PackageReference Include="AutoMapper" Version="15.1.0" />
+        <PackageReference Include="FluentValidation" Version="12.1.0" />
+        <PackageReference Include="MediatR" Version="13.1.0" />
+        <PackageReference Include="Shared.Rabbit" Version="1.0.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Freelance.UserProfiles.Domain\Freelance.UserProfiles.Domain.csproj"/>
+        <ProjectReference Include="..\Freelance.UserProfiles.Domain\Freelance.UserProfiles.Domain.csproj" />
     </ItemGroup>
 
     <ItemGroup>
