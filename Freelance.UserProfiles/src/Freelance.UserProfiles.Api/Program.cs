@@ -92,7 +92,7 @@ builder.Services
     .AddJwtAuthentication(configuration)
     .AddRoleBasedAuthorization()
     .AddOpenTelemetryObservability(otelEndpoint, serviceName, resourceBuilder)
-    .AddSwaggerWithJwtAuth("Freelance UserProfiles API");
+    .AddOpenApiWithJwtAuth("Freelance UserProfiles API");
 
 var app = builder.Build();
 
@@ -104,7 +104,7 @@ app.UseGlobalExceptionHandler<Program>()
     .UseRequestDurationLogging<Program>()
     .UseStandardMiddleware()
     .MapStandardEndpoints();
-
+app.MapApiDocumentation();
 // Map domain endpoints
 app.AddClientProfileEndpoints();
 app.AddFreelancerProfileEndpoints();
