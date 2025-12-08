@@ -21,9 +21,9 @@ public static class FreelancerProfileMappings
             freelancerProfile.Rate.Currency,
             freelancerProfile.Rating,
             freelancerProfile.PortfolioUrl,
-            [.. freelancerProfile.ForeignLanguages.Select(fl=>fl.Language)],
-            [.. freelancerProfile.Skills.Select(s=>s.ProgrammingLanguage)],
-            [.. freelancerProfile.Skills.Select(s=>s.Area)]
+            [.. freelancerProfile.ForeignLanguages.Select(fl => fl.Language)],
+            [.. freelancerProfile.Skills.Select(s => s.ProgrammingLanguage)],
+            [.. freelancerProfile.Skills.Select(s => s.Area)]
         );
     }
 
@@ -56,7 +56,7 @@ public static class FreelancerProfileMappings
     {
         return new UpdateFreelancerProfileDataCommand(id, updateProfileDataRequest.Bio, updateProfileDataRequest.Image);
     }
-     
+
     public static UpdateFreelancerDetailsCommand ToUpdateDetailsCommand(this UpdateFreelancerDetailRequest updateFreelancerProfileDetailsRequest, Guid id)
     {
         return new UpdateFreelancerDetailsCommand(

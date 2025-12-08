@@ -28,7 +28,7 @@ public class FreelancerProfile : BaseUserProfile
         string currency,
         int? rating,
         string portfolioUrl
-    ) : base(accountId,street, city, state, zipCode, country, streetNumber, bio, image)
+    ) : base(accountId, street, city, state, zipCode, country, streetNumber, bio, image)
     {
         Experience = experience;
         Rate = Money.Create(amount, currency);
@@ -42,7 +42,7 @@ public class FreelancerProfile : BaseUserProfile
 
     // Other properties
     public string Experience { get; private set; } = string.Empty;
-    public Money Rate { get; private set; }=Money.Create(0, "USD");
+    public Money Rate { get; private set; } = Money.Create(0, "USD");
     public int? Rating { get; private set; } = 0;
     public string PortfolioUrl { get; private set; } = string.Empty;
 

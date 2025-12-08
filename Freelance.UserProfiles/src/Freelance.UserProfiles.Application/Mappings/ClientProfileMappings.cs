@@ -21,17 +21,17 @@ public static class ClientProfileMappings
     public static List<ClientProfileDto> ToDtos(this IEnumerable<ClientProfile> clientProfiles)
         => [.. clientProfiles.Select(cp => cp.ToDto())];
 
-    public static CreateClientProfileCommand ToCreateCommand(this CreateClientProfileRequest createClientProfileRequest,Guid accountId)
+    public static CreateClientProfileCommand ToCreateCommand(this CreateClientProfileRequest createClientProfileRequest, Guid accountId)
     {
         return new CreateClientProfileCommand(accountId, createClientProfileRequest.Address, createClientProfileRequest.Bio, createClientProfileRequest.Image);
     }
 
-    public static UpdateClientProfileAddressCommand ToUpdateClientAddressCommand(this UpdateProfileAddressRequest updateClientProfileAddressRequest,Guid id)
+    public static UpdateClientProfileAddressCommand ToUpdateClientAddressCommand(this UpdateProfileAddressRequest updateClientProfileAddressRequest, Guid id)
     {
         return new UpdateClientProfileAddressCommand(id, updateClientProfileAddressRequest.AddressDto);
     }
 
-    public static UpdateClientProfileDataCommand ToUpdateClientDataCommand(this UpdateProfileDataRequest updateProfileDataRequest,Guid id)
+    public static UpdateClientProfileDataCommand ToUpdateClientDataCommand(this UpdateProfileDataRequest updateProfileDataRequest, Guid id)
     {
         return new UpdateClientProfileDataCommand(id, updateProfileDataRequest.Bio, updateProfileDataRequest.Image);
     }

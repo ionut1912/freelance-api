@@ -34,8 +34,8 @@ public class Account : Entity
         CreatedAt = DateTime.UtcNow;
     }
 
-    public string Email { get; private set; }=string.Empty;
-    public string Password { get; private set; }=string.Empty;
+    public string Email { get; private set; } = string.Empty;
+    public string Password { get; private set; } = string.Empty;
     public string PhoneNumber { get; private set; } = string.Empty;
     public string Username { get; private set; } = string.Empty;
     public Role Role { get; private set; } = Role.Freelancer;

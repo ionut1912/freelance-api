@@ -19,9 +19,9 @@ public static class ClientProfileModule
             .RequireAuthorization();
 
         clientOnlyGroup.MapPost("/", CreateClientProfile);
-        authenticatedGroup.MapGet("/",GetClientProfiles);
-        clientOnlyGroup.MapGet("/current",GetLoggedInClientProfile);
-        clientOnlyGroup.MapPut("/{id:guid}/address",UpdateClientProfileAddress);
+        authenticatedGroup.MapGet("/", GetClientProfiles);
+        clientOnlyGroup.MapGet("/current", GetLoggedInClientProfile);
+        clientOnlyGroup.MapPut("/{id:guid}/address", UpdateClientProfileAddress);
         clientOnlyGroup.MapPut("/{id:guid}/data", UpdateClientProfileData);
         clientOnlyGroup.MapDelete("/{id:guid}", DeleteClientProfile);
 

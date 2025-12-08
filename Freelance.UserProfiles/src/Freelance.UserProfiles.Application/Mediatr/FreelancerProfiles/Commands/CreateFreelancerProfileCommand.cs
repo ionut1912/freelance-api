@@ -13,8 +13,8 @@ public record CreateFreelancerProfileCommand(Guid AccountId,
     string Currency,
     string PortfolioUrl,
     List<string> ForeignLanguages,
-    List<string>ProgrammingLanguages,
-    List<string>Areas) : IRequest<FreelancerProfile>
+    List<string> ProgrammingLanguages,
+    List<string> Areas) : IRequest<FreelancerProfile>
 {
- 
+
 }

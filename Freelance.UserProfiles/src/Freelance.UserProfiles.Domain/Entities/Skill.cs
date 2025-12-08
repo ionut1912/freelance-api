@@ -16,7 +16,7 @@ public class Skill : Entity
         CreatedAt = DateTime.UtcNow;
     }
 
-    public string ProgrammingLanguage { get; private set; }= string.Empty;
+    public string ProgrammingLanguage { get; private set; } = string.Empty;
     public string Area { get; private set; } = string.Empty;
 
     public static Skill Create(string programmingLanguage, string area)

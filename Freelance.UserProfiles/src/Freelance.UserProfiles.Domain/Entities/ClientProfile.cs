@@ -6,9 +6,9 @@ public class ClientProfile : BaseUserProfile
     {
     }
 
-    private ClientProfile(Guid accountId,string street, string city, string state, string zipCode, string country,
+    private ClientProfile(Guid accountId, string street, string city, string state, string zipCode, string country,
         string streetNumber, string bio, string image)
-        : base(accountId,street, city, state, zipCode, country, streetNumber, bio, image)
+        : base(accountId, street, city, state, zipCode, country, streetNumber, bio, image)
     {
     }
 

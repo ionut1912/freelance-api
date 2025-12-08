@@ -1,7 +1,7 @@
 ﻿using Freelance.Identity.Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
-using Shared.Domain.Exceptions;
 using Shared.Api.Abstractions;
+using Shared.Domain.Exceptions;
 
 namespace Freelance.Identity.Api.Mappers;
 

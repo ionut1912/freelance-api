@@ -26,10 +26,10 @@ public static class FreelancerProfileModule
         authenticatedGroup.MapGet("/", GetFreelancersProfilesAsync);
         freelancerOnlyGroup.MapGet("/current", GetCurrentFreelancerProfileAsync);
         freelancerOnlyGroup.MapPut("/details/{id:guid}", UpdateFreelancerDetailsAsync);
-        freelancerOnlyGroup.MapPut("/address/{id:guid}",UpdateFreelancerAddressAsync);
+        freelancerOnlyGroup.MapPut("/address/{id:guid}", UpdateFreelancerAddressAsync);
         freelancerOnlyGroup.MapPut("/data/{id:guid}", UpdateFreelancerDataAsync);
         clientOnlyGroup.MapPut("/rating/{id:guid}", UpdateFreelancerRatingAsync);
-        freelancerOnlyGroup.MapDelete("/{id:guid}",DeleteFreelancerProfileAsync);
+        freelancerOnlyGroup.MapDelete("/{id:guid}", DeleteFreelancerProfileAsync);
 
         return app;
     }
@@ -63,7 +63,7 @@ public static class FreelancerProfileModule
     private static async Task<IResult> UpdateFreelancerDetailsAsync(IMediator mediator, Guid id, [FromBody] UpdateFreelancerDetailRequest updateFreelancerDetailRequest,
                 CancellationToken ct)
     {
-        var updateFreelancerDetailsCommand=updateFreelancerDetailRequest.ToUpdateDetailsCommand(id);
+        var updateFreelancerDetailsCommand = updateFreelancerDetailRequest.ToUpdateDetailsCommand(id);
         await mediator.Send(updateFreelancerDetailsCommand, ct);
         return Results.NoContent();
 
@@ -77,7 +77,7 @@ public static class FreelancerProfileModule
         return Results.NoContent();
     }
 
-    private static  async Task<IResult> UpdateFreelancerDataAsync(IMediator mediator, Guid id, [FromBody] UpdateProfileDataRequest updateProfileDataRequest,
+    private static async Task<IResult> UpdateFreelancerDataAsync(IMediator mediator, Guid id, [FromBody] UpdateProfileDataRequest updateProfileDataRequest,
         CancellationToken ct)
     {
         var updateFreelancerDataCommand = updateProfileDataRequest.ToUpdateFreelancerDataCommand(id);

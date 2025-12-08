@@ -40,10 +40,10 @@ public static class UserModules
         return Results.Ok(result);
     }
 
-    private static async Task<IResult> BlockUserAccount(IMediator mediator, HttpContext httpContext,CancellationToken ct)
+    private static async Task<IResult> BlockUserAccount(IMediator mediator, HttpContext httpContext, CancellationToken ct)
     {
-        var accountId=httpContext.GetAccountId();
-        if(accountId==Guid.Empty) return Results.Unauthorized();
+        var accountId = httpContext.GetAccountId();
+        if (accountId == Guid.Empty) return Results.Unauthorized();
 
         var blockAccountCommand = new BlockAccountCommand(accountId);
         await mediator.Send(blockAccountCommand, ct);
@@ -60,7 +60,7 @@ public static class UserModules
         return Results.Ok(result);
     }
 
-    private static async Task<IResult> UnblockUserAccount(IMediator mediator, HttpContext httpContext,CancellationToken ct)
+    private static async Task<IResult> UnblockUserAccount(IMediator mediator, HttpContext httpContext, CancellationToken ct)
     {
         var accountId = httpContext.GetAccountId();
         if (accountId == Guid.Empty) return Results.Unauthorized();

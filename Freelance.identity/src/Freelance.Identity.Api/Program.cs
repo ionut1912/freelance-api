@@ -23,8 +23,8 @@ builder.Services
     .AddRepositoriesConfig<IAccountRepository, AccountRepository>()
     .AddRepositoriesConfig<IJwtTokenService, JwtTokenService>()
     .AddRepositoriesConfig<IPasswordService, PasswordService>()
-    .AddAplicationConfig(typeof(CreateAccountCommand).Assembly,typeof(CreateAccountCommandValidator).Assembly)
-    .AddPresentation<IdentityExceptionMapper>(builder.Configuration,otelEndpoint,serviceName,environmentName, "Feelance-Identity","Freelance-Identity-Api");
+    .AddAplicationConfig(typeof(CreateAccountCommand).Assembly, typeof(CreateAccountCommandValidator).Assembly)
+    .AddPresentation<IdentityExceptionMapper>(builder.Configuration, otelEndpoint, serviceName, environmentName);
 
 
 var app = builder.Build();

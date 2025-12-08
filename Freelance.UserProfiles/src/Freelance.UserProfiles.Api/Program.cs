@@ -23,7 +23,7 @@ builder.Services
     .AddRepositoriesConfig<IFreelancerProfileRepository, FreelancerProfileService>()
     .AddRepositoriesConfig<IClientProfileRepository, ClientProfileService>()
     .AddAplicationConfig(typeof(MediatrAssemblyReference).Assembly, typeof(ValidationAssemblyReference).Assembly)
-    .AddPresentation<UserProfileExceptionMapper>(builder.Configuration, otelEndpoint, serviceName, environmentName, "Feelance-User-Profiles", "Freelance-User-Profiles-Api");
+    .AddPresentation<UserProfileExceptionMapper>(builder.Configuration, otelEndpoint, serviceName, environmentName);
 
 
 var app = builder.Build();

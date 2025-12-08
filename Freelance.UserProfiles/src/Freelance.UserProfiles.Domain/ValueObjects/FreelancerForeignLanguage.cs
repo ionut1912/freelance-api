@@ -13,7 +13,7 @@ public class FreelancerForeignLanguage : ValueObject
         Language = language;
     }
 
-    public string Language { get; }=string.Empty;
+    public string Language { get; } = string.Empty;
 
     public static FreelancerForeignLanguage Create(string language)
     {

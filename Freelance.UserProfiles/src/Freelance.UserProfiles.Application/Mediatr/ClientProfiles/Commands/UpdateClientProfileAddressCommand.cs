@@ -2,6 +2,6 @@
 using Shared.Application.Mediator;
 namespace Freelance.UserProfiles.Application.Mediatr.ClientProfiles.Commands;
 
-public record UpdateClientProfileAddressCommand(Guid Id,AddressDto AddressDto) : IRequest<Unit>
+public record UpdateClientProfileAddressCommand(Guid Id, AddressDto AddressDto) : IRequest<Unit>
 {
 }
