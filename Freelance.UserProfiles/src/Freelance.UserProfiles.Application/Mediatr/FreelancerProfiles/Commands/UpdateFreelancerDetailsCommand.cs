@@ -1,15 +1,8 @@
-﻿using MediatR;
+﻿using Shared.Application.Mediator;
 
-namespace Freelancer.UserProfiles.Application.Mediatr.FreelancerProfiles.Commands;
+namespace Freelance.UserProfiles.Application.Mediatr.FreelancerProfiles.Commands;
 
-public class UpdateFreelancerDetailsCommand : IRequest<Unit>
+public record UpdateFreelancerDetailsCommand(Guid Id,List<string> ForeignLanguages,List<string> ProgrammingLanguages,List<string> Areas,string Experience,decimal Amount,string Currency,string PortfolioUrl) : IRequest<Unit>
 {
-    public Guid Id { get; set; }
-    public List<string> ForeignLanguages { get; set; }
-    public List<string> ProgrammingLanguages { get; set; }
-    public List<string> Areas { get; set; }
-    public string Experience { get; set; }
-    public decimal Amount { get; set; }
-    public string Currency { get; set; }
-    public string PortfolioUrl { get; set; }
+
 }

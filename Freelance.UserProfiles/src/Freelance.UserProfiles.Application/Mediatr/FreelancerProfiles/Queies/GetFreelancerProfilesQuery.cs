@@ -1,8 +1,8 @@
-﻿using Freelancer.UserProfiles.Application.Dtos;
-using MediatR;
+﻿using Freelance.UserProfiles.Application.Dtos;
+using Shared.Application.Mediator;
 
-namespace Freelancer.UserProfiles.Application.Mediatr.FreelancerProfiles.Queies;
+namespace Freelance.UserProfiles.Application.Mediatr.FreelancerProfiles.Queies;
 
-public class GetFreelancerProfilesQuery : IRequest<List<FreelancerProfileDto>>
+public record GetFreelancerProfilesQuery : IRequest<List<FreelancerProfileDto>>
 {
 }

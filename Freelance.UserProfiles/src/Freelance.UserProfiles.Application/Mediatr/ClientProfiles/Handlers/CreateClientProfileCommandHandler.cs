@@ -1,9 +1,8 @@
-﻿using Freelance.UserProfiles.Domain.Entities;
+﻿using Freelance.UserProfiles.Application.Mediatr.ClientProfiles.Commands;
+using Freelance.UserProfiles.Domain.Entities;
 using Freelance.UserProfiles.Domain.Interfaces;
-using Freelancer.UserProfiles.Application.Mediatr.ClientProfiles.Commands;
-using MediatR;
-
-namespace Freelancer.UserProfiles.Application.Mediatr.ClientProfiles.Handlers;
+using Shared.Application.Mediator;
+namespace Freelance.UserProfiles.Application.Mediatr.ClientProfiles.Handlers;
 
 public class CreateClientProfileCommandHandler : IRequestHandler<CreateClientProfileCommand, ClientProfile>
 {
@@ -17,9 +16,9 @@ public class CreateClientProfileCommandHandler : IRequestHandler<CreateClientPro
 
     public async Task<ClientProfile> Handle(CreateClientProfileCommand request, CancellationToken cancellationToken)
     {
-        var clientProfile = ClientProfile.Create(request.AccountId, request.Address.Street, request.Address.City,
-            request.Address.State, request.Address.ZipCode, request.Address.Country, request
-                .Address.StreetNumber, request.Bio, request.Image);
+        var clientProfile = ClientProfile.Create(request.AccountId, request.AddressDto.Street, request.AddressDto.City,
+            request.AddressDto.State, request.AddressDto.ZipCode, request.AddressDto.Country, request
+                .AddressDto.StreetNumber, request.Bio, request.Image);
         await _repository.CreateClientProfileAsync(clientProfile, cancellationToken);
         return clientProfile;
     }

@@ -1,5 +1,5 @@
-﻿namespace Freelancer.UserProfiles.Application.Dtos;
+﻿namespace Freelance.UserProfiles.Application.Dtos;
 
-public class ClientProfileDto : BaseProfileDto
+public record ClientProfileDto(Guid AccountId, AddressDto Address, string Bio, string Image, bool IsVerified) : BaseProfileDto(AccountId, Address, Bio, Image, IsVerified)
 {
 }

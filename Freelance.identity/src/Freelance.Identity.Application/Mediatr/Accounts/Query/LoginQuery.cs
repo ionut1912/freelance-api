@@ -3,8 +3,7 @@ using Shared.Application.Mediator;
 
 namespace Freelance.Identity.Application.Mediatr.Accounts.Query;
 
-public class LoginQuery : IRequest<AccountDto>
+public record LoginQuery(string Username,string Password) : IRequest<AccountDto>
 {
-    public string Username { get; set; }
-    public string Password { get; set; }
+
 }

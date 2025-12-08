@@ -2,7 +2,7 @@
 
 namespace Freelance.Identity.Application.Mediatr.Accounts.Commands;
 
-public class DeleteAccountCommand : IRequest<Unit>
+public record DeleteAccountCommand(Guid Id) : IRequest<Unit>
 {
-    public Guid Id { get; set; }
+
 }

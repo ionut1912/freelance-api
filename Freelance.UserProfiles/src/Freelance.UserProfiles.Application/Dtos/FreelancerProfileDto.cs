@@ -1,13 +1,18 @@
-﻿namespace Freelancer.UserProfiles.Application.Dtos;
+﻿namespace Freelance.UserProfiles.Application.Dtos;
 
-public class FreelancerProfileDto : BaseProfileDto
+public record FreelancerProfileDto(Guid AccountId,
+    AddressDto Address, 
+    string Bio,
+    string Image, 
+    bool IsVerified,
+    string Experience,
+    decimal Amount, 
+    string Currency,
+    int?Rating,
+    string PortfolioUrl,
+    List<string>ForeignLanguages,
+    List<string> ProgrammingLanguages,
+    List<string>Areas) : BaseProfileDto(AccountId,Address,Bio,Image,IsVerified)
 {
-    public string Experience { get; set; }
-    public decimal Amount { get; set; }
-    public string Currency { get; set; }
-    public int? Rating { get; set; }
-    public string PortfolioUrl { get; set; }
-    public List<string> ForeignLanguages { get; set; }
-    public List<string> ProgrammingLanguages { get; set; }
-    public List<string> Areas { get; set; }
+
 }

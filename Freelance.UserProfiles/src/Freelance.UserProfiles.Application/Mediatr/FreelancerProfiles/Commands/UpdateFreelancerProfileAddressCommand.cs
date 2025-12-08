@@ -1,10 +1,9 @@
-﻿using Freelancer.UserProfiles.Application.Dtos;
-using MediatR;
+﻿using Freelance.UserProfiles.Application.Dtos;
+using Shared.Application.Mediator;
 
-namespace Freelancer.UserProfiles.Application.Mediatr.FreelancerProfiles.Commands;
+namespace Freelance.UserProfiles.Application.Mediatr.FreelancerProfiles.Commands;
 
-public class UpdateFreelancerProfileAddressCommand : IRequest<Unit>
+public record UpdateFreelancerProfileAddressCommand(Guid Id, AddressDto AddressDto) : IRequest<Unit>
 {
-    public Guid Id { get; set; }
-    public AddressDto AddressDto { get; set; }
+
 }

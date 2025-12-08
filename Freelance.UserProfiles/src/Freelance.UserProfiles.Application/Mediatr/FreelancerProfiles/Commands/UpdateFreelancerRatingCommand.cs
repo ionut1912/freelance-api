@@ -1,9 +1,7 @@
-﻿using MediatR;
+﻿using Shared.Application.Mediator;
 
-namespace Freelancer.UserProfiles.Application.Mediatr.FreelancerProfiles.Commands;
+namespace Freelance.UserProfiles.Application.Mediatr.FreelancerProfiles.Commands;
 
-public class UpdateFreelancerRatingCommand : IRequest<Unit>
+public record UpdateFreelancerRatingCommand(Guid Id,int Rating) : IRequest<Unit>
 {
-    public Guid Id { get; set; }
-    public int Rating { get; set; }
 }

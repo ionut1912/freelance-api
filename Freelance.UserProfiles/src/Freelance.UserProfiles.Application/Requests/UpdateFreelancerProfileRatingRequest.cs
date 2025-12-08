@@ -1,6 +1,6 @@
-﻿namespace Freelancer.UserProfiles.Application.Requests;
+﻿namespace Freelance.UserProfiles.Application.Requests;
 
-public class UpdateFreelancerProfileRatingRequest
+public record UpdateFreelancerProfileRatingRequest(int Rating)
 {
-    public int Rating { get; set; }
+
 }

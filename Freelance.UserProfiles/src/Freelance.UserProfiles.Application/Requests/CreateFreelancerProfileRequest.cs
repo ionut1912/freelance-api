@@ -1,12 +1,17 @@
-﻿namespace Freelancer.UserProfiles.Application.Requests;
+﻿using Freelance.UserProfiles.Application.Dtos;
 
-public class CreateFreelancerProfileRequest : BaseCreateProfileRequest
+namespace Freelance.UserProfiles.Application.Requests;
+
+public record CreateFreelancerProfileRequest(AddressDto Address,
+    string Bio, 
+    string Image,
+    string Experience,
+    decimal Amount,
+    string Currency,
+    string PortfolioUrl,
+    List<string>ForeignLanguages,
+    List<string>ProgrammingLanguages,
+    List<string>Areas) : BaseCreateProfileRequest(Address,Bio,Image)
 {
-    public string Experience { get; set; }
-    public decimal Amount { get; set; }
-    public string Currency { get; set; }
-    public string PortfolioUrl { get; set; }
-    public List<string> ForeignLanguages { get; set; }
-    public List<string> ProgrammingLanguages { get; set; }
-    public List<string> Areas { get; set; }
+
 }

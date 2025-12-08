@@ -20,8 +20,8 @@ public class Money : ValueObject
         Currency = currency.ToUpperInvariant();
     }
 
-    public decimal Amount { get; }
-    public string Currency { get; }
+    public decimal Amount { get; } = 0;
+    public string Currency { get; } = string.Empty;
 
     public static Money Create(decimal amount, string currency)
     {

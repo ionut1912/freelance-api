@@ -18,7 +18,7 @@ public class GetCurrentAccountQueryHandler : IRequestHandler<GetCurrentAccountQu
     public async Task<AccountDto> Handle(GetCurrentAccountQuery request, CancellationToken cancellationToken)
     {
         var account = await _accountRepository.GetCurrentAccountAsync(request.Username);
-        var accountDto = account.ToDto();
+        var accountDto = account.ToDto(null);
         return accountDto;
     }
 }

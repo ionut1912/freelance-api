@@ -4,14 +4,12 @@
         <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <RootNamespace>Freelancer.UserProfiles.Application</RootNamespace>
+        <RootNamespace>Freelance.UserProfiles.Application</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AutoMapper" Version="15.1.0" />
-        <PackageReference Include="FluentValidation" Version="12.1.0" />
-        <PackageReference Include="MediatR" Version="13.1.0" />
-        <PackageReference Include="Shared.Rabbit" Version="1.0.0" />
+		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
+		<PackageReference Include="Shared.ApplicationLayer" Version="1.0.1" />
     </ItemGroup>
 
     <ItemGroup>

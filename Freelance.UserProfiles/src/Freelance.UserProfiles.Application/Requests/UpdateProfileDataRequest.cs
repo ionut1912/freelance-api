@@ -1,7 +1,6 @@
-﻿namespace Freelancer.UserProfiles.Application.Requests;
+﻿namespace Freelance.UserProfiles.Application.Requests;
 
-public class UpdateProfileDataRequest
+public record UpdateProfileDataRequest(string Bio, string Image)
 {
-    public string Bio { get; set; }
-    public string Image { get; set; }
+
 }

@@ -6,19 +6,17 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 	<OutputType>Exe</OutputType>
+	<UserSecretsId>d843d83a-1bff-4d8f-a46c-6070971cb8d7</UserSecretsId>
+	<DockerfileContext>..\..</DockerfileContext>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.0" />
-        <PackageReference Include="MediatR" Version="13.1.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.11" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.11">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Shared.ApiLayer" Version="1.0.1" />
-        <PackageReference Include="Shared.InfraLayer" Version="1.0.0" />
-	        <PackageReference Include="Shared.RabbitLayer" Version="1.0.0" />
+        <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />
+        <PackageReference Include="Shared.ApiLayer" Version="1.1.4" />
     </ItemGroup>
 
     <ItemGroup>

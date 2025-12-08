@@ -1,9 +1,9 @@
-﻿using Freelance.UserProfiles.Domain.Exceptions;
+﻿using Freelance.UserProfiles.Application.Mediatr.ClientProfiles.Commands;
+using Freelance.UserProfiles.Domain.Exceptions;
 using Freelance.UserProfiles.Domain.Interfaces;
-using Freelancer.UserProfiles.Application.Mediatr.ClientProfiles.Commands;
-using MediatR;
+using Shared.Application.Mediator;
 
-namespace Freelancer.UserProfiles.Application.Mediatr.ClientProfiles.Handlers;
+namespace Freelance.UserProfiles.Application.Mediatr.ClientProfiles.Handlers;
 
 public class UpdateClientProfileDataCommandHandler : IRequestHandler<UpdateClientProfileDataCommand, Unit>
 {

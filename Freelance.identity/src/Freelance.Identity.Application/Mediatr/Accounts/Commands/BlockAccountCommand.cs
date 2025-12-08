@@ -2,7 +2,7 @@
 
 namespace Freelance.Identity.Application.Mediatr.Accounts.Commands;
 
-public class BlockAccountCommand : IRequest<Unit>
+public record BlockAccountCommand(Guid AccountId) : IRequest<Unit>
 {
-    public Guid AccountId { get; set; }
+
 }

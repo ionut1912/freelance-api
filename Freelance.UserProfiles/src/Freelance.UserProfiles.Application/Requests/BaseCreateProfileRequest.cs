@@ -1,10 +1,8 @@
-﻿using Freelancer.UserProfiles.Application.Dtos;
+﻿using Freelance.UserProfiles.Application.Dtos;
 
-namespace Freelancer.UserProfiles.Application.Requests;
+namespace Freelance.UserProfiles.Application.Requests;
 
-public class BaseCreateProfileRequest
+public record BaseCreateProfileRequest(AddressDto Address, string Bio, string Image)
 {
-    public AddressDto Address { get; set; }
-    public string Bio { get; set; }
-    public string Image { get; set; }
+
 }

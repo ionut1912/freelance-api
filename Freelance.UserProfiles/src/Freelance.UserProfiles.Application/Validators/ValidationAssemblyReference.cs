@@ -1,4 +1,4 @@
-﻿namespace Freelancer.UserProfiles.Application.Validators;
+﻿namespace Freelance.UserProfiles.Application.Validators;
 
 public class ValidationAssemblyReference
 {

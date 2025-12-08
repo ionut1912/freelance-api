@@ -1,29 +1,25 @@
-﻿using AutoMapper;
+﻿using Freelance.UserProfiles.Application.Dtos;
+using Freelance.UserProfiles.Application.Mappings;
+using Freelance.UserProfiles.Application.Mediatr.ClientProfiles.Queries;
 using Freelance.UserProfiles.Domain.Interfaces;
-using Freelancer.UserProfiles.Application.Dtos;
-using Freelancer.UserProfiles.Application.Mediatr.ClientProfiles.Queries;
-using MediatR;
-
-namespace Freelancer.UserProfiles.Application.Mediatr.ClientProfiles.Handlers;
+using Shared.Application.Mediator;
+namespace Freelance.UserProfiles.Application.Mediatr.ClientProfiles.Handlers;
 
 public class GetClientProfilesQueryHandler : IRequestHandler<GetClientProfilesQuery, List<ClientProfileDto>>
 {
     private readonly IClientProfileRepository _clientProfileRepository;
-    private readonly IMapper _mapper;
 
-    public GetClientProfilesQueryHandler(IClientProfileRepository clientProfileRepository, IMapper mapper)
+    public GetClientProfilesQueryHandler(IClientProfileRepository clientProfileRepository)
     {
         ArgumentNullException.ThrowIfNull(clientProfileRepository, nameof(clientProfileRepository));
-        ArgumentNullException.ThrowIfNull(mapper, nameof(mapper));
         _clientProfileRepository = clientProfileRepository;
-        _mapper = mapper;
     }
 
     public async Task<List<ClientProfileDto>> Handle(GetClientProfilesQuery request,
         CancellationToken cancellationToken)
     {
         var clientProfiles = await _clientProfileRepository.GetClientProfilesAsync(cancellationToken);
-        var clientDtos = _mapper.Map<List<ClientProfileDto>>(clientProfiles);
+        var clientDtos = clientProfiles.ToDtos();
         return clientDtos;
     }
 }

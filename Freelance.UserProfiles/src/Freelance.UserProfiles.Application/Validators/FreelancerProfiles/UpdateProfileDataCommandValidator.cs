@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
-using Freelancer.UserProfiles.Application.Mediatr.FreelancerProfiles.Commands;
+using Freelance.UserProfiles.Application.Mediatr.FreelancerProfiles.Commands;
 
-namespace Freelancer.UserProfiles.Application.Validators.FreelancerProfiles;
+namespace Freelance.UserProfiles.Application.Validators.FreelancerProfiles;
 
 public class UpdateProfileDataCommandValidator : AbstractValidator<UpdateFreelancerProfileDataCommand>
 {

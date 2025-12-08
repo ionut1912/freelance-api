@@ -1,9 +1,9 @@
-﻿using Freelance.UserProfiles.Domain.Exceptions;
+﻿using Freelance.UserProfiles.Application.Mediatr.FreelancerProfiles.Commands;
+using Freelance.UserProfiles.Domain.Exceptions;
 using Freelance.UserProfiles.Domain.Interfaces;
-using Freelancer.UserProfiles.Application.Mediatr.FreelancerProfiles.Commands;
-using MediatR;
+using Shared.Application.Mediator;
 
-namespace Freelancer.UserProfiles.Application.Mediatr.FreelancerProfiles.Handlers;
+namespace Freelance.UserProfiles.Application.Mediatr.FreelancerProfiles.Handlers;
 
 public class UpdateFreelancerRatingCommandHandler : IRequestHandler<UpdateFreelancerRatingCommand, Unit>
 {

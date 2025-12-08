@@ -1,25 +1,20 @@
-﻿using AutoMapper;
+﻿using Freelance.UserProfiles.Application.Dtos;
+using Freelance.UserProfiles.Application.Mappings;
+using Freelance.UserProfiles.Application.Mediatr.FreelancerProfiles.Queies;
 using Freelance.UserProfiles.Domain.Exceptions;
 using Freelance.UserProfiles.Domain.Interfaces;
-using Freelancer.UserProfiles.Application.Dtos;
-using Freelancer.UserProfiles.Application.Mediatr.FreelancerProfiles.Queies;
-using MediatR;
+using Shared.Application.Mediator;
 
-namespace Freelancer.UserProfiles.Application.Mediatr.FreelancerProfiles.Handlers;
+namespace Freelance.UserProfiles.Application.Mediatr.FreelancerProfiles.Handlers;
 
-public class
-    GetLoggedInFreelancerProfileQueryHandler : IRequestHandler<GetLoggedInFreelancerProfileQuery, FreelancerProfileDto>
+public class GetLoggedInFreelancerProfileQueryHandler : IRequestHandler<GetLoggedInFreelancerProfileQuery, FreelancerProfileDto>
 {
     private readonly IFreelancerProfileRepository _freelancerProfileRepository;
-    private readonly IMapper _mapper;
 
-    public GetLoggedInFreelancerProfileQueryHandler(IFreelancerProfileRepository freelancerProfileRepository,
-        IMapper mapper)
+    public GetLoggedInFreelancerProfileQueryHandler(IFreelancerProfileRepository freelancerProfileRepository)
     {
         ArgumentNullException.ThrowIfNull(freelancerProfileRepository, nameof(freelancerProfileRepository));
-        ArgumentNullException.ThrowIfNull(mapper, nameof(mapper));
         _freelancerProfileRepository = freelancerProfileRepository;
-        _mapper = mapper;
     }
 
     public async Task<FreelancerProfileDto> Handle(GetLoggedInFreelancerProfileQuery request,
@@ -29,7 +24,7 @@ public class
             await _freelancerProfileRepository.GetLoggedInFreelancerProfileAsync(request.AccountId, cancellationToken);
         if (freelancerProfile == null)
             throw new ProfileNotFoundException($"Freelancer Profile with AccountId {request.AccountId} not found");
-        var freelancerProfileDto = _mapper.Map<FreelancerProfileDto>(freelancerProfile);
+        var freelancerProfileDto = freelancerProfile.ToDto();
         return freelancerProfileDto;
     }
 }

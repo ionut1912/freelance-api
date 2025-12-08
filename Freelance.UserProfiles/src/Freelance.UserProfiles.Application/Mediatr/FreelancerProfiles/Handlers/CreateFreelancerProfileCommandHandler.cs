@@ -1,10 +1,10 @@
-﻿using Freelance.UserProfiles.Domain.Entities;
+﻿using Freelance.UserProfiles.Application.Mediatr.FreelancerProfiles.Commands;
+using Freelance.UserProfiles.Domain.Entities;
 using Freelance.UserProfiles.Domain.Interfaces;
 using Freelance.UserProfiles.Domain.ValueObjects;
-using Freelancer.UserProfiles.Application.Mediatr.FreelancerProfiles.Commands;
-using MediatR;
+using Shared.Application.Mediator;
 
-namespace Freelancer.UserProfiles.Application.Mediatr.FreelancerProfiles.Handlers;
+namespace Freelance.UserProfiles.Application.Mediatr.FreelancerProfiles.Handlers;
 
 public class CreateFreelancerProfileCommandHandler : IRequestHandler<CreateFreelancerProfileCommand, FreelancerProfile>
 {
@@ -39,7 +39,7 @@ public class CreateFreelancerProfileCommandHandler : IRequestHandler<CreateFreel
 
         var foreignLanguages = request.ForeignLanguages?
             .Select(language => FreelancerForeignLanguage.Create(language))
-            .ToList();
+            .ToList() ?? new List<FreelancerForeignLanguage>();
 
         var skills = new List<Skill>();
         if (request.ProgrammingLanguages != null && request.Areas != null)
@@ -48,6 +48,7 @@ public class CreateFreelancerProfileCommandHandler : IRequestHandler<CreateFreel
                 var skill = Skill.Create(request.ProgrammingLanguages[i], request.Areas[i]);
                 skills.Add(skill);
             }
+
 
         freelancerProfile.AddLanguages(foreignLanguages);
         freelancerProfile.AddSkills(skills);

@@ -1,8 +1,7 @@
-﻿using MediatR;
+﻿using Shared.Application.Mediator;
 
-namespace Freelancer.UserProfiles.Application.Mediatr.ClientProfiles.Commands;
+namespace Freelance.UserProfiles.Application.Mediatr.ClientProfiles.Commands;
 
-public class DeleteClientProfileCommand : IRequest<Unit>
+public record DeleteClientProfileCommand(Guid Id) : IRequest<Unit>
 {
-    public Guid Id { get; set; }
 }

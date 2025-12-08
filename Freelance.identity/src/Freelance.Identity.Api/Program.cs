@@ -1,9 +1,11 @@
-using Freelance.Identity.Api.Modules;
+using Freelance.Identity.Api.Endpoints;
+using Freelance.Identity.Api.Mappers;
+using Freelance.Identity.Application.Mediatr.Accounts.Commands;
+using Freelance.Identity.Application.Validators;
+using Freelance.Identity.Domain.interfaces;
+using Freelance.Identity.Infrastructure.Persistance;
+using Freelance.Identity.Infrastructure.Persistance.Repositories;
 using Shared.Api.Extensions;
-using Freelance.Identity.Infrastructure.Extensions;
-using Freelance.Identity.Application.Extensions;
-using Freelance.Identity.Api.Extensions;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Configuration
@@ -13,25 +15,22 @@ var serviceName = configuration["OTEL_SERVICE_NAME"] ?? "Freelance-Identity";
 var environmentName = builder.Environment.EnvironmentName ?? "Development";
 
 // Create OpenTelemetry resource
-var resourceBuilder = Shared.Api.Extensions.ServiceCollectionExtensions.CreateServiceResourceBuilder(
-    serviceName,
-    environmentName);
-// Logging
-builder.Logging.AddOpenTelemetryLogging(otelEndpoint, resourceBuilder);
+builder.AddOpenTelemetry(otelEndpoint, serviceName, environmentName);
 
-// Register layers
+
 builder.Services
-    .AddInfrastructure(configuration)
-    .AddApplication()
-    .AddPresentation(configuration, otelEndpoint, resourceBuilder);
-
-
+    .AddDatabaseConfig<ApplicationDbContext>(builder.Configuration)
+    .AddRepositoriesConfig<IAccountRepository, AccountRepository>()
+    .AddRepositoriesConfig<IJwtTokenService, JwtTokenService>()
+    .AddRepositoriesConfig<IPasswordService, PasswordService>()
+    .AddAplicationConfig(typeof(CreateAccountCommand).Assembly,typeof(CreateAccountCommandValidator).Assembly)
+    .AddPresentation<IdentityExceptionMapper>(builder.Configuration,otelEndpoint,serviceName,environmentName, "Feelance-Identity","Freelance-Identity-Api");
 
 
 var app = builder.Build();
 
 // Migrate database
-app.MigrateIdentityDatabase();
+app.MigrateDatabaseConfig<ApplicationDbContext>();
 
 // Configure middleware pipeline
 app.UseGlobalExceptionHandler<Program>()
@@ -41,7 +40,6 @@ app.UseGlobalExceptionHandler<Program>()
 
 app.MapApiDocumentation();
 
-// Map domain endpoints
-app.AddUserEndpoints();
+app.MapUsersEndpoints();
 
 app.Run();

@@ -34,11 +34,11 @@ public class Account : Entity
         CreatedAt = DateTime.UtcNow;
     }
 
-    public string Email { get; private set; }
-    public string Password { get; private set; }
-    public string PhoneNumber { get; private set; }
-    public string Username { get; private set; }
-    public Role Role { get; private set; }
+    public string Email { get; private set; }=string.Empty;
+    public string Password { get; private set; }=string.Empty;
+    public string PhoneNumber { get; private set; } = string.Empty;
+    public string Username { get; private set; } = string.Empty;
+    public Role Role { get; private set; } = Role.Freelancer;
     public bool IsBlocked { get; private set; }
     public DateTime BlockedAt { get; private set; }
 

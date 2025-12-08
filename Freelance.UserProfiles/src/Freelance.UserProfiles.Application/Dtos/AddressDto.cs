@@ -1,11 +1,6 @@
-﻿namespace Freelancer.UserProfiles.Application.Dtos;
+﻿namespace Freelance.UserProfiles.Application.Dtos;
 
-public class AddressDto
+public record AddressDto(string Street, string City, string State, string ZipCode, string Country, string StreetNumber)
 {
-    public string Street { get; set; } = string.Empty;
-    public string City { get; set; } = string.Empty;
-    public string State { get; set; } = string.Empty;
-    public string ZipCode { get; set; } = string.Empty;
-    public string Country { get; set; } = string.Empty;
-    public string StreetNumber { get; set; } = string.Empty;
+
 }

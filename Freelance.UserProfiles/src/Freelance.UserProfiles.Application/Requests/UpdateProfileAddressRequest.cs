@@ -1,8 +1,8 @@
-﻿using Freelancer.UserProfiles.Application.Dtos;
+﻿using Freelance.UserProfiles.Application.Dtos;
 
-namespace Freelancer.UserProfiles.Application.Requests;
+namespace Freelance.UserProfiles.Application.Requests;
 
-public class UpdateProfileAddressRequest
+public record UpdateProfileAddressRequest(AddressDto AddressDto)
 {
-    public AddressDto AddressDto { get; set; }
+
 }

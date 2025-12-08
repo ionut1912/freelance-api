@@ -1,5 +1,7 @@
-﻿namespace Freelancer.UserProfiles.Application.Requests;
+﻿using Freelance.UserProfiles.Application.Dtos;
 
-public class CreateClientProfileRequest : BaseCreateProfileRequest
+namespace Freelance.UserProfiles.Application.Requests;
+
+public record CreateClientProfileRequest(AddressDto Address, string Bio, string Image) : BaseCreateProfileRequest(Address,Bio,Image)
 {
 }

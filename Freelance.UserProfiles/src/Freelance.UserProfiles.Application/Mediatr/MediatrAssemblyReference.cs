@@ -1,4 +1,4 @@
-﻿namespace Freelancer.UserProfiles.Application.Mediatr;
+﻿namespace Freelance.UserProfiles.Application.Mediatr;
 
 public class MediatrAssemblyReference
 {

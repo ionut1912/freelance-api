@@ -1,9 +1,9 @@
-﻿using Freelancer.UserProfiles.Application.Dtos;
-using MediatR;
+﻿using Freelance.UserProfiles.Application.Dtos;
+using Shared.Application.Mediator;
 
-namespace Freelancer.UserProfiles.Application.Mediatr.FreelancerProfiles.Queies;
+namespace Freelance.UserProfiles.Application.Mediatr.FreelancerProfiles.Queies;
 
-public class GetLoggedInFreelancerProfileQuery : IRequest<FreelancerProfileDto>
+public record GetLoggedInFreelancerProfileQuery(Guid AccountId) : IRequest<FreelancerProfileDto>
 {
-    public Guid AccountId { get; set; }
+
 }

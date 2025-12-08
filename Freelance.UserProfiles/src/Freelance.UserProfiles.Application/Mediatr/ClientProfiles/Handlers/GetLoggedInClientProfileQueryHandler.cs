@@ -1,23 +1,19 @@
-﻿using AutoMapper;
+﻿using Freelance.UserProfiles.Application.Dtos;
+using Freelance.UserProfiles.Application.Mappings;
+using Freelance.UserProfiles.Application.Mediatr.ClientProfiles.Queries;
 using Freelance.UserProfiles.Domain.Exceptions;
 using Freelance.UserProfiles.Domain.Interfaces;
-using Freelancer.UserProfiles.Application.Dtos;
-using Freelancer.UserProfiles.Application.Mediatr.ClientProfiles.Queries;
-using MediatR;
-
-namespace Freelancer.UserProfiles.Application.Mediatr.ClientProfiles.Handlers;
+using Shared.Application.Mediator;
+namespace Freelance.UserProfiles.Application.Mediatr.ClientProfiles.Handlers;
 
 public class GetLoggedInClientProfileQueryHandler : IRequestHandler<GetLoggedInClientProfileQuery, ClientProfileDto>
 {
     private readonly IClientProfileRepository _clientProfileRepository;
-    private readonly IMapper _mapper;
 
-    public GetLoggedInClientProfileQueryHandler(IClientProfileRepository clientProfileRepository, IMapper mapper)
+    public GetLoggedInClientProfileQueryHandler(IClientProfileRepository clientProfileRepository)
     {
         ArgumentNullException.ThrowIfNull(clientProfileRepository, nameof(clientProfileRepository));
-        ArgumentNullException.ThrowIfNull(mapper, nameof(mapper));
         _clientProfileRepository = clientProfileRepository;
-        _mapper = mapper;
     }
 
     public async Task<ClientProfileDto> Handle(GetLoggedInClientProfileQuery request,
@@ -28,7 +24,7 @@ public class GetLoggedInClientProfileQueryHandler : IRequestHandler<GetLoggedInC
         if (clientProfile == null)
             throw new ProfileNotFoundException($"Profile with accountId {request.AccountId} not found");
 
-        var clientProfileDto = _mapper.Map<ClientProfileDto>(clientProfile);
+        var clientProfileDto = clientProfile.ToDto();
         return clientProfileDto;
     }
 }

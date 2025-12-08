@@ -25,8 +25,7 @@ public class LoginQueryHandler : IRequestHandler<LoginQuery, AccountDto>
         var account = await _accountRepository.LoginAsync(request.Username, request.Password);
         if (account.IsBlocked) throw new AccountBlockedException("Acount is blocked.Try again later");
 
-        var accountDto = account.ToDto();
-        accountDto.Token = _jwtTokenService.GenerateToken(account);
+        var accountDto = account.ToDto(_jwtTokenService.GenerateToken(account));
         return accountDto;
     }
 }

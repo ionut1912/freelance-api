@@ -1,13 +1,9 @@
-﻿using Freelance.UserProfiles.Domain.Entities;
-using Freelancer.UserProfiles.Application.Dtos;
-using MediatR;
+﻿using Freelance.UserProfiles.Application.Dtos;
+using Freelance.UserProfiles.Domain.Entities;
+using Shared.Application.Mediator;
 
-namespace Freelancer.UserProfiles.Application.Mediatr.ClientProfiles.Commands;
+namespace Freelance.UserProfiles.Application.Mediatr.ClientProfiles.Commands;
 
-public class CreateClientProfileCommand : IRequest<ClientProfile>
+public record CreateClientProfileCommand(Guid AccountId,AddressDto AddressDto,string Bio,string Image) : IRequest<ClientProfile>
 {
-    public Guid AccountId { get; set; }
-    public AddressDto Address { get; set; }
-    public string Bio { get; set; }
-    public string Image { get; set; }
 }

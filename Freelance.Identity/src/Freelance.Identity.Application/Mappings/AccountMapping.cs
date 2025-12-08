@@ -5,17 +5,9 @@ namespace Freelance.Identity.Application.Mappings
 {
     public static class AccountMapping
     {
-        public static AccountDto ToDto(this Account account)
+        public static AccountDto ToDto(this Account account,string? token)
         {
-            return new AccountDto
-            {
-                Email = account.Email,
-                PhoneNumber= account.PhoneNumber,
-                Username = account.Username,
-                Role=account.Role.Value,
-                IsBlocked=account.IsBlocked,
-                BlockedAt=account.BlockedAt,
-            };
+            return new AccountDto(account.Email, account.PhoneNumber, account.Username,token, account.Role.Value, account.IsBlocked, account.BlockedAt);
         }
     }
 }

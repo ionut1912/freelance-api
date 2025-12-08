@@ -1,10 +1,6 @@
-﻿using MediatR;
+﻿using Shared.Application.Mediator;
+namespace Freelance.UserProfiles.Application.Mediatr.ClientProfiles.Commands;
 
-namespace Freelancer.UserProfiles.Application.Mediatr.ClientProfiles.Commands;
-
-public class UpdateClientProfileDataCommand : IRequest<Unit>
+public  record UpdateClientProfileDataCommand(Guid Id,string Bio, string Image): IRequest<Unit>
 {
-    public Guid Id { get; set; }
-    public string Bio { get; set; }
-    public string Image { get; set; }
 }
