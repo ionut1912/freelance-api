@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿using Shared.Application.Mediator;
 
 namespace Freelance.Identity.Application.Mediatr.Accounts.Commands;
 

@@ -3,7 +3,7 @@ using Freelance.Identity.Domain.Entities;
 using Freelance.Identity.Domain.Exceptions;
 using Freelance.Identity.Domain.interfaces;
 using Freelance.Identity.Domain.ValueObjects;
-using MediatR;
+using Shared.Application.Mediator;
 
 namespace Freelance.Identity.Application.Mediatr.Accounts.Handlers;
 

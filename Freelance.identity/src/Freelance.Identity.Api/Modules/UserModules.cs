@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
 using Freelance.Identity.Application.Mediatr.Accounts.Commands;
 using Freelance.Identity.Application.Mediatr.Accounts.Query;
-using MediatR;
+using Shared.Application.Mediator;
 
 namespace Freelance.Identity.Api.Modules;
 

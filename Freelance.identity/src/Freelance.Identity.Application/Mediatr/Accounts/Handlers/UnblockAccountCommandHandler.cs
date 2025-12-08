@@ -1,7 +1,7 @@
 ﻿using Freelance.Identity.Application.Mediatr.Accounts.Commands;
 using Freelance.Identity.Domain.Exceptions;
 using Freelance.Identity.Domain.interfaces;
-using MediatR;
+using Shared.Application.Mediator;
 
 namespace Freelance.Identity.Application.Mediatr.Accounts.Handlers;
 

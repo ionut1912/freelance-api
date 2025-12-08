@@ -1,17 +1,8 @@
-using Freelance.Identity.Api.Handlers;
 using Freelance.Identity.Api.Modules;
-using Freelance.Identity.Application.Mappings;
-using Freelance.Identity.Application.Mediatr.Accounts.Commands;
-using Freelance.Identity.Application.Validators;
-using Freelance.Identity.Domain.interfaces;
-using Freelance.Identity.Infrastructure.Persistance;
-using Freelance.Identity.Infrastructure.Persistance.Repositories;
-using Microsoft.AspNetCore.Diagnostics;
 using Shared.Api.Extensions;
-using Shared.Domain.Interfaces;
-using Shared.Infra.Extensions;
-using Shared.Infra.Services;
-using ServiceCollectionExtensions = Shared.Api.Extensions.ServiceCollectionExtensions;
+using Freelance.Identity.Infrastructure.Extensions;
+using Freelance.Identity.Application.Extensions;
+using Freelance.Identity.Api.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,48 +13,34 @@ var serviceName = configuration["OTEL_SERVICE_NAME"] ?? "Freelance-Identity";
 var environmentName = builder.Environment.EnvironmentName ?? "Development";
 
 // Create OpenTelemetry resource
-var resourceBuilder = ServiceCollectionExtensions.CreateServiceResourceBuilder(
-    serviceName, 
+var resourceBuilder = Shared.Api.Extensions.ServiceCollectionExtensions.CreateServiceResourceBuilder(
+    serviceName,
     environmentName);
-
-// Register services
-builder.Services
-    .AddDatabaseContext<ApplicationDbContext>(configuration)
-    .AddMediatorWithValidation(
-        typeof(CreateAccountCommand),
-        typeof(CreateAccountCommandValidator),
-        typeof(MappingProfile))
-    .AddJwtAuthentication(configuration)
-    .AddRoleBasedAuthorization()
-    .AddOpenTelemetryObservability(otelEndpoint, serviceName, resourceBuilder)
-    .AddOpenApiWithJwtAuth("Freelance UserProfiles API");
-
 // Logging
 builder.Logging.AddOpenTelemetryLogging(otelEndpoint, resourceBuilder);
 
-// Domain-specific services
-builder.Services.AddScoped<IUnitOfWork<ApplicationDbContext>, UnitOfWork<ApplicationDbContext>>();
-builder.Services.AddScoped<IAccountRepository, AccountRepository>();
-builder.Services.AddScoped<IPasswordService, PasswordService>();
-builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
-builder.Services.AddSingleton<IExceptionHandler, ExceptionHandler>();
+// Register layers
+builder.Services
+    .AddInfrastructure(configuration)
+    .AddApplication()
+    .AddPresentation(configuration, otelEndpoint, resourceBuilder);
 
-// Health checks and controllers
-builder.Services.AddHealthChecks();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddControllers();
+
+
 
 var app = builder.Build();
 
 // Migrate database
-app.Services.MigrateDatabase<ApplicationDbContext>();
+app.MigrateIdentityDatabase();
 
 // Configure middleware pipeline
 app.UseGlobalExceptionHandler<Program>()
     .UseRequestDurationLogging<Program>()
     .UseStandardMiddleware()
     .MapStandardEndpoints();
+
 app.MapApiDocumentation();
+
 // Map domain endpoints
 app.AddUserEndpoints();
 
