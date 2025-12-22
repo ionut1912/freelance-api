@@ -1,6 +1,0 @@
-@Frelance.Web_HostAddress = http://localhost:5182
-
-GET {{Frelance.Web_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
