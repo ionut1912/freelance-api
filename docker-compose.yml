@@ -1,11 +1,8 @@
-version: "3.9"
-
 services:
-
   gateway:
     build:
-      context: .
-      dockerfile: Freelance.ApiGateway/src/Freelance.ApiGateway/Dockerfile
+      context: Freelance.ApiGateway
+      dockerfile: src/Freelance.ApiGateway/Dockerfile
     ports:
       - "9000:8080"
     environment:
@@ -24,8 +21,8 @@ services:
 
   freelance_identity:
     build:
-      context: .
-      dockerfile: Freelance.Identity/src/Freelance.Identity.Api/Dockerfile
+      context: Freelance.Identity
+      dockerfile: src/Freelance.Identity.Api/Dockerfile
     environment:
       - ASPNETCORE_URLS=http://+:80
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=FreelanceIdentity;Username=postgres;Password=postgres
@@ -41,8 +38,8 @@ services:
 
   freelance_user_profiles:
     build:
-      context: .
-      dockerfile: Freelance.UserProfiles/src/Freelance.UserProfiles.Api/Dockerfile
+      context: Freelance.UserProfiles
+      dockerfile: src/Freelance.UserProfiles.Api/Dockerfile
     environment:
       - ASPNETCORE_URLS=http://+:80
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=FreelanceUserProfiles;Username=postgres;Password=postgres
@@ -79,7 +76,6 @@ services:
     image: grafana/loki:2.9.3
     ports:
       - "3100:3100"
-    command: -config.file=/etc/loki/local-config.yaml
     volumes:
       - loki_data:/loki
     networks:
@@ -87,10 +83,10 @@ services:
 
   tempo:
     image: grafana/tempo:latest
-    command: [ "-config.file=/etc/tempo.yaml" ]
     volumes:
       - ./tempo-config.yaml:/etc/tempo.yaml
       - tempo_data:/tmp/tempo
+    command: ["-config.file=/etc/tempo.yaml"]
     ports:
       - "3200:3200"
       - "4317"
@@ -99,13 +95,13 @@ services:
 
   prometheus:
     image: prom/prometheus:latest
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.enable-remote-write-receiver'
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.enable-remote-write-receiver"
     ports:
       - "9090:9090"
     networks:
@@ -118,8 +114,8 @@ services:
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
     volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
@@ -138,4 +134,3 @@ volumes:
 
 networks:
   freelance-network:
-    external: true
