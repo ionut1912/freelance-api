@@ -23,7 +23,7 @@ services:
   freelance_identity:
     build:
       context: .
-      dockerfile: Freelance.Identity/Dockerfile
+      dockerfile: Freelance.Identity/src/Freelance.Identity.Api/Dockerfile
     environment:
       - ASPNETCORE_URLS=http://+:80
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=FreelanceIdentity;Username=postgres;Password=postgres
@@ -40,7 +40,7 @@ services:
   freelance_user_profiles:
     build:
       context: .
-      dockerfile: Freelance.UserProfiles/Dockerfile
+      dockerfile: Freelance.UserProfiles/src/Freelance.UserProfiles.Api/Dockerfile
     environment:
       - ASPNETCORE_URLS=http://+:80
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=FreelanceUserProfiles;Username=postgres;Password=postgres

@@ -18,8 +18,8 @@ public class GetCurrentAccountQueryHandler : IRequestHandler<GetCurrentAccountQu
 
     public async Task<AccountDto> Handle(GetCurrentAccountQuery request, CancellationToken cancellationToken)
     {
-        var account = await _accountRepository.GetAccountByUsernameAsync(request.Username,cancellationToken);
-        if(account is null)
+        var account = await _accountRepository.GetAccountByUsernameAsync(request.Username, cancellationToken);
+        if (account is null)
         {
             throw new AccountNotFoundException($"Account with username '{request.Username}' was not found.");
         }

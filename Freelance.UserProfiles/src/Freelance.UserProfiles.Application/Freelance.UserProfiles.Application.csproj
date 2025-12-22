@@ -9,11 +9,12 @@
 
     <ItemGroup>
 		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
-		<PackageReference Include="Shared.ApplicationLayer" Version="1.0.3" />
+		<PackageReference Include="Shared.ApplicationLayer" Version="1.2.3" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Freelance.UserProfiles.Domain\Freelance.UserProfiles.Domain.csproj" />
+        <ProjectReference Include="..\Freelance.UserProfiles.Infrastructure\Freelance.UserProfiles.Infrastructure.csproj" />
     </ItemGroup>
 
     <ItemGroup>

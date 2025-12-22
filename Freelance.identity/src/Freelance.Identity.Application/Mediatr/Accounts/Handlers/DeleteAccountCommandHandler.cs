@@ -1,5 +1,4 @@
 ﻿using Freelance.Identity.Application.Mediatr.Accounts.Commands;
-using Freelance.Identity.Domain.Entities;
 using Freelance.Identity.Domain.Exceptions;
 using Freelance.Identity.Domain.interfaces;
 using Freelance.Identity.Infrastructure.Persistance;
@@ -13,10 +12,10 @@ public class DeleteAccountCommandHandler : IRequestHandler<DeleteAccountCommand,
     private readonly IAccountRepository _accountRepository;
     private readonly IUnitOfWork<ApplicationDbContext> _unitOfWork;
 
-    public DeleteAccountCommandHandler(IAccountRepository accountRepository,IUnitOfWork<ApplicationDbContext> unitOfWork)
+    public DeleteAccountCommandHandler(IAccountRepository accountRepository, IUnitOfWork<ApplicationDbContext> unitOfWork)
     {
-        ArgumentNullException.ThrowIfNull(accountRepository,nameof(accountRepository));
-        ArgumentNullException.ThrowIfNull(unitOfWork,nameof(unitOfWork));
+        ArgumentNullException.ThrowIfNull(accountRepository, nameof(accountRepository));
+        ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));
         _accountRepository = accountRepository;
         _unitOfWork = unitOfWork;
     }

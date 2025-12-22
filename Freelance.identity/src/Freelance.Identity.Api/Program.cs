@@ -28,7 +28,7 @@ builder.Services
     .AddRepository<Account, AccountRepository, IAccountRepository, ApplicationDbContext>()
     .AddRepositoriesConfig<IJwtTokenService, JwtTokenService>()
     .AddRepositoriesConfig<IPasswordService, PasswordService>()
-    .AddRepositoriesConfig<IUnitOfWork<ApplicationDbContext>,UnitOfWork<ApplicationDbContext>>()
+    .AddRepositoriesConfig<IUnitOfWork<ApplicationDbContext>, UnitOfWork<ApplicationDbContext>>()
     .AddAplicationConfig(typeof(CreateAccountCommand).Assembly, typeof(CreateAccountCommandValidator).Assembly)
     .AddPresentation<IdentityExceptionMapper>(builder.Configuration, otelEndpoint, serviceName, environmentName);
 

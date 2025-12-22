@@ -18,7 +18,7 @@ public class GetClientProfilesQueryHandler : IRequestHandler<GetClientProfilesQu
     public async Task<List<ClientProfileDto>> Handle(GetClientProfilesQuery request,
         CancellationToken cancellationToken)
     {
-        var clientProfiles = await _clientProfileRepository.GetClientProfilesAsync(cancellationToken);
+        var clientProfiles = await _clientProfileRepository.GetAllAsync(cancellationToken);
         var clientDtos = clientProfiles.ToDtos();
         return clientDtos;
     }

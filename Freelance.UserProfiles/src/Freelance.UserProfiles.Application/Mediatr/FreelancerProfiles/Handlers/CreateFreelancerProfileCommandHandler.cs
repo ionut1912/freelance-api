@@ -2,18 +2,22 @@
 using Freelance.UserProfiles.Domain.Entities;
 using Freelance.UserProfiles.Domain.Interfaces;
 using Freelance.UserProfiles.Domain.ValueObjects;
+using Freelance.UserProfiles.Infrastructure.Persistance;
 using Shared.Application.Mediator;
+using Shared.Domain.Interfaces;
 
 namespace Freelance.UserProfiles.Application.Mediatr.FreelancerProfiles.Handlers;
 
 public class CreateFreelancerProfileCommandHandler : IRequestHandler<CreateFreelancerProfileCommand, FreelancerProfile>
 {
     private readonly IFreelancerProfileRepository _freelancerProfileRepository;
+    private readonly IUnitOfWork<ApplicationDbContext> _unitOfWork;
 
-    public CreateFreelancerProfileCommandHandler(IFreelancerProfileRepository freelancerProfileRepository)
+    public CreateFreelancerProfileCommandHandler(IFreelancerProfileRepository freelancerProfileRepository, IUnitOfWork<ApplicationDbContext> unitOfWork)
     {
         _freelancerProfileRepository = freelancerProfileRepository ??
                                        throw new ArgumentNullException(nameof(freelancerProfileRepository));
+        _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
     }
 
     public async Task<FreelancerProfile> Handle(CreateFreelancerProfileCommand request,
@@ -53,8 +57,8 @@ public class CreateFreelancerProfileCommandHandler : IRequestHandler<CreateFreel
         freelancerProfile.AddLanguages(foreignLanguages);
         freelancerProfile.AddSkills(skills);
 
-        await _freelancerProfileRepository.CreateFreelancerProfileAsync(freelancerProfile, cancellationToken);
-
+        await _freelancerProfileRepository.AddAsync(freelancerProfile, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
         return freelancerProfile;
     }
 }

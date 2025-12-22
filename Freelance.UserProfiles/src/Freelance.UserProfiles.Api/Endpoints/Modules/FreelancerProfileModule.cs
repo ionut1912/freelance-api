@@ -34,7 +34,7 @@ public static class FreelancerProfileModule
         return app;
     }
 
-    private static async Task<IResult> CreateFreelancerProfileAsync(Mediator mediator, HttpContext httpContext,
+    private static async Task<IResult> CreateFreelancerProfileAsync(IMediator mediator, HttpContext httpContext,
                 CreateFreelancerProfileRequest createFreelancerProfileRequest, CancellationToken ct)
     {
         var accountId = httpContext.GetAccountId();

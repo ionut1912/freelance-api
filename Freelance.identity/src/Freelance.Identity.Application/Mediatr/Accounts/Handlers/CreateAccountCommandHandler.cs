@@ -16,11 +16,11 @@ public class CreateAccountCommandHandler : IRequestHandler<CreateAccountCommand,
     private readonly IUnitOfWork<ApplicationDbContext> _unitOfWork;
 
     public CreateAccountCommandHandler(IAccountRepository accountRepository,
-        IPasswordService passwordService,IUnitOfWork<ApplicationDbContext> unitOfWork)
+        IPasswordService passwordService, IUnitOfWork<ApplicationDbContext> unitOfWork)
     {
-        ArgumentNullException.ThrowIfNull(accountRepository,nameof(accountRepository));
-        ArgumentNullException.ThrowIfNull(passwordService,nameof(passwordService));
-        ArgumentNullException.ThrowIfNull(unitOfWork,nameof(unitOfWork));
+        ArgumentNullException.ThrowIfNull(accountRepository, nameof(accountRepository));
+        ArgumentNullException.ThrowIfNull(passwordService, nameof(passwordService));
+        ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));
         _accountRepository = accountRepository;
         _passwordService = passwordService;
         _unitOfWork = unitOfWork;

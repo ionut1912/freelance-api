@@ -12,8 +12,6 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["src/Freelance.Identity.Api/nuget.config", "src/Freelance.Identity.Api/"]
-COPY ["src/Freelance.Identity.Domain/nuget.config", "src/Freelance.Identity.Domain/"]
 COPY ["src/Freelance.Identity.Api/Freelance.Identity.Api.csproj", "src/Freelance.Identity.Api/"]
 COPY ["src/Freelance.Identity.Application/Freelance.Identity.Application.csproj", "src/Freelance.Identity.Application/"]
 COPY ["src/Freelance.Identity.Domain/Freelance.Identity.Domain.csproj", "src/Freelance.Identity.Domain/"]

@@ -9,13 +9,13 @@ namespace Freelance.Identity.Application.Mediatr.Accounts.Handlers;
 
 public class BlockAccountCommandHandler : IRequestHandler<BlockAccountCommand, Unit>
 {
-   private readonly IAccountRepository _accountRepository;
+    private readonly IAccountRepository _accountRepository;
     private readonly IUnitOfWork<ApplicationDbContext> _unitOfWork;
 
-    public BlockAccountCommandHandler(IAccountRepository accountRepository,IUnitOfWork<ApplicationDbContext> unitOfWork)
+    public BlockAccountCommandHandler(IAccountRepository accountRepository, IUnitOfWork<ApplicationDbContext> unitOfWork)
     {
-        ArgumentNullException.ThrowIfNull(accountRepository,nameof(accountRepository));
-        ArgumentNullException.ThrowIfNull(unitOfWork,nameof(unitOfWork));
+        ArgumentNullException.ThrowIfNull(accountRepository, nameof(accountRepository));
+        ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));
         _accountRepository = accountRepository;
         _unitOfWork = unitOfWork;
     }

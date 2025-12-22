@@ -26,7 +26,7 @@ public class UnblockAccountCommandHandler : IRequestHandler<UnblockAccountComman
         if (account == null)
             throw new AccountNotFoundException($"Account with id {request.AccountId} does not exist");
         account.UnblockAccount();
-       _accountRepository.Update(account);
+        _accountRepository.Update(account);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;
     }

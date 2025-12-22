@@ -2,10 +2,13 @@ using Freelance.UserProfiles.Api.Endpoints;
 using Freelance.UserProfiles.Api.Mappers;
 using Freelance.UserProfiles.Application.Mediatr;
 using Freelance.UserProfiles.Application.Validators;
+using Freelance.UserProfiles.Domain.Entities;
 using Freelance.UserProfiles.Domain.Interfaces;
 using Freelance.UserProfiles.Infrastructure.Persistance;
 using Freelance.UserProfiles.Infrastructure.Persistance.Repository;
 using Shared.Api.Extensions;
+using Shared.Domain.Interfaces;
+using Shared.Infra.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,11 +20,11 @@ var environmentName = builder.Environment.EnvironmentName ?? "Development";
 // Create OpenTelemetry resource
 builder.AddOpenTelemetry(otelEndpoint, serviceName, environmentName);
 
-
 builder.Services
     .AddDatabaseConfig<ApplicationDbContext>(builder.Configuration)
-    .AddRepositoriesConfig<IFreelancerProfileRepository, FreelancerProfileService>()
-    .AddRepositoriesConfig<IClientProfileRepository, ClientProfileService>()
+    .AddRepository<ClientProfile, ClientProfileService, IClientProfileRepository, ApplicationDbContext>()
+    .AddRepository<FreelancerProfile, FreelancerProfileService, IFreelancerProfileRepository, ApplicationDbContext>()
+    .AddRepositoriesConfig<IUnitOfWork<ApplicationDbContext>, UnitOfWork<ApplicationDbContext>>()
     .AddAplicationConfig(typeof(MediatrAssemblyReference).Assembly, typeof(ValidationAssemblyReference).Assembly)
     .AddPresentation<UserProfileExceptionMapper>(builder.Configuration, otelEndpoint, serviceName, environmentName);
 

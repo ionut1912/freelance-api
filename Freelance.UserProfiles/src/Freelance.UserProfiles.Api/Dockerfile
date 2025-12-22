@@ -12,8 +12,6 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["src/Freelance.UserProfiles.Api/nuget.config", "src/Freelance.UserProfiles.Api/"]
-COPY ["src/Freelance.UserProfiles.Application/nuget.config", "src/Freelance.UserProfiles.Application/"]
 COPY ["src/Freelance.UserProfiles.Api/Freelance.UserProfiles.Api.csproj", "src/Freelance.UserProfiles.Api/"]
 COPY ["src/Freelance.UserProfiles.Application/Freelance.UserProfiles.Application.csproj", "src/Freelance.UserProfiles.Application/"]
 COPY ["src/Freelance.UserProfiles.Domain/Freelance.UserProfiles.Domain.csproj", "src/Freelance.UserProfiles.Domain/"]
@@ -32,4 +30,4 @@ RUN dotnet publish "./Freelance.UserProfiles.Api.csproj" -c $BUILD_CONFIGURATION
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Freelance.UserProfiles.Api.dll"] 
+ENTRYPOINT ["dotnet", "Freelance.UserProfiles.Api.dll"]

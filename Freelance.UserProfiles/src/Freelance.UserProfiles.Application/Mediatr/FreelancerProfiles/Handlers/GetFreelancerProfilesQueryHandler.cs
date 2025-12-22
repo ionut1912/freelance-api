@@ -19,7 +19,7 @@ public class GetFreelancerProfilesQueryHandler : IRequestHandler<GetFreelancerPr
     public async Task<List<FreelancerProfileDto>> Handle(GetFreelancerProfilesQuery request,
         CancellationToken cancellationToken)
     {
-        var freelancerProfiles = await _freelancerProfileRepository.GetFreelancerProfilesAsync(cancellationToken);
+        var freelancerProfiles = await _freelancerProfileRepository.GetAllAsync(cancellationToken, s => s.Skills, fL => fL.ForeignLanguages);
         var freelancerProfileDtos = freelancerProfiles.ToDtos();
         return freelancerProfileDtos;
     }
