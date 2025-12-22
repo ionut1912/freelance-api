@@ -25,3 +25,4 @@ terraform/terraform.tfstate.backup
 /Freelance.Web/Freelance.Web.csproj.user
 /.vs/Freelance.API
 /Freelance.Camera/.vs/Freelance.Camera.slnx
+/Freelance.ApiGateway/.vs/Freelance.ApiGateway/FileContentIndex

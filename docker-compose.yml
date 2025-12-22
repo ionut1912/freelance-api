@@ -3,7 +3,9 @@ version: "3.9"
 services:
 
   gateway:
-    build: ./Freelance.ApiGateway
+    build:
+      context: .
+      dockerfile: Freelance.ApiGateway/src/Freelance.ApiGateway/Dockerfile
     ports:
       - "9000:8080"
     environment:
