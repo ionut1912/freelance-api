@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Shared.DomainLayer" Version="1.0.1" />
+      <PackageReference Include="Shared.DomainLayer" Version="1.1.1" />
     </ItemGroup>
 
   

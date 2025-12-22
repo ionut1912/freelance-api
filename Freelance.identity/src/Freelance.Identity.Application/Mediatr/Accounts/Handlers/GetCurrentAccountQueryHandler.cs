@@ -1,6 +1,7 @@
 ﻿using Freelance.Identity.Application.Dtos;
 using Freelance.Identity.Application.Mappings;
 using Freelance.Identity.Application.Mediatr.Accounts.Query;
+using Freelance.Identity.Domain.Exceptions;
 using Freelance.Identity.Domain.interfaces;
 using Shared.Application.Mediator;
 
@@ -17,7 +18,12 @@ public class GetCurrentAccountQueryHandler : IRequestHandler<GetCurrentAccountQu
 
     public async Task<AccountDto> Handle(GetCurrentAccountQuery request, CancellationToken cancellationToken)
     {
-        var account = await _accountRepository.GetCurrentAccountAsync(request.Username);
+        var account = await _accountRepository.GetAccountByUsernameAsync(request.Username,cancellationToken);
+        if(account is null)
+        {
+            throw new AccountNotFoundException($"Account with username '{request.Username}' was not found.");
+        }
+
         var accountDto = account.ToDto(null);
         return accountDto;
     }

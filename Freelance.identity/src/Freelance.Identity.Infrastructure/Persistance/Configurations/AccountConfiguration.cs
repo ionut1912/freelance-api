@@ -18,9 +18,6 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
                 .HasColumnName("Role")
                 .HasMaxLength(20)
                 .IsRequired();
-
-            role.HasIndex(c => c.Value)
-                .IsUnique();
         });
 
         builder.Property(a => a.Email)
@@ -34,6 +31,8 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
         builder.Property(a => a.Username)
             .HasMaxLength(50)
             .IsRequired();
+
+        builder.HasIndex(a => a.Username).IsUnique();
 
         builder.Property(a => a.IsBlocked)
             .HasDefaultValue(false)

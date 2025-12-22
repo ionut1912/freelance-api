@@ -21,7 +21,7 @@ public static class UserModules
         authenticatedGroup.MapPut("/block", BlockUserAccount);
         authenticatedGroup.MapGet("/current", GetCurrentUser);
         authenticatedGroup.MapPut("/unblock", UnblockUserAccount);
-        authenticatedGroup.MapDelete("/{id:guid}", DeleteUserAccount);
+        authenticatedGroup.MapDelete("/", DeleteUserAccount);
 
         return app;
     }
@@ -70,9 +70,11 @@ public static class UserModules
         return Results.NoContent();
     }
 
-    private static async Task<IResult> DeleteUserAccount(IMediator mediator, Guid id, CancellationToken ct)
+    private static async Task<IResult> DeleteUserAccount(IMediator mediator, HttpContext httpContext, CancellationToken ct)
     {
-        var deleteAccountCommand = new DeleteAccountCommand(id);
+        var accountId = httpContext.GetAccountId();
+        if (accountId == Guid.Empty) return Results.Unauthorized();
+        var deleteAccountCommand = new DeleteAccountCommand(accountId);
         await mediator.Send(deleteAccountCommand, ct);
         return Results.NoContent();
     }

@@ -2,7 +2,6 @@ version: "3.9"
 
 services:
 
-  # API Gateway
   gateway:
     build: ./Freelance.ApiGateway
     ports:
@@ -21,7 +20,6 @@ services:
     networks:
       - freelance-network
 
-  # Identity Service
   freelance_identity:
     build:
       context: .
@@ -35,12 +33,10 @@ services:
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://alloy:4317
       - OTEL_SERVICE_NAME=Freelance-Identity
     depends_on:
-      - postgres
       - alloy
     networks:
       - freelance-network
 
-  # UserProfiles Service
   freelance_user_profiles:
     build:
       context: .
@@ -54,32 +50,16 @@ services:
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://alloy:4317
       - OTEL_SERVICE_NAME=Freelance-UserProfiles
     depends_on:
-      - postgres
       - alloy
     networks:
       - freelance-network
 
-  # Shared PostgreSQL Database
-  postgres:
-    image: postgres:16
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_MULTIPLE_DATABASES: FreelanceUserProfiles,FreelanceIdentity
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - freelance-network
-
-  # Grafana Alloy - OpenTelemetry Collector
   alloy:
     image: grafana/alloy:latest
     ports:
-      - "4317:4317"   # OTLP gRPC receiver
-      - "4318:4318"   # OTLP HTTP receiver
-      - "12345:12345" # Alloy UI
+      - "4317:4317"
+      - "4318:4318"
+      - "12345:12345"
     volumes:
       - ./alloy-config.yaml:/etc/alloy/config.alloy
     command:
@@ -93,7 +73,6 @@ services:
     networks:
       - freelance-network
 
-  # Loki - Log Aggregation
   loki:
     image: grafana/loki:2.9.3
     ports:
@@ -104,7 +83,6 @@ services:
     networks:
       - freelance-network
 
-  # Tempo - Distributed Tracing
   tempo:
     image: grafana/tempo:latest
     command: [ "-config.file=/etc/tempo.yaml" ]
@@ -112,12 +90,11 @@ services:
       - ./tempo-config.yaml:/etc/tempo.yaml
       - tempo_data:/tmp/tempo
     ports:
-      - "3200:3200"   # Tempo UI
-      - "4317"        # OTLP gRPC
+      - "3200:3200"
+      - "4317"
     networks:
       - freelance-network
 
-  # Prometheus - Metrics
   prometheus:
     image: prom/prometheus:latest
     command:
@@ -132,7 +109,6 @@ services:
     networks:
       - freelance-network
 
-  # Grafana - Visualization
   grafana:
     image: grafana/grafana:latest
     ports:
@@ -153,7 +129,6 @@ services:
       - freelance-network
 
 volumes:
-  postgres_data:
   loki_data:
   tempo_data:
   prometheus_data:
@@ -161,4 +136,4 @@ volumes:
 
 networks:
   freelance-network:
-    driver: bridge
+    external: true

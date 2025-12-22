@@ -3,25 +3,34 @@ using Freelance.Identity.Domain.Entities;
 using Freelance.Identity.Domain.Exceptions;
 using Freelance.Identity.Domain.interfaces;
 using Freelance.Identity.Domain.ValueObjects;
+using Freelance.Identity.Infrastructure.Persistance;
 using Shared.Application.Mediator;
+using Shared.Domain.Interfaces;
 
 namespace Freelance.Identity.Application.Mediatr.Accounts.Handlers;
 
 public class CreateAccountCommandHandler : IRequestHandler<CreateAccountCommand, Account>
 {
     private readonly IAccountRepository _accountRepository;
+    private readonly IPasswordService _passwordService;
+    private readonly IUnitOfWork<ApplicationDbContext> _unitOfWork;
 
-    public CreateAccountCommandHandler(IAccountRepository accountRepository)
+    public CreateAccountCommandHandler(IAccountRepository accountRepository,
+        IPasswordService passwordService,IUnitOfWork<ApplicationDbContext> unitOfWork)
     {
-        ArgumentNullException.ThrowIfNull(accountRepository);
+        ArgumentNullException.ThrowIfNull(accountRepository,nameof(accountRepository));
+        ArgumentNullException.ThrowIfNull(passwordService,nameof(passwordService));
+        ArgumentNullException.ThrowIfNull(unitOfWork,nameof(unitOfWork));
         _accountRepository = accountRepository;
+        _passwordService = passwordService;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Account> Handle(CreateAccountCommand request, CancellationToken cancellationToken)
     {
         var roleForRepo = Role.Client;
-        var existsByUsername = await _accountRepository.ExistsAsync(request.Username, cancellationToken);
-        if (existsByUsername)
+        var account = await _accountRepository.GetAccountByUsernameAsync(request.Username, cancellationToken);
+        if (account is not null)
             throw new UserAlreadyExistsException($"Account with username {request.Username} already exists");
         roleForRepo = request.Role switch
         {
@@ -30,9 +39,11 @@ public class CreateAccountCommandHandler : IRequestHandler<CreateAccountCommand,
             _ => roleForRepo
         };
 
-        var account = Account.Create(request.Email, request.Password, request.PhoneNumber, request.Username,
+        var accountToCreate = Account.Create(request.Email, request.Password, request.PhoneNumber, request.Username,
             roleForRepo);
-        await _accountRepository.RegisterAsync(account, cancellationToken);
-        return account;
+        accountToCreate.HashPassword(_passwordService);
+        await _accountRepository.AddAsync(accountToCreate, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        return accountToCreate;
     }
 }
