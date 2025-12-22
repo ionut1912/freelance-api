@@ -5,6 +5,7 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+COPY ["nuget.config", "."]
 COPY src/Freelance.ApiGateway/Freelance.ApiGateway.csproj src/Freelance.ApiGateway/
 RUN dotnet restore src/Freelance.ApiGateway/Freelance.ApiGateway.csproj
 COPY . .

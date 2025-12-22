@@ -10,8 +10,6 @@ using Shared.Api.Extensions;
 using Shared.Domain.Interfaces;
 using Shared.Infra.Services;
 
-
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Configuration
@@ -35,7 +33,7 @@ builder.Services
 
 var app = builder.Build();
 
-// Migrate database
+
 app.MigrateDatabaseConfig<ApplicationDbContext>();
 
 app.UseGlobalExceptionHandler<Program>()

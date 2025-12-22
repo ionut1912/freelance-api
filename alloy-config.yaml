@@ -1,21 +1,52 @@
-otelcol.receiver.otlp "default" {
-  grpc { endpoint = "0.0.0.0:4317" }
-  http { endpoint = "0.0.0.0:4318" }
-  output { metrics = [otelcol.processor.batch.default.input] logs = [otelcol.processor.batch.default.input] traces = [otelcol.processor.batch.default.input] }
+otel.receiver.otlp "default" {
+  grpc {
+    endpoint = "0.0.0.0:4317"
+  }
+
+  http {
+    endpoint = "0.0.0.0:4318"
+  }
+
+  output {
+    metrics = [otel.processor.batch.default.input]
+    logs    = [otel.processor.batch.default.input]
+    traces  = [otel.processor.batch.default.input]
+  }
 }
 
-otelcol.processor.batch "default" {
-  output { metrics = [otelcol.exporter.prometheus.default.input] logs = [otelcol.exporter.loki.default.input] traces = [otelcol.exporter.otlp.tempo.input] }
+otel.processor.batch "default" {
+  output {
+    metrics = [otel.exporter.prometheus.default.input]
+    logs    = [otel.exporter.loki.default.input]
+    traces  = [otel.exporter.otlp.tempo.input]
+  }
 }
 
-otelcol.exporter.prometheus "default" { forward_to = [prometheus.remote_write.default.receiver] }
+otel.exporter.otlp "tempo" {
+  client {
+    endpoint = "tempo:9095"
+    tls {
+      insecure = true
+    }
+  }
+}
 
-prometheus.remote_write "default" { endpoint { url = "http://prometheus:9090/api/v1/write" } }
+otel.exporter.loki "default" {
+  forward_to = [loki.write.default.receiver]
+}
 
-otelcol.exporter.loki "default" { forward_to = [loki.write.default.receiver] }
+loki.write "default" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}
 
-loki.write "default" { endpoint { url = "http://loki:3100/loki/api/v1/push" } }
+otel.exporter.prometheus "default" {
+  forward_to = [prometheus.remote_write.default.receiver]
+}
 
-otelcol.exporter.otlp "tempo" { client { endpoint = "tempo:4317" tls { insecure = true } } }
-
-otelcol.service "default" { pipelines { logs = { receivers = [otelcol.receiver.otlp.default] processors = [otelcol.processor.batch.default] exporters = [otelcol.exporter.loki.default] } traces = { receivers = [otelcol.receiver.otlp.default] processors = [otelcol.processor.batch.default] exporters = [otelcol.exporter.otlp.tempo] } metrics = { receivers = [otelcol.receiver.otlp.default] processors = [otelcol.processor.batch.default] exporters = [otelcol.exporter.prometheus.default] } } }
+prometheus.remote_write "default" {
+  endpoint {
+    url = "http://prometheus:9090/api/v1/write"
+  }
+}

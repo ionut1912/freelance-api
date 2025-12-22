@@ -1,23 +1,28 @@
 using Microsoft.IdentityModel.Tokens;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
-using MMLib.SwaggerForOcelot.DependencyInjection;
-using MMLib.SwaggerForOcelot.Middleware;
+using Scalar.AspNetCore;
+using Shared.Api.Extensions;
 using System.Text;
+using ServiceCollectionExtensions = Shared.Api.Extensions.ServiceCollectionExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.WebHost.UseUrls("http://+:8080");
-
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
+var otelEndpoint = builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"] ?? "http://alloy:4317";
+var serviceName = builder.Configuration["OTEL_SERVICE_NAME"] ?? "Freelance-Gateway";
+var environmentName = builder.Environment.EnvironmentName;
 
+builder.AddOpenTelemetry(otelEndpoint, serviceName, environmentName);
+
+var key = Encoding.UTF8.GetBytes(jwtSettings["Key"] ?? throw new InvalidOperationException("JWT Key is missing"));
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", options =>
     {
-        options.RequireHttpsMetadata = false; // ✅ Disable HTTPS metadata for container use
+        options.RequireHttpsMetadata = false;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -32,22 +37,31 @@ builder.Services.AddAuthentication("Bearer")
 
 builder.Services.AddAuthorization();
 
-// Swagger + Ocelot
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+var resourceBuilder = ServiceCollectionExtensions.CreateServiceResourceBuilder(serviceName, environmentName);
+builder.Services.AddOpenTelemetryObservability(otelEndpoint, serviceName, resourceBuilder);
+
 builder.Services.AddOcelot(builder.Configuration);
-builder.Services.AddSwaggerForOcelot(builder.Configuration);
+
+builder.Services.AddOpenApiWithJwtAuth("Freelance API Gateway");
+builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
-app.UseRouting();
-app.UseAuthentication();
-app.UseAuthorization();
+app.UseRequestDurationLogging<Program>();
 
-app.UseSwaggerForOcelotUI(opt =>
+app.UseStandardMiddleware();
+
+app.MapApiDocumentation(options =>
 {
-    opt.PathToSwaggerGenerator = "/swagger/docs";
+    options
+        .WithTitle("Freelance API Gateway")
+        .WithTheme(ScalarTheme.Default)
+        .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
 });
+
+app.MapStandardEndpoints();
 
 await app.UseOcelot();
 

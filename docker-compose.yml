@@ -78,18 +78,21 @@ services:
       - "3100:3100"
     volumes:
       - loki_data:/loki
+      - ./loki-config.yaml:/etc/loki/local-config.yaml
+    command: -config.file=/etc/loki/local-config.yaml
     networks:
       - freelance-network
 
   tempo:
     image: grafana/tempo:latest
+    container_name: tempo
     volumes:
-      - ./tempo-config.yaml:/etc/tempo.yaml
       - tempo_data:/tmp/tempo
+      - ./tempo-config.yaml:/etc/tempo.yaml:ro
     command: ["-config.file=/etc/tempo.yaml"]
     ports:
       - "3200:3200"
-      - "4317"
+      - "9095:9095"  # Changed from 4317 to avoid conflict
     networks:
       - freelance-network
 
