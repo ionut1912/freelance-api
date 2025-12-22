@@ -26,3 +26,4 @@ terraform/terraform.tfstate.backup
 /.vs/Freelance.API
 /Freelance.Camera/.vs/Freelance.Camera.slnx
 /Freelance.ApiGateway/.vs/Freelance.ApiGateway/FileContentIndex
+/Freelance.ApiGateway/.vs/Freelance.ApiGateway/v18
