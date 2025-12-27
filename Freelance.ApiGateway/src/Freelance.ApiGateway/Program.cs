@@ -1,6 +1,8 @@
+using ApiGateway.Services;
 using Microsoft.IdentityModel.Tokens;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
+using Scalar.AspNetCore;
 using Shared.Api.Extensions;
 using System.Text;
 
@@ -33,24 +35,44 @@ var otelEndpoint = configuration["OTEL_EXPORTER_OTLP_ENDPOINT"] ?? "http://tempo
 var serviceName = configuration["OTEL_SERVICE_NAME"] ?? "Freelance-Api-Gateway";
 var environmentName = builder.Environment.EnvironmentName ?? "Development";
 var lokiEndpoint = configuration["OTEL_EXPORTER_OTLP_LOGS_ENDPOINT"] ?? "http://loki:3100";
+
 var resourceBuilder = OpenTelemetryExtensions.CreateServiceResourceBuilder(serviceName, environmentName);
 builder.AddOpenTelemetry(lokiEndpoint, resourceBuilder);
-builder.Services.AddOpenTelemetryObservability(otelEndpoint,serviceName);
+builder.Services.AddOpenTelemetryObservability(otelEndpoint, serviceName);
 
 builder.Services.AddAuthorization();
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+builder.Services.AddHttpClient();
+
+builder.Services.AddSingleton<OpenApiAggregatorService>();
+
 builder.Services.AddOcelot(builder.Configuration);
-builder.Services.AddSwaggerForOcelot(builder.Configuration);
 
 var app = builder.Build();
+
+app.MapControllers();
+
+app.MapScalarApiReference(options =>
+{
+    options
+        .WithTitle("Freelance API Gateway")
+        .WithTheme(ScalarTheme.Purple)
+        .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient)
+        .WithOpenApiRoutePattern("/openapi/v1.json");
+});
 
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseSwaggerForOcelotUI();
-
-await app.UseOcelot();
+app.UseWhen(
+    context => !context.Request.Path.StartsWithSegments("/scalar") &&
+               !context.Request.Path.StartsWithSegments("/openapi"),
+    appBuilder =>
+    {
+        appBuilder.UseOcelot().Wait();
+    });
 
 app.Run();

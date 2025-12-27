@@ -27,7 +27,7 @@ builder.AddOpenTelemetry(lokiEndpoint, resourceBuilder);
 builder.Services
     .AddDatabaseConfig<ApplicationDbContext>(builder.Configuration)
     .AddRepository<ClientProfile, ClientProfileService, IClientProfileRepository, ApplicationDbContext>()
-    .AddRepository<FreelancerProfile,FreelancerProfileService, IFreelancerProfileRepository, ApplicationDbContext>()
+    .AddRepository<FreelancerProfile, FreelancerProfileService, IFreelancerProfileRepository, ApplicationDbContext>()
     .AddRepositoriesConfig<IUnitOfWork<ApplicationDbContext>, UnitOfWork<ApplicationDbContext>>()
     .AddAplicationConfig(typeof(MediatrAssemblyReference).Assembly, typeof(ValidationAssemblyReference).Assembly)
     .AddPresentation<UserProfileExceptionMapper>(builder.Configuration, otelEndpoint, serviceName, environmentName);

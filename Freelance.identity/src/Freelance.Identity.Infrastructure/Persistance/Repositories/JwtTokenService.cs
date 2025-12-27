@@ -5,7 +5,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
 namespace Freelance.Identity.Infrastructure.Persistance.Repositories;
 
@@ -29,7 +28,7 @@ public class JwtTokenService : IJwtTokenService
             new(JwtRegisteredClaimNames.Sub, account.Id.ToString()),
             new(ClaimTypes.Name, account.Username),
             new(JwtRegisteredClaimNames.Email, account.Email),
-            new(ClaimTypes.Role, account.Role.Value), // 👈 Role claim
+            new(ClaimTypes.Role, account.Role.Value),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
