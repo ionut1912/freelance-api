@@ -1,4 +1,5 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using Freelance.ApiGateway.Models;
+using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Readers;
 using Microsoft.OpenApi.Writers;
 
@@ -174,7 +175,7 @@ public class OpenApiAggregatorService
         MergeSecuritySchemes(target, source);
     }
 
-    private void MergePaths(OpenApiDocument target, OpenApiDocument source, string swaggerKey)
+    private  void MergePaths(OpenApiDocument target, OpenApiDocument source, string swaggerKey)
     {
         if (source.Paths == null) return;
 
@@ -196,7 +197,7 @@ public class OpenApiAggregatorService
         }
     }
 
-    private string TransformPath(string originalPath, string swaggerKey, List<RouteConfig> routes)
+    private static string TransformPath(string originalPath, string swaggerKey, List<RouteConfig> routes)
     {
         if (!originalPath.StartsWith("/api/"))
         {
@@ -210,7 +211,7 @@ public class OpenApiAggregatorService
             r.DownstreamPathTemplate != null &&
             PathMatchesTemplate(originalPath, r.DownstreamPathTemplate));
 
-        if (matchingRoute?.UpstreamPathTemplate != null)
+        if (matchingRoute?.UpstreamPathTemplate != null&& matchingRoute?.DownstreamPathTemplate!=null)
         {
             return TransformWithTemplate(originalPath, matchingRoute.DownstreamPathTemplate, matchingRoute.UpstreamPathTemplate);
         }
@@ -218,7 +219,7 @@ public class OpenApiAggregatorService
         return pathAfterApi;
     }
 
-    private bool PathMatchesTemplate(string path, string template)
+    private static bool PathMatchesTemplate(string path, string template)
     {
         var pathParts = path.Split('/');
         var templateParts = template.Split('/');
@@ -244,7 +245,7 @@ public class OpenApiAggregatorService
         return true;
     }
 
-    private string TransformWithTemplate(string originalPath, string downstreamTemplate, string upstreamTemplate)
+    private static string TransformWithTemplate(string originalPath, string downstreamTemplate, string upstreamTemplate)
     {
         var pathParts = originalPath.Split('/');
         var downstreamParts = downstreamTemplate.Split('/');
@@ -284,7 +285,7 @@ public class OpenApiAggregatorService
         return "/" + string.Join("/", result);
     }
 
-    private void MergeSchemas(OpenApiDocument target, OpenApiDocument source)
+    private static void MergeSchemas(OpenApiDocument target, OpenApiDocument source)
     {
         if (source.Components?.Schemas == null) return;
 
@@ -303,7 +304,7 @@ public class OpenApiAggregatorService
         }
     }
 
-    private void MergeSecuritySchemes(OpenApiDocument target, OpenApiDocument source)
+    private static void MergeSecuritySchemes(OpenApiDocument target, OpenApiDocument source)
     {
         if (source.Components?.SecuritySchemes == null) return;
 
@@ -315,24 +316,4 @@ public class OpenApiAggregatorService
             }
         }
     }
-}
-
-public class SwaggerEndPoint
-{
-    public string Key { get; set; } = string.Empty;
-    public List<SwaggerConfig> Config { get; set; } = new();
-}
-
-public class SwaggerConfig
-{
-    public string Name { get; set; } = string.Empty;
-    public string Version { get; set; } = string.Empty;
-    public string Url { get; set; } = string.Empty;
-}
-
-public class RouteConfig
-{
-    public string? UpstreamPathTemplate { get; set; }
-    public string? DownstreamPathTemplate { get; set; }
-    public string? SwaggerKey { get; set; }
 }
