@@ -1,4 +1,5 @@
 using ApiGateway.Services;
+using Freelance.ApiGateway.Endponts;
 using Microsoft.IdentityModel.Tokens;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
@@ -66,7 +67,7 @@ app.MapScalarApiReference(options =>
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.MapOpenApiEndpoints();
 app.UseWhen(
     context => !context.Request.Path.StartsWithSegments("/scalar") &&
                !context.Request.Path.StartsWithSegments("/openapi"),
