@@ -7,15 +7,20 @@ services:
       - "9000:8080"
     environment:
       - ASPNETCORE_URLS=http://+:8080
+      - ASPNETCORE_ENVIRONMENT=Development
       - JwtSettings__Key=YourSuperSecretKeyHere123!ChangeItTo32PlusChars
       - JwtSettings__Issuer=FreelanceApp
       - JwtSettings__Audience=FreelanceAppUsers
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://alloy:4317
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4317
+      - OTEL_EXPORTER_OTLP_LOGS_ENDPOINT=http://loki:3100
       - OTEL_SERVICE_NAME=Freelance-Gateway
+      - Logging__LogLevel__Default=Information
+      - Logging__LogLevel__Microsoft.AspNetCore=Warning
     depends_on:
       - freelance_identity
       - freelance_user_profiles
-      - alloy
+      - tempo
+      - loki
     networks:
       - freelance-network
 
@@ -25,14 +30,19 @@ services:
       dockerfile: src/Freelance.Identity.Api/Dockerfile
     environment:
       - ASPNETCORE_URLS=http://+:80
+      - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=FreelanceIdentity;Username=postgres;Password=postgres
       - JwtSettings__Key=YourSuperSecretKeyHere123!ChangeItTo32PlusChars
       - JwtSettings__Issuer=FreelanceApp
       - JwtSettings__Audience=FreelanceAppUsers
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://alloy:4317
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4317
+      - OTEL_EXPORTER_OTLP_LOGS_ENDPOINT=http://loki:3100
       - OTEL_SERVICE_NAME=Freelance-Identity
+      - Logging__LogLevel__Default=Information
+      - Logging__LogLevel__Microsoft.AspNetCore=Warning
     depends_on:
-      - alloy
+      - tempo
+      - loki
     networks:
       - freelance-network
 
@@ -42,40 +52,27 @@ services:
       dockerfile: src/Freelance.UserProfiles.Api/Dockerfile
     environment:
       - ASPNETCORE_URLS=http://+:80
+      - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=FreelanceUserProfiles;Username=postgres;Password=postgres
       - JwtSettings__Key=YourSuperSecretKeyHere123!ChangeItTo32PlusChars
       - JwtSettings__Issuer=FreelanceApp
       - JwtSettings__Audience=FreelanceAppUsers
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://alloy:4317
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4317
+      - OTEL_EXPORTER_OTLP_LOGS_ENDPOINT=http://loki:3100
       - OTEL_SERVICE_NAME=Freelance-UserProfiles
+      - Logging__LogLevel__Default=Information
+      - Logging__LogLevel__Microsoft.AspNetCore=Warning
     depends_on:
-      - alloy
-    networks:
-      - freelance-network
-
-  alloy:
-    image: grafana/alloy:latest
-    ports:
-      - "4317:4317"
-      - "4318:4318"
-      - "12345:12345"
-    volumes:
-      - ./alloy-config.yaml:/etc/alloy/config.alloy
-    command:
-      - run
-      - /etc/alloy/config.alloy
-      - --server.http.listen-addr=0.0.0.0:12345
-    depends_on:
-      - loki
       - tempo
-      - prometheus
+      - loki
     networks:
       - freelance-network
 
   loki:
-    image: grafana/loki:2.9.3
+    image: grafana/loki:3.0.0
     ports:
       - "3100:3100"
+      - "9096:9096"
     volumes:
       - loki_data:/loki
       - ./loki-config.yaml:/etc/loki/local-config.yaml
@@ -86,13 +83,15 @@ services:
   tempo:
     image: grafana/tempo:latest
     container_name: tempo
+    user: "0:0"
     volumes:
       - tempo_data:/tmp/tempo
       - ./tempo-config.yaml:/etc/tempo.yaml:ro
     command: ["-config.file=/etc/tempo.yaml"]
     ports:
       - "3200:3200"
-      - "9095:9095"  # Changed from 4317 to avoid conflict
+      - "4317:4317"
+      - "4318:4318"
     networks:
       - freelance-network
 

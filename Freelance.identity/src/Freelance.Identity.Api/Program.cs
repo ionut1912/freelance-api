@@ -1,4 +1,4 @@
-using Freelance.Identity.Api.Endpoints;
+﻿using Freelance.Identity.Api.Endpoints;
 using Freelance.Identity.Api.Mappers;
 using Freelance.Identity.Application.Mediatr.Accounts.Commands;
 using Freelance.Identity.Application.Validators;
@@ -10,16 +10,19 @@ using Shared.Api.Extensions;
 using Shared.Domain.Interfaces;
 using Shared.Infra.Services;
 
-var builder = WebApplication.CreateBuilder(args);
 
-// Configuration
+var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
-var otelEndpoint = configuration["OTEL_EXPORTER_OTLP_ENDPOINT"] ?? "http://alloy:4317";
+var otelEndpoint = configuration["OTEL_EXPORTER_OTLP_ENDPOINT"] ?? "http://tempo:4317";
 var serviceName = configuration["OTEL_SERVICE_NAME"] ?? "Freelance-Identity";
 var environmentName = builder.Environment.EnvironmentName ?? "Development";
 
-// Create OpenTelemetry resource
-builder.AddOpenTelemetry(otelEndpoint, serviceName, environmentName);
+// Use the correct Loki OTLP endpoint
+var lokiEndpoint = configuration["OTEL_EXPORTER_OTLP_LOGS_ENDPOINT"] ?? "http://loki:3100";
+
+var resourceBuilder = OpenTelemetryExtensions.CreateServiceResourceBuilder(serviceName, environmentName);
+
+builder.AddOpenTelemetry(lokiEndpoint, resourceBuilder);
 
 builder.Services
     .AddDatabaseConfig<ApplicationDbContext>(builder.Configuration)
@@ -30,9 +33,7 @@ builder.Services
     .AddAplicationConfig(typeof(CreateAccountCommand).Assembly, typeof(CreateAccountCommandValidator).Assembly)
     .AddPresentation<IdentityExceptionMapper>(builder.Configuration, otelEndpoint, serviceName, environmentName);
 
-
 var app = builder.Build();
-
 
 app.MigrateDatabaseConfig<ApplicationDbContext>();
 
@@ -42,7 +43,8 @@ app.UseGlobalExceptionHandler<Program>()
     .MapStandardEndpoints();
 
 app.MapApiDocumentation();
-
 app.MapUsersEndpoints();
+
+app.Logger.LogInformation("🚀 {ServiceName} starting up in {Environment} environment", serviceName, environmentName);
 
 app.Run();

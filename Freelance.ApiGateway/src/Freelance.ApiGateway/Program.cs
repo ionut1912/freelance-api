@@ -1,21 +1,21 @@
 using Microsoft.IdentityModel.Tokens;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
+using Shared.Api.Extensions;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.WebHost.UseUrls("http://+:8080");
-
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
+var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]!);
 
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", options =>
     {
-        options.RequireHttpsMetadata = false; // ? Disable HTTPS metadata for container use
+        options.RequireHttpsMetadata = false;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -28,9 +28,16 @@ builder.Services.AddAuthentication("Bearer")
         };
     });
 
-builder.Services.AddAuthorization();
+var configuration = builder.Configuration;
+var otelEndpoint = configuration["OTEL_EXPORTER_OTLP_ENDPOINT"] ?? "http://tempo:4317";
+var serviceName = configuration["OTEL_SERVICE_NAME"] ?? "Freelance-Api-Gateway";
+var environmentName = builder.Environment.EnvironmentName ?? "Development";
+var lokiEndpoint = configuration["OTEL_EXPORTER_OTLP_LOGS_ENDPOINT"] ?? "http://loki:3100";
+var resourceBuilder = OpenTelemetryExtensions.CreateServiceResourceBuilder(serviceName, environmentName);
+builder.AddOpenTelemetry(lokiEndpoint, resourceBuilder);
+builder.Services.AddOpenTelemetryObservability(otelEndpoint,serviceName);
 
-// Swagger + Ocelot
+builder.Services.AddAuthorization();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddOcelot(builder.Configuration);
@@ -42,10 +49,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseSwaggerForOcelotUI(opt =>
-{
-    opt.PathToSwaggerGenerator = "/swagger/docs";
-});
+app.UseSwaggerForOcelotUI();
 
 await app.UseOcelot();
 
