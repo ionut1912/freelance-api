@@ -2,32 +2,28 @@
 using Freelance.UserProfiles.Application.Mediatr.ClientProfiles.Commands;
 using Freelance.UserProfiles.Application.Mediatr.ClientProfiles.Queries;
 using Freelance.UserProfiles.Application.Requests;
+using Microsoft.AspNetCore.Authorization;
 using Shared.Api.Extensions;
+using Shared.Api.Infrastructure;
 using Shared.Application.Mediator;
 
-namespace Freelance.UserProfiles.Api.Endpoints.Modules;
+namespace Freelance.UserProfiles.Api.Endpoints;
 
-public static class ClientProfileModule
+public class ClientProfileEndpointGroup : EndpointGroup
 {
-    public static IEndpointRouteBuilder AddClientProfileEndpoints(this IEndpointRouteBuilder app)
+    public override void Map(IEndpointRouteBuilder endpoints)
     {
-        var clientOnlyGroup = app.MapGroup("/api/client-profiles")
-            .WithTags("ClientProfile")
-            .RequireAuthorization("ClientOnly");
-        var authenticatedGroup = app.MapGroup("/api/client-profiles")
-            .WithTags("ClientProfile")
-            .RequireAuthorization();
+        var group = endpoints.MapGroup(this);
 
-        clientOnlyGroup.MapPost("/", CreateClientProfile);
-        authenticatedGroup.MapGet("/", GetClientProfiles);
-        clientOnlyGroup.MapGet("/current", GetLoggedInClientProfile);
-        clientOnlyGroup.MapPut("/{id:guid}/address", UpdateClientProfileAddress);
-        clientOnlyGroup.MapPut("/{id:guid}/data", UpdateClientProfileData);
-        clientOnlyGroup.MapDelete("/{id:guid}", DeleteClientProfile);
-
-        return app;
+        group.MapPost(CreateClientProfile);
+        group.MapGet(GetClientProfiles);
+        group.MapGet(GetLoggedInClientProfile, "/current");
+        group.MapPut(UpdateClientProfileAddress, "/{id:guid}/address");
+        group.MapPut(UpdateClientProfileData, "/{id:guid}/data");
+        group.MapDelete(DeleteClientProfile, "/{id:guid}");
     }
 
+    [Authorize(Policy = "ClientOnly")]
     private static async Task<IResult> CreateClientProfile(IMediator mediator,
         CreateClientProfileRequest request,
         HttpContext httpContext,
@@ -35,11 +31,13 @@ public static class ClientProfileModule
     {
         var accountId = httpContext.GetAccountId();
         if (accountId == Guid.Empty) return Results.Unauthorized();
+
         var command = request.ToCreateCommand(accountId);
         var created = await mediator.Send(command, ct);
         return Results.Created($"/api/client-profiles/{created.Id}", created);
     }
 
+    [Authorize]
     private static async Task<IResult> GetClientProfiles(IMediator mediator, CancellationToken ct)
     {
         var query = new GetClientProfilesQuery();
@@ -47,15 +45,18 @@ public static class ClientProfileModule
         return Results.Ok(profiles);
     }
 
+    [Authorize(Policy = "ClientOnly")]
     private static async Task<IResult> GetLoggedInClientProfile(IMediator mediator, HttpContext httpContext, CancellationToken ct)
     {
         var accountId = httpContext.GetAccountId();
         if (accountId == Guid.Empty) return Results.Unauthorized();
+
         var query = new GetLoggedInClientProfileQuery(accountId);
         var profile = await mediator.Send(query, ct);
         return Results.Ok(profile);
     }
 
+    [Authorize(Policy = "ClientOnly")]
     private static async Task<IResult> UpdateClientProfileAddress(IMediator mediator, Guid id,
         UpdateProfileAddressRequest request, CancellationToken ct)
     {
@@ -64,6 +65,7 @@ public static class ClientProfileModule
         return Results.NoContent();
     }
 
+    [Authorize(Policy = "ClientOnly")]
     private static async Task<IResult> UpdateClientProfileData(IMediator mediator, Guid id,
         UpdateProfileDataRequest request, CancellationToken ct)
     {
@@ -72,6 +74,7 @@ public static class ClientProfileModule
         return Results.NoContent();
     }
 
+    [Authorize(Policy = "ClientOnly")]
     private static async Task<IResult> DeleteClientProfile(IMediator mediator, Guid id, CancellationToken ct)
     {
         var command = new DeleteClientProfileCommand(id);

@@ -7,6 +7,7 @@ using Freelance.Identity.Domain.interfaces;
 using Freelance.Identity.Infrastructure.Persistance;
 using Freelance.Identity.Infrastructure.Persistance.Repositories;
 using Shared.Api.Extensions;
+using Shared.Api.Infrastructure;
 using Shared.Domain.Interfaces;
 using Shared.Infra.Services;
 
@@ -43,7 +44,7 @@ app.UseGlobalExceptionHandler<Program>()
     .MapStandardEndpoints();
 
 app.MapApiDocumentation();
-app.MapUsersEndpoints();
+app.MapEndpoints(typeof(UserEndpointsGroup).Assembly);
 
 app.Logger.LogInformation("🚀 {ServiceName} starting up in {Environment} environment", serviceName, environmentName);
 

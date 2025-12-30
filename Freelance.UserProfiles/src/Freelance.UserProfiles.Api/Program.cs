@@ -7,6 +7,7 @@ using Freelance.UserProfiles.Domain.Interfaces;
 using Freelance.UserProfiles.Infrastructure.Persistance;
 using Freelance.UserProfiles.Infrastructure.Persistance.Repository;
 using Shared.Api.Extensions;
+using Shared.Api.Infrastructure;
 using Shared.Domain.Interfaces;
 using Shared.Infra.Services;
 
@@ -42,7 +43,7 @@ app.UseGlobalExceptionHandler<Program>()
     .MapStandardEndpoints();
 
 app.MapApiDocumentation();
-app.MapUserProfileEndpoints();
+app.MapEndpoints(typeof(ClientProfileEndpointGroup).Assembly);
 
 app.Logger.LogInformation("🚀 {ServiceName} starting up in {Environment} environment", serviceName, environmentName);
 
