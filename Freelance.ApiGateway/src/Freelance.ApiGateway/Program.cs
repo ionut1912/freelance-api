@@ -41,20 +41,27 @@ var resourceBuilder = OpenTelemetryExtensions.CreateServiceResourceBuilder(servi
 builder.AddOpenTelemetry(lokiEndpoint, resourceBuilder);
 builder.Services.AddOpenTelemetryObservability(otelEndpoint, serviceName);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin", policy =>
+    {
+        policy.WithOrigins("https://yourfrontend.com", "http://localhost:3000")
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
+});
+
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-
 builder.Services.AddHttpClient();
-
 builder.Services.AddSingleton<OpenApiAggregatorService>();
-
 builder.Services.AddOcelot(builder.Configuration);
 
 var app = builder.Build();
 
 app.MapControllers();
-
 app.MapScalarApiReference(options =>
 {
     options
@@ -64,10 +71,14 @@ app.MapScalarApiReference(options =>
         .WithOpenApiRoutePattern("/openapi/v1.json");
 });
 
+app.UseCors("AllowSpecificOrigin");
+
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapOpenApiEndpoints();
+
 app.UseWhen(
     context => !context.Request.Path.StartsWithSegments("/scalar") &&
                !context.Request.Path.StartsWithSegments("/openapi"),
