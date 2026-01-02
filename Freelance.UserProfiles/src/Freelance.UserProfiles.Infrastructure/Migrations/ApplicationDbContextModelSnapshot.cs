@@ -40,8 +40,7 @@ namespace Freelance.UserProfiles.Infrastructure.Migrations
 
                     b.Property<string>("Image")
                         .IsRequired()
-                        .HasMaxLength(10000)
-                        .HasColumnType("character varying(10000)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsVerified")
                         .ValueGeneratedOnAdd()
@@ -78,8 +77,7 @@ namespace Freelance.UserProfiles.Infrastructure.Migrations
 
                     b.Property<string>("Image")
                         .IsRequired()
-                        .HasMaxLength(10000)
-                        .HasColumnType("character varying(10000)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsVerified")
                         .ValueGeneratedOnAdd()

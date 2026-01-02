@@ -23,6 +23,7 @@ public class FreelancerProfileEndpointGroup : EndpointGroup
         group.MapPut(UpdateFreelancerAddressAsync, "/address/{id:guid}");
         group.MapPut(UpdateFreelancerDataAsync, "/data/{id:guid}");
         group.MapPut(UpdateFreelancerRatingAsync, "/rating/{id:guid}");
+        group.MapPut(VerifyFreelancerProfile, "/verify");
         group.MapDelete(DeleteFreelancerProfileAsync, "/{id:guid}");
     }
 
@@ -98,6 +99,16 @@ public class FreelancerProfileEndpointGroup : EndpointGroup
     {
         var deleteFreelancerProfileCommand = new DeleteFreelancerProfileCommand(id);
         await mediator.Send(deleteFreelancerProfileCommand, ct);
+        return Results.NoContent();
+    }
+
+    [Authorize(Policy = "FreelancerOnly")]
+    private static async Task<IResult> VerifyFreelancerProfile(IMediator mediator,VerifyProfileRequest verifyProfileRequest,HttpContext httpContext, CancellationToken ct)
+    {
+        var accountId = httpContext.GetAccountId();
+        if (accountId == Guid.Empty) return Results.Unauthorized();
+        var verifyFreelancerCommand = verifyProfileRequest.ToVerifyFreelancerCommand(accountId);
+        await mediator.Send(verifyFreelancerCommand, ct);
         return Results.NoContent();
     }
 }

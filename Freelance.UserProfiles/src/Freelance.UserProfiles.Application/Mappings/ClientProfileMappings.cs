@@ -10,7 +10,7 @@ public static class ClientProfileMappings
     public static ClientProfileDto ToDto(this ClientProfile clientProfile)
     {
 
-        return new ClientProfileDto(clientProfile.AccountId,
+        return new ClientProfileDto(clientProfile.Id,clientProfile.AccountId,
             new AddressDto(clientProfile.Address.Street, clientProfile.Address.City, clientProfile.Address.Country, clientProfile.Address.StreetNumber, clientProfile.Address.ZipCode, clientProfile.Address.State),
             clientProfile.Bio,
             clientProfile.Image,
@@ -34,6 +34,11 @@ public static class ClientProfileMappings
     public static UpdateClientProfileDataCommand ToUpdateClientDataCommand(this UpdateProfileDataRequest updateProfileDataRequest, Guid id)
     {
         return new UpdateClientProfileDataCommand(id, updateProfileDataRequest.Bio, updateProfileDataRequest.Image);
+    }
+
+    public static VerifyClientProfileCommand ToVerifyClientCommand(this VerifyProfileRequest verifyProfileRequest, Guid accountId)
+    {
+        return new VerifyClientProfileCommand(accountId, verifyProfileRequest.ImageUrl);
     }
 }
 

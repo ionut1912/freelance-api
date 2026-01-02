@@ -20,6 +20,7 @@ public class ClientProfileEndpointGroup : EndpointGroup
         group.MapGet(GetLoggedInClientProfile, "/current");
         group.MapPut(UpdateClientProfileAddress, "/{id:guid}/address");
         group.MapPut(UpdateClientProfileData, "/{id:guid}/data");
+        group.MapPut(VerifyClientProfile, "/verify");
         group.MapDelete(DeleteClientProfile, "/{id:guid}");
     }
 
@@ -78,6 +79,16 @@ public class ClientProfileEndpointGroup : EndpointGroup
     private static async Task<IResult> DeleteClientProfile(IMediator mediator, Guid id, CancellationToken ct)
     {
         var command = new DeleteClientProfileCommand(id);
+        await mediator.Send(command, ct);
+        return Results.NoContent();
+    }
+
+    [Authorize(Policy = "ClientOnly")]
+    private static async Task<IResult> VerifyClientProfile(IMediator mediator,VerifyProfileRequest verifyProfileRequest, HttpContext httpContext, CancellationToken ct)
+    {
+        var accountId = httpContext.GetAccountId();
+        if (accountId == Guid.Empty) return Results.Unauthorized();
+        var command = verifyProfileRequest.ToVerifyClientCommand(accountId);
         await mediator.Send(command, ct);
         return Results.NoContent();
     }

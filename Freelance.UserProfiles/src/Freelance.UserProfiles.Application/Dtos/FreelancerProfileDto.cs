@@ -1,6 +1,6 @@
 ﻿namespace Freelance.UserProfiles.Application.Dtos;
 
-public record FreelancerProfileDto(Guid AccountId,
+public record FreelancerProfileDto(Guid Id,Guid AccountId,
     AddressDto Address,
     string Bio,
     string Image,

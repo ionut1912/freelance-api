@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="src/Freelance.FaceRecognition.Api/Freelance.FaceRecognition.Api.csproj" Id="9c2826e9-44d5-46f5-b258-0d2d3845c469" />
+  <Project Path="src/Freelance.FaceRecognition.Application/Freelance.FaceRecognition.Application.csproj" Id="9708d748-e5dc-41cb-a299-2d84e63e7a63" />
+  <Project Path="src/Freelance.FaceRecognition.Domain/Freelance.FaceRecognition.Domain.csproj" />
+  <Project Path="src/Freelance.FaceRecognition.Infrastructure/Freelance.FaceRecognition.Infrastructure.csproj" Id="16646587-cce3-413c-8b31-9a4d1815c7ee" />
+</Solution>

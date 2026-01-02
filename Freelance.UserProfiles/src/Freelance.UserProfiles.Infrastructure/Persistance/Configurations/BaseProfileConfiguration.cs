@@ -23,7 +23,7 @@ public abstract class BaseProfileConfiguration<TProfile> : IEntityTypeConfigurat
 
         builder.Property(x => x.Image)
             .IsRequired()
-            .HasMaxLength(10000);
+            .HasColumnType("text");
 
         builder.Property(x => x.IsVerified)
             .IsRequired()

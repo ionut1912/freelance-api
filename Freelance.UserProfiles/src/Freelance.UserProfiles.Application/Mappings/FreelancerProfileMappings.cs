@@ -1,4 +1,5 @@
 ﻿using Freelance.UserProfiles.Application.Dtos;
+using Freelance.UserProfiles.Application.Mediatr.ClientProfiles.Commands;
 using Freelance.UserProfiles.Application.Mediatr.FreelancerProfiles.Commands;
 using Freelance.UserProfiles.Application.Requests;
 using Freelance.UserProfiles.Domain.Entities;
@@ -10,7 +11,7 @@ public static class FreelancerProfileMappings
     public static FreelancerProfileDto ToDto(this FreelancerProfile freelancerProfile)
     {
         return new FreelancerProfileDto
-        (
+        (freelancerProfile.Id,
             freelancerProfile.AccountId,
             new AddressDto(freelancerProfile.Address.Street, freelancerProfile.Address.City, freelancerProfile.Address.Country, freelancerProfile.Address.StreetNumber, freelancerProfile.Address.ZipCode, freelancerProfile.Address.State),
             freelancerProfile.Bio,
@@ -74,6 +75,11 @@ public static class FreelancerProfileMappings
     public static UpdateFreelancerRatingCommand ToUpdateRatingCommand(this UpdateFreelancerProfileRatingRequest updateProfileDataRequest, Guid id)
     {
         return new UpdateFreelancerRatingCommand(id, updateProfileDataRequest.Rating);
+    }
+
+    public static VerifyFreelancerProfileCommand ToVerifyFreelancerCommand(this VerifyProfileRequest verifyProfileRequest, Guid accountId)
+    {
+        return new VerifyFreelancerProfileCommand(accountId, verifyProfileRequest.ImageUrl);
     }
 
 

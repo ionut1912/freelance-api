@@ -1,5 +1,7 @@
-﻿using Freelance.UserProfiles.Api.Endpoints;
+﻿using Freelance.Shared.Events.Events;
+using Freelance.UserProfiles.Api.Endpoints;
 using Freelance.UserProfiles.Api.Mappers;
+using Freelance.UserProfiles.Application.EventHandlers;
 using Freelance.UserProfiles.Application.Mediatr;
 using Freelance.UserProfiles.Application.Validators;
 using Freelance.UserProfiles.Domain.Entities;
@@ -10,6 +12,9 @@ using Shared.Api.Extensions;
 using Shared.Api.Infrastructure;
 using Shared.Domain.Interfaces;
 using Shared.Infra.Services;
+using Shared.Rabbit.Extensions;
+using Shared.Rabbit.Repositories;
+using Shared.Rabbit.Settings;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,6 +27,20 @@ var environmentName = builder.Environment.EnvironmentName ?? "Development";
 var lokiEndpoint = configuration["OTEL_EXPORTER_OTLP_LOGS_ENDPOINT"] ?? "http://loki:3100";
 
 var resourceBuilder = OpenTelemetryExtensions.CreateServiceResourceBuilder(serviceName, environmentName);
+var rabbitMqSection = builder.Configuration.GetSection("RabbitMq");
+
+
+builder.Services.AddRabbitMqEventBus(
+    options =>
+    {
+        options.ExchangeConfigurations = rabbitMqSection
+            .GetSection("Exchanges")
+            .Get<List<ExchangeConfiguration>>();
+    },
+    hostname: rabbitMqSection["HostName"]!,
+    username: rabbitMqSection["UserName"]!,
+    password: rabbitMqSection["Password"]!
+);
 
 builder.AddOpenTelemetry(lokiEndpoint, resourceBuilder);
 
@@ -32,9 +51,11 @@ builder.Services
     .AddRepositoriesConfig<IUnitOfWork<ApplicationDbContext>, UnitOfWork<ApplicationDbContext>>()
     .AddAplicationConfig(typeof(MediatrAssemblyReference).Assembly, typeof(ValidationAssemblyReference).Assembly)
     .AddPresentation<UserProfileExceptionMapper>(builder.Configuration, otelEndpoint, serviceName, environmentName);
+builder.Services.AddScoped<VerifiedFaceEventHandler>();
 
 var app = builder.Build();
-
+var eventBus = app.Services.GetRequiredService<IEventBus>();
+eventBus.Subscribe<VerifiedFaceEvent, VerifiedFaceEventHandler>();
 app.MigrateDatabaseConfig<ApplicationDbContext>();
 
 app.UseGlobalExceptionHandler<Program>()

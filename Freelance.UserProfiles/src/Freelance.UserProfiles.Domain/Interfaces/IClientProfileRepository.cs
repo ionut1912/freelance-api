@@ -5,5 +5,5 @@ namespace Freelance.UserProfiles.Domain.Interfaces;
 
 public interface IClientProfileRepository : IGenericRepository<ClientProfile>
 {
-    Task<ClientProfile> GetLoggedInFreelancerProfileAsync(Guid accountId, CancellationToken cancellationToken);
+    Task<ClientProfile> GetLoggedInClientProfileAsync(Guid accountId, CancellationToken cancellationToken);
 }

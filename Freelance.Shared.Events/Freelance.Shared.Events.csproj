@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Version>1.0.3</Version>
+		<Authors>ionut1912</Authors>
+		<Company>Shared</Company>
+		<PackageId>Freelance.Shared.Events</PackageId>
+		<Description>Rabbit event for Freelance microservices</Description>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<IncludeSymbols>true</IncludeSymbols>
+		<IncludeSource>true</IncludeSource>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<DocumentationFile>bin\Release\net9.0\Freelance.Shared.Events.xml</DocumentationFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Include="Events\VerifiedFace.cs" />
+	</ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Shared.RabbitLayer" Version="1.0.3" />
+  </ItemGroup>
+
+</Project>

@@ -20,7 +20,7 @@ public class GetLoggedInClientProfileQueryHandler : IRequestHandler<GetLoggedInC
         CancellationToken cancellationToken)
     {
         var clientProfile =
-            await _clientProfileRepository.GetLoggedInFreelancerProfileAsync(request.AccountId, cancellationToken);
+            await _clientProfileRepository.GetLoggedInClientProfileAsync(request.AccountId, cancellationToken);
         if (clientProfile == null)
             throw new ProfileNotFoundException($"Profile with accountId {request.AccountId} not found");
 

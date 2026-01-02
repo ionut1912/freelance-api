@@ -41,11 +41,13 @@ var resourceBuilder = OpenTelemetryExtensions.CreateServiceResourceBuilder(servi
 builder.AddOpenTelemetry(lokiEndpoint, resourceBuilder);
 builder.Services.AddOpenTelemetryObservability(otelEndpoint, serviceName);
 
+const string frontendOrigin = "_frontendOrigin";
+var feEnv = Environment.GetEnvironmentVariable("FRONTEND_BASE_URL");
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowSpecificOrigin", policy =>
+    options.AddPolicy(frontendOrigin, policy =>
     {
-        policy.WithOrigins("https://yourfrontend.com", "http://localhost:3000")
+        policy.WithOrigins("https://yourfrontend.com", "http://localhost:3000",feEnv??"test")
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials();
@@ -71,7 +73,7 @@ app.MapScalarApiReference(options =>
         .WithOpenApiRoutePattern("/openapi/v1.json");
 });
 
-app.UseCors("AllowSpecificOrigin");
+app.UseCors(frontendOrigin);
 
 app.UseRouting();
 app.UseAuthentication();

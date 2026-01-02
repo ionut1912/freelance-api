@@ -9,7 +9,9 @@
 
     <ItemGroup>
 		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
+		<PackageReference Include="Freelance.Shared.Events" Version="1.0.3" />
 		<PackageReference Include="Shared.ApplicationLayer" Version="1.2.3" />
+		<PackageReference Include="Shared.RabbitLayer" Version="1.0.3" />
     </ItemGroup>
 
     <ItemGroup>

@@ -20,7 +20,7 @@ public class UserEndpointsGroup : EndpointGroup
         group.MapGet(GetCurrentUser, "/current");
         group.MapPut(UnblockUserAccount, "/unblock");
         group.MapDelete(DeleteUserAccount, "/");
-    }
+    }+
 
     private static async Task<IResult> RegisterUser(IMediator mediator, CreateAccountCommand createAccountCommand,
         CancellationToken ct)

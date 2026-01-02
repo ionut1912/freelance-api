@@ -12,8 +12,22 @@ services:
     networks:
       - freelance-network
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - freelance-network
+      
 volumes:
   postgres_data:
+  rabbitmq_data:
 
 networks:
   freelance-network:
