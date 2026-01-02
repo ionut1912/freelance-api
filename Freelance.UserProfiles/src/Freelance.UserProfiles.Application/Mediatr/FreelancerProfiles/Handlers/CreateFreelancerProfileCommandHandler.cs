@@ -1,5 +1,6 @@
 ﻿using Freelance.UserProfiles.Application.Mediatr.FreelancerProfiles.Commands;
 using Freelance.UserProfiles.Domain.Entities;
+using Freelance.UserProfiles.Domain.Exceptions;
 using Freelance.UserProfiles.Domain.Interfaces;
 using Freelance.UserProfiles.Domain.ValueObjects;
 using Freelance.UserProfiles.Infrastructure.Persistance;
@@ -23,6 +24,10 @@ public class CreateFreelancerProfileCommandHandler : IRequestHandler<CreateFreel
     public async Task<FreelancerProfile> Handle(CreateFreelancerProfileCommand request,
         CancellationToken cancellationToken)
     {
+        var existingFreelancer=await _freelancerProfileRepository.GetLoggedInFreelancerProfileAsync(request.AccountId, cancellationToken);
+        if (existingFreelancer != null) {
+            throw new ProfileAllreadyExistsException($"Profile with accountId {request.AccountId} allready exists");
+       }
         var freelancerProfile = FreelancerProfile.Create(
             request.AccountId,
             request.Address.Street,

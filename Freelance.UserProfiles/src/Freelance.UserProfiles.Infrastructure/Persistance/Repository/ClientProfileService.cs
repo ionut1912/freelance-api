@@ -14,8 +14,6 @@ public class ClientProfileService(DbSet<ClientProfile> dbSet) : GenericRepositor
         var clientProfile = await dbSet
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.AccountId == accountId, cancellationToken);
-        return clientProfile == null
-            ? throw new ProfileNotFoundException($"Profile with AccountId {accountId} not found")
-            : clientProfile;
+        return clientProfile;
     }
 }

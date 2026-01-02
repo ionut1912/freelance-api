@@ -19,6 +19,7 @@ services:
     depends_on:
       - freelance_identity
       - freelance_user_profiles
+      - freelance_face
       - tempo
       - loki
     networks:
@@ -57,9 +58,47 @@ services:
       - JwtSettings__Key=YourSuperSecretKeyHere123!ChangeItTo32PlusChars
       - JwtSettings__Issuer=FreelanceApp
       - JwtSettings__Audience=FreelanceAppUsers
+      - RabbitMq__HostName=rabbitmq
+      - RabbitMq__UserName=guest
+      - RabbitMq__Password=guest
+      - RabbitMq__Exchanges__0__Name=face.events
+      - RabbitMq__Exchanges__0__Type=topic
+      - RabbitMq__Exchanges__0__Durable=true
+      - RabbitMq__Exchanges__0__AutoDelete=false
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4317
       - OTEL_EXPORTER_OTLP_LOGS_ENDPOINT=http://loki:3100
       - OTEL_SERVICE_NAME=Freelance-UserProfiles
+      - Logging__LogLevel__Default=Information
+      - Logging__LogLevel__Microsoft.AspNetCore=Warning
+    depends_on:
+      - tempo
+      - loki
+    networks:
+      - freelance-network
+
+  freelance_face:
+    build:
+      context: Freelance.Face
+      dockerfile: Dockerfile
+      args:
+        BUILD_CONFIGURATION: Release
+        APP_UID: 0
+    ports:
+      - "9010:8080"
+    environment:
+      - ASPNETCORE_URLS=http://+:8080
+      - ASPNETCORE_ENVIRONMENT=Development
+      - FRONTEND_BASE_URL=http://localhost:3000
+      - RabbitMq__HostName=rabbitmq
+      - RabbitMq__UserName=guest
+      - RabbitMq__Password=guest
+      - RabbitMq__Exchanges__0__Name=face.events
+      - RabbitMq__Exchanges__0__Type=topic
+      - RabbitMq__Exchanges__0__Durable=true
+      - RabbitMq__Exchanges__0__AutoDelete=false
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4317
+      - OTEL_EXPORTER_OTLP_LOGS_ENDPOINT=http://loki:3100
+      - OTEL_SERVICE_NAME=Freelance-Face
       - Logging__LogLevel__Default=Information
       - Logging__LogLevel__Microsoft.AspNetCore=Warning
     depends_on:

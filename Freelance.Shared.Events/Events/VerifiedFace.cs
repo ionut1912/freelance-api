@@ -41,12 +41,6 @@ public class VerifiedFaceEvent : IEvent
     public bool IsMatch { get; set; }
 
     /// <summary>
-    /// Gets or sets a descriptive message providing additional
-    /// information about the face verification result.
-    /// </summary>
-    public string Message { get; set; } = string.Empty;
-
-    /// <summary>
     /// Gets or sets the role or verification context associated
     /// with the face verification result.
     /// </summary>

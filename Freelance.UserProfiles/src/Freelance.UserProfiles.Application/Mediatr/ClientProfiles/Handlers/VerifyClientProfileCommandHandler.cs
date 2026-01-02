@@ -21,19 +21,27 @@ public class VerifyClientProfileCommandHandler : IRequestHandler<VerifyClientPro
 
     public async Task<Unit> Handle(VerifyClientProfileCommand request, CancellationToken cancellationToken = default)
     {
-        var profile = await _clientProfileRepository.GetLoggedInClientProfileAsync(request.AccountId, cancellationToken);
-        if (profile is null)
+        try
         {
-            throw new ProfileNotFoundException("Client profile not found.");
-        }
+            var profile = await _clientProfileRepository.GetLoggedInClientProfileAsync(request.AccountId, cancellationToken);
+            if (profile is null)
+            {
+                throw new ProfileNotFoundException("Client profile not found.");
+            }
 
-        await _eventBus.PublishAsync(new VerifyFaceEvent
-        {
-            InitialImageUrl= profile.Image,
-            ProfileId=profile.Id,
-            CompareImageUrl = request.ImageUrl,
-            Role="Client",
-        });
+            await _eventBus.PublishAsync(new VerifyFaceEvent
+            {
+                InitialImageUrl = profile.Image,
+                ProfileId = profile.Id,
+                CompareImageUrl = request.ImageUrl,
+                Role = "Client",
+            });
+        }
+        catch (Exception ex) { 
+        
+        throw new Exception(ex.Message, ex);
+        }
+        
 
         return Unit.Value;
     }

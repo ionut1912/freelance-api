@@ -44,7 +44,7 @@ app.UseGlobalExceptionHandler<Program>()
     .MapStandardEndpoints();
 
 app.MapApiDocumentation();
-app.MapEndpoints(typeof(UserEndpointsGroup).Assembly);
+app.MapEndpoints(typeof(UserEndpointGroup).Assembly);
 
 app.Logger.LogInformation("🚀 {ServiceName} starting up in {Environment} environment", serviceName, environmentName);
 

@@ -1,5 +1,6 @@
 ﻿using Freelance.UserProfiles.Application.Mediatr.ClientProfiles.Commands;
 using Freelance.UserProfiles.Domain.Entities;
+using Freelance.UserProfiles.Domain.Exceptions;
 using Freelance.UserProfiles.Domain.Interfaces;
 using Freelance.UserProfiles.Infrastructure.Persistance;
 using Shared.Application.Mediator;
@@ -21,6 +22,12 @@ public class CreateClientProfileCommandHandler : IRequestHandler<CreateClientPro
 
     public async Task<ClientProfile> Handle(CreateClientProfileCommand request, CancellationToken cancellationToken)
     {
+        var existingClientProfile=await _repository.GetLoggedInClientProfileAsync(request.AccountId, cancellationToken);
+        if (existingClientProfile != null) 
+        {
+            throw new ProfileAllreadyExistsException($"Profile with accountId {request.AccountId} allready exists");
+        }
+
         var clientProfile = ClientProfile.Create(request.AccountId, request.AddressDto.Street, request.AddressDto.City,
             request.AddressDto.State, request.AddressDto.ZipCode, request.AddressDto.Country, request
                 .AddressDto.StreetNumber, request.Bio, request.Image);

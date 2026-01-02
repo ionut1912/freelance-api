@@ -15,6 +15,7 @@ public class UserProfileExceptionMapper : IExceptionProblemDetailsMapper
             ImageAlreadyExistsException ex => Create(400, "Image Already Exists", ex.Message),
             ProfileNotFoundException ex => Create(404, "Profile Not Found", ex.Message),
             FaceNotMatchException ex => Create(400, "Face Not Match", ex.Message),
+            ProfileAllreadyExistsException ex=> Create(400,"Profile Already Exists" ,ex.Message),
             CustomValidationException ex => CreateValidation(ex),
 
             _ => Create(500, "Internal Server Error", "An unexpected error occurred.")

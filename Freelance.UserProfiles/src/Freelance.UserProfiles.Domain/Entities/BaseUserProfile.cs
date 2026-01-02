@@ -9,7 +9,7 @@ public abstract class BaseUserProfile : Entity
     protected BaseUserProfile(Guid accountId, string street, string city, string state, string zipCode, string country,
         string streetNumber, string bio, string image)
     {
-        accountId = AccountId;
+        AccountId = accountId;
         Address = Address.Create(street, city, state, zipCode, country, streetNumber);
         Bio = bio;
         Image = image;
@@ -21,7 +21,7 @@ public abstract class BaseUserProfile : Entity
     {
     }
 
-    public Guid AccountId { get; private set; } = Guid.NewGuid();
+    public Guid AccountId { get; private set; }
     public Address Address { get; private set; } = Address.Create(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
     public string Bio { get; private set; } = string.Empty;
     public string Image { get; private set; } = string.Empty;

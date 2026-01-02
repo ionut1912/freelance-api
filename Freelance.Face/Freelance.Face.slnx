@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="src/Freelance.Face.Api/Freelance.Face.Api.csproj" />
+  <Project Path="src/Freelance.Face.Application/Freelance.Face.Application.csproj" />
+  <Project Path="src/Freelance.Face.Domain/Freelance.Face.Domain.csproj" />
+  <Project Path="src/Freelance.Face.Infrastructure/Freelance.Face.Infrastructure.csproj" />
+</Solution>

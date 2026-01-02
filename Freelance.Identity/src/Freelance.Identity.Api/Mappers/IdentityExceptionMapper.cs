@@ -26,10 +26,10 @@ public class IdentityExceptionMapper : IExceptionProblemDetailsMapper
         return problemDetails != null;
     }
 
-    private ProblemDetails Create(int status, string title, string detail) =>
+    private static ProblemDetails Create(int status, string title, string detail) =>
         new() { Status = status, Title = title, Detail = detail };
 
-    private ProblemDetails CreateValidation(CustomValidationException ex)
+    private static ProblemDetails CreateValidation(CustomValidationException ex)
     {
         var pd = Create(400, "Validation Error", "One or more validation errors occurred.");
         pd.Extensions["errors"] = ex.ValidationErrors;
