@@ -13,6 +13,7 @@ using Shared.Infra.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
 var configuration = builder.Configuration;
 var otelEndpoint = configuration["OTEL_EXPORTER_OTLP_ENDPOINT"] ?? "http://tempo:4317";
 var serviceName = configuration["OTEL_SERVICE_NAME"] ?? "Freelance-Identity";
