@@ -38,7 +38,8 @@ public class UnblockAccountCommandHandler : IRequestHandler<UnblockAccountComman
             account.UnblockAccount();
             _accountRepository.Update(account);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
-        } catch (AccountNotBlockedException ex)
+        } 
+        catch (AccountNotBlockedException ex)
         {
             _logger.LogError(ex, "Account with id: {AccountId} can not be unblocked because it is not blocked", request.AccountId);
             throw;

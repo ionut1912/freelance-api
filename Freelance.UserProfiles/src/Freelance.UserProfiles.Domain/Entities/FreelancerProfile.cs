@@ -4,11 +4,9 @@ namespace Freelance.UserProfiles.Domain.Entities;
 
 public class FreelancerProfile : BaseUserProfile
 {
-    // Internal collections
-    private readonly List<FreelancerForeignLanguage> _foreignLanguages = new();
-    private readonly List<Skill> _skills = new();
+    private readonly List<FreelancerForeignLanguage> _foreignLanguages = [];
+    private readonly List<Skill> _skills = [];
 
-    // Private constructor for EF
     private FreelancerProfile()
     {
     }
@@ -36,17 +34,14 @@ public class FreelancerProfile : BaseUserProfile
         PortfolioUrl = portfolioUrl;
     }
 
-    // Exposed read-only collections for EF and domain logic
     public IReadOnlyCollection<FreelancerForeignLanguage> ForeignLanguages => _foreignLanguages.AsReadOnly();
     public IReadOnlyCollection<Skill> Skills => _skills.AsReadOnly();
 
-    // Other properties
     public string Experience { get; private set; } = string.Empty;
     public Money Rate { get; private set; } = Money.Create(0, "USD");
     public int? Rating { get; private set; } = 0;
     public string PortfolioUrl { get; private set; } = string.Empty;
 
-    // Factory method
     public static FreelancerProfile Create(
         Guid accountId,
         string street,
@@ -68,7 +63,6 @@ public class FreelancerProfile : BaseUserProfile
             experience, amount, currency, rating, portfolioUrl);
     }
 
-    // Methods to manage collections
     public void AddLanguages(List<FreelancerForeignLanguage> languages)
     {
         _foreignLanguages.AddRange(languages);

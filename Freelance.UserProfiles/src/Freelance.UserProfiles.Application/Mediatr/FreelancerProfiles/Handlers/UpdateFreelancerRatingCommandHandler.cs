@@ -2,6 +2,7 @@
 using Freelance.UserProfiles.Domain.Exceptions;
 using Freelance.UserProfiles.Domain.Interfaces;
 using Freelance.UserProfiles.Infrastructure.Persistance;
+using Microsoft.Extensions.Logging;
 using Shared.Application.Mediator;
 using Shared.Domain.Interfaces;
 
@@ -11,13 +12,16 @@ public class UpdateFreelancerRatingCommandHandler : IRequestHandler<UpdateFreela
 {
     private readonly IFreelancerProfileRepository _freelancerProfileRepository;
     private readonly IUnitOfWork<ApplicationDbContext> _unitOfWork;
+    private readonly ILogger<UpdateFreelancerRatingCommandHandler> _logger;
 
-    public UpdateFreelancerRatingCommandHandler(IFreelancerProfileRepository freelancerProfileRepository, IUnitOfWork<ApplicationDbContext> unitOfWork)
+    public UpdateFreelancerRatingCommandHandler(IFreelancerProfileRepository freelancerProfileRepository, IUnitOfWork<ApplicationDbContext> unitOfWork,ILogger<UpdateFreelancerRatingCommandHandler> logger)
     {
         ArgumentNullException.ThrowIfNull(freelancerProfileRepository, nameof(freelancerProfileRepository));
         ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));
+        ArgumentNullException.ThrowIfNull(logger, nameof(logger));
         _freelancerProfileRepository = freelancerProfileRepository;
         _unitOfWork = unitOfWork;
+        _logger = logger;
     }
 
     public async Task<Unit> Handle(UpdateFreelancerRatingCommand request, CancellationToken cancellationToken)
@@ -25,10 +29,15 @@ public class UpdateFreelancerRatingCommandHandler : IRequestHandler<UpdateFreela
         var freelancerProfile =
             await _freelancerProfileRepository.GetByIdAsync(request.Id, cancellationToken, s => s.Skills, fL => fL.ForeignLanguages);
         if (freelancerProfile is null)
+        {
+            _logger.LogError("Profile with id {ProfileId} not found", request.Id);
             throw new ProfileNotFoundException($"Profile with id {request.Id} not found");
+        }
+
         freelancerProfile.UpdateRating(request.Rating);
         _freelancerProfileRepository.Update(freelancerProfile);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+        _logger.LogInformation("Profile with id {ProfileId} updated with new rating {Rating}", request.Id, request.Rating);
         return Unit.Value;
     }
 }

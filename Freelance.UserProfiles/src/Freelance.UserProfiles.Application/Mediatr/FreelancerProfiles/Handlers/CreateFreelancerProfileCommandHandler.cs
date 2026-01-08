@@ -4,6 +4,7 @@ using Freelance.UserProfiles.Domain.Exceptions;
 using Freelance.UserProfiles.Domain.Interfaces;
 using Freelance.UserProfiles.Domain.ValueObjects;
 using Freelance.UserProfiles.Infrastructure.Persistance;
+using Microsoft.Extensions.Logging;
 using Shared.Application.Mediator;
 using Shared.Domain.Interfaces;
 
@@ -13,21 +14,26 @@ public class CreateFreelancerProfileCommandHandler : IRequestHandler<CreateFreel
 {
     private readonly IFreelancerProfileRepository _freelancerProfileRepository;
     private readonly IUnitOfWork<ApplicationDbContext> _unitOfWork;
-
-    public CreateFreelancerProfileCommandHandler(IFreelancerProfileRepository freelancerProfileRepository, IUnitOfWork<ApplicationDbContext> unitOfWork)
+    private readonly ILogger<CreateFreelancerProfileCommandHandler> _logger;
+ 
+    public CreateFreelancerProfileCommandHandler(IFreelancerProfileRepository freelancerProfileRepository, IUnitOfWork<ApplicationDbContext> unitOfWork,ILogger<CreateFreelancerProfileCommandHandler> logger)
     {
         _freelancerProfileRepository = freelancerProfileRepository ??
                                        throw new ArgumentNullException(nameof(freelancerProfileRepository));
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public async Task<FreelancerProfile> Handle(CreateFreelancerProfileCommand request,
         CancellationToken cancellationToken)
     {
         var existingFreelancer=await _freelancerProfileRepository.GetLoggedInFreelancerProfileAsync(request.AccountId, cancellationToken);
-        if (existingFreelancer != null) {
+        if (existingFreelancer != null) 
+       {
+            _logger.LogError("Freelancer profile creation failed: Profile with accountId {AccountId} already exists", request.AccountId);
             throw new ProfileAllreadyExistsException($"Profile with accountId {request.AccountId} allready exists");
        }
+
         var freelancerProfile = FreelancerProfile.Create(
             request.AccountId,
             request.Address.Street,
@@ -64,6 +70,7 @@ public class CreateFreelancerProfileCommandHandler : IRequestHandler<CreateFreel
 
         await _freelancerProfileRepository.AddAsync(freelancerProfile, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+        _logger.LogInformation("Freelancer profile created successfully for accountId {AccountId}", request.AccountId);
         return freelancerProfile;
     }
 }

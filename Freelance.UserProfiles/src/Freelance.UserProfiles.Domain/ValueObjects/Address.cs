@@ -31,12 +31,6 @@ public class Address : ValueObject
         return new Address(street, city, state, zipCode, country, streetNumber);
     }
 
-    public static Address Update(string street, string city, string state, string zipCode, string country,
-        string streetNumber)
-    {
-        return new Address(street, city, state, zipCode, country, streetNumber);
-    }
-
     protected override IEnumerable<object?> GetEqualityComponents()
     {
         yield return Street;

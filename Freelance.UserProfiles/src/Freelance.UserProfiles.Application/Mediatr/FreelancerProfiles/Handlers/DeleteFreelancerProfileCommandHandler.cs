@@ -2,6 +2,7 @@
 using Freelance.UserProfiles.Domain.Exceptions;
 using Freelance.UserProfiles.Domain.Interfaces;
 using Freelance.UserProfiles.Infrastructure.Persistance;
+using Microsoft.Extensions.Logging;
 using Shared.Application.Mediator;
 using Shared.Domain.Interfaces;
 
@@ -11,13 +12,16 @@ public class DeleteFreelancerProfileCommandHandler : IRequestHandler<DeleteFreel
 {
     private readonly IFreelancerProfileRepository _freelancerProfileRepository;
     private readonly IUnitOfWork<ApplicationDbContext> _unitOfWork;
+    private readonly ILogger<DeleteFreelancerProfileCommandHandler> _logger;
 
-    public DeleteFreelancerProfileCommandHandler(IFreelancerProfileRepository freelancerProfileRepository, IUnitOfWork<ApplicationDbContext> unitOfWork)
+    public DeleteFreelancerProfileCommandHandler(IFreelancerProfileRepository freelancerProfileRepository, IUnitOfWork<ApplicationDbContext> unitOfWork,ILogger<DeleteFreelancerProfileCommandHandler> logger)
     {
         ArgumentNullException.ThrowIfNull(freelancerProfileRepository, nameof(freelancerProfileRepository));
         ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));
+        ArgumentNullException.ThrowIfNull(logger, nameof(logger));
         _freelancerProfileRepository = freelancerProfileRepository;
         _unitOfWork = unitOfWork;
+        _logger = logger;
     }
 
     public async Task<Unit> Handle(DeleteFreelancerProfileCommand request, CancellationToken cancellationToken)
@@ -25,9 +29,13 @@ public class DeleteFreelancerProfileCommandHandler : IRequestHandler<DeleteFreel
         var freelancerProfile =
             await _freelancerProfileRepository.GetByIdAsync(request.Id, cancellationToken);
         if (freelancerProfile is null)
+        {
+            _logger.LogError("Profile with id {ProfileId} not found", request.Id);
             throw new ProfileNotFoundException($"Profile with id {request.Id} not found");
+        }
         _freelancerProfileRepository.Delete(freelancerProfile);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+        _logger.LogInformation("Profile with ID {ProfileId} was deleted successfully", request.Id);
         return Unit.Value;
     }
 }

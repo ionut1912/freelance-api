@@ -2,6 +2,7 @@
 using Freelance.UserProfiles.Domain.Exceptions;
 using Freelance.UserProfiles.Domain.Interfaces;
 using Freelance.UserProfiles.Infrastructure.Persistance;
+using Microsoft.Extensions.Logging;
 using Shared.Application.Mediator;
 using Shared.Domain.Interfaces;
 
@@ -11,24 +12,52 @@ public class UpdateClientProfileDataCommandHandler : IRequestHandler<UpdateClien
 {
     private readonly IClientProfileRepository _clientProfileRepository;
     private readonly IUnitOfWork<ApplicationDbContext> _unitOfWork;
+    private readonly ILogger<UpdateClientProfileDataCommandHandler> _logger;
 
-    public UpdateClientProfileDataCommandHandler(IClientProfileRepository clientProfileRepository, IUnitOfWork<ApplicationDbContext> unitOfWork)
+    public UpdateClientProfileDataCommandHandler(IClientProfileRepository clientProfileRepository, IUnitOfWork<ApplicationDbContext> unitOfWork,ILogger<UpdateClientProfileDataCommandHandler> logger)
     {
         ArgumentNullException.ThrowIfNull(clientProfileRepository, nameof(clientProfileRepository));
         ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));
+        ArgumentNullException.ThrowIfNull(logger, nameof(logger));
         _clientProfileRepository = clientProfileRepository;
         _unitOfWork = unitOfWork;
+        _logger = logger;
     }
 
     public async Task<Unit> Handle(UpdateClientProfileDataCommand request, CancellationToken cancellationToken)
     {
         var clientProfile = await _clientProfileRepository.GetByIdAsync(request.Id, cancellationToken);
-        if (clientProfile == null)
-            throw new ProfileNotFoundException($"Client Profile with id {request.Id} does not exists");
+        try
+        {
+       
+            if (clientProfile == null)
+            {
+                _logger.LogError("Client Profile with id {ClientProfileId} does not exists", request.Id);
+                throw new ProfileNotFoundException($"Client Profile with id {request.Id} does not exists");
+            }
+ 
 
-        clientProfile.UpdateUserData(request.Image, request.Bio);
-        _clientProfileRepository.Update(clientProfile);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+            clientProfile.UpdateUserData(request.Image, request.Bio);
+            _clientProfileRepository.Update(clientProfile);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+        }
+        catch(ImageAlreadyExistsException ex)
+        {
+            _logger.LogError(ex, "Image {Image} already exists", request.Image);
+            throw;
+        }
+        catch(BioAlreadyExistsException ex)
+        {
+            _logger.LogError(ex, "Bio {Bio} already exists", request.Bio);
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while updating Client Profile data with id {ClientProfileId}", request.Id);
+            throw;
+        }
+
+        _logger.LogInformation("Client Profile data with id {ClientProfileId} updated successfully,newBio {Bio},newImage {Image}", request.Id,clientProfile.Bio,clientProfile.Image);
         return Unit.Value;
     }
 }

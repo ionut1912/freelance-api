@@ -35,7 +35,7 @@ public abstract class BaseUserProfile : Entity
     public void UpdateAddress(string street, string city, string state, string zipCode, string country,
         string streetNumber)
     {
-        Address = Address.Update(street, city, state, zipCode, country, streetNumber);
+        Address = Address.Create(street, city, state, zipCode, country, streetNumber);
         UpdatedAt = DateTime.UtcNow;
     }
 

@@ -2,6 +2,7 @@
 using Freelance.UserProfiles.Application.Mediatr.ClientProfiles.Commands;
 using Freelance.UserProfiles.Domain.Exceptions;
 using Freelance.UserProfiles.Domain.Interfaces;
+using Microsoft.Extensions.Logging;
 using Shared.Application.Mediator;
 using Shared.Rabbit.Repositories;
 
@@ -11,22 +12,25 @@ public class VerifyClientProfileCommandHandler : IRequestHandler<VerifyClientPro
 {
     private readonly IEventBus _eventBus;
     private readonly IClientProfileRepository _clientProfileRepository;
-    public VerifyClientProfileCommandHandler(IEventBus eventBus,IClientProfileRepository clientProfileRepository)
+    private readonly ILogger<VerifyClientProfileCommandHandler> _logger;
+
+    public VerifyClientProfileCommandHandler(IEventBus eventBus,IClientProfileRepository clientProfileRepository,ILogger<VerifyClientProfileCommandHandler> logger)
     {
         ArgumentNullException.ThrowIfNull(eventBus, nameof(eventBus));
         ArgumentNullException.ThrowIfNull(clientProfileRepository, nameof(clientProfileRepository));
+        ArgumentNullException.ThrowIfNull(logger, nameof(logger));
         _eventBus = eventBus;
         _clientProfileRepository = clientProfileRepository;
+        _logger = logger;
     }
 
     public async Task<Unit> Handle(VerifyClientProfileCommand request, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var profile = await _clientProfileRepository.GetLoggedInClientProfileAsync(request.AccountId, cancellationToken);
+           var profile = await _clientProfileRepository.GetLoggedInClientProfileAsync(request.AccountId, cancellationToken);
             if (profile is null)
             {
-                throw new ProfileNotFoundException("Client profile not found.");
+                _logger.LogError("Client profile for accountId {AccountId} not found", request.AccountId);
+            throw new ProfileNotFoundException("Client profile not found.");
             }
 
             await _eventBus.PublishAsync(new VerifyFaceEvent
@@ -36,11 +40,7 @@ public class VerifyClientProfileCommandHandler : IRequestHandler<VerifyClientPro
                 CompareImageUrl = request.ImageUrl,
                 Role = "Client",
             });
-        }
-        catch (Exception ex) { 
-        
-        throw new Exception(ex.Message, ex);
-        }
+      
         
 
         return Unit.Value;
