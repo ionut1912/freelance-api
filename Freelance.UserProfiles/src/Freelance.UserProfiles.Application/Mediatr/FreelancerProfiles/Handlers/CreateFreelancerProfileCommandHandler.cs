@@ -48,7 +48,7 @@ public class CreateFreelancerProfileCommandHandler : IRequestHandler<CreateFreel
 
         var foreignLanguages = request.ForeignLanguages?
             .Select(language => FreelancerForeignLanguage.Create(language))
-            .ToList() ?? new List<FreelancerForeignLanguage>();
+            .ToList() ?? [];
 
         var skills = new List<Skill>();
         if (request.ProgrammingLanguages != null && request.Areas != null)

@@ -1,14 +1,24 @@
 ﻿using Freelance.Identity.Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Shared.Api.Abstractions;
 using Shared.Domain.Exceptions;
 
 namespace Freelance.Identity.Api.Mappers;
 
-public class IdentityExceptionMapper : IExceptionProblemDetailsMapper
+public sealed class IdentityExceptionMapper : IExceptionProblemDetailsMapper
 {
+    private readonly ILogger<IdentityExceptionMapper> _logger;
+
+    public IdentityExceptionMapper(ILogger<IdentityExceptionMapper> logger)
+    {
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
+
     public bool TryMap(Exception exception, out ProblemDetails problemDetails)
     {
+        ArgumentNullException.ThrowIfNull(exception);
+
         problemDetails = exception switch
         {
             AccountAlreadyBlockedException ex => Create(400, "Account Already Blocked", ex.Message),
@@ -22,6 +32,13 @@ public class IdentityExceptionMapper : IExceptionProblemDetailsMapper
 
             _ => Create(500, "Internal Server Error", "An unexpected error occurred")
         };
+
+        _logger.LogError(
+            exception,
+            "Mapped exception {ExceptionType} to ProblemDetails {Status} - {Title}",
+            exception.GetType().Name,
+            problemDetails.Status,
+            problemDetails.Title);
 
         return problemDetails != null;
     }

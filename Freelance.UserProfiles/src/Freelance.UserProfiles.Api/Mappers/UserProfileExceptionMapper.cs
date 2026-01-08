@@ -1,5 +1,6 @@
 ﻿using Freelance.UserProfiles.Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Shared.Api.Abstractions;
 using Shared.Domain.Exceptions;
 
@@ -7,6 +8,13 @@ namespace Freelance.UserProfiles.Api.Mappers;
 
 public class UserProfileExceptionMapper : IExceptionProblemDetailsMapper
 {
+    private readonly ILogger<UserProfileExceptionMapper> _logger;
+
+    public UserProfileExceptionMapper(ILogger<UserProfileExceptionMapper> logger)
+    {
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
+
     public bool TryMap(Exception exception, out ProblemDetails problemDetails)
     {
         problemDetails = exception switch
@@ -15,11 +23,17 @@ public class UserProfileExceptionMapper : IExceptionProblemDetailsMapper
             ImageAlreadyExistsException ex => Create(400, "Image Already Exists", ex.Message),
             ProfileNotFoundException ex => Create(404, "Profile Not Found", ex.Message),
             FaceNotMatchException ex => Create(400, "Face Not Match", ex.Message),
-            ProfileAllreadyExistsException ex=> Create(400,"Profile Already Exists" ,ex.Message),
+            ProfileAllreadyExistsException ex => Create(400, "Profile Already Exists", ex.Message),
             CustomValidationException ex => CreateValidation(ex),
-
             _ => Create(500, "Internal Server Error", "An unexpected error occurred.")
         };
+
+        _logger.LogError(
+            exception,
+            "Mapped exception {ExceptionType} to ProblemDetails {Status} - {Title}",
+            exception.GetType().Name,
+            problemDetails.Status,
+            problemDetails.Title);
 
         return problemDetails != null;
     }

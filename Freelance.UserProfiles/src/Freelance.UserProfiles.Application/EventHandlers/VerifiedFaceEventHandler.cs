@@ -45,6 +45,7 @@ public class VerifiedFaceEventHandler : IEventHandler<VerifiedFaceEvent>
 
             clientProfile.Verify();
             _clientProfileRepository.Update(clientProfile);
+            _logger.LogInformation("ClientProfile with ProfileId: {ProfileId} was verified",@event.ProfileId);
         }
         else if(@event.Role== "Freelancer")
         {
@@ -56,8 +57,8 @@ public class VerifiedFaceEventHandler : IEventHandler<VerifiedFaceEvent>
             }
             freelancerProfile.Verify();
             _freelancerProfileRepository.Update(freelancerProfile);
+            _logger.LogInformation("FreelancerProfile with ProfileId: {ProfileId} was verified", @event.ProfileId);
         }
-
         await _unitOfWork.SaveChangesAsync(CancellationToken.None);
     }
 }
