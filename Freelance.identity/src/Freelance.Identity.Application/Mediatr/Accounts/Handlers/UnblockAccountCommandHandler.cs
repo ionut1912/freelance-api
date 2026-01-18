@@ -1,7 +1,6 @@
 ﻿using Freelance.Identity.Application.Mediatr.Accounts.Commands;
 using Freelance.Identity.Domain.Exceptions;
 using Freelance.Identity.Domain.interfaces;
-using Freelance.Identity.Infrastructure.Persistance;
 using Microsoft.Extensions.Logging;
 using Shared.Application.Mediator;
 using Shared.Domain.Interfaces;
@@ -11,10 +10,10 @@ namespace Freelance.Identity.Application.Mediatr.Accounts.Handlers;
 public class UnblockAccountCommandHandler : IRequestHandler<UnblockAccountCommand, Unit>
 {
     private readonly IAccountRepository _accountRepository;
-    private readonly IUnitOfWork<ApplicationDbContext> _unitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<UnblockAccountCommandHandler> _logger;
 
-    public UnblockAccountCommandHandler(IAccountRepository accountRepository, IUnitOfWork<ApplicationDbContext> unitOfWork, ILogger<UnblockAccountCommandHandler> logger)
+    public UnblockAccountCommandHandler(IAccountRepository accountRepository, IUnitOfWork unitOfWork, ILogger<UnblockAccountCommandHandler> logger)
     {
         ArgumentNullException.ThrowIfNull(accountRepository, nameof(accountRepository));
         ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));

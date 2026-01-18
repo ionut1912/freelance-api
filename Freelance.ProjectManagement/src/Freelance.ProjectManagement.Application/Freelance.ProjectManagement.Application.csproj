@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
+	  <PackageReference Include="Shared.ApplicationLayer" Version="1.2.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Freelance.ProjectManagement.Domain\Freelance.ProjectManagement.Domain.csproj" />
+    <ProjectReference Include="..\Freelance.ProjectManagement.Infrastructure\Freelance.ProjectManagement.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

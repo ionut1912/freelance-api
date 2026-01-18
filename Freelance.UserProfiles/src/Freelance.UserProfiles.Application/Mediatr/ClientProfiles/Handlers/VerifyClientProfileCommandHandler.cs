@@ -32,7 +32,6 @@ public class VerifyClientProfileCommandHandler : IRequestHandler<VerifyClientPro
                 _logger.LogError("Client profile for accountId {AccountId} not found", request.AccountId);
             throw new ProfileNotFoundException("Client profile not found.");
             }
-
             await _eventBus.PublishAsync(new VerifyFaceEvent
             {
                 InitialImageUrl = profile.Image,

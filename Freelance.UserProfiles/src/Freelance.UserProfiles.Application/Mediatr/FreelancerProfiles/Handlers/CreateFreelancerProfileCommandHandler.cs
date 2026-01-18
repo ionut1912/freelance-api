@@ -3,7 +3,6 @@ using Freelance.UserProfiles.Domain.Entities;
 using Freelance.UserProfiles.Domain.Exceptions;
 using Freelance.UserProfiles.Domain.Interfaces;
 using Freelance.UserProfiles.Domain.ValueObjects;
-using Freelance.UserProfiles.Infrastructure.Persistance;
 using Microsoft.Extensions.Logging;
 using Shared.Application.Mediator;
 using Shared.Domain.Interfaces;
@@ -13,10 +12,10 @@ namespace Freelance.UserProfiles.Application.Mediatr.FreelancerProfiles.Handlers
 public class CreateFreelancerProfileCommandHandler : IRequestHandler<CreateFreelancerProfileCommand, FreelancerProfile>
 {
     private readonly IFreelancerProfileRepository _freelancerProfileRepository;
-    private readonly IUnitOfWork<ApplicationDbContext> _unitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<CreateFreelancerProfileCommandHandler> _logger;
  
-    public CreateFreelancerProfileCommandHandler(IFreelancerProfileRepository freelancerProfileRepository, IUnitOfWork<ApplicationDbContext> unitOfWork,ILogger<CreateFreelancerProfileCommandHandler> logger)
+    public CreateFreelancerProfileCommandHandler(IFreelancerProfileRepository freelancerProfileRepository, IUnitOfWork unitOfWork,ILogger<CreateFreelancerProfileCommandHandler> logger)
     {
         _freelancerProfileRepository = freelancerProfileRepository ??
                                        throw new ArgumentNullException(nameof(freelancerProfileRepository));
@@ -70,7 +69,7 @@ public class CreateFreelancerProfileCommandHandler : IRequestHandler<CreateFreel
 
         await _freelancerProfileRepository.AddAsync(freelancerProfile, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-        _logger.LogInformation("Freelancer profile created successfully for accountId {AccountId}", request.AccountId);
+        _logger.LogInformation("Freelancer profile with Id {Id} created successfully for accountId {AccountId}",freelancerProfile.Id, request.AccountId);
         return freelancerProfile;
     }
 }

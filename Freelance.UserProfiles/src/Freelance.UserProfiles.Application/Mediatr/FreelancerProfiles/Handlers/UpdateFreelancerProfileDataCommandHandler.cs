@@ -11,10 +11,10 @@ namespace Freelance.UserProfiles.Application.Mediatr.FreelancerProfiles.Handlers
 public class UpdateFreelancerProfileDataCommandHandler : IRequestHandler<UpdateFreelancerProfileDataCommand, Unit>
 {
     private readonly IFreelancerProfileRepository _freelancerProfileRepository;
-    private readonly IUnitOfWork<ApplicationDbContext> _unitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<UpdateFreelancerProfileDataCommandHandler> _logger;
 
-    public UpdateFreelancerProfileDataCommandHandler(IFreelancerProfileRepository freelancerProfileRepository, IUnitOfWork<ApplicationDbContext> unitOfWork,ILogger<UpdateFreelancerProfileDataCommandHandler> logger)
+    public UpdateFreelancerProfileDataCommandHandler(IFreelancerProfileRepository freelancerProfileRepository, IUnitOfWork unitOfWork,ILogger<UpdateFreelancerProfileDataCommandHandler> logger)
     {
         ArgumentNullException.ThrowIfNull(freelancerProfileRepository, nameof(freelancerProfileRepository));
         ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));

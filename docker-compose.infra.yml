@@ -11,6 +11,11 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - freelance-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -24,7 +29,13 @@ services:
       - rabbitmq_data:/var/lib/rabbitmq
     networks:
       - freelance-network
-      
+    healthcheck:
+      test: timeout 10 bash -c ':> /dev/tcp/127.0.0.1/5672'
+      interval: 5s
+      timeout: 10s
+      retries: 10
+      start_period: 40s
+
 volumes:
   postgres_data:
   rabbitmq_data:

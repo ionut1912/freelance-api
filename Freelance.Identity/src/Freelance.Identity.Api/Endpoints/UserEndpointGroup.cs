@@ -13,7 +13,6 @@ public class UserEndpointGroup : EndpointGroup
     public override void Map(IEndpointRouteBuilder endpoints)
     {
         var group = endpoints.MapGroup(this);
-
         group.MapPost(RegisterUser, "/register");
         group.MapPost(LoginUser, "/login");
         group.MapPut(BlockUserAccount, "/block");

@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="src/Freelance.ProjectManagement.Api/Freelance.ProjectManagement.Api.csproj" Id="c010c7c0-639b-4785-8be2-bedb32517a77" />
+  <Project Path="src/Freelance.ProjectManagement.Application/Freelance.ProjectManagement.Application.csproj" Id="bc2ed03d-4835-4025-965e-bd3c47e61669" />
+  <Project Path="src/Freelance.ProjectManagement.Domain/Freelance.ProjectManagement.Domain.csproj" />
+  <Project Path="src/Freelance.ProjectManagement.Infrastructure/Freelance.ProjectManagement.Infrastructure.csproj" Id="5dce304e-874d-4dd5-98e7-4e7f89a360d7" />
+</Solution>

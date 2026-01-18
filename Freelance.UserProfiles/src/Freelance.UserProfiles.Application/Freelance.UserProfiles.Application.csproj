@@ -10,19 +10,13 @@
     <ItemGroup>
 		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
 		<PackageReference Include="Freelance.Shared.Events" Version="1.0.3" />
-		<PackageReference Include="Shared.ApplicationLayer" Version="1.2.3" />
+		<PackageReference Include="Shared.ApplicationLayer" Version="1.2.5" />
 		<PackageReference Include="Shared.RabbitLayer" Version="1.0.3" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Freelance.UserProfiles.Domain\Freelance.UserProfiles.Domain.csproj" />
         <ProjectReference Include="..\Freelance.UserProfiles.Infrastructure\Freelance.UserProfiles.Infrastructure.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <Reference Include="Freelance.Shared.Domain">
-            <HintPath>..\..\Freelance.Shared\Freelance.Shared.Domain\bin\Debug\net9.0\Freelance.Shared.Domain.dll</HintPath>
-        </Reference>
     </ItemGroup>
 
 </Project>

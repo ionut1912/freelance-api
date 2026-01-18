@@ -48,7 +48,7 @@ builder.Services
     .AddDatabaseConfig<ApplicationDbContext>(builder.Configuration)
     .AddRepository<ClientProfile, ClientProfileService, IClientProfileRepository, ApplicationDbContext>()
     .AddRepository<FreelancerProfile, FreelancerProfileService, IFreelancerProfileRepository, ApplicationDbContext>()
-    .AddRepositoriesConfig<IUnitOfWork<ApplicationDbContext>, UnitOfWork<ApplicationDbContext>>()
+    .AddRepositoriesConfig<IUnitOfWork, UnitOfWork>()
     .AddAplicationConfig(typeof(MediatrAssemblyReference).Assembly, typeof(ValidationAssemblyReference).Assembly)
     .AddPresentation<UserProfileExceptionMapper>(builder.Configuration, otelEndpoint, serviceName, environmentName);
 builder.Services.AddScoped<VerifiedFaceEventHandler>();

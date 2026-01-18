@@ -1,7 +1,6 @@
 ﻿using Freelance.UserProfiles.Application.Mediatr.FreelancerProfiles.Commands;
 using Freelance.UserProfiles.Domain.Exceptions;
 using Freelance.UserProfiles.Domain.Interfaces;
-using Freelance.UserProfiles.Infrastructure.Persistance;
 using Microsoft.Extensions.Logging;
 using Shared.Application.Mediator;
 using Shared.Domain.Interfaces;
@@ -11,10 +10,10 @@ namespace Freelance.UserProfiles.Application.Mediatr.FreelancerProfiles.Handlers
 public class UpdateFreelancerRatingCommandHandler : IRequestHandler<UpdateFreelancerRatingCommand, Unit>
 {
     private readonly IFreelancerProfileRepository _freelancerProfileRepository;
-    private readonly IUnitOfWork<ApplicationDbContext> _unitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<UpdateFreelancerRatingCommandHandler> _logger;
 
-    public UpdateFreelancerRatingCommandHandler(IFreelancerProfileRepository freelancerProfileRepository, IUnitOfWork<ApplicationDbContext> unitOfWork,ILogger<UpdateFreelancerRatingCommandHandler> logger)
+    public UpdateFreelancerRatingCommandHandler(IFreelancerProfileRepository freelancerProfileRepository, IUnitOfWork unitOfWork,ILogger<UpdateFreelancerRatingCommandHandler> logger)
     {
         ArgumentNullException.ThrowIfNull(freelancerProfileRepository, nameof(freelancerProfileRepository));
         ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));

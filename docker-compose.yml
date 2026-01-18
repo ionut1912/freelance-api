@@ -20,6 +20,7 @@ services:
       - freelance_identity
       - freelance_user_profiles
       - freelance_face
+      - freelance_project_management
       - tempo
       - loki
     networks:
@@ -42,8 +43,12 @@ services:
       - Logging__LogLevel__Default=Information
       - Logging__LogLevel__Microsoft.AspNetCore=Warning
     depends_on:
-      - tempo
-      - loki
+      postgres:
+        condition: service_healthy
+      tempo:
+        condition: service_started
+      loki:
+        condition: service_started
     networks:
       - freelance-network
 
@@ -71,15 +76,21 @@ services:
       - Logging__LogLevel__Default=Information
       - Logging__LogLevel__Microsoft.AspNetCore=Warning
     depends_on:
-      - tempo
-      - loki
+      rabbitmq:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      tempo:
+        condition: service_started
+      loki:
+        condition: service_started
     networks:
       - freelance-network
 
   freelance_face:
     build:
       context: Freelance.Face
-      dockerfile: Dockerfile
+      dockerfile: src/Freelance.Face.Api/Dockerfile
       args:
         BUILD_CONFIGURATION: Release
         APP_UID: 0
@@ -102,8 +113,38 @@ services:
       - Logging__LogLevel__Default=Information
       - Logging__LogLevel__Microsoft.AspNetCore=Warning
     depends_on:
-      - tempo
-      - loki
+      rabbitmq:
+        condition: service_healthy
+      tempo:
+        condition: service_started
+      loki:
+        condition: service_started
+    networks:
+      - freelance-network
+
+  freelance_project_management:
+    build:
+      context: Freelance.ProjectManagement
+      dockerfile: src/Freelance.ProjectManagement.Api/Dockerfile
+    environment:
+      - ASPNETCORE_URLS=http://+:80
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=FreelanceProjectManagement;Username=postgres;Password=postgres
+      - JwtSettings__Key=YourSuperSecretKeyHere123!ChangeItTo32PlusChars
+      - JwtSettings__Issuer=FreelanceApp
+      - JwtSettings__Audience=FreelanceAppUsers
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4317
+      - OTEL_EXPORTER_OTLP_LOGS_ENDPOINT=http://loki:3100
+      - OTEL_SERVICE_NAME=Freelance-Project-Management
+      - Logging__LogLevel__Default=Information
+      - Logging__LogLevel__Microsoft.AspNetCore=Warning
+    depends_on:
+      postgres:
+        condition: service_healthy
+      tempo:
+        condition: service_started
+      loki:
+        condition: service_started
     networks:
       - freelance-network
 

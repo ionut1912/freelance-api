@@ -53,7 +53,7 @@ eventBus.Subscribe<VerifyFaceEvent, VerifyFaceEventHandler>();
 
 app.UseGlobalExceptionHandler<Program>()
    .UseRequestDurationLogging<Program>()
-   .UseStandardMiddleware()
+   .UseRouting()
    .MapStandardEndpoints();
 
 app.MapApiDocumentation();

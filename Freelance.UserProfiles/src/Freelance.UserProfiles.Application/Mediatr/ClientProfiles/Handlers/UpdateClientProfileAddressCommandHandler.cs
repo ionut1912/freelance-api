@@ -1,7 +1,6 @@
 ﻿using Freelance.UserProfiles.Application.Mediatr.ClientProfiles.Commands;
 using Freelance.UserProfiles.Domain.Exceptions;
 using Freelance.UserProfiles.Domain.Interfaces;
-using Freelance.UserProfiles.Infrastructure.Persistance;
 using Microsoft.Extensions.Logging;
 using Shared.Application.Mediator;
 using Shared.Domain.Interfaces;
@@ -12,10 +11,10 @@ namespace Freelance.UserProfiles.Application.Mediatr.ClientProfiles.Handlers;
 public class UpdateClientProfileAddressCommandHandler : IRequestHandler<UpdateClientProfileAddressCommand, Unit>
 {
     private readonly IClientProfileRepository _clientProfileRepository;
-    private readonly IUnitOfWork<ApplicationDbContext> _unitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<UpdateClientProfileAddressCommandHandler> _logger;
 
-    public UpdateClientProfileAddressCommandHandler(IClientProfileRepository clientProfileRepository, IUnitOfWork<ApplicationDbContext> unitOfWork,ILogger<UpdateClientProfileAddressCommandHandler> logger)
+    public UpdateClientProfileAddressCommandHandler(IClientProfileRepository clientProfileRepository, IUnitOfWork unitOfWork,ILogger<UpdateClientProfileAddressCommandHandler> logger)
     {
         ArgumentNullException.ThrowIfNull(clientProfileRepository, nameof(clientProfileRepository));
         ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));

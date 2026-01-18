@@ -2,7 +2,6 @@
 using Freelance.UserProfiles.Domain.Entities;
 using Freelance.UserProfiles.Domain.Exceptions;
 using Freelance.UserProfiles.Domain.Interfaces;
-using Freelance.UserProfiles.Infrastructure.Persistance;
 using Microsoft.Extensions.Logging;
 using Shared.Application.Mediator;
 using Shared.Domain.Interfaces;
@@ -11,10 +10,10 @@ namespace Freelance.UserProfiles.Application.Mediatr.ClientProfiles.Handlers;
 public class CreateClientProfileCommandHandler : IRequestHandler<CreateClientProfileCommand, ClientProfile>
 {
     private readonly IClientProfileRepository _repository;
-    private readonly IUnitOfWork<ApplicationDbContext> _unitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<CreateClientProfileCommandHandler> _logger;
 
-    public CreateClientProfileCommandHandler(IClientProfileRepository repository, IUnitOfWork<ApplicationDbContext> unitOfWork, ILogger<CreateClientProfileCommandHandler> logger)
+    public CreateClientProfileCommandHandler(IClientProfileRepository repository, IUnitOfWork unitOfWork, ILogger<CreateClientProfileCommandHandler> logger)
     {
         ArgumentNullException.ThrowIfNull(repository, nameof(repository));
         ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));

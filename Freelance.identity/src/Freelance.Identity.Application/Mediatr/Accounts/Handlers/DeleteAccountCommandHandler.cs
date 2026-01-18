@@ -1,7 +1,6 @@
 ﻿using Freelance.Identity.Application.Mediatr.Accounts.Commands;
 using Freelance.Identity.Domain.Exceptions;
 using Freelance.Identity.Domain.interfaces;
-using Freelance.Identity.Infrastructure.Persistance;
 using Microsoft.Extensions.Logging;
 using Shared.Application.Mediator;
 using Shared.Domain.Interfaces;
@@ -11,10 +10,10 @@ namespace Freelance.Identity.Application.Mediatr.Accounts.Handlers;
 public class DeleteAccountCommandHandler : IRequestHandler<DeleteAccountCommand, Unit>
 {
     private readonly IAccountRepository _accountRepository;
-    private readonly IUnitOfWork<ApplicationDbContext> _unitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<DeleteAccountCommandHandler> _logger;
 
-    public DeleteAccountCommandHandler(IAccountRepository accountRepository, IUnitOfWork<ApplicationDbContext> unitOfWork,ILogger<DeleteAccountCommandHandler> logger)
+    public DeleteAccountCommandHandler(IAccountRepository accountRepository, IUnitOfWork unitOfWork,ILogger<DeleteAccountCommandHandler> logger)
     {
         ArgumentNullException.ThrowIfNull(accountRepository, nameof(accountRepository));
         ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));

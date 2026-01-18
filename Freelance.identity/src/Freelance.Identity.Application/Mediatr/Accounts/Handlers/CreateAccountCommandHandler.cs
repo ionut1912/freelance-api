@@ -3,7 +3,6 @@ using Freelance.Identity.Domain.Entities;
 using Freelance.Identity.Domain.Exceptions;
 using Freelance.Identity.Domain.interfaces;
 using Freelance.Identity.Domain.ValueObjects;
-using Freelance.Identity.Infrastructure.Persistance;
 using Microsoft.Extensions.Logging;
 using Shared.Application.Mediator;
 using Shared.Domain.Interfaces;
@@ -14,11 +13,11 @@ public class CreateAccountCommandHandler : IRequestHandler<CreateAccountCommand,
 {
     private readonly IAccountRepository _accountRepository;
     private readonly IPasswordService _passwordService;
-    private readonly IUnitOfWork<ApplicationDbContext> _unitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<CreateAccountCommandHandler> _logger;
 
     public CreateAccountCommandHandler(IAccountRepository accountRepository,
-        IPasswordService passwordService, IUnitOfWork<ApplicationDbContext> unitOfWork,ILogger<CreateAccountCommandHandler> logger)
+        IPasswordService passwordService, IUnitOfWork unitOfWork,ILogger<CreateAccountCommandHandler> logger)
     {
         ArgumentNullException.ThrowIfNull(accountRepository, nameof(accountRepository));
         ArgumentNullException.ThrowIfNull(passwordService, nameof(passwordService));
@@ -44,7 +43,7 @@ public class CreateAccountCommandHandler : IRequestHandler<CreateAccountCommand,
         {
             "Client" => Role.Client,
             "Freelancer" => Role.Freelancer,
-            _ => roleForRepo
+            _ => throw new NotImplementedException()
         };
 
         var accountToCreate = Account.Create(request.Email, request.Password, request.PhoneNumber, request.Username,
@@ -52,7 +51,7 @@ public class CreateAccountCommandHandler : IRequestHandler<CreateAccountCommand,
         accountToCreate.HashPassword(_passwordService);
         await _accountRepository.AddAsync(accountToCreate, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-        _logger.LogInformation("Account was created");
+        _logger.LogInformation("Account with id {Id} was created", accountToCreate.Id);
         return accountToCreate;
     }
 }

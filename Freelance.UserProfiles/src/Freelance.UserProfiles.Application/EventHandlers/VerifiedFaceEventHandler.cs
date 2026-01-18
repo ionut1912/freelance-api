@@ -12,9 +12,9 @@ public class VerifiedFaceEventHandler : IEventHandler<VerifiedFaceEvent>
 {
     private readonly IFreelancerProfileRepository _freelancerProfileRepository;
     private readonly IClientProfileRepository _clientProfileRepository;
-    private readonly IUnitOfWork<ApplicationDbContext> _unitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<VerifiedFaceEventHandler> _logger;
-    public VerifiedFaceEventHandler(IFreelancerProfileRepository freelancerProfileRepository, IClientProfileRepository clientProfileRepository, IUnitOfWork<ApplicationDbContext> unitOfWork, ILogger<VerifiedFaceEventHandler> logger)
+    public VerifiedFaceEventHandler(IFreelancerProfileRepository freelancerProfileRepository, IClientProfileRepository clientProfileRepository, IUnitOfWork unitOfWork, ILogger<VerifiedFaceEventHandler> logger)
     {
         ArgumentNullException.ThrowIfNull(freelancerProfileRepository, nameof(freelancerProfileRepository));
         ArgumentNullException.ThrowIfNull(clientProfileRepository, nameof(clientProfileRepository));

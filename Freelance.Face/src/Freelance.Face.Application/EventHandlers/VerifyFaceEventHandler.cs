@@ -48,6 +48,7 @@ public class VerifyFaceEventHandler : IEventHandler<VerifyFaceEvent>
 
         if (!h1 || !h2 || d1 is null || d2 is null)
         {
+            _logger.LogInformation("Faces do not match because the process give null result");
             await _eventBus.PublishAsync(new VerifiedFaceEvent
             {
                 IsMatch = false,
@@ -58,13 +59,23 @@ public class VerifyFaceEventHandler : IEventHandler<VerifyFaceEvent>
         }
 
         var distance = _faceService.Distance(d1, d2);
-
-        await _eventBus.PublishAsync(new VerifiedFaceEvent
+        _logger.LogInformation("Face verification distance {distance}", distance);
+        bool isMatch = distance < 0.6;
+        if (isMatch)
         {
-            IsMatch = distance < 0.6,
-            ProfileId = @event.ProfileId,
-            Role = @event.Role
-        });
+            _logger.LogInformation("Faces are the same");
+        }
+        else
+        {
+            _logger.LogInformation("Faces do not match");
+        }
+
+            await _eventBus.PublishAsync(new VerifiedFaceEvent
+            {
+                IsMatch = isMatch,
+                ProfileId = @event.ProfileId,
+                Role = @event.Role
+            });
     }
 
     private static byte[] Decode(string base64)
