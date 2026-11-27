@@ -12,10 +12,10 @@ public class ProjectTaskConfiguration : IEntityTypeConfiguration<ProjectTask>
         builder.Property(pt => pt.Id)
             .ValueGeneratedNever();
         builder.Property(pt => pt.Title)
-            .HasMaxLength(100)
+            .HasMaxLength(ProjectTask.TitleMaxLength)
             .IsRequired();
         builder.Property(pt => pt.Description)
-            .HasMaxLength(500)
+            .HasMaxLength(ProjectTask.DescriptionMaxLength)
             .IsRequired();
 
         builder.HasMany(pt => pt.TimeLogs)

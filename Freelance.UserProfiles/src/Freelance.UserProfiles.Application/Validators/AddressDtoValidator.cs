@@ -1,3 +1,4 @@
+using Freelance.UserProfiles.Domain.ValueObjects;
 using FluentValidation;
 using Freelance.UserProfiles.Application.Dtos;
 
@@ -8,11 +9,11 @@ public sealed class AddressDtoValidator : AbstractValidator<AddressDto>
 {
     public AddressDtoValidator()
     {
-        RuleFor(x => x.Street).NotNull().MaximumLength(200);
-        RuleFor(x => x.City).NotNull().MaximumLength(100);
-        RuleFor(x => x.State).NotNull().MaximumLength(100);
-        RuleFor(x => x.ZipCode).NotNull().MaximumLength(20);
-        RuleFor(x => x.Country).NotNull().MaximumLength(100);
-        RuleFor(x => x.StreetNumber).NotNull().MaximumLength(100);
+        RuleFor(x => x.Street).NotNull().MaximumLength(Address.StreetMaxLength);
+        RuleFor(x => x.City).NotNull().MaximumLength(Address.CityMaxLength);
+        RuleFor(x => x.State).NotNull().MaximumLength(Address.StateMaxLength);
+        RuleFor(x => x.ZipCode).NotNull().MaximumLength(Address.ZipCodeMaxLength);
+        RuleFor(x => x.Country).NotNull().MaximumLength(Address.CountryMaxLength);
+        RuleFor(x => x.StreetNumber).NotNull().MaximumLength(Address.StreetNumberMaxLength);
     }
 }

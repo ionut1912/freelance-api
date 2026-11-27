@@ -1,4 +1,5 @@
-﻿using Freelance.UserProfiles.Domain.Entities;
+﻿using Freelance.UserProfiles.Domain.ValueObjects;
+using Freelance.UserProfiles.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -19,7 +20,7 @@ public abstract class BaseProfileConfiguration<TProfile> : IEntityTypeConfigurat
 
         builder.Property(x => x.Bio)
             .IsRequired()
-            .HasMaxLength(100);
+            .HasMaxLength(BaseUserProfile.BioMaxLength);
 
         builder.Property(x => x.Image)
             .IsRequired()
@@ -38,32 +39,32 @@ public abstract class BaseProfileConfiguration<TProfile> : IEntityTypeConfigurat
         {
             address.Property(a => a.Street)
                 .HasColumnName("Address_Street")
-                .HasMaxLength(200)
+                .HasMaxLength(Address.StreetMaxLength)
                 .IsRequired();
 
             address.Property(a => a.City)
                 .HasColumnName("Address_City")
-                .HasMaxLength(100)
+                .HasMaxLength(Address.CityMaxLength)
                 .IsRequired();
 
             address.Property(a => a.State)
                 .HasColumnName("Address_State")
-                .HasMaxLength(100)
+                .HasMaxLength(Address.StateMaxLength)
                 .IsRequired();
 
             address.Property(a => a.ZipCode)
                 .HasColumnName("Address_ZipCode")
-                .HasMaxLength(20)
+                .HasMaxLength(Address.ZipCodeMaxLength)
                 .IsRequired();
 
             address.Property(a => a.Country)
                 .HasColumnName("Address_Country")
-                .HasMaxLength(100)
+                .HasMaxLength(Address.CountryMaxLength)
                 .IsRequired();
 
             address.Property(a => a.StreetNumber)
                 .HasColumnName("Address_StreetNumber")
-                .HasMaxLength(100)
+                .HasMaxLength(Address.StreetNumberMaxLength)
                 .IsRequired();
         });
     }

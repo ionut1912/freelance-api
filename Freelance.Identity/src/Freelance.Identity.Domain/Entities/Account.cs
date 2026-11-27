@@ -7,6 +7,11 @@ namespace Freelance.Identity.Domain.Entities;
 
 public sealed class Account : Entity
 {
+    public const int EmailMaxLength = 100;
+    public const int PasswordHashMaxLength = 200;
+    public const int UsernameMaxLength = 50;
+    public const int PhoneNumberMaxLength = 10;
+
     private Account() //for EF core
     {
     }

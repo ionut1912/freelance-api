@@ -19,7 +19,7 @@ public sealed class FreelanceProfileConfiguration : BaseProfileConfiguration<Fre
                 .IsRequired();
 
             money.Property(m => m.Currency)
-                .HasMaxLength(3)
+                .HasMaxLength(FreelancerProfile.CurrencyLength)
                 .IsRequired();
         });
 
@@ -32,7 +32,7 @@ public sealed class FreelanceProfileConfiguration : BaseProfileConfiguration<Fre
 
             fl.Property(l => l.Language)
                 .HasColumnName("Language")
-                .HasMaxLength(100)
+                .HasMaxLength(FreelancerForeignLanguage.MaxLength)
                 .IsRequired();
             fl.HasKey("FreelancerProfileId", nameof(FreelancerForeignLanguage.Language));
             fl.ToTable("FreelancerForeignLanguages");

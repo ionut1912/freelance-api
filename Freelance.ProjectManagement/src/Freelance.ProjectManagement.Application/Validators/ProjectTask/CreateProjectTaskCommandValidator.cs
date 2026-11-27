@@ -9,8 +9,8 @@ public sealed class CreateProjectTaskCommandValidator : AbstractValidator<Create
     public CreateProjectTaskCommandValidator()
     {
         RuleFor(x => x.ProjectId).NotEmpty().WithMessage("Project Id can not be empty");
-        RuleFor(x => x.Title).NotEmpty().WithMessage("Title can not be empty").MaximumLength(100);
-        RuleFor(x => x.Description).NotEmpty().WithMessage("Description can not be empty").MaximumLength(500);
+        RuleFor(x => x.Title).NotEmpty().WithMessage("Title can not be empty").MaximumLength(Domain.Entities.ProjectTask.TitleMaxLength);
+        RuleFor(x => x.Description).NotEmpty().WithMessage("Description can not be empty").MaximumLength(Domain.Entities.ProjectTask.DescriptionMaxLength);
 
         RuleFor(x => x.Status)
             .NotEmpty().WithMessage("Status can not be empty")

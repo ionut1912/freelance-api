@@ -1,4 +1,6 @@
-﻿using FluentValidation;
+﻿using Freelance.ProjectManagement.Domain.ValueObjects;
+using Freelance.ProjectManagement.Domain.Entities;
+using FluentValidation;
 using Freelance.ProjectManagement.Application.Mediatr.Projects.Commands;
 
 namespace Freelance.ProjectManagement.Application.Validators.Projects;
@@ -9,9 +11,9 @@ public sealed class UpdateProjectCommandValidator : AbstractValidator<UpdateProj
     {
 
         // Title, description and technologies are optional: omitted values are left unchanged.
-        RuleFor(x => x.Title).MaximumLength(50);
-        RuleFor(x => x.Description).MaximumLength(50);
-        RuleForEach(x => x.Technologies).NotEmpty().MaximumLength(100);
+        RuleFor(x => x.Title).MaximumLength(Project.TitleMaxLength);
+        RuleFor(x => x.Description).MaximumLength(Project.DescriptionMaxLength);
+        RuleForEach(x => x.Technologies).NotEmpty().MaximumLength(ProjectTechnology.MaxLength);
 
         RuleFor(x => x.Deadline)
             .NotEmpty()
@@ -24,7 +26,7 @@ public sealed class UpdateProjectCommandValidator : AbstractValidator<UpdateProj
         RuleFor(x => x.Currency)
             .NotEmpty()
             .WithMessage("Currency can not be empty")
-            .Length(3)
+            .Length(Project.CurrencyLength)
             .WithMessage("Currency should be 3 characters length");
     }
 }

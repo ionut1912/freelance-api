@@ -1,4 +1,6 @@
-﻿using FluentValidation;
+﻿using Freelance.ProjectManagement.Domain.ValueObjects;
+using Freelance.ProjectManagement.Domain.Entities;
+using FluentValidation;
 using Freelance.ProjectManagement.Application.Mediatr.Projects.Commands;
 
 namespace Freelance.ProjectManagement.Application.Validators.Projects;
@@ -10,12 +12,12 @@ public sealed class CreateProjectCommandValidator : AbstractValidator<CreateProj
         RuleFor(x => x.Title)
             .NotEmpty()
             .WithMessage("Project Title can not be empty")
-            .MaximumLength(50);
+            .MaximumLength(Project.TitleMaxLength);
 
         RuleFor(x => x.Description)
             .NotEmpty()
             .WithMessage("Description can not be empty")
-            .MaximumLength(50);
+            .MaximumLength(Project.DescriptionMaxLength);
 
         RuleFor(x => x.Deadline)
             .NotEmpty()
@@ -28,13 +30,13 @@ public sealed class CreateProjectCommandValidator : AbstractValidator<CreateProj
         RuleFor(x => x.Currency)
             .NotEmpty()
             .WithMessage("Currency can not be empty")
-            .Length(3)
+            .Length(Project.CurrencyLength)
             .WithMessage("Currency should be 3 characters length");
 
         RuleFor(x => x.Technologies)
             .NotEmpty()
             .WithMessage("Technologies can not be empty");
 
-        RuleForEach(x => x.Technologies).NotEmpty().MaximumLength(100);
+        RuleForEach(x => x.Technologies).NotEmpty().MaximumLength(ProjectTechnology.MaxLength);
     }
 }

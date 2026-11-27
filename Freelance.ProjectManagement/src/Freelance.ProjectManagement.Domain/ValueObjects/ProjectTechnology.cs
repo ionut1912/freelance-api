@@ -4,6 +4,8 @@ namespace Freelance.ProjectManagement.Domain.ValueObjects;
 
 public sealed class ProjectTechnology : ValueObject
 {
+    public const int MaxLength = 100;
+
     private ProjectTechnology() // for EF Core
     {
     }

@@ -5,6 +5,10 @@ namespace Freelance.UserProfiles.Domain.Entities;
 
 public sealed class FreelancerProfile : BaseUserProfile
 {
+    public const int CurrencyLength = 3;
+    public const int MinRating = 1;
+    public const int MaxRating = 5;
+
     private readonly List<FreelancerForeignLanguage> _foreignLanguages = [];
     private readonly List<Skill> _skills = [];
 

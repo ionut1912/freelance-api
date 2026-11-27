@@ -6,6 +6,9 @@ namespace Freelance.ProjectManagement.Domain.Entities;
 
 public sealed class ProjectTask : Entity
 {
+    public const int TitleMaxLength = 100;
+    public const int DescriptionMaxLength = 500;
+
     private readonly List<TimeLog> _timeLogs = [];
 
     private ProjectTask() // for EF Core

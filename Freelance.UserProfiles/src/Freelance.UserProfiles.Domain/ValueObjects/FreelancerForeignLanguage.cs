@@ -4,6 +4,8 @@ namespace Freelance.UserProfiles.Domain.ValueObjects;
 
 public sealed class FreelancerForeignLanguage : ValueObject
 {
+    public const int MaxLength = 100;
+
     private FreelancerForeignLanguage()
     {
     }

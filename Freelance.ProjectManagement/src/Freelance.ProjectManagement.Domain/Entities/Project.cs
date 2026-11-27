@@ -6,6 +6,10 @@ namespace Freelance.ProjectManagement.Domain.Entities;
 
 public sealed class Project : Entity
 {
+    public const int TitleMaxLength = 50;
+    public const int DescriptionMaxLength = 50;
+    public const int CurrencyLength = 3;
+
     private readonly List<ProjectTechnology> _technologies = [];
     private readonly List<ProjectTask> _tasks = [];
 

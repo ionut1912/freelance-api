@@ -20,23 +20,23 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
                 .IsRequired();
             mb.Property(m => m.Currency)
                 .HasColumnName("BudgetCurrency")
-                .HasMaxLength(3)
+                .HasMaxLength(Project.CurrencyLength)
                 .IsRequired();
         });
 
         builder.Property(p => p.Title)
-            .HasMaxLength(50)
+            .HasMaxLength(Project.TitleMaxLength)
             .IsRequired();
 
         builder.Property(p => p.Description)
-            .HasMaxLength(50)
+            .HasMaxLength(Project.DescriptionMaxLength)
             .IsRequired();
 
         builder.OwnsMany(p => p.Technologies, tech =>
         {
             tech.WithOwner().HasForeignKey("ProjectId");
             tech.Property(t => t.Technology)
-                .HasMaxLength(100)
+                .HasMaxLength(ProjectTechnology.MaxLength)
                 .IsRequired();
             tech.HasKey("ProjectId", nameof(ProjectTechnology.Technology));
             tech.ToTable("ProjectTechnologies");

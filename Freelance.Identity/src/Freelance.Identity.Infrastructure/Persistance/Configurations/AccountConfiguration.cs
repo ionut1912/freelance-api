@@ -21,15 +21,15 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
         });
 
         builder.Property(a => a.Email)
-            .HasMaxLength(100)
+            .HasMaxLength(Account.EmailMaxLength)
             .IsRequired();
 
         builder.Property(a => a.Password)
-            .HasMaxLength(200)
+            .HasMaxLength(Account.PasswordHashMaxLength)
             .IsRequired();
 
         builder.Property(a => a.Username)
-            .HasMaxLength(50)
+            .HasMaxLength(Account.UsernameMaxLength)
             .IsRequired();
 
         builder.HasIndex(a => a.Username).IsUnique();

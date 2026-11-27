@@ -4,6 +4,13 @@ namespace Freelance.UserProfiles.Domain.ValueObjects;
 
 public sealed class Address : ValueObject
 {
+    public const int StreetMaxLength = 200;
+    public const int CityMaxLength = 100;
+    public const int StateMaxLength = 100;
+    public const int ZipCodeMaxLength = 20;
+    public const int CountryMaxLength = 100;
+    public const int StreetNumberMaxLength = 100;
+
     private Address()
     {
     } // For EF Core

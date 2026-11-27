@@ -1,4 +1,6 @@
-﻿using FluentValidation;
+﻿using Freelance.UserProfiles.Domain.ValueObjects;
+using Freelance.UserProfiles.Domain.Entities;
+using FluentValidation;
 using Freelance.UserProfiles.Application.Mediatr.FreelancerProfiles.Commands;
 
 namespace Freelance.UserProfiles.Application.Validators.FreelancerProfiles;
@@ -14,9 +16,10 @@ public sealed class UpdateFreelancerDetailsCommandValidator : AbstractValidator<
         RuleFor(x => x.Amount).NotEmpty().WithMessage("Amount is required")
             .GreaterThan(0).WithMessage("Amount must be greater than zero");
         RuleFor(x => x.Currency).NotEmpty().WithMessage("Currency is required")
-            .Length(3).WithMessage("Currency should be 3 characters length");
+            .Length(FreelancerProfile.CurrencyLength)
+            .WithMessage($"Currency should be {FreelancerProfile.CurrencyLength} characters length");
         RuleFor(x => x.PortfolioUrl).NotEmpty().WithMessage("Portfolio url is required");
-        RuleForEach(x => x.ForeignLanguages).NotEmpty().MaximumLength(100);
+        RuleForEach(x => x.ForeignLanguages).NotEmpty().MaximumLength(FreelancerForeignLanguage.MaxLength);
         RuleForEach(x => x.ProgrammingLanguages).NotEmpty();
         RuleForEach(x => x.Areas).NotEmpty();
 

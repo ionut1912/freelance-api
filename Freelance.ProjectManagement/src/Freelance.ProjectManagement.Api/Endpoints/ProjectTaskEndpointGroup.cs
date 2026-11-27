@@ -26,7 +26,7 @@ public sealed class ProjectTaskEndpointGroup : EndpointGroup
 
     // Ownership is enforced for clients. Freelancers cannot be checked: nothing assigns them to a project yet.
     private static Guid? ClientIdOrNull(HttpContext httpContext, Guid accountId) =>
-        httpContext.User.IsInRole("Client") ? accountId : null;
+        httpContext.User.IsInRole(AuthorizationPolicies.ClientRole) ? accountId : null;
 
     private static async Task<Results<Created<ProjectTaskDto>, UnauthorizedHttpResult>> CreateProjectTask(
         CreateProjectTaskRequest request, HttpContext httpContext, IMessageBus bus, CancellationToken ct)

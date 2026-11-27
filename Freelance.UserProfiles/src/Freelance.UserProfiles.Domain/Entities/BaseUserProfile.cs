@@ -6,6 +6,8 @@ namespace Freelance.UserProfiles.Domain.Entities;
 
 public abstract class BaseUserProfile : Entity
 {
+    public const int BioMaxLength = 100;
+
     protected BaseUserProfile(Guid accountId, string street, string city, string state, string zipCode, string country,
         string streetNumber, string bio, string image)
     {
