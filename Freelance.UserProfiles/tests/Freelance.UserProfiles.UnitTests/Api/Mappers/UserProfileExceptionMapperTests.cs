@@ -17,7 +17,6 @@ public sealed class UserProfileExceptionMapperTests
         { new ProfileNotFoundException("x"), StatusCodes.Status404NotFound, "Profile Not Found" },
         { new BioAlreadyExistsException("x"), StatusCodes.Status400BadRequest, "Bio Already Exists" },
         { new ImageAlreadyExistsException("x"), StatusCodes.Status400BadRequest, "Image Already Exists" },
-        { new FaceNotMatchException("x"), StatusCodes.Status400BadRequest, "Face Not Match" },
         { new ProfileAllreadyExistsException("x"), StatusCodes.Status400BadRequest, "Profile Already Exists" }
     };
 

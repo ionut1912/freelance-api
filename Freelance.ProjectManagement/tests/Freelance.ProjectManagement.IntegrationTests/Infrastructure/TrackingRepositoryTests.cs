@@ -41,7 +41,7 @@ public sealed class TrackingRepositoryTests(ProjectManagementApiFactory factory)
     {
         using var scope = factory.Services.CreateScope();
 
-        (await scope.ServiceProvider.GetRequiredService<ITimeLogRepository>().GetByIdWithTrackingAsync(Guid.NewGuid(), _ct))
+        (await scope.ServiceProvider.GetRequiredService<IProjectRepository>().GetByIdWithTrackingAsync(Guid.NewGuid(), _ct))
             .Should().BeNull();
         (await scope.ServiceProvider.GetRequiredService<IProjectTaskRepository>().GetByIdWithTrackingAsync(Guid.NewGuid(), _ct, null!))
             .Should().BeNull();

@@ -4,7 +4,8 @@ obj/
 riderModule.iml
 /_ReSharper.Caches/
 .idea
-Frelance.API.sln.DotSettings.user
+# Per-developer project settings
+*.csproj.user
 .DS_STORE
 /Frelance.Web/Frelance.Web.csproj.user
 /.vs/Frelance.API/FileContentIndex

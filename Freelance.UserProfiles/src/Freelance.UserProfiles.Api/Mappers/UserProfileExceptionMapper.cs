@@ -20,7 +20,6 @@ public sealed class UserProfileExceptionMapper : IExceptionProblemDetailsMapper
             ProfileNotFoundException ex => Create(StatusCodes.Status404NotFound, "Profile Not Found", ex.Message),
             BioAlreadyExistsException ex => Create(StatusCodes.Status400BadRequest, "Bio Already Exists", ex.Message),
             ImageAlreadyExistsException ex => Create(StatusCodes.Status400BadRequest, "Image Already Exists", ex.Message),
-            FaceNotMatchException ex => Create(StatusCodes.Status400BadRequest, "Face Not Match", ex.Message),
             ProfileAllreadyExistsException ex => Create(StatusCodes.Status400BadRequest, "Profile Already Exists", ex.Message),
             ValidationException ex => CreateValidation(ex.Errors.Select(e => new ValidationError(e.PropertyName, e.ErrorMessage))),
             CustomValidationException ex => CreateValidation(ex.ValidationErrors),
