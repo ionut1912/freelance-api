@@ -24,6 +24,9 @@ public sealed record VerifyFaceEvent
     /// <summary>Image to compare against the reference image.</summary>
     public required string CompareImageUrl { get; init; }
 
+    /// <summary>Identifies the reference image; the result repeats it so a stale answer can be recognised.</summary>
+    public string? ImageFingerprint { get; init; }
+
     /// <summary>Role of the profile owner (<c>Client</c> or <c>Freelancer</c>).</summary>
     public required string Role { get; init; }
 }

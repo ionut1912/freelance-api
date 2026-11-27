@@ -1,6 +1,7 @@
 using System.Net.Http.Json;
 using Freelance.Shared.Events.Events;
 using Freelance.UserProfiles.Application.Dtos;
+using Freelance.UserProfiles.Application.Mappings;
 using Wolverine.Tracking;
 
 namespace Freelance.UserProfiles.IntegrationTests.Messaging;
@@ -16,7 +17,7 @@ public sealed class FaceVerificationRedeliveryTests(UserProfilesApiFactory facto
     {
         var client = factory.CreateClient("Client");
         var profile = await UserProfilesApiFactory.CreateClientProfileAsync(client, _ct);
-        var result = new VerifiedFaceEvent { ProfileId = profile.Id, Role = "Client", IsMatch = true };
+        var result = new VerifiedFaceEvent { ProfileId = profile.Id, Role = "Client", IsMatch = true, ImageFingerprint = ImageFingerprint.Of(profile.Image) };
 
         await factory.Host.InvokeMessageAndWaitAsync(result);
         await factory.Host.InvokeMessageAndWaitAsync(result);

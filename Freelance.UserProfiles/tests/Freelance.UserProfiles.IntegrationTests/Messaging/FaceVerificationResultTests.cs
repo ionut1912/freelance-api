@@ -1,6 +1,7 @@
 using System.Net.Http.Json;
 using Freelance.Shared.Events.Events;
 using Freelance.UserProfiles.Application.Dtos;
+using Freelance.UserProfiles.Application.Mappings;
 using Wolverine.Tracking;
 
 namespace Freelance.UserProfiles.IntegrationTests.Messaging;
@@ -17,7 +18,7 @@ public sealed class FaceVerificationResultTests(UserProfilesApiFactory factory)
         var client = factory.CreateClient("Client");
         var profile = await UserProfilesApiFactory.CreateClientProfileAsync(client, _ct);
 
-        await factory.Host.InvokeMessageAndWaitAsync(new VerifiedFaceEvent { ProfileId = profile.Id, Role = "Client", IsMatch = true });
+        await factory.Host.InvokeMessageAndWaitAsync(new VerifiedFaceEvent { ProfileId = profile.Id, Role = "Client", IsMatch = true, ImageFingerprint = ImageFingerprint.Of(profile.Image) });
 
         (await client.GetFromJsonAsync<ClientProfileDto>("/client-profiles/current", _ct))!.IsVerified.Should().BeTrue();
     }
@@ -28,7 +29,7 @@ public sealed class FaceVerificationResultTests(UserProfilesApiFactory factory)
         var freelancer = factory.CreateClient("Freelancer");
         var profile = await UserProfilesApiFactory.CreateFreelancerProfileAsync(freelancer, _ct);
 
-        await factory.Host.InvokeMessageAndWaitAsync(new VerifiedFaceEvent { ProfileId = profile.Id, Role = "Freelancer", IsMatch = true });
+        await factory.Host.InvokeMessageAndWaitAsync(new VerifiedFaceEvent { ProfileId = profile.Id, Role = "Freelancer", IsMatch = true, ImageFingerprint = ImageFingerprint.Of(profile.Image) });
 
         (await freelancer.GetFromJsonAsync<FreelancerProfileDto>("/freelancer-profiles/current", _ct))!.IsVerified.Should().BeTrue();
     }
@@ -39,7 +40,7 @@ public sealed class FaceVerificationResultTests(UserProfilesApiFactory factory)
         var client = factory.CreateClient("Client");
         var profile = await UserProfilesApiFactory.CreateClientProfileAsync(client, _ct);
 
-        await factory.Host.InvokeMessageAndWaitAsync(new VerifiedFaceEvent { ProfileId = profile.Id, Role = "Client", IsMatch = false });
+        await factory.Host.InvokeMessageAndWaitAsync(new VerifiedFaceEvent { ProfileId = profile.Id, Role = "Client", IsMatch = false, ImageFingerprint = ImageFingerprint.Of(profile.Image) });
 
         (await client.GetFromJsonAsync<ClientProfileDto>("/client-profiles/current", _ct))!.IsVerified.Should().BeFalse();
     }

@@ -20,6 +20,9 @@ public sealed record VerifiedFaceEvent
     /// <summary><see langword="true"/> when both images contain the same face.</summary>
     public required bool IsMatch { get; init; }
 
+    /// <summary><see cref="VerifyFaceEvent.ImageFingerprint"/> of the request this result answers.</summary>
+    public string? ImageFingerprint { get; init; }
+
     /// <summary>Role of the profile owner (<c>Client</c> or <c>Freelancer</c>).</summary>
     public required string Role { get; init; }
 }

@@ -4,7 +4,7 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- Shared building blocks (GitHub package feed) -->
-    <PackageVersion Include="Freelance.Shared.Events" Version="1.1.0" />
+    <PackageVersion Include="Freelance.Shared.Events" Version="1.2.0" />
     <PackageVersion Include="Shared.Api" Version="1.1.9" />
     <PackageVersion Include="Shared.Domain" Version="1.1.1" />
     <PackageVersion Include="Shared.Infra" Version="1.1.3" />

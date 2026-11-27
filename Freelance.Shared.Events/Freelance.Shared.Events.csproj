@@ -5,7 +5,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-		<Version>1.1.0</Version>
+		<Version>1.2.0</Version>
 		<Authors>ionut1912</Authors>
 		<Company>Shared</Company>
 		<PackageId>Freelance.Shared.Events</PackageId>

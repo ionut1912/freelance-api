@@ -4,9 +4,9 @@
     "net10.0": {
       "Freelance.Shared.Events": {
         "type": "Direct",
-        "requested": "[1.1.0, )",
-        "resolved": "1.1.0",
-        "contentHash": "lR7d5IOmNEfEHpBqK8poudUN98CV4pKlkjK24dnTI9K78BF0reJUltezWnar3GaOZdcKjKvrPOlHqf64W8HuuQ=="
+        "requested": "[1.2.0, )",
+        "resolved": "1.2.0",
+        "contentHash": "tvrwyafbVbryQuBTKL7wLDu3KkFw9vLI7px3KAspOnGuVUYsx9ifiMTaAdDdwTptW9PTU45QFJPq4WxUIqzIwA=="
       },
       "Microsoft.Extensions.Logging.Abstractions": {
         "type": "Direct",

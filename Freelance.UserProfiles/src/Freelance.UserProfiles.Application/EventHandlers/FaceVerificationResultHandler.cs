@@ -1,3 +1,4 @@
+using Freelance.UserProfiles.Application.Mappings;
 using Freelance.Shared.Events.Events;
 using Freelance.UserProfiles.Domain.Entities;
 using Freelance.UserProfiles.Domain.Interfaces;
@@ -33,6 +34,14 @@ public sealed class FaceVerificationResultHandler(
         if (profile is null)
         {
             logger.LogError("Cannot verify {Role} profile {ProfileId}: profile not found", @event.Role, @event.ProfileId);
+            return;
+        }
+
+        // The image may have changed while the Face service was working: that result says nothing about the new one.
+        if (@event.ImageFingerprint != ImageFingerprint.Of(profile.Image))
+        {
+            logger.LogWarning("Ignoring a stale face verification result for {Role} profile {ProfileId}", @event.Role,
+                @event.ProfileId);
             return;
         }
 

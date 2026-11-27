@@ -21,6 +21,7 @@ public sealed class FaceVerificationRequestHandler(IFaceService faceService, ILo
         {
             ProfileId = request.ProfileId,
             Role = request.Role,
+            ImageFingerprint = request.ImageFingerprint,
             IsMatch = IsSameFace(request)
         };
     }

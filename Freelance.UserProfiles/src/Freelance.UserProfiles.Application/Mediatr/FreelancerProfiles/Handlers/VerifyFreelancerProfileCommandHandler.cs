@@ -1,3 +1,4 @@
+using Freelance.UserProfiles.Application.Mappings;
 using Freelance.Shared.Events.Events;
 using Freelance.UserProfiles.Application.Mediatr.FreelancerProfiles.Commands;
 using Freelance.UserProfiles.Domain.Exceptions;
@@ -24,6 +25,7 @@ public sealed class VerifyFreelancerProfileCommandHandler(
         {
             ProfileId = profile.Id,
             InitialImageUrl = profile.Image,
+            ImageFingerprint = ImageFingerprint.Of(profile.Image),
             CompareImageUrl = command.ImageUrl,
             Role = ProfileRoles.Freelancer
         };
