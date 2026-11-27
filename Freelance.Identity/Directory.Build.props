@@ -3,6 +3,8 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <!-- CI restores with locked mode against the committed packages.lock.json files. -->
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <!-- CA1515 (make types internal) conflicts with convention-based discovery (Wolverine handlers, endpoint groups). -->

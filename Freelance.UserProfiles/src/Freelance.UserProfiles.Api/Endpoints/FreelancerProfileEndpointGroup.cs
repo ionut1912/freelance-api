@@ -92,7 +92,7 @@ public sealed class FreelancerProfileEndpointGroup : EndpointGroup
         return TypedResults.NoContent();
     }
 
-    private static async Task<Results<NoContent, UnauthorizedHttpResult>> DeleteFreelancerProfile(Guid id, 
+    private static async Task<Results<NoContent, UnauthorizedHttpResult>> DeleteFreelancerProfile(Guid id,
         HttpContext httpContext, IMessageBus bus, CancellationToken ct)
     {
         var accountId = httpContext.GetAccountId();

@@ -4,7 +4,9 @@
   <CodeCoverage>
     <ModulePaths>
       <Include>
-        <ModulePath>.*Freelance\..*\.dll$</ModulePath>
+        <!-- Matches the file name only: the checkout folders are also called Freelance.*, which would otherwise
+             pull third-party assemblies into the report. -->
+        <ModulePath>.*[\\/]Freelance\.[^\\/]*\.dll$</ModulePath>
       </Include>
       <Exclude>
         <ModulePath>.*Tests\.dll$</ModulePath>
