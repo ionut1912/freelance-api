@@ -42,3 +42,5 @@ terraform/terraform.tfstate.backup
 /.env
 !**/nuget.config
 /Freelance.Identity/.vs/*
+TestResults/
+CoverageReport/

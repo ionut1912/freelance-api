@@ -1,3 +1,7 @@
 <Solution>
+  <Folder Name="/tests/">
+    <Project Path="tests/Freelance.ApiGateway.IntegrationTests/Freelance.ApiGateway.IntegrationTests.csproj" />
+    <Project Path="tests/Freelance.ApiGateway.UnitTests/Freelance.ApiGateway.UnitTests.csproj" />
+  </Folder>
   <Project Path="src/Freelance.ApiGateway/Freelance.ApiGateway.csproj" />
 </Solution>

@@ -7,6 +7,8 @@
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <!-- CA1515 (make types internal) conflicts with convention-based discovery (Wolverine handlers, endpoint groups). -->
     <NoWarn>$(NoWarn);CA1515;CA1848;CA1873</NoWarn>
+    <!-- CA1708 misreports C# 14 extension(...) blocks as members differing only by case (SDK 10.0.4xx analyzers). -->
+    <NoWarn>$(NoWarn);CA1708</NoWarn>
     <!-- DlibDotNet also ships a distro-specific centos-x64 RID; the portable linux-x64 asset is used instead. -->
     <NoWarn>$(NoWarn);NETSDK1206</NoWarn>
   </PropertyGroup>

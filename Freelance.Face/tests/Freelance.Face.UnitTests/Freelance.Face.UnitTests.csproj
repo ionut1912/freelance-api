@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Freelance.Face.Application\Freelance.Face.Application.csproj" />
+    <ProjectReference Include="..\..\src\Freelance.Face.Infrastructure\Freelance.Face.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

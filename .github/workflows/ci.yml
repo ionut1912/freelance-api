@@ -1,0 +1,152 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  packages: read
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_VERSION: 10.0.x
+  COVERAGE_THRESHOLD: 80
+  # Private GitHub Packages feed (Shared.* packages). Prefer a classic PAT with read:packages stored as the
+  # NUGET_AUTH_TOKEN secret; GITHUB_TOKEN only works if the packages grant this repository read access.
+  NUGET_AUTH_TOKEN: ${{ secrets.NUGET_AUTH_TOKEN || github.token }}
+
+jobs:
+  shared-events:
+    name: Freelance.Shared.Events
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Build and pack
+        working-directory: Freelance.Shared.Events
+        # The project has GeneratePackageOnBuild=true, so a Release build produces the package.
+        run: dotnet build Freelance.Shared.Events.csproj -c Release -p:PackageOutputPath="${{ runner.temp }}/nupkg"
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: freelance-shared-events
+          path: ${{ runner.temp }}/nupkg/*.nupkg
+          if-no-files-found: error
+
+  service:
+    name: ${{ matrix.service }}
+    needs: shared-events
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - Freelance.ApiGateway
+          - Freelance.Face
+          - Freelance.Identity
+          - Freelance.ProjectManagement
+          - Freelance.UserProfiles
+    defaults:
+      run:
+        working-directory: ${{ matrix.service }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ matrix.service }}-${{ hashFiles(format('{0}/Directory.Packages.props', matrix.service)) }}
+          restore-keys: nuget-${{ runner.os }}-${{ matrix.service }}-
+
+      # Services consume the Freelance.Shared.Events version built from this commit, not the published one.
+      - name: Download Freelance.Shared.Events
+        uses: actions/download-artifact@v4
+        with:
+          name: freelance-shared-events
+          path: ${{ runner.temp }}/localfeed
+
+      - name: Use local package feed
+        run: bash ../.github/scripts/use-local-feed.sh nuget.config "${{ runner.temp }}/localfeed"
+
+      - name: Install native dependencies (dlib)
+        if: matrix.service == 'Freelance.Face'
+        working-directory: .
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libglib2.0-0t64 libgl1 libsm6 libxrender1 libxext6 libgomp1 libopenblas0
+
+      - name: Restore
+        run: dotnet restore ${{ matrix.service }}.slnx
+
+      - name: Build
+        run: dotnet build ${{ matrix.service }}.slnx -c Release --no-restore
+
+      - name: Unit tests
+        run: >
+          dotnet test --project tests/${{ matrix.service }}.UnitTests -c Release --no-build
+          --results-directory "$GITHUB_WORKSPACE/TestResults/unit"
+          --coverage --coverage-output-format cobertura --coverage-settings "$GITHUB_WORKSPACE/coverage.settings.xml"
+          --report-xunit-trx --report-xunit-markdown
+
+      # Integration tests boot the real APIs (WebApplicationFactory) against PostgreSQL started by Testcontainers.
+      - name: Integration tests
+        run: >
+          dotnet test --project tests/${{ matrix.service }}.IntegrationTests -c Release --no-build
+          --results-directory "$GITHUB_WORKSPACE/TestResults/integration"
+          --coverage --coverage-output-format cobertura --coverage-settings "$GITHUB_WORKSPACE/coverage.settings.xml"
+          --report-xunit-trx --report-xunit-markdown
+
+      - name: Test summary
+        if: always()
+        working-directory: .
+        run: |
+          for report in TestResults/*/*.md; do
+            [ -f "$report" ] && cat "$report" >> "$GITHUB_STEP_SUMMARY"
+          done
+
+      - name: Merge coverage (unit + integration)
+        if: always()
+        working-directory: .
+        run: |
+          dotnet tool install --global dotnet-reportgenerator-globaltool --version 5.6.1
+          reportgenerator \
+            "-reports:TestResults/**/*.cobertura.xml" \
+            "-targetdir:CoverageReport" \
+            "-reporttypes:Cobertura;HtmlInline;MarkdownSummaryGithub" \
+            "-title:${{ matrix.service }}"
+          cat CoverageReport/SummaryGithub.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Enforce coverage >= ${{ env.COVERAGE_THRESHOLD }}%
+        working-directory: .
+        run: bash .github/scripts/check-coverage.sh CoverageReport/Cobertura.xml "$COVERAGE_THRESHOLD"
+
+      - name: Upload test results and coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.service }}-test-results
+          path: |
+            TestResults/**/*.trx
+            TestResults/**/*.md
+            CoverageReport/
+          if-no-files-found: ignore

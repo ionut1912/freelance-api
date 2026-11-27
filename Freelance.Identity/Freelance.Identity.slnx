@@ -1,4 +1,8 @@
 <Solution>
+  <Folder Name="/tests/">
+    <Project Path="tests/Freelance.Identity.IntegrationTests/Freelance.Identity.IntegrationTests.csproj" />
+    <Project Path="tests/Freelance.Identity.UnitTests/Freelance.Identity.UnitTests.csproj" />
+  </Folder>
   <Project Path="src/Freelance.Identity.Api/Freelance.Identity.Api.csproj" />
   <Project Path="src/Freelance.Identity.Application/Freelance.Identity.Application.csproj" />
   <Project Path="src/Freelance.Identity.Domain/Freelance.Identity.Domain.csproj" />

@@ -1,4 +1,8 @@
 <Solution>
+  <Folder Name="/tests/">
+    <Project Path="tests/Freelance.Face.IntegrationTests/Freelance.Face.IntegrationTests.csproj" />
+    <Project Path="tests/Freelance.Face.UnitTests/Freelance.Face.UnitTests.csproj" />
+  </Folder>
   <Project Path="src/Freelance.Face.Api/Freelance.Face.Api.csproj" />
   <Project Path="src/Freelance.Face.Application/Freelance.Face.Application.csproj" />
   <Project Path="src/Freelance.Face.Domain/Freelance.Face.Domain.csproj" />
