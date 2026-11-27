@@ -7,7 +7,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Replaces the obsolete ASP.NET Core 2.x "Microsoft.AspNetCore.SignalR" 1.2.0 package. -->
+    <!-- For the dependency injection abstractions used by DependencyInjection.cs. -->
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 

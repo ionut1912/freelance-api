@@ -12,6 +12,10 @@ namespace Freelance.Face.Infrastructure.Services;
 /// </summary>
 public sealed class FaceService : IFaceService, IDisposable
 {
+    // The input size and margin the ResNet recognition model was trained with.
+    private const uint FaceChipSize = 150;
+    private const double FaceChipPadding = 0.25;
+
     private readonly Lock _gate = new();
     private readonly FrontalFaceDetector _detector;
     private readonly ShapePredictor _predictor;
@@ -20,45 +24,21 @@ public sealed class FaceService : IFaceService, IDisposable
     public FaceService()
     {
         _detector = Dlib.GetFrontalFaceDetector();
-        _predictor = ShapePredictor.Deserialize(ResolveModelPath("shape_predictor_5_face_landmarks.dat"));
-        _recognition = LossMetric.Deserialize(ResolveModelPath("dlib_face_recognition_resnet_model_v1.dat"));
+        _predictor = ShapePredictor.Deserialize(DlibModelLocator.Resolve("shape_predictor_5_face_landmarks.dat"));
+        _recognition = LossMetric.Deserialize(DlibModelLocator.Resolve("dlib_face_recognition_resnet_model_v1.dat"));
     }
 
     public bool TryGetFaceDescriptor(byte[] imageBytes, [NotNullWhen(true)] out float[]? descriptor)
     {
-        ArgumentNullException.ThrowIfNull(imageBytes);
-
-        // DlibDotNet only decodes images from disk.
-        var tmp = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}{DetectExtension(imageBytes)}");
-        File.WriteAllBytes(tmp, imageBytes);
-
+        using var file = new TemporaryImageFile(imageBytes);
         try
         {
             lock (_gate)
             {
-                using var img = Dlib.LoadImage<RgbPixel>(tmp);
-
-                var detections = _detector.Operator(img);
-                if (detections.Length != 1)
-                {
-                    descriptor = null;
-                    return false;
-                }
-
-                using var shape = _predictor.Detect(img, detections[0]);
-                var chipDetails = Dlib.GetFaceChipDetails(shape, 150, 0.25);
-                using var chip = Dlib.ExtractImageChip<RgbPixel>(img, chipDetails);
-                using var chipMatrix = new Matrix<RgbPixel>(chip);
-                using var embeddings = _recognition.Operator(chipMatrix, 1);
-                using var embedding = embeddings[0];
-
-                // dlib returns a column vector (128 rows x 1 column). Sizing by Columns kept only the first value,
-                // which made different people match each other.
-                descriptor = new float[embedding.Rows];
-                for (var i = 0; i < descriptor.Length; i++)
-                    descriptor[i] = embedding[i, 0];
-
-                return true;
+                using var image = Dlib.LoadImage<RgbPixel>(file.Path);
+                var detections = _detector.Operator(image);
+                descriptor = detections.Length == 1 ? Describe(image, detections[0]) : null;
+                return descriptor is not null;
             }
         }
         catch (ImageLoadException)
@@ -67,10 +47,26 @@ public sealed class FaceService : IFaceService, IDisposable
             descriptor = null;
             return false;
         }
-        finally
-        {
-            File.Delete(tmp);
-        }
+    }
+
+    /// <summary>Aligns the detected face and runs it through the recognition network. Call while holding the lock.</summary>
+    private float[] Describe(Array2D<RgbPixel> image, Rectangle face)
+    {
+        using var shape = _predictor.Detect(image, face);
+        var chipDetails = Dlib.GetFaceChipDetails(shape, FaceChipSize, FaceChipPadding);
+        using var chip = Dlib.ExtractImageChip<RgbPixel>(image, chipDetails);
+        using var chipMatrix = new Matrix<RgbPixel>(chip);
+
+        using var embeddings = _recognition.Operator(chipMatrix, 1);
+        using var embedding = embeddings[0];
+
+        // dlib returns a column vector (128 rows x 1 column). Sizing by Columns kept only the first value,
+        // which made different people match each other.
+        var descriptor = new float[embedding.Rows];
+        for (var i = 0; i < descriptor.Length; i++)
+            descriptor[i] = embedding[i, 0];
+
+        return descriptor;
     }
 
     // SIMD-accelerated Euclidean distance.
@@ -89,27 +85,4 @@ public sealed class FaceService : IFaceService, IDisposable
         _predictor.Dispose();
         _detector.Dispose();
     }
-
-    private static string ResolveModelPath(string fileName)
-    {
-        var defaultPath = Path.Combine(AppContext.BaseDirectory, "models", fileName);
-        if (File.Exists(defaultPath)) return defaultPath;
-
-        // Development fallback: walk up from bin/ to find the repository's models folder.
-        for (var dir = new DirectoryInfo(AppContext.BaseDirectory); dir is not null; dir = dir.Parent)
-        {
-            string[] candidates = [Path.Combine(dir.FullName, "Freelance.Face", "models", fileName), Path.Combine(dir.FullName, "models", fileName)];
-            if (candidates.FirstOrDefault(File.Exists) is { } found) return found;
-        }
-
-        throw new FileNotFoundException($"dlib model '{fileName}' was not found.", defaultPath);
-    }
-
-    private static string DetectExtension(ReadOnlySpan<byte> b) => b switch
-    {
-        [0xFF, 0xD8, 0xFF, ..] => ".jpg",
-        [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, ..] => ".png",
-        [0x42, 0x4D, ..] => ".bmp",
-        _ => ".jpg"
-    };
 }

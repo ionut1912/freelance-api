@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 
-namespace Freelance.Face.Infrastructure.Hubs;
+namespace Freelance.Face.Api.Hubs;
 
 public sealed class CaptureHub : Hub
 {

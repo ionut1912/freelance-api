@@ -1,7 +1,8 @@
 using Freelance.Face.Api.Endpoints;
 using Freelance.Face.Application.EventHandlers;
 using Freelance.Face.Infrastructure;
-using Freelance.Face.Infrastructure.Hubs;
+using Freelance.Face.Api.Hubs;
+using Freelance.Face.Api.Options;
 using Freelance.Shared.Events.Events;
 using Microsoft.AspNetCore.Diagnostics;
 using Shared.Api.Extensions;
@@ -30,7 +31,10 @@ builder.Services
     .AddOpenApi()
     .AddHealthChecks();
 
-builder.Services.AddSignalR(options => options.MaximumReceiveMessageSize = 10 * 1024 * 1024);
+// Captured photos travel through the hub as data URLs.
+const long MaxHubMessageBytes = 10 * 1024 * 1024;
+builder.Services.AddSignalR(options => options.MaximumReceiveMessageSize = MaxHubMessageBytes);
+builder.Services.Configure<FrontendOptions>(configuration);
 
 builder.Services.AddOptions<RabbitMqOptions>()
     .BindConfiguration(RabbitMqOptions.SectionName)

@@ -1,7 +1,7 @@
-using Freelance.Face.Infrastructure.Hubs;
+using Freelance.Face.Api.Hubs;
 using Microsoft.AspNetCore.SignalR;
 
-namespace Freelance.Face.UnitTests.Infrastructure.Hubs;
+namespace Freelance.Face.UnitTests.Api.Hubs;
 
 public sealed class CaptureHubTests
 {

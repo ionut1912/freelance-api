@@ -5,6 +5,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Freelance.Face.Api\Freelance.Face.Api.csproj" />
     <ProjectReference Include="..\..\src\Freelance.Face.Application\Freelance.Face.Application.csproj" />
     <ProjectReference Include="..\..\src\Freelance.Face.Infrastructure\Freelance.Face.Infrastructure.csproj" />
   </ItemGroup>

@@ -1,4 +1,6 @@
+using Freelance.Face.Api.Options;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.Extensions.Options;
 using Shared.Api.Endpoints;
 
 namespace Freelance.Face.Api.Endpoints;
@@ -12,10 +14,11 @@ public sealed class CameraEndpointGroup : EndpointGroup
         group.MapPost("/capture/sessions", CreateCaptureSession).WithName(nameof(CreateCaptureSession));
     }
 
-    private static Results<Ok<CaptureSessionResponse>, ProblemHttpResult> CreateCaptureSession(IConfiguration configuration)
+    private static Results<Ok<CaptureSessionResponse>, ProblemHttpResult> CreateCaptureSession(
+        IOptionsMonitor<FrontendOptions> frontend)
     {
-        var baseUrl = configuration["FRONTEND_BASE_URL"];
-        if (string.IsNullOrWhiteSpace(baseUrl)) return TypedResults.Problem("FRONTEND_BASE_URL is not set.");
+        var baseUrl = frontend.CurrentValue.BaseUrl;
+        if (string.IsNullOrWhiteSpace(baseUrl)) return TypedResults.Problem($"{FrontendOptions.BaseUrlKey} is not set.");
 
         var sessionId = Guid.NewGuid().ToString("N");
         var deepLink = $"{baseUrl.TrimEnd('/')}/remote-capture?session={sessionId}";
