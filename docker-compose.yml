@@ -103,6 +103,9 @@ services:
       - ASPNETCORE_URLS=http://+:8080
       - ASPNETCORE_ENVIRONMENT=Development
       - FRONTEND_BASE_URL=http://localhost:3000
+      - JwtSettings__Key=YourSuperSecretKeyHere123!ChangeItTo32PlusChars
+      - JwtSettings__Issuer=FreelanceApp
+      - JwtSettings__Audience=FreelanceAppUsers
       - RabbitMQ__Host=rabbitmq
       - RabbitMQ__Username=guest
       - RabbitMQ__Password=guest

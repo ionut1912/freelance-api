@@ -10,9 +10,17 @@ public sealed class CameraEndpointGroupTests(FaceApiFactory factory)
     private readonly CancellationToken _ct = TestContext.Current.CancellationToken;
 
     [Fact]
-    public async Task CreateCaptureSession_ReturnsSessionAndDeepLink()
+    public async Task CreateCaptureSession_Anonymous_ReturnsUnauthorized()
     {
         var response = await factory.CreateClient().PostAsync("/camera/capture/sessions", null, _ct);
+
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task CreateCaptureSession_ReturnsSessionAndDeepLink()
+    {
+        var response = await factory.CreateAuthenticatedClient().PostAsync("/camera/capture/sessions", null, _ct);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var session = await response.Content.ReadFromJsonAsync<CaptureSessionResponse>(_ct);
@@ -23,7 +31,7 @@ public sealed class CameraEndpointGroupTests(FaceApiFactory factory)
     [Fact]
     public async Task CreateCaptureSession_EachCallCreatesANewSession()
     {
-        var client = factory.CreateClient();
+        var client = factory.CreateAuthenticatedClient();
 
         var first = await (await client.PostAsync("/camera/capture/sessions", null, _ct)).Content.ReadFromJsonAsync<CaptureSessionResponse>(_ct);
         var second = await (await client.PostAsync("/camera/capture/sessions", null, _ct)).Content.ReadFromJsonAsync<CaptureSessionResponse>(_ct);
@@ -36,7 +44,7 @@ public sealed class CameraEndpointGroupTests(FaceApiFactory factory)
     {
         using var misconfigured = factory.WithWebHostBuilder(b => b.UseSetting("FRONTEND_BASE_URL", ""));
 
-        var response = await misconfigured.CreateClient().PostAsync("/camera/capture/sessions", null, _ct);
+        var response = await FaceApiFactory.Authenticate(misconfigured.CreateClient()).PostAsync("/camera/capture/sessions", null, _ct);
 
         response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
         (await response.Content.ReadAsStringAsync(_ct)).Should().Contain("FRONTEND_BASE_URL is not set.");

@@ -11,7 +11,8 @@ public sealed class CameraEndpointGroup : EndpointGroup
     {
         // Explicit prefix: it is part of the public contract routed by the API gateway (/camera/*).
         var group = app.MapGroup("/camera").WithTags("Camera");
-        group.MapPost("/capture/sessions", CreateCaptureSession).WithName(nameof(CreateCaptureSession));
+        group.MapPost("/capture/sessions", CreateCaptureSession).WithName(nameof(CreateCaptureSession))
+            .RequireAuthorization();
     }
 
     private static Results<Ok<CaptureSessionResponse>, ProblemHttpResult> CreateCaptureSession(

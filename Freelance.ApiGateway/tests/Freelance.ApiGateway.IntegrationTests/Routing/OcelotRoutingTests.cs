@@ -10,7 +10,6 @@ public sealed class OcelotRoutingTests(GatewayFactory factory)
     [Theory]
     [InlineData("POST", "/auth/register", "http://freelance_identity:8080/auth/register")]
     [InlineData("POST", "/auth/login", "http://freelance_identity:8080/auth/login")]
-    [InlineData("POST", "/camera/capture/sessions", "http://freelance_face:8080/camera/capture/sessions")]
     public async Task AnonymousRoutes_AreForwardedWithoutToken(string method, string path, string downstream)
     {
         var response = await factory.CreateClient().SendAsync(new HttpRequestMessage(new HttpMethod(method), path), _ct);
@@ -22,6 +21,7 @@ public sealed class OcelotRoutingTests(GatewayFactory factory)
 
     [Theory]
     [InlineData("GET", "/auth/current", "http://freelance_identity:8080/auth/current")]
+    [InlineData("POST", "/camera/capture/sessions", "http://freelance_face:8080/camera/capture/sessions")]
     [InlineData("GET", "/client-profiles/current", "http://freelance_user_profiles:8080/client-profiles/current")]
     [InlineData("PUT", "/freelancer-profiles/verify", "http://freelance_user_profiles:8080/freelancer-profiles/verify")]
     [InlineData("GET", "/project/42", "http://freelance_project_management:8080/project/42")]

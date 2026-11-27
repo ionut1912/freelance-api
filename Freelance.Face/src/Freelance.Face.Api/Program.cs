@@ -27,6 +27,8 @@ builder.AddOpenTelemetry(lokiEndpoint,
 builder.Services
     .AddOpenTelemetryObservability(otelEndpoint, serviceName)
     .AddSingleton<IExceptionHandler, GlobalExceptionHandler>()
+    .AddJwtAuthentication(configuration)
+    .AddAuthorization()
     .AddFaceInfrastructure()
     .AddOpenApi()
     .AddHealthChecks();
@@ -68,6 +70,10 @@ app.UseGlobalExceptionHandler<Program>()
     .MapStandardEndpoints()
     .MapApiDocumentation();
 
+app.UseAuthentication();
+app.UseAuthorization();
+
+// The hub stays anonymous: the phone opening the deep link has no login, only the unguessable session id.
 app.MapHub<CaptureHub>("/hubs/capture");
 app.MapEndpoints(typeof(CameraEndpointGroup).Assembly);
 
