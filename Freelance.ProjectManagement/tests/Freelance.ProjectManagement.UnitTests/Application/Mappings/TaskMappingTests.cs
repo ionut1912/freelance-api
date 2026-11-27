@@ -25,9 +25,9 @@ public sealed class TaskMappingTests
         var projectId = Guid.NewGuid();
         var id = Guid.NewGuid();
 
-        new CreateProjectTaskRequest(projectId, "t", "d", "New", "Low").ToCreateCommand()
+        new CreateProjectTaskRequest(projectId, "t", "d", "New", "Low").ToCreateCommand(Guid.Empty)
             .Should().BeEquivalentTo(new { ProjectId = projectId, Title = "t", Status = "New", Priority = "Low" });
-        new UpdateProjectTaskReuqest(projectId, "t", "d", "Done", "High").ToUpdateCommand(id)
+        new UpdateProjectTaskReuqest(projectId, "t", "d", "Done", "High").ToUpdateCommand(id, Guid.Empty)
             .Should().BeEquivalentTo(new { Id = id, ProjectId = projectId, Status = "Done" });
     }
 }

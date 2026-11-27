@@ -11,6 +11,7 @@ namespace Freelance.ProjectManagement.Application.Mediatr.TimeLogs.Handlers;
 
 public sealed class CreateTimeLogCommandHandler(
     IProjectTaskRepository projectTaskRepository,
+    IProjectRepository projectRepository,
     IUnitOfWork unitOfWork,
     ILogger<CreateTimeLogCommandHandler> logger)
 {
@@ -18,6 +19,9 @@ public sealed class CreateTimeLogCommandHandler(
     {
         var projectTask = await projectTaskRepository.GetByIdWithTrackingAsync(command.TaskId, cancellationToken)
                           ?? throw new ProjectTaskNotFoundException($"Project task with id {command.TaskId} was not found");
+        // A task the freelancer is not assigned to is reported as missing.
+        if (!await projectRepository.IsAssignedAsync(projectTask, command.FreelancerId, cancellationToken))
+            throw new ProjectTaskNotFoundException($"Project task with id {command.TaskId} was not found");
 
         var timeLog = TimeLog.Create(command.TaskId, command.StartTime, command.EndTime);
         projectTask.AddTimeLog(timeLog);

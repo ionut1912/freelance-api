@@ -24,17 +24,13 @@ public sealed class ProjectTaskEndpointGroup : EndpointGroup
         group.MapDelete("/{id:guid}", DeleteProjectTask).WithName(nameof(DeleteProjectTask)).RequireAuthorization(AuthorizationPolicies.ClientOnly);
     }
 
-    // Ownership is enforced for clients. Freelancers cannot be checked: nothing assigns them to a project yet.
-    private static Guid? ClientIdOrNull(HttpContext httpContext, Guid accountId) =>
-        httpContext.User.IsInRole(AuthorizationPolicies.ClientRole) ? accountId : null;
-
     private static async Task<Results<Created<ProjectTaskDto>, UnauthorizedHttpResult>> CreateProjectTask(
         CreateProjectTaskRequest request, HttpContext httpContext, IMessageBus bus, CancellationToken ct)
     {
         var accountId = httpContext.GetAccountId();
         if (accountId == Guid.Empty) return TypedResults.Unauthorized();
 
-        var created = await bus.InvokeAsync<ProjectTaskDto>(request.ToCreateCommand(ClientIdOrNull(httpContext, accountId)), ct);
+        var created = await bus.InvokeAsync<ProjectTaskDto>(request.ToCreateCommand(accountId), ct);
         return TypedResults.Created($"/projectTask/{created.Id}", created);
     }
 
@@ -50,7 +46,7 @@ public sealed class ProjectTaskEndpointGroup : EndpointGroup
         var accountId = httpContext.GetAccountId();
         if (accountId == Guid.Empty) return TypedResults.Unauthorized();
 
-        await bus.InvokeAsync(request.ToUpdateCommand(id, ClientIdOrNull(httpContext, accountId)), ct);
+        await bus.InvokeAsync(request.ToUpdateCommand(id, accountId), ct);
         return TypedResults.NoContent();
     }
 

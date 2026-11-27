@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Freelance.ProjectManagement.Application.Dtos;
 
@@ -7,12 +8,16 @@ namespace Freelance.ProjectManagement.IntegrationTests.Endpoints;
 public sealed class TimeLogEndpointGroupTests(ProjectManagementApiFactory factory)
 {
     private readonly HttpClient _client = factory.CreateClient("Client");
-    private readonly HttpClient _freelancer = factory.CreateClient("Freelancer");
+    private readonly Guid _freelancerId = Guid.NewGuid();
+    private readonly HttpClient _freelancer = factory.CreateClient();
     private readonly CancellationToken _ct = TestContext.Current.CancellationToken;
 
     private async Task<ProjectTaskDto> CreateTaskAsync()
     {
+        _freelancer.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", ProjectManagementApiFactory.CreateToken("Freelancer", _freelancerId));
         var project = await ApiScenario.CreateProjectAsync(_client, _ct);
+        await ApiScenario.AssignFreelancerAsync(_client, project.Id, _freelancerId, _ct);
         return await ApiScenario.CreateTaskAsync(_client, project.Id, _ct);
     }
 
@@ -29,12 +34,22 @@ public sealed class TimeLogEndpointGroupTests(ProjectManagementApiFactory factor
     }
 
     [Fact]
+    public async Task Create_ByAnUnassignedFreelancer_ReturnsNotFound()
+    {
+        var task = await CreateTaskAsync();
+
+        (await factory.CreateClient("Freelancer").PostAsJsonAsync("/timeLog",
+            new { taskId = task.Id, startTime = ApiScenario.Start, endTime = ApiScenario.Start.AddHours(1) }, _ct))
+            .StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
     public async Task Create_AsClient_IsForbidden() =>
         (await _client.PostAsJsonAsync("/timeLog", new { taskId = Guid.NewGuid() }, _ct)).StatusCode.Should().Be(HttpStatusCode.Forbidden);
 
     [Fact]
     public async Task Create_EndBeforeStart_ReturnsBadRequest() =>
-        (await _freelancer.PostAsJsonAsync("/timeLog",
+        (await factory.CreateClient("Freelancer").PostAsJsonAsync("/timeLog",
             new { taskId = Guid.NewGuid(), startTime = ApiScenario.Start, endTime = ApiScenario.Start.AddHours(-1) }, _ct))
         .StatusCode.Should().Be(HttpStatusCode.BadRequest);
 

@@ -90,5 +90,14 @@ public sealed class Project : Entity
 
     public void AssignClient(Guid clientId) => ClientId = clientId;
 
-    public void AssignFreelancer(Guid freelancerId) => FreelancerId = freelancerId;
+    public void AssignFreelancer(Guid freelancerId)
+    {
+        FreelancerId = freelancerId;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public bool IsAssignedTo(Guid freelancerId) => freelancerId != Guid.Empty && FreelancerId == freelancerId;
+
+    /// <summary>The owning client and the assigned freelancer may work on the project.</summary>
+    public bool IsMember(Guid accountId) => IsAssignedTo(accountId) || (accountId != Guid.Empty && ClientId == accountId);
 }

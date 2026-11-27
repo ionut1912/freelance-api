@@ -21,9 +21,9 @@ public sealed class TimeLogMappingTests
         var taskId = Guid.NewGuid();
         var id = Guid.NewGuid();
 
-        new CreateTimeLogRequest(taskId, Projects.Deadline, Projects.Deadline.AddHours(1)).ToCreateCommand()
+        new CreateTimeLogRequest(taskId, Projects.Deadline, Projects.Deadline.AddHours(1)).ToCreateCommand(Guid.Empty)
             .TaskId.Should().Be(taskId);
-        new UpdateTimeLogRequest(taskId, Projects.Deadline, Projects.Deadline.AddHours(1)).ToUpdateCommand(id)
+        new UpdateTimeLogRequest(taskId, Projects.Deadline, Projects.Deadline.AddHours(1)).ToUpdateCommand(id, Guid.Empty)
             .Should().BeEquivalentTo(new { Id = id, TaskId = taskId });
     }
 }

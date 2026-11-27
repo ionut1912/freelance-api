@@ -34,6 +34,12 @@ public static class ProjectMappings
                 clientId);
     }
 
+    extension(AssignFreelancerRequest request)
+    {
+        public AssignFreelancerCommand ToAssignCommand(Guid projectId, Guid clientId) =>
+            new(projectId, request.FreelancerId, clientId);
+    }
+
     extension(UpdateProjectRequest request)
     {
         public UpdateProjectCommand ToUpdateCommand(Guid id, Guid clientId) =>

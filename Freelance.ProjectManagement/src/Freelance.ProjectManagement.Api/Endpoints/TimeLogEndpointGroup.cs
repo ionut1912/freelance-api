@@ -1,3 +1,4 @@
+using Shared.Api.Extensions;
 using Freelance.ProjectManagement.Application.Dtos;
 using Freelance.ProjectManagement.Application.Mappings;
 using Freelance.ProjectManagement.Application.Mediatr.TimeLogs.Commands;
@@ -23,10 +24,13 @@ public sealed class TimeLogEndpointGroup : EndpointGroup
         group.MapDelete("/{id:guid}", DeleteTimeLog).WithName(nameof(DeleteTimeLog)).RequireAuthorization(AuthorizationPolicies.FreelancerOnly);
     }
 
-    private static async Task<Created<TimeLogDto>> CreateTimeLog(CreateTimeLogRequest request, IMessageBus bus,
-        CancellationToken ct)
+    private static async Task<Results<Created<TimeLogDto>, UnauthorizedHttpResult>> CreateTimeLog(
+        CreateTimeLogRequest request, HttpContext httpContext, IMessageBus bus, CancellationToken ct)
     {
-        var created = await bus.InvokeAsync<TimeLogDto>(request.ToCreateCommand(), ct);
+        var accountId = httpContext.GetAccountId();
+        if (accountId == Guid.Empty) return TypedResults.Unauthorized();
+
+        var created = await bus.InvokeAsync<TimeLogDto>(request.ToCreateCommand(accountId), ct);
         return TypedResults.Created($"/timeLog/{created.Id}", created);
     }
 
@@ -36,16 +40,23 @@ public sealed class TimeLogEndpointGroup : EndpointGroup
     private static async Task<Ok<TimeLogDto>> GetTimeLogById(Guid id, IMessageBus bus, CancellationToken ct) =>
         TypedResults.Ok(await bus.InvokeAsync<TimeLogDto>(new GetTimeLogByIdQuery(id), ct));
 
-    private static async Task<NoContent> UpdateTimeLog(Guid id, UpdateTimeLogRequest request, IMessageBus bus,
-        CancellationToken ct)
+    private static async Task<Results<NoContent, UnauthorizedHttpResult>> UpdateTimeLog(Guid id,
+        UpdateTimeLogRequest request, HttpContext httpContext, IMessageBus bus, CancellationToken ct)
     {
-        await bus.InvokeAsync(request.ToUpdateCommand(id), ct);
+        var accountId = httpContext.GetAccountId();
+        if (accountId == Guid.Empty) return TypedResults.Unauthorized();
+
+        await bus.InvokeAsync(request.ToUpdateCommand(id, accountId), ct);
         return TypedResults.NoContent();
     }
 
-    private static async Task<NoContent> DeleteTimeLog(Guid id, IMessageBus bus, CancellationToken ct)
+    private static async Task<Results<NoContent, UnauthorizedHttpResult>> DeleteTimeLog(Guid id,
+        HttpContext httpContext, IMessageBus bus, CancellationToken ct)
     {
-        await bus.InvokeAsync(new DeleteTimeLogCommand(id), ct);
+        var accountId = httpContext.GetAccountId();
+        if (accountId == Guid.Empty) return TypedResults.Unauthorized();
+
+        await bus.InvokeAsync(new DeleteTimeLogCommand(id, accountId), ct);
         return TypedResults.NoContent();
     }
 }

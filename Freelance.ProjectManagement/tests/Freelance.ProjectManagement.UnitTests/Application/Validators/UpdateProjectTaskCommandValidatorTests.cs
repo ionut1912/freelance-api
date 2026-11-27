@@ -5,7 +5,7 @@ namespace Freelance.ProjectManagement.UnitTests.Application.Validators;
 
 public sealed class UpdateProjectTaskCommandValidatorTests
 {
-    private static readonly UpdateProjectTaskCommand Valid = new(Guid.NewGuid(), Guid.NewGuid(), "", "", "Done", "Low");
+    private static readonly UpdateProjectTaskCommand Valid = new(Guid.NewGuid(), Guid.NewGuid(), "", "", "Done", "Low", Guid.NewGuid());
     private readonly UpdateProjectTaskCommandValidator _validator = new();
 
     [Fact]
@@ -21,6 +21,6 @@ public sealed class UpdateProjectTaskCommandValidatorTests
     [InlineData(101, 500, false)]
     [InlineData(100, 501, false)]
     public void Validate_TextLengthBoundaries_MatchTheColumns(int title, int description, bool valid) =>
-        _validator.Validate(new UpdateProjectTaskCommand(Guid.NewGuid(), Guid.NewGuid(), new string('a', title), new string('a', description), "New", "Low"))
+        _validator.Validate(new UpdateProjectTaskCommand(Guid.NewGuid(), Guid.NewGuid(), new string('a', title), new string('a', description), "New", "Low", Guid.NewGuid()))
             .IsValid.Should().Be(valid);
 }

@@ -23,6 +23,9 @@ internal static class ApiScenario
         return (await response.Content.ReadFromJsonAsync<ProjectDto>(ct))!;
     }
 
+    public static async Task AssignFreelancerAsync(HttpClient client, Guid projectId, Guid freelancerId, CancellationToken ct) =>
+        (await client.PutAsJsonAsync($"/project/{projectId}/freelancer", new { freelancerId }, ct)).EnsureSuccessStatusCode();
+
     public static async Task<ProjectTaskDto> CreateTaskAsync(HttpClient client, Guid projectId, CancellationToken ct)
     {
         var response = await client.PostAsJsonAsync("/projectTask",

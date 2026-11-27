@@ -21,6 +21,8 @@ public sealed class ProjectEndpointGroup : EndpointGroup
         group.MapGet("", GetProjects).WithName(nameof(GetProjects));
         group.MapGet("/{id:guid}", GetProjectById).WithName(nameof(GetProjectById));
         group.MapPut("/{id:guid}", UpdateProject).WithName(nameof(UpdateProject)).RequireAuthorization(AuthorizationPolicies.ClientOnly);
+        group.MapPut("/{id:guid}/freelancer", AssignFreelancer).WithName(nameof(AssignFreelancer))
+            .RequireAuthorization(AuthorizationPolicies.ClientOnly);
         group.MapDelete("/{id:guid}", DeleteProject).WithName(nameof(DeleteProject)).RequireAuthorization(AuthorizationPolicies.ClientOnly);
     }
 
@@ -47,6 +49,16 @@ public sealed class ProjectEndpointGroup : EndpointGroup
         if (accountId == Guid.Empty) return TypedResults.Unauthorized();
 
         await bus.InvokeAsync(request.ToUpdateCommand(id, accountId), ct);
+        return TypedResults.NoContent();
+    }
+
+    private static async Task<Results<NoContent, UnauthorizedHttpResult>> AssignFreelancer(Guid id,
+        AssignFreelancerRequest request, HttpContext httpContext, IMessageBus bus, CancellationToken ct)
+    {
+        var accountId = httpContext.GetAccountId();
+        if (accountId == Guid.Empty) return TypedResults.Unauthorized();
+
+        await bus.InvokeAsync(request.ToAssignCommand(id, accountId), ct);
         return TypedResults.NoContent();
     }
 

@@ -16,16 +16,16 @@ public sealed class UpdateProjectTaskCommandHandlerTests : HandlerTestBase
     {
         GivenProject(null, tracked: true);
 
-        await Handler.Invoking(h => h.Handle(new UpdateProjectTaskCommand(Guid.NewGuid(), Guid.NewGuid(), "t", "d", "Done", "Low"), Ct))
+        await Handler.Invoking(h => h.Handle(new UpdateProjectTaskCommand(Guid.NewGuid(), Guid.NewGuid(), "t", "d", "Done", "Low", TestData.Projects.ClientId), Ct))
             .Should().ThrowAsync<ProjectNotFoundException>();
     }
 
     [Fact]
     public async Task Handle_TaskNotInProject_ThrowsProjectTaskNotFound()
     {
-        GivenProject(TestData.Projects.Project(), tracked: true);
+        GivenProject(TestData.Projects.AssignedProject(), tracked: true);
 
-        await Handler.Invoking(h => h.Handle(new UpdateProjectTaskCommand(Guid.NewGuid(), Guid.NewGuid(), "t", "d", "Done", "Low"), Ct))
+        await Handler.Invoking(h => h.Handle(new UpdateProjectTaskCommand(Guid.NewGuid(), Guid.NewGuid(), "t", "d", "Done", "Low", TestData.Projects.ClientId), Ct))
             .Should().ThrowAsync<ProjectTaskNotFoundException>();
         VerifyNotSaved();
     }
@@ -33,12 +33,12 @@ public sealed class UpdateProjectTaskCommandHandlerTests : HandlerTestBase
     [Fact]
     public async Task Handle_UpdatesTaskAndSaves()
     {
-        var project = TestData.Projects.Project();
+        var project = TestData.Projects.AssignedProject();
         var task = TestData.Projects.Task(project.Id);
         project.AddTask(task);
         GivenProject(project, tracked: true);
 
-        await Handler.Handle(new UpdateProjectTaskCommand(task.Id, project.Id, "v2", "d2", "Done", "Low"), Ct);
+        await Handler.Handle(new UpdateProjectTaskCommand(task.Id, project.Id, "v2", "d2", "Done", "Low", TestData.Projects.ClientId), Ct);
 
         task.Status.Should().Be(ProjectTaskStatus.Done);
         task.Title.Should().Be("v2");
@@ -46,9 +46,9 @@ public sealed class UpdateProjectTaskCommandHandlerTests : HandlerTestBase
     }
 
     [Fact]
-    public async Task Handle_ProjectOfAnotherClient_ThrowsProjectNotFoundWithoutSaving()
+    public async Task Handle_NeitherOwnerNorAssignedFreelancer_ThrowsProjectNotFoundWithoutSaving()
     {
-        var project = TestData.Projects.Project();
+        var project = TestData.Projects.AssignedProject();
         GivenProject(project, tracked: true);
 
         await Handler.Invoking(h => h.Handle(new UpdateProjectTaskCommand(Guid.NewGuid(), project.Id, "v2", "d2", "Done", "Low", Guid.NewGuid()), Ct))

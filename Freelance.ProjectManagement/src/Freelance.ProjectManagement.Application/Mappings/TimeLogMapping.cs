@@ -20,11 +20,13 @@ public static class TimeLogMapping
 
     extension(CreateTimeLogRequest request)
     {
-        public CreateTimeLogCommand ToCreateCommand() => new(request.TaskId, request.StartTime, request.EndTime);
+        public CreateTimeLogCommand ToCreateCommand(Guid freelancerId) =>
+            new(request.TaskId, request.StartTime, request.EndTime, freelancerId);
     }
 
     extension(UpdateTimeLogRequest request)
     {
-        public UpdateTimeLogCommand ToUpdateCommand(Guid id) => new(id, request.TaskId, request.StartTime, request.EndTime);
+        public UpdateTimeLogCommand ToUpdateCommand(Guid id, Guid freelancerId) =>
+            new(id, request.TaskId, request.StartTime, request.EndTime, freelancerId);
     }
 }

@@ -15,7 +15,7 @@ public sealed class CreateProjectTaskCommandHandlerTests : HandlerTestBase
     {
         GivenProject(null, tracked: true);
 
-        await Handler.Invoking(h => h.Handle(new CreateProjectTaskCommand(Guid.NewGuid(), "t", "d", "New", "Low"), Ct))
+        await Handler.Invoking(h => h.Handle(new CreateProjectTaskCommand(Guid.NewGuid(), "t", "d", "New", "Low", TestData.Projects.ClientId), Ct))
             .Should().ThrowAsync<ProjectNotFoundException>();
         VerifyNotSaved();
     }
@@ -23,10 +23,10 @@ public sealed class CreateProjectTaskCommandHandlerTests : HandlerTestBase
     [Fact]
     public async Task Handle_AddsTaskThroughTheAggregate_AndSaves()
     {
-        var project = TestData.Projects.Project();
+        var project = TestData.Projects.AssignedProject();
         GivenProject(project, tracked: true);
 
-        var dto = await Handler.Handle(new CreateProjectTaskCommand(project.Id, "API", "Build", "InProgress", "Medium"), Ct);
+        var dto = await Handler.Handle(new CreateProjectTaskCommand(project.Id, "API", "Build", "InProgress", "Medium", TestData.Projects.ClientId), Ct);
 
         project.Tasks.Should().ContainSingle(t => t.Id == dto.Id);
         dto.Should().BeEquivalentTo(new { ProjectId = project.Id, Status = "InProgress", Priority = "Medium" });
@@ -34,9 +34,9 @@ public sealed class CreateProjectTaskCommandHandlerTests : HandlerTestBase
     }
 
     [Fact]
-    public async Task Handle_ProjectOfAnotherClient_ThrowsProjectNotFoundWithoutSaving()
+    public async Task Handle_NeitherOwnerNorAssignedFreelancer_ThrowsProjectNotFoundWithoutSaving()
     {
-        var project = TestData.Projects.Project();
+        var project = TestData.Projects.AssignedProject();
         GivenProject(project, tracked: true);
 
         await Handler.Invoking(h => h.Handle(new CreateProjectTaskCommand(project.Id, "API", "Build", "New", "Low", Guid.NewGuid()), Ct))

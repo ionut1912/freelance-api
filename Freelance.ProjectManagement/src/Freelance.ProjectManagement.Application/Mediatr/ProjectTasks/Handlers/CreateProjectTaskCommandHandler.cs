@@ -19,8 +19,8 @@ public sealed class CreateProjectTaskCommandHandler(
     {
         var project = await projectRepository.GetByIdWithTrackingAsync(command.ProjectId, cancellationToken)
                       ?? throw new ProjectNotFoundException($"Project with Id {command.ProjectId} was not found");
-        // Clients may only touch their own projects.
-        if (command.ClientId is { } clientId && project.ClientId != clientId)
+        // Only the owning client and the assigned freelancer may touch the project's tasks.
+        if (!project.IsMember(command.AccountId))
             throw new ProjectNotFoundException($"Project with Id {command.ProjectId} was not found");
 
         var task = ProjectTask.Create(project.Id, command.Title, command.Description,

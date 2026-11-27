@@ -27,15 +27,15 @@ public static class TaskMapping
 
     extension(CreateProjectTaskRequest request)
     {
-        public CreateProjectTaskCommand ToCreateCommand(Guid? clientId = null) =>
+        public CreateProjectTaskCommand ToCreateCommand(Guid accountId) =>
             new(request.ProjectId, request.Title, request.Description, request.Status, request.Priority,
-                clientId);
+                accountId);
     }
 
     extension(UpdateProjectTaskReuqest request)
     {
-        public UpdateProjectTaskCommand ToUpdateCommand(Guid id, Guid? clientId = null) =>
+        public UpdateProjectTaskCommand ToUpdateCommand(Guid id, Guid accountId) =>
             new(id, request.ProjectId, request.Title, request.Description, request.Status, request.Priority,
-                clientId);
+                accountId);
     }
 }
