@@ -70,7 +70,7 @@ public sealed class ClientProfileEndpointGroup : EndpointGroup
         return TypedResults.NoContent();
     }
 
-    private static async Task<Results<NoContent, UnauthorizedHttpResult>> DeleteClientProfile(Guid id, 
+    private static async Task<Results<NoContent, UnauthorizedHttpResult>> DeleteClientProfile(Guid id,
         HttpContext httpContext, IMessageBus bus, CancellationToken ct)
     {
         var accountId = httpContext.GetAccountId();

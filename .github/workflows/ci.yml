@@ -1,8 +1,9 @@
 name: CI
 
 on:
-  push:
   pull_request:
+  push:
+    branches: [master, main, develop]
   workflow_dispatch:
 
 concurrency:
@@ -15,9 +16,11 @@ permissions:
 
 env:
   DOTNET_NOLOGO: true
-  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
-  DOTNET_VERSION: 10.0.x
+  ContinuousIntegrationBuild: true
+  # global.json selects the SDK; the projects target net10.0, so their tests also need this runtime.
+  DOTNET_RUNTIME_VERSION: 10.0.x
   COVERAGE_THRESHOLD: 80
   # Private GitHub Packages feed (Shared.* packages). Prefer a classic PAT with read:packages stored as the
   # NUGET_AUTH_TOKEN secret; GITHUB_TOKEN only works if the packages grant this repository read access.
@@ -27,17 +30,35 @@ jobs:
   shared-events:
     name: Freelance.Shared.Events
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: Freelance.Shared.Events
+
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+          global-json-file: global.json
+          dotnet-version: ${{ env.DOTNET_RUNTIME_VERSION }}
 
-      - name: Build and pack
-        working-directory: Freelance.Shared.Events
-        # The project has GeneratePackageOnBuild=true, so a Release build produces the package.
-        run: dotnet build Freelance.Shared.Events.csproj -c Release -p:PackageOutputPath="${{ runner.temp }}/nupkg"
+      - name: Restore tools
+        working-directory: .
+        run: dotnet tool restore
+
+      - name: Restore (locked)
+        run: dotnet restore Freelance.Shared.Events.csproj --locked-mode
+
+      - name: Format check
+        run: dotnet format Freelance.Shared.Events.csproj --verify-no-changes --no-restore
+
+      # The project has GeneratePackageOnBuild=true, so a Release build produces the package.
+      - name: Build and analyzers
+        run: dotnet build Freelance.Shared.Events.csproj -c Release --no-restore -warnaserror -p:PackageOutputPath="${{ runner.temp }}/nupkg"
+
+      - name: Vulnerable packages
+        run: bash ../.github/scripts/check-vulnerable.sh Freelance.Shared.Events.csproj
 
       - name: Upload package
         uses: actions/upload-artifact@v4
@@ -69,13 +90,14 @@ jobs:
 
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+          global-json-file: global.json
+          dotnet-version: ${{ env.DOTNET_RUNTIME_VERSION }}
 
       - name: Cache NuGet packages
         uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
-          key: nuget-${{ runner.os }}-${{ matrix.service }}-${{ hashFiles(format('{0}/Directory.Packages.props', matrix.service)) }}
+          key: nuget-${{ runner.os }}-${{ matrix.service }}-${{ hashFiles(format('{0}/**/packages.lock.json', matrix.service), format('{0}/Directory.Packages.props', matrix.service)) }}
           restore-keys: nuget-${{ runner.os }}-${{ matrix.service }}-
 
       # Services consume the Freelance.Shared.Events version built from this commit, not the published one.
@@ -95,13 +117,23 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends libglib2.0-0t64 libgl1 libsm6 libxrender1 libxext6 libgomp1 libopenblas0
 
-      - name: Restore
-        run: dotnet restore ${{ matrix.service }}.slnx
+      # Checks run cheapest first, so a badly formatted file or a warning fails before the tests start.
+      - name: Restore tools
+        working-directory: .
+        run: dotnet tool restore
 
-      - name: Build
-        run: dotnet build ${{ matrix.service }}.slnx -c Release --no-restore
+      - name: Restore (locked)
+        run: dotnet restore ${{ matrix.service }}.slnx --locked-mode
 
+      - name: Format check
+        run: dotnet format ${{ matrix.service }}.slnx --verify-no-changes --no-restore
+
+      - name: Build and analyzers
+        run: dotnet build ${{ matrix.service }}.slnx -c Release --no-restore -warnaserror
+
+      # global.json selects Microsoft.Testing.Platform, which uses these options instead of --logger/--collect.
       - name: Unit tests
+        id: unit
         run: >
           dotnet test --project tests/${{ matrix.service }}.UnitTests -c Release --no-build
           --results-directory "$GITHUB_WORKSPACE/TestResults/unit"
@@ -117,7 +149,7 @@ jobs:
           --report-xunit-trx --report-xunit-markdown
 
       - name: Test summary
-        if: always()
+        if: ${{ !cancelled() && steps.unit.outcome != 'skipped' }}
         working-directory: .
         run: |
           for report in TestResults/*/*.md; do
@@ -125,11 +157,10 @@ jobs:
           done
 
       - name: Merge coverage (unit + integration)
-        if: always()
+        if: ${{ !cancelled() && steps.unit.outcome != 'skipped' }}
         working-directory: .
         run: |
-          dotnet tool install --global dotnet-reportgenerator-globaltool --version 5.6.1
-          reportgenerator \
+          dotnet reportgenerator \
             "-reports:TestResults/**/*.cobertura.xml" \
             "-targetdir:CoverageReport" \
             "-reporttypes:Cobertura;HtmlInline;MarkdownSummaryGithub" \
@@ -141,7 +172,7 @@ jobs:
         run: bash .github/scripts/check-coverage.sh CoverageReport/Cobertura.xml "$COVERAGE_THRESHOLD"
 
       - name: Upload test results and coverage
-        if: always()
+        if: ${{ !cancelled() && steps.unit.outcome != 'skipped' }}
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.service }}-test-results
@@ -150,3 +181,34 @@ jobs:
             TestResults/**/*.md
             CoverageReport/
           if-no-files-found: ignore
+
+      - name: Vulnerable packages
+        run: bash ../.github/scripts/check-vulnerable.sh ${{ matrix.service }}.slnx
+
+      - name: Deprecated and outdated packages (warning only)
+        continue-on-error: true
+        run: |
+          for kind in deprecated outdated; do
+            if ! report=$(dotnet list ${{ matrix.service }}.slnx package --$kind 2>&1); then
+              echo "$report"
+              echo "::warning title=${{ matrix.service }}::Could not check for $kind packages."
+              continue
+            fi
+            echo "$report"
+            if grep -qE '^\s+> ' <<< "$report"; then
+              echo "::warning title=${{ matrix.service }}::Some packages are $kind; see the step log."
+            fi
+          done
+
+  # The single status check to require in branch protection: it stays valid when the matrix changes.
+  # Any future deploy or release job must declare "needs: ci-passed".
+  ci-passed:
+    name: CI passed
+    if: ${{ always() }}
+    needs: [shared-events, service]
+    runs-on: ubuntu-latest
+    steps:
+      - name: All checks succeeded
+        run: |
+          echo "shared-events: ${{ needs.shared-events.result }}, services: ${{ needs.service.result }}"
+          [ "${{ needs.shared-events.result }}" = "success" ] && [ "${{ needs.service.result }}" = "success" ]
