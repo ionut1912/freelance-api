@@ -1,65 +1,51 @@
-﻿using Freelance.ProjectManagement.Application.Mappings;
-using Freelance.ProjectManagement.Application.Mediatr.ProjectTasks.Commands;
-using Freelance.ProjectManagement.Application.Mediatr.ProjectTasks.Querires;
+using Freelance.ProjectManagement.Application.Dtos;
+using Freelance.ProjectManagement.Application.Mappings;
 using Freelance.ProjectManagement.Application.Mediatr.TimeLogs.Commands;
 using Freelance.ProjectManagement.Application.Mediatr.TimeLogs.Queries;
 using Freelance.ProjectManagement.Application.Requests;
-using Microsoft.AspNetCore.Authorization;
-using Shared.Api.Infrastructure;
-using Shared.Application.Mediator;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Shared.Api.Endpoints;
+using Wolverine;
 
 namespace Freelance.ProjectManagement.Api.Endpoints;
 
-public class TimeLogEndpointGroup:EndpointGroup
+public sealed class TimeLogEndpointGroup : EndpointGroup
 {
-    public override void Map(IEndpointRouteBuilder endpoints)
+    public override void Map(IEndpointRouteBuilder app)
     {
-        var group = endpoints.MapGroup(this);
+        // Explicit prefix: it is part of the public contract routed by the API gateway (/timeLog/*).
+        var group = app.MapGroup("/timeLog").WithTags("Time Log").RequireAuthorization();
 
-        group.MapPost(CreeateTimeLog);
-        group.MapGet(GetTimeLogs);
-        group.MapGet(GetTimeLogById, "/{id:guid}");
-        group.MapPut(UpdateTimelog, "/{id:guid}");
-        group.MapDelete(DeleteTimeLog, "/{id:guid}");
+        group.MapPost("", CreateTimeLog).WithName(nameof(CreateTimeLog)).RequireAuthorization(AuthorizationPolicies.FreelancerOnly);
+        group.MapGet("", GetTimeLogs).WithName(nameof(GetTimeLogs));
+        group.MapGet("/{id:guid}", GetTimeLogById).WithName(nameof(GetTimeLogById));
+        group.MapPut("/{id:guid}", UpdateTimeLog).WithName(nameof(UpdateTimeLog)).RequireAuthorization(AuthorizationPolicies.FreelancerOnly);
+        group.MapDelete("/{id:guid}", DeleteTimeLog).WithName(nameof(DeleteTimeLog)).RequireAuthorization(AuthorizationPolicies.FreelancerOnly);
     }
 
-    [Authorize(Policy = "FreelancerOnly")]
-    public static async Task<IResult> CreeateTimeLog(IMediator mediator, CreateTimeLogRequest createTimeLogRequest, CancellationToken cancellationToken)
+    private static async Task<Created<TimeLogDto>> CreateTimeLog(CreateTimeLogRequest request, IMessageBus bus,
+        CancellationToken ct)
     {
-        var command = createTimeLogRequest.ToCreateCommand();
-        var created = await mediator.Send(command, cancellationToken);
-        return Results.Created($"/timeLog/{created.Id}", created);
+        var created = await bus.InvokeAsync<TimeLogDto>(request.ToCreateCommand(), ct);
+        return TypedResults.Created($"/timeLog/{created.Id}", created);
     }
 
-    [Authorize]
-    public static async Task<IResult> GetTimeLogs(IMediator mediator, CancellationToken cancellationToken)
+    private static async Task<Ok<List<TimeLogDto>>> GetTimeLogs(IMessageBus bus, CancellationToken ct) =>
+        TypedResults.Ok(await bus.InvokeAsync<List<TimeLogDto>>(new GetAllTimeLogsQuery(), ct));
+
+    private static async Task<Ok<TimeLogDto>> GetTimeLogById(Guid id, IMessageBus bus, CancellationToken ct) =>
+        TypedResults.Ok(await bus.InvokeAsync<TimeLogDto>(new GetTimeLogByIdQuery(id), ct));
+
+    private static async Task<NoContent> UpdateTimeLog(Guid id, UpdateTimeLogRequest request, IMessageBus bus,
+        CancellationToken ct)
     {
-        var query = new GetAllTimeLogsQuery();
-        var timeLogs = await mediator.Send(query, cancellationToken);
-        return Results.Ok(timeLogs);
+        await bus.InvokeAsync(request.ToUpdateCommand(id), ct);
+        return TypedResults.NoContent();
     }
 
-    [Authorize]
-    public static async Task<IResult> GetTimeLogById(IMediator mediator, Guid id, CancellationToken cancellationToken)
+    private static async Task<NoContent> DeleteTimeLog(Guid id, IMessageBus bus, CancellationToken ct)
     {
-        var query = new GetTimeLogByIdQuery(id);
-        var timeLog = await mediator.Send(query, cancellationToken);
-        return Results.Ok(timeLog);
-    }
-
-    [Authorize(Policy = "FreelancerOnly")]
-    public static async Task<IResult> UpdateTimelog(IMediator mediator, Guid id, UpdateTimeLogRequest updateTimeLogRequest, CancellationToken cancellationToken)
-    {
-        var comand = updateTimeLogRequest.ToUpdateCommand(id);
-        await mediator.Send(comand, cancellationToken);
-        return Results.NoContent();
-    }
-
-    [Authorize(Policy = "FreelancerOnly")]
-    public static async Task<IResult> DeleteTimeLog(IMediator mediator, Guid id, CancellationToken cancellationToken)
-    {
-        var command = new DeleteTimeLogCommand(id);
-        await mediator.Send(command, cancellationToken);
-        return Results.NoContent();
+        await bus.InvokeAsync(new DeleteTimeLogCommand(id), ct);
+        return TypedResults.NoContent();
     }
 }

@@ -3,6 +3,8 @@ services:
     build:
       context: Freelance.ApiGateway
       dockerfile: src/Freelance.ApiGateway/Dockerfile
+      args:
+        NUGET_AUTH_TOKEN: ${NUGET_AUTH_TOKEN}
     ports:
       - "9000:8080"
     environment:
@@ -30,8 +32,10 @@ services:
     build:
       context: Freelance.Identity
       dockerfile: src/Freelance.Identity.Api/Dockerfile
+      args:
+        NUGET_AUTH_TOKEN: ${NUGET_AUTH_TOKEN}
     environment:
-      - ASPNETCORE_URLS=http://+:80
+      - ASPNETCORE_URLS=http://+:8080
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=FreelanceIdentity;Username=postgres;Password=postgres
       - JwtSettings__Key=YourSuperSecretKeyHere123!ChangeItTo32PlusChars
@@ -56,20 +60,18 @@ services:
     build:
       context: Freelance.UserProfiles
       dockerfile: src/Freelance.UserProfiles.Api/Dockerfile
+      args:
+        NUGET_AUTH_TOKEN: ${NUGET_AUTH_TOKEN}
     environment:
-      - ASPNETCORE_URLS=http://+:80
+      - ASPNETCORE_URLS=http://+:8080
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=FreelanceUserProfiles;Username=postgres;Password=postgres
       - JwtSettings__Key=YourSuperSecretKeyHere123!ChangeItTo32PlusChars
       - JwtSettings__Issuer=FreelanceApp
       - JwtSettings__Audience=FreelanceAppUsers
-      - RabbitMq__HostName=rabbitmq
-      - RabbitMq__UserName=guest
-      - RabbitMq__Password=guest
-      - RabbitMq__Exchanges__0__Name=face.events
-      - RabbitMq__Exchanges__0__Type=topic
-      - RabbitMq__Exchanges__0__Durable=true
-      - RabbitMq__Exchanges__0__AutoDelete=false
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Username=guest
+      - RabbitMQ__Password=guest
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4317
       - OTEL_EXPORTER_OTLP_LOGS_ENDPOINT=http://loki:3100
       - OTEL_SERVICE_NAME=Freelance-UserProfiles
@@ -94,19 +96,16 @@ services:
       args:
         BUILD_CONFIGURATION: Release
         APP_UID: 0
+        NUGET_AUTH_TOKEN: ${NUGET_AUTH_TOKEN}
     ports:
       - "9010:8080"
     environment:
       - ASPNETCORE_URLS=http://+:8080
       - ASPNETCORE_ENVIRONMENT=Development
       - FRONTEND_BASE_URL=http://localhost:3000
-      - RabbitMq__HostName=rabbitmq
-      - RabbitMq__UserName=guest
-      - RabbitMq__Password=guest
-      - RabbitMq__Exchanges__0__Name=face.events
-      - RabbitMq__Exchanges__0__Type=topic
-      - RabbitMq__Exchanges__0__Durable=true
-      - RabbitMq__Exchanges__0__AutoDelete=false
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Username=guest
+      - RabbitMQ__Password=guest
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4317
       - OTEL_EXPORTER_OTLP_LOGS_ENDPOINT=http://loki:3100
       - OTEL_SERVICE_NAME=Freelance-Face
@@ -126,8 +125,10 @@ services:
     build:
       context: Freelance.ProjectManagement
       dockerfile: src/Freelance.ProjectManagement.Api/Dockerfile
+      args:
+        NUGET_AUTH_TOKEN: ${NUGET_AUTH_TOKEN}
     environment:
-      - ASPNETCORE_URLS=http://+:80
+      - ASPNETCORE_URLS=http://+:8080
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=FreelanceProjectManagement;Username=postgres;Password=postgres
       - JwtSettings__Key=YourSuperSecretKeyHere123!ChangeItTo32PlusChars

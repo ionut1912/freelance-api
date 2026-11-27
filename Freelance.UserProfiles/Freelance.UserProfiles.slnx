@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="src/Freelance.UserProfiles.Api/Freelance.UserProfiles.Api.csproj" />
+  <Project Path="src/Freelance.UserProfiles.Application/Freelance.UserProfiles.Application.csproj" />
+  <Project Path="src/Freelance.UserProfiles.Domain/Freelance.UserProfiles.Domain.csproj" />
+  <Project Path="src/Freelance.UserProfiles.Infrastructure/Freelance.UserProfiles.Infrastructure.csproj" />
+</Solution>

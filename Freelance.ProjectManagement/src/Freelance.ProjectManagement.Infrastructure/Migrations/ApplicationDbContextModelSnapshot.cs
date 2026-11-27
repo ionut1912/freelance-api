@@ -17,7 +17,7 @@ namespace Freelance.ProjectManagement.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.11")
+                .HasAnnotation("ProductVersion", "10.0.15")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -128,21 +128,14 @@ namespace Freelance.ProjectManagement.Infrastructure.Migrations
                 {
                     b.OwnsMany("Freelance.ProjectManagement.Domain.ValueObjects.ProjectTechnology", "Technologies", b1 =>
                         {
-                            b1.Property<Guid>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("uuid");
-
                             b1.Property<Guid>("ProjectId")
                                 .HasColumnType("uuid");
 
                             b1.Property<string>("Technology")
-                                .IsRequired()
                                 .HasMaxLength(100)
                                 .HasColumnType("character varying(100)");
 
-                            b1.HasKey("Id");
-
-                            b1.HasIndex("ProjectId");
+                            b1.HasKey("ProjectId", "Technology");
 
                             b1.ToTable("ProjectTechnologies", (string)null);
 

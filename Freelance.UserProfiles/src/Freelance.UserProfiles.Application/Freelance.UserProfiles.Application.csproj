@@ -1,22 +1,13 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <RootNamespace>Freelance.UserProfiles.Application</RootNamespace>
-    </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="Freelance.Shared.Events" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+  </ItemGroup>
 
-    <ItemGroup>
-		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
-		<PackageReference Include="Freelance.Shared.Events" Version="1.0.3" />
-		<PackageReference Include="Shared.ApplicationLayer" Version="1.2.5" />
-		<PackageReference Include="Shared.RabbitLayer" Version="1.0.3" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\Freelance.UserProfiles.Domain\Freelance.UserProfiles.Domain.csproj" />
-        <ProjectReference Include="..\Freelance.UserProfiles.Infrastructure\Freelance.UserProfiles.Infrastructure.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Freelance.UserProfiles.Domain\Freelance.UserProfiles.Domain.csproj" />
+  </ItemGroup>
 
 </Project>

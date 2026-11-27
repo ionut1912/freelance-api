@@ -1,6 +1,3 @@
-﻿namespace Freelance.UserProfiles.Application.Dtos;
+namespace Freelance.UserProfiles.Application.Dtos;
 
-public record AddressDto(string Street, string City, string State, string ZipCode, string Country, string StreetNumber)
-{
-
-}
+public sealed record AddressDto(string Street, string City, string State, string ZipCode, string Country, string StreetNumber);

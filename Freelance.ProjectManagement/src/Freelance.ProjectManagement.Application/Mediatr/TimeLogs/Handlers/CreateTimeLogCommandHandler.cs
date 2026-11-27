@@ -1,47 +1,29 @@
-﻿using Freelance.ProjectManagement.Application.Mediatr.TimeLogs.Commands;
+using Freelance.ProjectManagement.Application.Dtos;
+using Freelance.ProjectManagement.Application.Mappings;
+using Freelance.ProjectManagement.Application.Mediatr.TimeLogs.Commands;
 using Freelance.ProjectManagement.Domain.Entities;
 using Freelance.ProjectManagement.Domain.Exceptions;
 using Freelance.ProjectManagement.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
-using Shared.Application.Mediator;
 using Shared.Domain.Interfaces;
 
 namespace Freelance.ProjectManagement.Application.Mediatr.TimeLogs.Handlers;
 
-public class CreateTimeLogCommandHandler : IRequestHandler<CreateTimeLogCommand, TimeLog>
+public sealed class CreateTimeLogCommandHandler(
+    IProjectTaskRepository projectTaskRepository,
+    IUnitOfWork unitOfWork,
+    ILogger<CreateTimeLogCommandHandler> logger)
 {
-    private readonly IProjectTaskRepository _projectTaskRepository;
-    private readonly ITimeLogRepository _timeLogRepository;
-    private readonly ILogger<CreateTimeLogCommandHandler> _logger;
-    private readonly IUnitOfWork _unitOfWork;
-
-    public CreateTimeLogCommandHandler(IProjectTaskRepository projectTaskRepository,ITimeLogRepository timeLogRepository,ILogger<CreateTimeLogCommandHandler> logger, IUnitOfWork unitOfWork)
+    public async Task<TimeLogDto> Handle(CreateTimeLogCommand command, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(projectTaskRepository, nameof(projectTaskRepository));
-        ArgumentNullException.ThrowIfNull(timeLogRepository, nameof(timeLogRepository));
-        ArgumentNullException.ThrowIfNull(logger, nameof(logger));
-        ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));
-        _projectTaskRepository = projectTaskRepository;
-        _timeLogRepository = timeLogRepository;
-        _logger = logger;
-        _unitOfWork = unitOfWork;
-    }
+        var projectTask = await projectTaskRepository.GetByIdWithTrackingAsync(command.TaskId, cancellationToken)
+                          ?? throw new ProjectTaskNotFoundException($"Project task with id {command.TaskId} was not found");
 
-    public async Task<TimeLog> Handle(CreateTimeLogCommand request, CancellationToken cancellationToken)
-    {
-        var projectTask = await _projectTaskRepository.GetByIdAsync(request.TaskId, cancellationToken, pt => pt.TimeLogs);
-        if (projectTask == null)
-        {
-            _logger.LogError("We can not create timeLog,because Project Task with Id {TaskId} was not found", request.TaskId);
-            throw new ProjectTaskNotFoundException($"Project task with id {request.TaskId} was not found");
-        }
-
-        var timeLog = TimeLog.Create(request.TaskId, request.StartTime, request.EndTime);
-        await _timeLogRepository.AddAsync(timeLog, cancellationToken);
+        var timeLog = TimeLog.Create(command.TaskId, command.StartTime, command.EndTime);
         projectTask.AddTimeLog(timeLog);
-        _projectTaskRepository.Update(projectTask);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-        _logger.LogInformation("TimeLog wiht Id {Id} was created", timeLog.Id);
-        return timeLog;
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        logger.LogInformation("Time log {TimeLogId} was created for task {TaskId}", timeLog.Id, command.TaskId);
+        return timeLog.ToDto();
     }
 }

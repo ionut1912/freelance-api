@@ -1,63 +1,51 @@
-﻿using Freelance.ProjectManagement.Application.Mappings;
+using Freelance.ProjectManagement.Application.Dtos;
+using Freelance.ProjectManagement.Application.Mappings;
 using Freelance.ProjectManagement.Application.Mediatr.ProjectTasks.Commands;
 using Freelance.ProjectManagement.Application.Mediatr.ProjectTasks.Querires;
 using Freelance.ProjectManagement.Application.Requests;
-using Microsoft.AspNetCore.Authorization;
-using Shared.Api.Infrastructure;
-using Shared.Application.Mediator;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Shared.Api.Endpoints;
+using Wolverine;
 
 namespace Freelance.ProjectManagement.Api.Endpoints;
 
-public class ProjectTaskEndpointGroup:EndpointGroup
+public sealed class ProjectTaskEndpointGroup : EndpointGroup
 {
-    public override void Map(IEndpointRouteBuilder endpoints)
+    public override void Map(IEndpointRouteBuilder app)
     {
-        var group = endpoints.MapGroup(this);
+        // Explicit prefix: it is part of the public contract routed by the API gateway (/projectTask/*).
+        var group = app.MapGroup("/projectTask").WithTags("Project Task").RequireAuthorization();
 
-        group.MapPost(CreaterProjectTask);
-        group.MapGet(GetProjectTasks);
-        group.MapGet(GetProjectTaskById, "/{id:guid}");
-        group.MapPut(UpdateProjectTask, "/{id:guid}");
-        group.MapDelete(DeleteProjectTask, "/{id:guid}");
+        group.MapPost("", CreateProjectTask).WithName(nameof(CreateProjectTask));
+        group.MapGet("", GetProjectTasks).WithName(nameof(GetProjectTasks));
+        group.MapGet("/{id:guid}", GetProjectTaskById).WithName(nameof(GetProjectTaskById));
+        group.MapPut("/{id:guid}", UpdateProjectTask).WithName(nameof(UpdateProjectTask));
+        group.MapDelete("/{id:guid}", DeleteProjectTask).WithName(nameof(DeleteProjectTask)).RequireAuthorization(AuthorizationPolicies.ClientOnly);
     }
 
-    [Authorize]
-    public static async Task<IResult> CreaterProjectTask(IMediator mediator, CreateProjectTaskRequest createProjectTaskRequest, CancellationToken cancellationToken)
+    private static async Task<Created<ProjectTaskDto>> CreateProjectTask(CreateProjectTaskRequest request,
+        IMessageBus bus, CancellationToken ct)
     {
-        var command = createProjectTaskRequest.ToCreateCommand();
-        var created = await mediator.Send(command, cancellationToken);
-        return Results.Created($"/projectTask/{created.Id}", created);
+        var created = await bus.InvokeAsync<ProjectTaskDto>(request.ToCreateCommand(), ct);
+        return TypedResults.Created($"/projectTask/{created.Id}", created);
     }
 
-    [Authorize]
-    public static async Task<IResult> GetProjectTasks(IMediator mediator, CancellationToken cancellationToken)
+    private static async Task<Ok<List<ProjectTaskDto>>> GetProjectTasks(IMessageBus bus, CancellationToken ct) =>
+        TypedResults.Ok(await bus.InvokeAsync<List<ProjectTaskDto>>(new GetAllProjectTasksQuery(), ct));
+
+    private static async Task<Ok<ProjectTaskDto>> GetProjectTaskById(Guid id, IMessageBus bus, CancellationToken ct) =>
+        TypedResults.Ok(await bus.InvokeAsync<ProjectTaskDto>(new GetProjectTaskByIdQuery(id), ct));
+
+    private static async Task<NoContent> UpdateProjectTask(Guid id, UpdateProjectTaskReuqest request, IMessageBus bus,
+        CancellationToken ct)
     {
-        var query = new GetAllProjectTasksQuery();
-        var projectTasks = await mediator.Send(query, cancellationToken);
-        return Results.Ok(projectTasks);
+        await bus.InvokeAsync(request.ToUpdateCommand(id), ct);
+        return TypedResults.NoContent();
     }
 
-    [Authorize]
-    public static async Task<IResult> GetProjectTaskById(IMediator mediator, Guid id, CancellationToken cancellationToken)
+    private static async Task<NoContent> DeleteProjectTask(Guid id, IMessageBus bus, CancellationToken ct)
     {
-        var query = new GetProjectTaskByIdQuery(id);
-        var projectTask = await mediator.Send(query, cancellationToken);
-        return Results.Ok(projectTask);
-    }
-
-    [Authorize]
-    public static async Task<IResult> UpdateProjectTask(IMediator mediator, Guid id, UpdateProjectTaskReuqest updateProjectTaskReuqest, CancellationToken cancellationToken)
-    {
-        var comand = updateProjectTaskReuqest.ToUpdateCommand(id);
-        await mediator.Send(comand, cancellationToken);
-        return Results.NoContent();
-    }
-
-    [Authorize(Policy = "ClientOnly")]
-    public static async Task<IResult> DeleteProjectTask(IMediator mediator, Guid id, CancellationToken cancellationToken)
-    {
-        var command = new DeleteProjectTaskCommand(id);
-        await mediator.Send(command, cancellationToken);
-        return Results.NoContent();
+        await bus.InvokeAsync(new DeleteProjectTaskCommand(id), ct);
+        return TypedResults.NoContent();
     }
 }

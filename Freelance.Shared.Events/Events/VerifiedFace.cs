@@ -1,52 +1,25 @@
-﻿using Shared.Rabbit.Repositories;
-
 namespace Freelance.Shared.Events.Events;
 
 /// <summary>
-/// Represents an event raised when a face verification process
-/// has been completed.
+/// Result of a face verification requested through <see cref="VerifyFaceEvent"/>.
 /// </summary>
 /// <remarks>
-/// This event is typically published after a face comparison operation
-/// finishes, indicating the result of the verification.
+/// Published by the Face service and handled by the UserProfiles service.
 /// </remarks>
-public class VerifiedFaceEvent : IEvent
+public sealed record VerifiedFaceEvent
 {
-    /// <summary>
-    /// Gets a unique identifier for this event instance.
-    /// </summary>
-    /// <remarks>
-    /// A new <see cref="Guid"/> is generated each time this property is accessed.
-    /// </remarks>
-    public Guid EventId => Guid.NewGuid();
+    /// <summary>Unique identifier of this event instance.</summary>
+    public Guid EventId { get; init; } = Guid.CreateVersion7();
 
-    /// <summary>
-    /// Gets the UTC timestamp indicating when the event occurred.
-    /// </summary>
-    /// <remarks>
-    /// The value is generated at access time using <see cref="DateTime.UtcNow"/>.
-    /// </remarks>
-    public DateTime OccurredAt => DateTime.UtcNow;
+    /// <summary>UTC timestamp of when the event was created.</summary>
+    public DateTimeOffset OccurredAt { get; init; } = DateTimeOffset.UtcNow;
 
-    /// <summary>
-    /// Gets or sets the unique identifier of the profile
-    /// associated with this face verification result.
-    /// </summary>
-    public Guid ProfileId { get; set; }
+    /// <summary>Identifier of the profile that was verified.</summary>
+    public required Guid ProfileId { get; init; }
 
-    /// <summary>
-    /// Gets or sets a value indicating whether the face verification
-    /// was successful.
-    /// </summary>
-    public bool IsMatch { get; set; }
+    /// <summary><see langword="true"/> when both images contain the same face.</summary>
+    public required bool IsMatch { get; init; }
 
-    /// <summary>
-    /// Gets or sets the role or verification context associated
-    /// with the face verification result.
-    /// </summary>
-    /// <remarks>
-    /// This may represent a user role, system role,
-    /// or a specific verification scenario.
-    /// </remarks>
-    public string Role { get; set; } = string.Empty;
+    /// <summary>Role of the profile owner (<c>Client</c> or <c>Freelancer</c>).</summary>
+    public required string Role { get; init; }
 }

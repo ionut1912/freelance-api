@@ -1,67 +1,33 @@
-﻿using Freelance.ProjectManagement.Application.Mediatr.ProjectTasks.Commands;
+using Freelance.ProjectManagement.Application.Dtos;
+using Freelance.ProjectManagement.Application.Mappings;
+using Freelance.ProjectManagement.Application.Mediatr.ProjectTasks.Commands;
 using Freelance.ProjectManagement.Domain.Entities;
 using Freelance.ProjectManagement.Domain.Exceptions;
 using Freelance.ProjectManagement.Domain.Interfaces;
 using Freelance.ProjectManagement.Domain.ValueObjects;
 using Microsoft.Extensions.Logging;
-using Shared.Application.Mediator;
 using Shared.Domain.Interfaces;
-using System.Data;
 
 namespace Freelance.ProjectManagement.Application.Mediatr.ProjectTasks.Handlers;
 
-public class CreateProjectTaskCommandHandler : IRequestHandler<CreateProjectTaskCommand, ProjectTask>
+public sealed class CreateProjectTaskCommandHandler(
+    IProjectRepository projectRepository,
+    IUnitOfWork unitOfWork,
+    ILogger<CreateProjectTaskCommandHandler> logger)
 {
-    private readonly IProjectRepository _projectRepository;
-    private readonly IProjectTaskRepository _projectTaskRepository;
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly ILogger<CreateProjectTaskCommandHandler> _logger;
-
-    public CreateProjectTaskCommandHandler(IProjectRepository projectRepository,IProjectTaskRepository projectTaskRepository,IUnitOfWork unitOfWork,ILogger<CreateProjectTaskCommandHandler>logger)
+    public async Task<ProjectTaskDto> Handle(CreateProjectTaskCommand command, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(projectRepository, nameof(projectRepository));
-        ArgumentNullException.ThrowIfNull(projectTaskRepository, nameof(projectTaskRepository));
-        ArgumentNullException.ThrowIfNull(unitOfWork,nameof(unitOfWork));
-        ArgumentNullException.ThrowIfNull(logger,nameof(logger));
-        _projectRepository = projectRepository;
-        _projectTaskRepository = projectTaskRepository;
-        _unitOfWork = unitOfWork;
-        _logger = logger;
-    }
+        var project = await projectRepository.GetByIdWithTrackingAsync(command.ProjectId, cancellationToken)
+                      ?? throw new ProjectNotFoundException($"Project with Id {command.ProjectId} was not found");
 
-    public async Task<ProjectTask> Handle(CreateProjectTaskCommand request, CancellationToken cancellationToken)
-    {
-        var status = ProjectTaskStatus.New;
-        var priority = ProjectTaskPriority.Low;
-        var project = await _projectRepository.GetByIdAsync(request.ProjectId, cancellationToken,p=>p.Tasks);
-        if(project == null)
-        {
-            _logger.LogInformation("We can't create task,because project with Id {ProjectId} was not found", request.ProjectId);
-            throw new ProjectNotFoundException($"Project with Id {request.ProjectId} was not found");
-        }
-        status = request.Status switch
-        {
-            "New" => ProjectTaskStatus.New,
-            "InProgress" => ProjectTaskStatus.InProgress,
-            "Review" => ProjectTaskStatus.Review,
-            "Done" => ProjectTaskStatus.Done,
-            _ => throw new NotImplementedException()
-        };
+        var task = ProjectTask.Create(project.Id, command.Title, command.Description,
+            ProjectTaskStatus.FromName(command.Status), ProjectTaskPriority.FromName(command.Priority));
 
-        priority = request.Priority switch
-        {
-            "Low" => ProjectTaskPriority.Low,
-            "Medium"=> ProjectTaskPriority.Medium,
-            "High"=>ProjectTaskPriority.High,
-            _=> throw new NotImplementedException()
-        };
-
-        var task = ProjectTask.Create(project.Id, request.Title, request.Description, status,priority);
-        await _projectTaskRepository.AddAsync(task,cancellationToken);
+        // The project is the aggregate root: adding through it lets EF set the relationship and insert the task.
         project.AddTask(task);
-        _projectRepository.Update(project);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-        _logger.LogInformation("Task with Id {Id} was created", task.Id);
-        return task;
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        logger.LogInformation("Task {TaskId} was created for project {ProjectId}", task.Id, project.Id);
+        return task.ToDto();
     }
 }

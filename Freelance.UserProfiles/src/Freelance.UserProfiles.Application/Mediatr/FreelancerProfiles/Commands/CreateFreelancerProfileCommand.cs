@@ -1,10 +1,9 @@
-﻿using Freelance.UserProfiles.Application.Dtos;
-using Freelance.UserProfiles.Domain.Entities;
-using Shared.Application.Mediator;
+using Freelance.UserProfiles.Application.Dtos;
 
 namespace Freelance.UserProfiles.Application.Mediatr.FreelancerProfiles.Commands;
 
-public record CreateFreelancerProfileCommand(Guid AccountId,
+public sealed record CreateFreelancerProfileCommand(
+    Guid AccountId,
     AddressDto Address,
     string Bio,
     string Image,
@@ -14,7 +13,4 @@ public record CreateFreelancerProfileCommand(Guid AccountId,
     string PortfolioUrl,
     List<string> ForeignLanguages,
     List<string> ProgrammingLanguages,
-    List<string> Areas) : IRequest<FreelancerProfile>
-{
-
-}
+    List<string> Areas);

@@ -1,5 +1,3 @@
-﻿namespace Freelance.ProjectManagement.Application.Requests;
+namespace Freelance.ProjectManagement.Application.Requests;
 
-public record UpdateProjectTaskReuqest(Guid ProjectId,string Title, string Description, string Status, string Priority)
-{
-}
+public sealed record UpdateProjectTaskReuqest(Guid ProjectId, string Title, string Description, string Status, string Priority);

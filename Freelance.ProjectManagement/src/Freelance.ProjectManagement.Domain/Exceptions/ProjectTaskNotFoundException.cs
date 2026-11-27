@@ -1,5 +1,5 @@
 ﻿namespace Freelance.ProjectManagement.Domain.Exceptions;
 
-public class ProjectTaskNotFoundException(string message) : Exception(message)
+public sealed class ProjectTaskNotFoundException(string message) : Exception(message)
 {
 }

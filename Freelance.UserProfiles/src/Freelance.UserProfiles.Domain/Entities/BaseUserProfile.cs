@@ -1,4 +1,4 @@
-﻿using Freelance.UserProfiles.Domain.Exceptions;
+using Freelance.UserProfiles.Domain.Exceptions;
 using Freelance.UserProfiles.Domain.ValueObjects;
 using Shared.Domain.Common;
 
@@ -13,11 +13,10 @@ public abstract class BaseUserProfile : Entity
         Address = Address.Create(street, city, state, zipCode, country, streetNumber);
         Bio = bio;
         Image = image;
-        CreatedAt = DateTime.UtcNow;
         IsVerified = false;
     }
 
-    protected BaseUserProfile()
+    protected BaseUserProfile() // for EF Core
     {
     }
 
@@ -25,11 +24,12 @@ public abstract class BaseUserProfile : Entity
     public Address Address { get; private set; } = Address.Create(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
     public string Bio { get; private set; } = string.Empty;
     public string Image { get; private set; } = string.Empty;
-    public bool IsVerified { get; private set; } = false;
+    public bool IsVerified { get; private set; }
 
     public void Verify()
     {
         IsVerified = true;
+        UpdatedAt = DateTime.UtcNow;
     }
 
     public void UpdateAddress(string street, string city, string state, string zipCode, string country,
@@ -42,9 +42,7 @@ public abstract class BaseUserProfile : Entity
     public void UpdateUserData(string newImage, string newBio)
     {
         if (Image == newImage) throw new ImageAlreadyExistsException($"Image {newImage} already exists");
-
-        if (Bio == newBio)
-            throw new BioAlreadyExistsException($"Bio {newBio} is the same as previous");
+        if (Bio == newBio) throw new BioAlreadyExistsException($"Bio {newBio} is the same as previous");
 
         Bio = newBio;
         Image = newImage;

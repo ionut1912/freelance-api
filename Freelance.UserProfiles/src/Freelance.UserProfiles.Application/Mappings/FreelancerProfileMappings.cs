@@ -1,5 +1,4 @@
-﻿using Freelance.UserProfiles.Application.Dtos;
-using Freelance.UserProfiles.Application.Mediatr.ClientProfiles.Commands;
+using Freelance.UserProfiles.Application.Dtos;
 using Freelance.UserProfiles.Application.Mediatr.FreelancerProfiles.Commands;
 using Freelance.UserProfiles.Application.Requests;
 using Freelance.UserProfiles.Domain.Entities;
@@ -8,32 +7,33 @@ namespace Freelance.UserProfiles.Application.Mappings;
 
 public static class FreelancerProfileMappings
 {
-    public static FreelancerProfileDto ToDto(this FreelancerProfile freelancerProfile)
+    extension(FreelancerProfile profile)
     {
-        return new FreelancerProfileDto
-        (freelancerProfile.Id,
-            freelancerProfile.AccountId,
-            new AddressDto(freelancerProfile.Address.Street, freelancerProfile.Address.City, freelancerProfile.Address.Country, freelancerProfile.Address.StreetNumber, freelancerProfile.Address.ZipCode, freelancerProfile.Address.State),
-            freelancerProfile.Bio,
-            freelancerProfile.Image,
-            freelancerProfile.IsVerified,
-            freelancerProfile.Experience,
-            freelancerProfile.Rate.Amount,
-            freelancerProfile.Rate.Currency,
-            freelancerProfile.Rating,
-            freelancerProfile.PortfolioUrl,
-            [.. freelancerProfile.ForeignLanguages.Select(fl => fl.Language)],
-            [.. freelancerProfile.Skills.Select(s => s.ProgrammingLanguage)],
-            [.. freelancerProfile.Skills.Select(s => s.Area)]
-        );
+        public FreelancerProfileDto ToDto() => new(
+            profile.Id,
+            profile.AccountId,
+            profile.Address.ToDto(),
+            profile.Bio,
+            profile.Image,
+            profile.IsVerified,
+            profile.Experience,
+            profile.Rate.Amount,
+            profile.Rate.Currency,
+            profile.Rating,
+            profile.PortfolioUrl,
+            [.. profile.ForeignLanguages.Select(fl => fl.Language)],
+            [.. profile.Skills.Select(s => s.ProgrammingLanguage)],
+            [.. profile.Skills.Select(s => s.Area)]);
     }
 
-    public static List<FreelancerProfileDto> ToDtos(this IEnumerable<FreelancerProfile> freelancerProfiles)
-        => [.. freelancerProfiles.Select(fp => fp.ToDto())];
-
-    public static CreateFreelancerProfileCommand ToCreateCommand(this CreateFreelancerProfileRequest request, Guid accountId)
+    extension(IEnumerable<FreelancerProfile> profiles)
     {
-        return new CreateFreelancerProfileCommand(
+        public List<FreelancerProfileDto> ToDtos() => [.. profiles.Select(fp => fp.ToDto())];
+    }
+
+    extension(CreateFreelancerProfileRequest request)
+    {
+        public CreateFreelancerProfileCommand ToCreateCommand(Guid accountId) => new(
             accountId,
             request.Address,
             request.Bio,
@@ -44,43 +44,39 @@ public static class FreelancerProfileMappings
             request.PortfolioUrl,
             request.ForeignLanguages,
             request.ProgrammingLanguages,
-            request.Areas
-        );
+            request.Areas);
     }
 
-    public static UpdateFreelancerProfileAddressCommand ToUpdateFreelancerAddressCommand(this UpdateProfileAddressRequest updateFreelancerProfileAddressRequest, Guid id)
+    extension(UpdateFreelancerDetailRequest request)
     {
-        return new UpdateFreelancerProfileAddressCommand(id, updateFreelancerProfileAddressRequest.AddressDto);
-    }
-
-    public static UpdateFreelancerProfileDataCommand ToUpdateFreelancerDataCommand(this UpdateProfileDataRequest updateProfileDataRequest, Guid id)
-    {
-        return new UpdateFreelancerProfileDataCommand(id, updateProfileDataRequest.Bio, updateProfileDataRequest.Image);
-    }
-
-    public static UpdateFreelancerDetailsCommand ToUpdateDetailsCommand(this UpdateFreelancerDetailRequest updateFreelancerProfileDetailsRequest, Guid id)
-    {
-        return new UpdateFreelancerDetailsCommand(
+        public UpdateFreelancerDetailsCommand ToUpdateDetailsCommand(Guid id) => new(
             id,
-            updateFreelancerProfileDetailsRequest.ForeignLanguages,
-            updateFreelancerProfileDetailsRequest.ProgrammingLanguages,
-            updateFreelancerProfileDetailsRequest.Areas,
-            updateFreelancerProfileDetailsRequest.Experience,
-            updateFreelancerProfileDetailsRequest.Amount,
-            updateFreelancerProfileDetailsRequest.Currency,
-            updateFreelancerProfileDetailsRequest.PortfolioUrl
-        );
+            request.ForeignLanguages,
+            request.ProgrammingLanguages,
+            request.Areas,
+            request.Experience,
+            request.Amount,
+            request.Currency,
+            request.PortfolioUrl);
     }
 
-    public static UpdateFreelancerRatingCommand ToUpdateRatingCommand(this UpdateFreelancerProfileRatingRequest updateProfileDataRequest, Guid id)
+    extension(UpdateFreelancerProfileRatingRequest request)
     {
-        return new UpdateFreelancerRatingCommand(id, updateProfileDataRequest.Rating);
+        public UpdateFreelancerRatingCommand ToUpdateRatingCommand(Guid id) => new(id, request.Rating);
     }
 
-    public static VerifyFreelancerProfileCommand ToVerifyFreelancerCommand(this VerifyProfileRequest verifyProfileRequest, Guid accountId)
+    extension(UpdateProfileAddressRequest request)
     {
-        return new VerifyFreelancerProfileCommand(accountId, verifyProfileRequest.ImageUrl);
+        public UpdateFreelancerProfileAddressCommand ToUpdateFreelancerAddressCommand(Guid id) => new(id, request.AddressDto);
     }
 
+    extension(UpdateProfileDataRequest request)
+    {
+        public UpdateFreelancerProfileDataCommand ToUpdateFreelancerDataCommand(Guid id) => new(id, request.Bio, request.Image);
+    }
 
+    extension(VerifyProfileRequest request)
+    {
+        public VerifyFreelancerProfileCommand ToVerifyFreelancerCommand(Guid accountId) => new(accountId, request.ImageUrl);
+    }
 }

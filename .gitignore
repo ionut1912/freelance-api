@@ -39,3 +39,6 @@ terraform/terraform.tfstate.backup
 /Freelance.Identity/global.json
 /Freelance.Face/.vs
 /Freelance.ProjectManagement/.vs/Freelance.ProjectManagement.slnx
+/.env
+!**/nuget.config
+/Freelance.Identity/.vs/*

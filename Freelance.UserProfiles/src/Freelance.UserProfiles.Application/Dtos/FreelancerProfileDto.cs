@@ -1,6 +1,8 @@
-﻿namespace Freelance.UserProfiles.Application.Dtos;
+namespace Freelance.UserProfiles.Application.Dtos;
 
-public record FreelancerProfileDto(Guid Id,Guid AccountId,
+public sealed record FreelancerProfileDto(
+    Guid Id,
+    Guid AccountId,
     AddressDto Address,
     string Bio,
     string Image,
@@ -12,7 +14,4 @@ public record FreelancerProfileDto(Guid Id,Guid AccountId,
     string PortfolioUrl,
     List<string> ForeignLanguages,
     List<string> ProgrammingLanguages,
-    List<string> Areas) : BaseProfileDto(AccountId, Address, Bio, Image, IsVerified)
-{
-
-}
+    List<string> Areas) : BaseProfileDto(AccountId, Address, Bio, Image, IsVerified);

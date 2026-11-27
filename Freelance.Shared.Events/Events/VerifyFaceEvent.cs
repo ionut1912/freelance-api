@@ -1,58 +1,29 @@
-﻿using Shared.Rabbit.Repositories;
-
 namespace Freelance.Shared.Events.Events;
 
 /// <summary>
-/// Represents an event that requests a face verification operation
-/// between two images.
+/// Requests a face verification between a profile's reference image and a freshly captured image.
 /// </summary>
 /// <remarks>
-/// This event is typically published to initiate an asynchronous
-/// face comparison workflow.
+/// Published by the UserProfiles service and handled by the Face service.
+/// Images are base64 strings, optionally prefixed with a data-URL header (<c>data:image/png;base64,</c>).
 /// </remarks>
-public class VerifyFaceEvent : IEvent
+public sealed record VerifyFaceEvent
 {
-    /// <summary>
-    /// Gets a unique identifier for this event instance.
-    /// </summary>
-    /// <remarks>
-    /// A new <see cref="Guid"/> is generated each time this property is accessed.
-    /// </remarks>
-    Guid IEvent.EventId => Guid.NewGuid();
+    /// <summary>Unique identifier of this event instance.</summary>
+    public Guid EventId { get; init; } = Guid.CreateVersion7();
 
-    /// <summary>
-    /// Gets the UTC timestamp indicating when the event occurred.
-    /// </summary>
-    /// <remarks>
-    /// The value is generated at access time using <see cref="DateTime.UtcNow"/>.
-    /// </remarks>
-    DateTime IEvent.OccurredAt => DateTime.UtcNow;
+    /// <summary>UTC timestamp of when the event was created.</summary>
+    public DateTimeOffset OccurredAt { get; init; } = DateTimeOffset.UtcNow;
 
-    /// <summary>
-    /// Gets or sets the unique identifier of the profile
-    /// associated with this face verification request.
-    /// </summary>
-    public Guid ProfileId { get; set; }
+    /// <summary>Identifier of the profile being verified.</summary>
+    public required Guid ProfileId { get; init; }
 
-    /// <summary>
-    /// Gets or sets the URL of the initial (reference) image
-    /// used for face verification.
-    /// </summary>
-    public string InitialImageUrl { get; set; } = string.Empty;
+    /// <summary>Reference (stored) image of the profile.</summary>
+    public required string InitialImageUrl { get; init; }
 
-    /// <summary>
-    /// Gets or sets the URL of the image to be compared
-    /// against the initial image.
-    /// </summary>
-    public string CompareImageUrl { get; set; } = string.Empty;
+    /// <summary>Image to compare against the reference image.</summary>
+    public required string CompareImageUrl { get; init; }
 
-    /// <summary>
-    /// Gets or sets the role or verification context
-    /// associated with the face verification request.
-    /// </summary>
-    /// <remarks>
-    /// This may represent a user role, system role,
-    /// or a specific verification scenario.
-    /// </remarks>
-    public string Role { get; set; } = string.Empty;
+    /// <summary>Role of the profile owner (<c>Client</c> or <c>Freelancer</c>).</summary>
+    public required string Role { get; init; }
 }

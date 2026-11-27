@@ -1,59 +1,30 @@
-﻿using Freelance.Identity.Application.Dtos;
+using Freelance.Identity.Application.Dtos;
 using Freelance.Identity.Application.Mappings;
 using Freelance.Identity.Application.Mediatr.Accounts.Query;
 using Freelance.Identity.Domain.Exceptions;
 using Freelance.Identity.Domain.interfaces;
 using Microsoft.Extensions.Logging;
-using Shared.Application.Mediator;
 
 namespace Freelance.Identity.Application.Mediatr.Accounts.Handlers;
 
-public class LoginQueryHandler : IRequestHandler<LoginQuery, AccountDto>
+public sealed class LoginQueryHandler(
+    IAccountRepository accountRepository,
+    IPasswordService passwordService,
+    IJwtTokenService jwtTokenService,
+    ILogger<LoginQueryHandler> logger)
 {
-    private readonly IAccountRepository _accountRepository;
-    private readonly IPasswordService _passwordService;
-    private readonly IJwtTokenService _jwtTokenService;
-    private readonly ILogger<LoginQueryHandler> _logger;
-
-    public LoginQueryHandler(IAccountRepository accountRepository, IPasswordService passwordService, IJwtTokenService jwtTokenService,ILogger<LoginQueryHandler> logger)
+    public async Task<AccountDto> Handle(LoginQuery query, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(accountRepository, nameof(accountRepository));
-        ArgumentNullException.ThrowIfNull(passwordService, nameof(passwordService));
-        ArgumentNullException.ThrowIfNull(jwtTokenService, nameof(jwtTokenService));
-        ArgumentNullException.ThrowIfNull(logger, nameof(logger));
-        _accountRepository = accountRepository;
-        _passwordService = passwordService;
-        _jwtTokenService = jwtTokenService;
-        _logger = logger;
-    }
+        var account = await accountRepository.GetAccountByUsernameAsync(query.Username, cancellationToken)
+                      ?? throw new AccountNotFoundException($"Account with {query.Username} not found");
 
-    public async Task<AccountDto> Handle(LoginQuery request, CancellationToken cancellationToken)
-    {
-        var account = await _accountRepository.GetAccountByUsernameAsync(request.Username, cancellationToken);
-
-        if (account is null)
-        {
-            _logger.LogError("We can't login because account with username :{Username} was not found",request.Username);
-            throw new AccountNotFoundException($"Account with {request.Username} not found");
-        }
-
-        var isPasswordValid = _passwordService.VerifyPassword(request.Password, account.Password);
-
-        if (!isPasswordValid)
-        {
-            _logger.LogError("We can t login because the passwords do not match");
+        if (!passwordService.VerifyPassword(query.Password, account.Password))
             throw new PasswordNotMatchException("Passwords do not match");
 
-        }
-
         if (account.IsBlocked)
-        {
-            _logger.LogError("We can't login because account is blocked");
-            throw new AccountBlockedException("Acount is blocked.Try again later");
-        }  
-            
-        var accountDto = account.ToDto(_jwtTokenService.GenerateToken(account));
-        _logger.LogInformation("Login successfully");
-        return accountDto;
+            throw new AccountBlockedException("Account is blocked. Try again later");
+
+        logger.LogInformation("Account {AccountId} logged in", account.Id);
+        return account.ToDto(jwtTokenService.GenerateToken(account));
     }
 }

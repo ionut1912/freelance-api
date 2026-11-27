@@ -1,11 +1,10 @@
-
 using Shared.Domain.Common;
 
 namespace Freelance.UserProfiles.Domain.Entities;
 
-public class Skill : Entity
+public sealed class Skill : Entity
 {
-    private Skill()
+    private Skill() // for EF Core
     {
     }
 
@@ -13,14 +12,10 @@ public class Skill : Entity
     {
         ProgrammingLanguage = programmingLanguage;
         Area = area;
-        CreatedAt = DateTime.UtcNow;
     }
 
     public string ProgrammingLanguage { get; private set; } = string.Empty;
     public string Area { get; private set; } = string.Empty;
 
-    public static Skill Create(string programmingLanguage, string area)
-    {
-        return new Skill(programmingLanguage, area);
-    }
+    public static Skill Create(string programmingLanguage, string area) => new(programmingLanguage, area);
 }

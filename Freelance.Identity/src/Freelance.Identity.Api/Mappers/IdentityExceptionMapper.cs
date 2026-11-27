@@ -1,55 +1,42 @@
-﻿using Freelance.Identity.Domain.Exceptions;
+using FluentValidation;
+using Freelance.Identity.Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Shared.Api.Abstractions;
+using Shared.Domain.Common;
 using Shared.Domain.Exceptions;
 
 namespace Freelance.Identity.Api.Mappers;
 
+/// <summary>Translates Identity domain exceptions into RFC 9457 problem details.</summary>
 public sealed class IdentityExceptionMapper : IExceptionProblemDetailsMapper
 {
-    private readonly ILogger<IdentityExceptionMapper> _logger;
-
-    public IdentityExceptionMapper(ILogger<IdentityExceptionMapper> logger)
-    {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
-
     public bool TryMap(Exception exception, out ProblemDetails problemDetails)
     {
         ArgumentNullException.ThrowIfNull(exception);
 
         problemDetails = exception switch
         {
-            AccountAlreadyBlockedException ex => Create(400, "Account Already Blocked", ex.Message),
-            AccountNotBlockedException ex => Create(400, "Account Not Blocked", ex.Message),
-            AccountNotFoundException ex => Create(404, "Account Not Found", ex.Message),
-            PasswordNotMatchException ex => Create(400, "Password Not Match", ex.Message),
-            AccountBlockedException ex => Create(400, "Account Blocked", ex.Message),
-            UserAlreadyExistsException ex => Create(400, "User Already Exists", ex.Message),
-
-            CustomValidationException ex => CreateValidation(ex),
-
-            _ => Create(500, "Internal Server Error", "An unexpected error occurred")
+            AccountNotFoundException ex => Create(StatusCodes.Status404NotFound, "Account Not Found", ex.Message),
+            AccountAlreadyBlockedException ex => Create(StatusCodes.Status400BadRequest, "Account Already Blocked", ex.Message),
+            AccountNotBlockedException ex => Create(StatusCodes.Status400BadRequest, "Account Not Blocked", ex.Message),
+            PasswordNotMatchException ex => Create(StatusCodes.Status400BadRequest, "Password Not Match", ex.Message),
+            AccountBlockedException ex => Create(StatusCodes.Status400BadRequest, "Account Blocked", ex.Message),
+            UserAlreadyExistsException ex => Create(StatusCodes.Status400BadRequest, "User Already Exists", ex.Message),
+            ValidationException ex => CreateValidation(ex.Errors.Select(e => new ValidationError(e.PropertyName, e.ErrorMessage))),
+            CustomValidationException ex => CreateValidation(ex.ValidationErrors),
+            _ => Create(StatusCodes.Status500InternalServerError, "Internal Server Error", "An unexpected error occurred")
         };
 
-        _logger.LogError(
-            exception,
-            "Mapped exception {ExceptionType} to ProblemDetails {Status} - {Title}",
-            exception.GetType().Name,
-            problemDetails.Status,
-            problemDetails.Title);
-
-        return problemDetails != null;
+        return true;
     }
 
     private static ProblemDetails Create(int status, string title, string detail) =>
         new() { Status = status, Title = title, Detail = detail };
 
-    private static ProblemDetails CreateValidation(CustomValidationException ex)
+    private static ProblemDetails CreateValidation(IEnumerable<ValidationError> errors)
     {
-        var pd = Create(400, "Validation Error", "One or more validation errors occurred.");
-        pd.Extensions["errors"] = ex.ValidationErrors;
-        return pd;
+        var problem = Create(StatusCodes.Status400BadRequest, "Validation Error", "One or more validation errors occurred.");
+        problem.Extensions["errors"] = errors.ToList();
+        return problem;
     }
 }

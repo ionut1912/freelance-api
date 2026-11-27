@@ -2,8 +2,7 @@
 
 namespace Freelance.Face.Infrastructure.Hubs;
 
-public class CaptureHub : Hub
-
+public sealed class CaptureHub : Hub
 {
     public Task Join(string sessionId)
     {

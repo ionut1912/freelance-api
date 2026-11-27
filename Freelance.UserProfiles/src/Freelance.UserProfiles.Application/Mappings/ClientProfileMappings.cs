@@ -1,4 +1,4 @@
-﻿using Freelance.UserProfiles.Application.Dtos;
+using Freelance.UserProfiles.Application.Dtos;
 using Freelance.UserProfiles.Application.Mediatr.ClientProfiles.Commands;
 using Freelance.UserProfiles.Application.Requests;
 using Freelance.UserProfiles.Domain.Entities;
@@ -7,38 +7,40 @@ namespace Freelance.UserProfiles.Application.Mappings;
 
 public static class ClientProfileMappings
 {
-    public static ClientProfileDto ToDto(this ClientProfile clientProfile)
+    extension(ClientProfile clientProfile)
     {
-
-        return new ClientProfileDto(clientProfile.Id,clientProfile.AccountId,
-            new AddressDto(clientProfile.Address.Street, clientProfile.Address.City, clientProfile.Address.Country, clientProfile.Address.StreetNumber, clientProfile.Address.ZipCode, clientProfile.Address.State),
+        public ClientProfileDto ToDto() => new(
+            clientProfile.Id,
+            clientProfile.AccountId,
+            clientProfile.Address.ToDto(),
             clientProfile.Bio,
             clientProfile.Image,
-            clientProfile.IsVerified
-        );
+            clientProfile.IsVerified);
     }
 
-    public static List<ClientProfileDto> ToDtos(this IEnumerable<ClientProfile> clientProfiles)
-        => [.. clientProfiles.Select(cp => cp.ToDto())];
-
-    public static CreateClientProfileCommand ToCreateCommand(this CreateClientProfileRequest createClientProfileRequest, Guid accountId)
+    extension(IEnumerable<ClientProfile> clientProfiles)
     {
-        return new CreateClientProfileCommand(accountId, createClientProfileRequest.Address, createClientProfileRequest.Bio, createClientProfileRequest.Image);
+        public List<ClientProfileDto> ToDtos() => [.. clientProfiles.Select(cp => cp.ToDto())];
     }
 
-    public static UpdateClientProfileAddressCommand ToUpdateClientAddressCommand(this UpdateProfileAddressRequest updateClientProfileAddressRequest, Guid id)
+    extension(CreateClientProfileRequest request)
     {
-        return new UpdateClientProfileAddressCommand(id, updateClientProfileAddressRequest.AddressDto);
+        public CreateClientProfileCommand ToCreateCommand(Guid accountId) =>
+            new(accountId, request.Address, request.Bio, request.Image);
     }
 
-    public static UpdateClientProfileDataCommand ToUpdateClientDataCommand(this UpdateProfileDataRequest updateProfileDataRequest, Guid id)
+    extension(UpdateProfileAddressRequest request)
     {
-        return new UpdateClientProfileDataCommand(id, updateProfileDataRequest.Bio, updateProfileDataRequest.Image);
+        public UpdateClientProfileAddressCommand ToUpdateClientAddressCommand(Guid id) => new(id, request.AddressDto);
     }
 
-    public static VerifyClientProfileCommand ToVerifyClientCommand(this VerifyProfileRequest verifyProfileRequest, Guid accountId)
+    extension(UpdateProfileDataRequest request)
     {
-        return new VerifyClientProfileCommand(accountId, verifyProfileRequest.ImageUrl);
+        public UpdateClientProfileDataCommand ToUpdateClientDataCommand(Guid id) => new(id, request.Bio, request.Image);
+    }
+
+    extension(VerifyProfileRequest request)
+    {
+        public VerifyClientProfileCommand ToVerifyClientCommand(Guid accountId) => new(accountId, request.ImageUrl);
     }
 }
-

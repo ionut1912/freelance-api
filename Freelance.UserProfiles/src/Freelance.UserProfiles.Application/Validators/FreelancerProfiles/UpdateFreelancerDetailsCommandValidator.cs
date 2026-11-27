@@ -3,7 +3,7 @@ using Freelance.UserProfiles.Application.Mediatr.FreelancerProfiles.Commands;
 
 namespace Freelance.UserProfiles.Application.Validators.FreelancerProfiles;
 
-public class UpdateFreelancerDetailsCommandValidator : AbstractValidator<UpdateFreelancerDetailsCommand>
+public sealed class UpdateFreelancerDetailsCommandValidator : AbstractValidator<UpdateFreelancerDetailsCommand>
 {
     public UpdateFreelancerDetailsCommandValidator()
     {
@@ -18,7 +18,7 @@ public class UpdateFreelancerDetailsCommandValidator : AbstractValidator<UpdateF
         RuleFor(x => x)
             .Custom((x, context) =>
             {
-                if (x.ProgrammingLanguages.Count != x.Areas.Count)
+                if (x.ProgrammingLanguages?.Count != x.Areas?.Count)
                     context.AddFailure("ProgrammingLanguages and Areas must have the same number of items.");
             });
     }

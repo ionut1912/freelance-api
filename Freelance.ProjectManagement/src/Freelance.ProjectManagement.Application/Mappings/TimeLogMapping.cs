@@ -1,4 +1,4 @@
-﻿using Freelance.ProjectManagement.Application.Dtos;
+using Freelance.ProjectManagement.Application.Dtos;
 using Freelance.ProjectManagement.Application.Mediatr.TimeLogs.Commands;
 using Freelance.ProjectManagement.Application.Requests;
 using Freelance.ProjectManagement.Domain.Entities;
@@ -7,29 +7,24 @@ namespace Freelance.ProjectManagement.Application.Mappings;
 
 public static class TimeLogMapping
 {
-    public static TimeLogDto ToDto(this TimeLog timeLog)
+    extension(TimeLog timeLog)
     {
-        return new TimeLogDto(
-            timeLog.Id,
-            timeLog.TaskId,
-            timeLog.StartTime,
-            timeLog.EndTime,
-            timeLog.TotalHours);
+        public TimeLogDto ToDto() =>
+            new(timeLog.Id, timeLog.TaskId, timeLog.StartTime, timeLog.EndTime, timeLog.TotalHours);
     }
 
-    public static List<TimeLogDto> ToDtos(this IEnumerable<TimeLog> timeLogs)
+    extension(IEnumerable<TimeLog> timeLogs)
     {
-        return [.. timeLogs.Select(tl => tl.ToDto())];
-
+        public List<TimeLogDto> ToDtos() => [.. timeLogs.Select(tl => tl.ToDto())];
     }
 
-    public static CreateTimeLogCommand ToCreateCommand(this CreateTimeLogRequest request)
+    extension(CreateTimeLogRequest request)
     {
-        return new CreateTimeLogCommand(request.TaskId, request.StartTime, request.EndTime);
+        public CreateTimeLogCommand ToCreateCommand() => new(request.TaskId, request.StartTime, request.EndTime);
     }
 
-    public static UpdateTimeLogCommand ToUpdateCommand(this UpdateTimeLogRequest request,Guid Id)
+    extension(UpdateTimeLogRequest request)
     {
-        return new UpdateTimeLogCommand(Id,request.TaskId,request.StartTime, request.EndTime);
+        public UpdateTimeLogCommand ToUpdateCommand(Guid id) => new(id, request.TaskId, request.StartTime, request.EndTime);
     }
 }

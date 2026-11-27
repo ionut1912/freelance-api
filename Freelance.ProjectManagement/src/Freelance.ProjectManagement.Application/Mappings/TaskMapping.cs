@@ -1,4 +1,3 @@
-﻿
 using Freelance.ProjectManagement.Application.Dtos;
 using Freelance.ProjectManagement.Application.Mediatr.ProjectTasks.Commands;
 using Freelance.ProjectManagement.Application.Requests;
@@ -8,32 +7,33 @@ namespace Freelance.ProjectManagement.Application.Mappings;
 
 public static class TaskMapping
 {
-    public static ProjectTaskDto ToDto(this ProjectTask task)
+    extension(ProjectTask task)
     {
-        return new ProjectTaskDto(
+        public ProjectTaskDto ToDto() => new(
             task.Id,
             task.ProjectId,
             task.Title,
             task.Description,
-
             task.TimeLogs.ToDtos(),
             task.FreelacerId,
             task.Status.Value,
             task.Priority.Value);
     }
 
-    public static List<ProjectTaskDto> ToDtos(this IEnumerable<ProjectTask> tasks)
+    extension(IEnumerable<ProjectTask> tasks)
     {
-        return [.. tasks.Select(t => t.ToDto())];
+        public List<ProjectTaskDto> ToDtos() => [.. tasks.Select(t => t.ToDto())];
     }
 
-    public static CreateProjectTaskCommand ToCreateCommand(this CreateProjectTaskRequest request)
+    extension(CreateProjectTaskRequest request)
     {
-        return new CreateProjectTaskCommand(request.ProjectId, request.Title, request.Description, request.Status, request.Priority);
+        public CreateProjectTaskCommand ToCreateCommand() =>
+            new(request.ProjectId, request.Title, request.Description, request.Status, request.Priority);
     }
 
-    public static UpdateProjectTaskCommand ToUpdateCommand(this UpdateProjectTaskReuqest request,Guid Id)
+    extension(UpdateProjectTaskReuqest request)
     {
-        return new UpdateProjectTaskCommand(Id,request.ProjectId,request.Title, request.Description, request.Status, request.Priority);
+        public UpdateProjectTaskCommand ToUpdateCommand(Guid id) =>
+            new(id, request.ProjectId, request.Title, request.Description, request.Status, request.Priority);
     }
 }

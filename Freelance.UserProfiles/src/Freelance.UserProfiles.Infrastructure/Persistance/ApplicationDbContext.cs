@@ -1,17 +1,13 @@
-﻿using Freelance.UserProfiles.Domain.Entities;
+using Freelance.UserProfiles.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Freelance.UserProfiles.Infrastructure.Persistance;
 
-public class ApplicationDbContext : DbContext
+public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
-    {
-    }
-
-    public DbSet<ClientProfile> ClientProfiles { get; set; }
-    public DbSet<FreelancerProfile> FreelancerProfiles { get; set; }
-    public DbSet<Skill> Skill { get; set; }
+    public DbSet<ClientProfile> ClientProfiles => Set<ClientProfile>();
+    public DbSet<FreelancerProfile> FreelancerProfiles => Set<FreelancerProfile>();
+    public DbSet<Skill> Skill => Set<Skill>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -1,57 +1,34 @@
-﻿using Freelance.Identity.Application.Mediatr.Accounts.Commands;
+using Freelance.Identity.Application.Dtos;
+using Freelance.Identity.Application.Mappings;
+using Freelance.Identity.Application.Mediatr.Accounts.Commands;
 using Freelance.Identity.Domain.Entities;
 using Freelance.Identity.Domain.Exceptions;
 using Freelance.Identity.Domain.interfaces;
 using Freelance.Identity.Domain.ValueObjects;
 using Microsoft.Extensions.Logging;
-using Shared.Application.Mediator;
 using Shared.Domain.Interfaces;
 
 namespace Freelance.Identity.Application.Mediatr.Accounts.Handlers;
 
-public class CreateAccountCommandHandler : IRequestHandler<CreateAccountCommand, Account>
+public sealed class CreateAccountCommandHandler(
+    IAccountRepository accountRepository,
+    IPasswordService passwordService,
+    IUnitOfWork unitOfWork,
+    ILogger<CreateAccountCommandHandler> logger)
 {
-    private readonly IAccountRepository _accountRepository;
-    private readonly IPasswordService _passwordService;
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly ILogger<CreateAccountCommandHandler> _logger;
-
-    public CreateAccountCommandHandler(IAccountRepository accountRepository,
-        IPasswordService passwordService, IUnitOfWork unitOfWork,ILogger<CreateAccountCommandHandler> logger)
+    public async Task<AccountDto> Handle(CreateAccountCommand command, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(accountRepository, nameof(accountRepository));
-        ArgumentNullException.ThrowIfNull(passwordService, nameof(passwordService));
-        ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));
-        ArgumentNullException.ThrowIfNull(logger, nameof(logger));
-        _accountRepository = accountRepository;
-        _passwordService = passwordService;
-        _unitOfWork = unitOfWork;
-        _logger = logger;
-    }
+        if (await accountRepository.GetAccountByUsernameAsync(command.Username, cancellationToken) is not null)
+            throw new UserAlreadyExistsException($"Account with username {command.Username} already exists");
 
-    public async Task<Account> Handle(CreateAccountCommand request, CancellationToken cancellationToken)
-    {
-        var roleForRepo = Role.Client;
-        var account = await _accountRepository.GetAccountByUsernameAsync(request.Username, cancellationToken);
-        if (account is not null)
-        {
-            _logger.LogError("Accont with username :{Username} can not be created because already exists", request.Username);
-            throw new UserAlreadyExistsException($"Account with username {request.Username} already exists");
-        }
+        var account = Account.Create(command.Email, command.Password, command.PhoneNumber, command.Username,
+            Role.FromName(command.Role));
+        account.HashPassword(passwordService);
 
-        roleForRepo = request.Role switch
-        {
-            "Client" => Role.Client,
-            "Freelancer" => Role.Freelancer,
-            _ => throw new NotImplementedException()
-        };
+        await accountRepository.AddAsync(account, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        var accountToCreate = Account.Create(request.Email, request.Password, request.PhoneNumber, request.Username,
-            roleForRepo);
-        accountToCreate.HashPassword(_passwordService);
-        await _accountRepository.AddAsync(accountToCreate, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-        _logger.LogInformation("Account with id {Id} was created", accountToCreate.Id);
-        return accountToCreate;
+        logger.LogInformation("Account {AccountId} was created", account.Id);
+        return account.ToDto();
     }
 }

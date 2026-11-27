@@ -2,7 +2,7 @@
 
 namespace Freelance.UserProfiles.Domain.ValueObjects;
 
-public class FreelancerForeignLanguage : ValueObject
+public sealed class FreelancerForeignLanguage : ValueObject
 {
     private FreelancerForeignLanguage()
     {

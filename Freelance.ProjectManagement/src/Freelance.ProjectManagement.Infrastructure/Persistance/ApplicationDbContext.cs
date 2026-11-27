@@ -1,24 +1,17 @@
-﻿using Freelance.ProjectManagement.Domain.Entities;
+using Freelance.ProjectManagement.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Freelance.ProjectManagement.Infrastructure.Persistance;
 
-public class ApplicationDbContext : DbContext
+public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
-    {
-
-
-    }
-
-    public DbSet<Project> Projects { get; set; }
-    public DbSet<ProjectTask> ProjectTasks { get; set; }
-    public DbSet<TimeLog> TimeLogs { get; set; }
+    public DbSet<Project> Projects => Set<Project>();
+    public DbSet<ProjectTask> ProjectTasks => Set<ProjectTask>();
+    public DbSet<TimeLog> TimeLogs => Set<TimeLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
     }
 }

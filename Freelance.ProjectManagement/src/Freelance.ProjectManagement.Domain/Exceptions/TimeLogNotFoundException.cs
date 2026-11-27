@@ -1,5 +1,5 @@
 ﻿namespace Freelance.ProjectManagement.Domain.Exceptions;
 
-public class TimeLogNotFoundException(string message) : Exception(message)
+public sealed class TimeLogNotFoundException(string message) : Exception(message)
 {
 }

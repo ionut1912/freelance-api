@@ -1,30 +1,26 @@
-﻿using Freelance.ProjectManagement.Domain.Exceptions;
+using Freelance.ProjectManagement.Domain.Exceptions;
 using Freelance.ProjectManagement.Domain.ValueObjects;
 using Shared.Domain.Common;
 
 namespace Freelance.ProjectManagement.Domain.Entities;
 
-public class Project : Entity
+public sealed class Project : Entity
 {
-    private Project()
+    private readonly List<ProjectTechnology> _technologies = [];
+    private readonly List<ProjectTask> _tasks = [];
+
+    private Project() // for EF Core
     {
     }
 
     private Project(string title, string description, DateTime deadline, decimal amount, string currency)
     {
-        if (string.IsNullOrWhiteSpace(title))
-        {
-            throw new ArgumentException("Title cannot be null or empty", nameof(title));
-        }
-        if (string.IsNullOrWhiteSpace(description))
-        {
-            throw new ArgumentException("Description cannot be null or empty", nameof(description));
-        }
+        ArgumentException.ThrowIfNullOrWhiteSpace(title);
+        ArgumentException.ThrowIfNullOrWhiteSpace(description);
+
         Title = title;
         Description = description;
-        Deadline = deadline.Kind == DateTimeKind.Utc
-        ? deadline
-        : DateTime.SpecifyKind(deadline, DateTimeKind.Utc);
+        Deadline = AsUtc(deadline);
         Budget = Money.Create(amount, currency);
     }
 
@@ -33,25 +29,20 @@ public class Project : Entity
     public DateTime Deadline { get; private set; }
     public Guid ClientId { get; private set; }
     public Guid FreelancerId { get; private set; }
-    private readonly List<ProjectTechnology> _technologies = [];
     public IReadOnlyCollection<ProjectTechnology> Technologies => _technologies.AsReadOnly();
-    private readonly List<ProjectTask> _tasks = [];
     public IReadOnlyCollection<ProjectTask> Tasks => _tasks.AsReadOnly();
     public Money Budget { get; private set; } = Money.Create(0, "USD");
 
-    public static Project Create(string title, string description, DateTime deadline, decimal amount, string currency)
-    {
-        return new Project(title, description, deadline, amount, currency);
-    }
+    public static Project Create(string title, string description, DateTime deadline, decimal amount, string currency) =>
+        new(title, description, deadline, amount, currency);
 
     public void AddTechnologies(IEnumerable<ProjectTechnology> technologies)
     {
+        ArgumentNullException.ThrowIfNull(technologies);
         foreach (var technology in technologies)
         {
-            if (!_technologies.Any(t => t.Technology == technology.Technology))
-            {
+            if (!_technologies.Exists(t => t.Technology == technology.Technology))
                 _technologies.Add(technology);
-            }
         }
     }
 
@@ -59,52 +50,35 @@ public class Project : Entity
     {
         ArgumentNullException.ThrowIfNull(task);
         _tasks.Add(task);
+        UpdatedAt = DateTime.UtcNow;
     }
 
     public void Update(string title, string description, DateTime deadline, decimal amount, string currency)
     {
-        if (!string.IsNullOrEmpty(title))
-        {
-            Title = title;
-        }
-        if (!string.IsNullOrEmpty(description))
-        {
-            Description = description;
-        }
-        Deadline = deadline.Kind == DateTimeKind.Utc
-        ? deadline
-        : DateTime.SpecifyKind(deadline, DateTimeKind.Utc);
-        Budget = Money.Create(amount, currency) ?? Budget;
+        if (!string.IsNullOrEmpty(title)) Title = title;
+        if (!string.IsNullOrEmpty(description)) Description = description;
+
+        Deadline = AsUtc(deadline);
+        Budget = Money.Create(amount, currency);
+        UpdatedAt = DateTime.UtcNow;
     }
 
-    public void UpdateTask(ProjectTask task)
+    public void UpdateTask(Guid taskId, string title, string description, ProjectTaskStatus status,
+        ProjectTaskPriority priority)
     {
-        var exitingTask = _tasks.FirstOrDefault(x => x.Id == task.Id);
-        if (exitingTask == null)
-        {
-            throw new ProjectTaskNotFoundException($"Project task with id {task.Id} was not found");
-        }
-        exitingTask.Update(task.Title, task.Description, task.Status, task.Priority);
+        var task = _tasks.Find(x => x.Id == taskId)
+                   ?? throw new ProjectTaskNotFoundException($"Project task with id {taskId} was not found");
+
+        task.Update(title, description, status, priority);
+        UpdatedAt = DateTime.UtcNow;
     }
 
-    public void UpdateTechnologies(IEnumerable<ProjectTechnology> technologies)
-    {
-        foreach (var technology in technologies)
-        {
-            if (!_technologies.Any(t => t.Technology == technology.Technology))
-            {
-                _technologies.Add(technology);
-            }
-        }
-    }
+    public void UpdateTechnologies(IEnumerable<ProjectTechnology> technologies) => AddTechnologies(technologies);
 
-    public void AssignClient(Guid clientId)
-    {
-        ClientId = clientId;
-    }
+    public void AssignClient(Guid clientId) => ClientId = clientId;
 
-    public void AssignFreelancer(Guid freelancerId)
-    {
-        FreelancerId = freelancerId;
-    }
+    public void AssignFreelancer(Guid freelancerId) => FreelancerId = freelancerId;
+
+    private static DateTime AsUtc(DateTime value) =>
+        value.Kind == DateTimeKind.Utc ? value : DateTime.SpecifyKind(value, DateTimeKind.Utc);
 }

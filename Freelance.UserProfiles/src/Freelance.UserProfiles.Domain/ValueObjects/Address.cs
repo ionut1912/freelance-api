@@ -2,7 +2,7 @@
 
 namespace Freelance.UserProfiles.Domain.ValueObjects;
 
-public class Address : ValueObject
+public sealed class Address : ValueObject
 {
     private Address()
     {

@@ -1,50 +1,41 @@
-﻿using Freelance.UserProfiles.Domain.Exceptions;
+using FluentValidation;
+using Freelance.UserProfiles.Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Shared.Api.Abstractions;
+using Shared.Domain.Common;
 using Shared.Domain.Exceptions;
 
 namespace Freelance.UserProfiles.Api.Mappers;
 
-public class UserProfileExceptionMapper : IExceptionProblemDetailsMapper
+/// <summary>Translates UserProfiles domain exceptions into RFC 9457 problem details.</summary>
+public sealed class UserProfileExceptionMapper : IExceptionProblemDetailsMapper
 {
-    private readonly ILogger<UserProfileExceptionMapper> _logger;
-
-    public UserProfileExceptionMapper(ILogger<UserProfileExceptionMapper> logger)
-    {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
-
     public bool TryMap(Exception exception, out ProblemDetails problemDetails)
     {
+        ArgumentNullException.ThrowIfNull(exception);
+
         problemDetails = exception switch
         {
-            BioAlreadyExistsException ex => Create(400, "Bio Already Exists", ex.Message),
-            ImageAlreadyExistsException ex => Create(400, "Image Already Exists", ex.Message),
-            ProfileNotFoundException ex => Create(404, "Profile Not Found", ex.Message),
-            FaceNotMatchException ex => Create(400, "Face Not Match", ex.Message),
-            ProfileAllreadyExistsException ex => Create(400, "Profile Already Exists", ex.Message),
-            CustomValidationException ex => CreateValidation(ex),
-            _ => Create(500, "Internal Server Error", "An unexpected error occurred.")
+            ProfileNotFoundException ex => Create(StatusCodes.Status404NotFound, "Profile Not Found", ex.Message),
+            BioAlreadyExistsException ex => Create(StatusCodes.Status400BadRequest, "Bio Already Exists", ex.Message),
+            ImageAlreadyExistsException ex => Create(StatusCodes.Status400BadRequest, "Image Already Exists", ex.Message),
+            FaceNotMatchException ex => Create(StatusCodes.Status400BadRequest, "Face Not Match", ex.Message),
+            ProfileAllreadyExistsException ex => Create(StatusCodes.Status400BadRequest, "Profile Already Exists", ex.Message),
+            ValidationException ex => CreateValidation(ex.Errors.Select(e => new ValidationError(e.PropertyName, e.ErrorMessage))),
+            CustomValidationException ex => CreateValidation(ex.ValidationErrors),
+            _ => Create(StatusCodes.Status500InternalServerError, "Internal Server Error", "An unexpected error occurred.")
         };
 
-        _logger.LogError(
-            exception,
-            "Mapped exception {ExceptionType} to ProblemDetails {Status} - {Title}",
-            exception.GetType().Name,
-            problemDetails.Status,
-            problemDetails.Title);
-
-        return problemDetails != null;
+        return true;
     }
 
-    private ProblemDetails Create(int status, string title, string detail) =>
+    private static ProblemDetails Create(int status, string title, string detail) =>
         new() { Status = status, Title = title, Detail = detail };
 
-    private ProblemDetails CreateValidation(CustomValidationException ex)
+    private static ProblemDetails CreateValidation(IEnumerable<ValidationError> errors)
     {
-        var pd = Create(400, "Validation Error", "One or more validation errors occurred.");
-        pd.Extensions["errors"] = ex.ValidationErrors;
-        return pd;
+        var problem = Create(StatusCodes.Status400BadRequest, "Validation Error", "One or more validation errors occurred.");
+        problem.Extensions["errors"] = errors.ToList();
+        return problem;
     }
 }

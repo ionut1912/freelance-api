@@ -1,95 +1,83 @@
-﻿using Freelance.UserProfiles.Application.Mappings;
+using Freelance.UserProfiles.Application.Dtos;
+using Freelance.UserProfiles.Application.Mappings;
 using Freelance.UserProfiles.Application.Mediatr.ClientProfiles.Commands;
 using Freelance.UserProfiles.Application.Mediatr.ClientProfiles.Queries;
 using Freelance.UserProfiles.Application.Requests;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Shared.Api.Endpoints;
 using Shared.Api.Extensions;
-using Shared.Api.Infrastructure;
-using Shared.Application.Mediator;
+using Wolverine;
 
 namespace Freelance.UserProfiles.Api.Endpoints;
 
-public class ClientProfileEndpointGroup : EndpointGroup
+public sealed class ClientProfileEndpointGroup : EndpointGroup
 {
-    public override void Map(IEndpointRouteBuilder endpoints)
+    public override void Map(IEndpointRouteBuilder app)
     {
-        var group = endpoints.MapGroup(this);
+        // Explicit prefix: it is part of the public contract routed by the API gateway (/client-profiles/*).
+        var group = app.MapGroup("/client-profiles").WithTags("Client Profile").RequireAuthorization();
+        var clients = group.MapGroup(string.Empty).RequireAuthorization(AuthorizationPolicies.ClientOnly);
 
-        group.MapPost(CreateClientProfile);
-        group.MapGet(GetClientProfiles);
-        group.MapGet(GetLoggedInClientProfile, "/current");
-        group.MapPut(UpdateClientProfileAddress, "/{id:guid}/address");
-        group.MapPut(UpdateClientProfileData, "/{id:guid}/data");
-        group.MapPut(VerifyClientProfile, "/verify");
-        group.MapDelete(DeleteClientProfile, "/{id:guid}");
+        group.MapGet("", GetClientProfiles).WithName(nameof(GetClientProfiles));
+
+        clients.MapPost("", CreateClientProfile).WithName(nameof(CreateClientProfile));
+        clients.MapGet("/current", GetLoggedInClientProfile).WithName(nameof(GetLoggedInClientProfile));
+        clients.MapPut("/{id:guid}/address", UpdateClientProfileAddress).WithName(nameof(UpdateClientProfileAddress));
+        clients.MapPut("/{id:guid}/data", UpdateClientProfileData).WithName(nameof(UpdateClientProfileData));
+        clients.MapPut("/verify", VerifyClientProfile).WithName(nameof(VerifyClientProfile));
+        clients.MapDelete("/{id:guid}", DeleteClientProfile).WithName(nameof(DeleteClientProfile));
     }
 
-    [Authorize(Policy = "ClientOnly")]
-    private static async Task<IResult> CreateClientProfile(IMediator mediator,
-        CreateClientProfileRequest request,
-        HttpContext httpContext,
-        CancellationToken ct)
+    private static async Task<Results<Created<ClientProfileDto>, UnauthorizedHttpResult>> CreateClientProfile(
+        CreateClientProfileRequest request, HttpContext httpContext, IMessageBus bus, CancellationToken ct)
     {
         var accountId = httpContext.GetAccountId();
-        if (accountId == Guid.Empty) return Results.Unauthorized();
+        if (accountId == Guid.Empty) return TypedResults.Unauthorized();
 
-        var command = request.ToCreateCommand(accountId);
-        var created = await mediator.Send(command, ct);
-        return Results.Created($"/api/client-profiles/{created.Id}", created);
+        var created = await bus.InvokeAsync<ClientProfileDto>(request.ToCreateCommand(accountId), ct);
+        return TypedResults.Created($"/client-profiles/{created.Id}", created);
     }
 
-    [Authorize]
-    private static async Task<IResult> GetClientProfiles(IMediator mediator, CancellationToken ct)
-    {
-        var query = new GetClientProfilesQuery();
-        var profiles = await mediator.Send(query, ct);
-        return Results.Ok(profiles);
-    }
+    private static async Task<Ok<List<ClientProfileDto>>> GetClientProfiles(IMessageBus bus, CancellationToken ct) =>
+        TypedResults.Ok(await bus.InvokeAsync<List<ClientProfileDto>>(new GetClientProfilesQuery(), ct));
 
-    [Authorize(Policy = "ClientOnly")]
-    private static async Task<IResult> GetLoggedInClientProfile(IMediator mediator, HttpContext httpContext, CancellationToken ct)
+    private static async Task<Results<Ok<ClientProfileDto>, UnauthorizedHttpResult>> GetLoggedInClientProfile(
+        HttpContext httpContext, IMessageBus bus, CancellationToken ct)
     {
         var accountId = httpContext.GetAccountId();
-        if (accountId == Guid.Empty) return Results.Unauthorized();
+        if (accountId == Guid.Empty) return TypedResults.Unauthorized();
 
-        var query = new GetLoggedInClientProfileQuery(accountId);
-        var profile = await mediator.Send(query, ct);
-        return Results.Ok(profile);
+        return TypedResults.Ok(await bus.InvokeAsync<ClientProfileDto>(new GetLoggedInClientProfileQuery(accountId), ct));
     }
 
-    [Authorize(Policy = "ClientOnly")]
-    private static async Task<IResult> UpdateClientProfileAddress(IMediator mediator, Guid id,
-        UpdateProfileAddressRequest request, CancellationToken ct)
+    private static async Task<NoContent> UpdateClientProfileAddress(Guid id, UpdateProfileAddressRequest request,
+        IMessageBus bus, CancellationToken ct)
     {
-        var command = request.ToUpdateClientAddressCommand(id);
-        await mediator.Send(command, ct);
-        return Results.NoContent();
+        await bus.InvokeAsync(request.ToUpdateClientAddressCommand(id), ct);
+        return TypedResults.NoContent();
     }
 
-    [Authorize(Policy = "ClientOnly")]
-    private static async Task<IResult> UpdateClientProfileData(IMediator mediator, Guid id,
-        UpdateProfileDataRequest request, CancellationToken ct)
+    private static async Task<NoContent> UpdateClientProfileData(Guid id, UpdateProfileDataRequest request,
+        IMessageBus bus, CancellationToken ct)
     {
-        var command = request.ToUpdateClientDataCommand(id);
-        await mediator.Send(command, ct);
-        return Results.NoContent();
+        await bus.InvokeAsync(request.ToUpdateClientDataCommand(id), ct);
+        return TypedResults.NoContent();
     }
 
-    [Authorize(Policy = "ClientOnly")]
-    private static async Task<IResult> DeleteClientProfile(IMediator mediator, Guid id, CancellationToken ct)
+    private static async Task<NoContent> DeleteClientProfile(Guid id, IMessageBus bus, CancellationToken ct)
     {
-        var command = new DeleteClientProfileCommand(id);
-        await mediator.Send(command, ct);
-        return Results.NoContent();
+        await bus.InvokeAsync(new DeleteClientProfileCommand(id), ct);
+        return TypedResults.NoContent();
     }
 
-    [Authorize(Policy = "ClientOnly")]
-    private static async Task<IResult> VerifyClientProfile(IMediator mediator,VerifyProfileRequest verifyProfileRequest, HttpContext httpContext, CancellationToken ct)
+    /// <summary>Starts an asynchronous face verification; the result arrives later through RabbitMQ.</summary>
+    private static async Task<Results<NoContent, UnauthorizedHttpResult>> VerifyClientProfile(
+        VerifyProfileRequest request, HttpContext httpContext, IMessageBus bus, CancellationToken ct)
     {
         var accountId = httpContext.GetAccountId();
-        if (accountId == Guid.Empty) return Results.Unauthorized();
-        var command = verifyProfileRequest.ToVerifyClientCommand(accountId);
-        await mediator.Send(command, ct);
-        return Results.NoContent();
+        if (accountId == Guid.Empty) return TypedResults.Unauthorized();
+
+        await bus.InvokeAsync(request.ToVerifyClientCommand(accountId), ct);
+        return TypedResults.NoContent();
     }
 }

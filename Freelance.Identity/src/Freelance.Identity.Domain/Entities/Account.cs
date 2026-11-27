@@ -1,12 +1,11 @@
-﻿using Freelance.Identity.Domain.Exceptions;
+using Freelance.Identity.Domain.Exceptions;
 using Freelance.Identity.Domain.interfaces;
 using Freelance.Identity.Domain.ValueObjects;
 using Shared.Domain.Common;
 
-
 namespace Freelance.Identity.Domain.Entities;
 
-public class Account : Entity
+public sealed class Account : Entity
 {
     private Account() //for EF core
     {
@@ -14,16 +13,11 @@ public class Account : Entity
 
     private Account(string email, string password, string phoneNumber, string username, Role role)
     {
-        if (string.IsNullOrEmpty(email))
-            throw new ArgumentNullException("Email cannot be null or empty");
-        if (string.IsNullOrEmpty(password))
-            throw new ArgumentNullException("Password cannot be null or empty");
-        if (string.IsNullOrEmpty(phoneNumber))
-            throw new ArgumentNullException("Phone Number cannot be null or empty");
-        if (string.IsNullOrEmpty(username))
-            throw new ArgumentNullException("Username cannot be null or empty");
-        if (string.IsNullOrEmpty(role.Value))
-            throw new ArgumentNullException("Role cannot be null or empty");
+        ArgumentException.ThrowIfNullOrWhiteSpace(email);
+        ArgumentException.ThrowIfNullOrWhiteSpace(password);
+        ArgumentException.ThrowIfNullOrWhiteSpace(phoneNumber);
+        ArgumentException.ThrowIfNullOrWhiteSpace(username);
+        ArgumentNullException.ThrowIfNull(role);
 
         Email = email;
         Password = password;
@@ -31,7 +25,6 @@ public class Account : Entity
         Username = username;
         Role = role;
         IsBlocked = false;
-        CreatedAt = DateTime.UtcNow;
     }
 
     public string Email { get; private set; } = string.Empty;
@@ -42,10 +35,8 @@ public class Account : Entity
     public bool IsBlocked { get; private set; }
     public DateTime BlockedAt { get; private set; }
 
-    public static Account Create(string email, string password, string phoneNumber, string username, Role role)
-    {
-        return new Account(email, password, phoneNumber, username, role);
-    }
+    public static Account Create(string email, string password, string phoneNumber, string username, Role role) =>
+        new(email, password, phoneNumber, username, role);
 
     public void BlockAccount()
     {
@@ -53,12 +44,12 @@ public class Account : Entity
             throw new AccountAlreadyBlockedException("Account is blocked");
 
         IsBlocked = true;
-        UpdatedAt = DateTime.UtcNow;
-        BlockedAt = DateTime.UtcNow;
+        UpdatedAt = BlockedAt = DateTime.UtcNow;
     }
 
     public void HashPassword(IPasswordService passwordService)
     {
+        ArgumentNullException.ThrowIfNull(passwordService);
         if (string.IsNullOrWhiteSpace(Password))
             throw new InvalidOperationException("Password cannot be empty before hashing.");
 

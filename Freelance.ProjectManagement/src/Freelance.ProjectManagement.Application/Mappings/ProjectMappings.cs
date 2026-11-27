@@ -1,4 +1,4 @@
-﻿using Freelance.ProjectManagement.Application.Dtos;
+using Freelance.ProjectManagement.Application.Dtos;
 using Freelance.ProjectManagement.Application.Mediatr.Projects.Commands;
 using Freelance.ProjectManagement.Application.Requests;
 using Freelance.ProjectManagement.Domain.Entities;
@@ -7,9 +7,9 @@ namespace Freelance.ProjectManagement.Application.Mappings;
 
 public static class ProjectMappings
 {
-    public static ProjectDto ToDto(this Project project)
+    extension(Project project)
     {
-        return new ProjectDto(
+        public ProjectDto ToDto() => new(
             project.Id,
             project.Title,
             project.Description,
@@ -22,19 +22,20 @@ public static class ProjectMappings
             project.Budget.Currency);
     }
 
-    public static List<ProjectDto> ToDtos(this IEnumerable<Project> projects)
+    extension(IEnumerable<Project> projects)
     {
-        return [.. projects.Select(p => p.ToDto())];
+        public List<ProjectDto> ToDtos() => [.. projects.Select(p => p.ToDto())];
     }
 
-
-    public static CreateProjectCommand ToCreateCommand(this CreateProjectRequest request)
+    extension(CreateProjectRequest request)
     {
-        return new CreateProjectCommand(request.Title, request.Description, request.Deadline, request.Amount, request.Currency, request.Technologies);
+        public CreateProjectCommand ToCreateCommand() =>
+            new(request.Title, request.Description, request.Deadline, request.Amount, request.Currency, request.Technologies);
     }
 
-    public static UpdateProjectCommand ToUpdateCommand(this UpdateProjectRequest request, Guid Id)
+    extension(UpdateProjectRequest request)
     {
-        return new UpdateProjectCommand(Id,request.Title, request.Description, request.Deadline, request.Amount, request.Currency, request.Technologies);
+        public UpdateProjectCommand ToUpdateCommand(Guid id) =>
+            new(id, request.Title, request.Description, request.Deadline, request.Amount, request.Currency, request.Technologies);
     }
 }

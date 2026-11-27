@@ -1,18 +1,23 @@
-﻿using Freelance.ProjectManagement.Domain.Exceptions;
+using Freelance.ProjectManagement.Domain.Exceptions;
 using Freelance.ProjectManagement.Domain.ValueObjects;
 using Shared.Domain.Common;
 
 namespace Freelance.ProjectManagement.Domain.Entities;
 
-public class ProjectTask : Entity
+public sealed class ProjectTask : Entity
 {
-    private ProjectTask() //for EF core
-    {
+    private readonly List<TimeLog> _timeLogs = [];
 
+    private ProjectTask() // for EF Core
+    {
     }
 
-    private ProjectTask(Guid projectId, string title, string description, ProjectTaskStatus status, ProjectTaskPriority priority)
+    private ProjectTask(Guid projectId, string title, string description, ProjectTaskStatus status,
+        ProjectTaskPriority priority)
     {
+        ArgumentNullException.ThrowIfNull(status);
+        ArgumentNullException.ThrowIfNull(priority);
+
         ProjectId = projectId;
         Title = title;
         Description = description;
@@ -23,48 +28,44 @@ public class ProjectTask : Entity
     public Guid ProjectId { get; private set; }
     public string Title { get; private set; } = string.Empty;
     public string Description { get; private set; } = string.Empty;
-    private readonly List<TimeLog> _timeLogs = [];
     public IReadOnlyCollection<TimeLog> TimeLogs => _timeLogs.AsReadOnly();
+
+    // NOTE: the misspelling is kept on purpose: it is the mapped column name in the existing migrations.
     public Guid FreelacerId { get; private set; }
     public ProjectTaskStatus Status { get; private set; } = ProjectTaskStatus.New;
     public ProjectTaskPriority Priority { get; private set; } = ProjectTaskPriority.Low;
 
-    public static ProjectTask Create(Guid projectId, string title, string description, ProjectTaskStatus status, ProjectTaskPriority priority)
-    {
-        return new ProjectTask(projectId, title, description, status, priority);
-    }
+    public static ProjectTask Create(Guid projectId, string title, string description, ProjectTaskStatus status,
+        ProjectTaskPriority priority) =>
+        new(projectId, title, description, status, priority);
 
     public void AddTimeLog(TimeLog timeLog)
     {
         ArgumentNullException.ThrowIfNull(timeLog);
         _timeLogs.Add(timeLog);
+        UpdatedAt = DateTime.UtcNow;
     }
 
     public void Update(string title, string description, ProjectTaskStatus status, ProjectTaskPriority priority)
     {
+        ArgumentNullException.ThrowIfNull(status);
+        ArgumentNullException.ThrowIfNull(priority);
 
-        if (!string.IsNullOrEmpty(title))
-        {
-            Title= title;
-        }
-        if (!string.IsNullOrEmpty(description))
-        {
-            Description= description;
-        }
+        if (!string.IsNullOrEmpty(title)) Title = title;
+        if (!string.IsNullOrEmpty(description)) Description = description;
         Status = status;
         Priority = priority;
+        UpdatedAt = DateTime.UtcNow;
     }
 
-    public void UpdateTimelog(TimeLog timeLog)
+    public void UpdateTimeLog(Guid timeLogId, DateTime startTime, DateTime endTime)
     {
-        ArgumentNullException.ThrowIfNull(timeLog);
-        var existingTimelog= _timeLogs.FirstOrDefault(x=>x.Id == timeLog.Id);
-        if (existingTimelog == null) throw new TimeLogNotFoundException($"Time log with id {timeLog.Id} can not be found");
-        existingTimelog.Update(timeLog.StartTime, timeLog.EndTime);
+        var timeLog = _timeLogs.Find(x => x.Id == timeLogId)
+                      ?? throw new TimeLogNotFoundException($"Time log with id {timeLogId} can not be found");
+
+        timeLog.Update(startTime, endTime);
+        UpdatedAt = DateTime.UtcNow;
     }
 
-    public void AssignFreelancer(Guid freelancerId)
-    {
-        FreelacerId = freelancerId;
-    }
+    public void AssignFreelancer(Guid freelancerId) => FreelacerId = freelancerId;
 }

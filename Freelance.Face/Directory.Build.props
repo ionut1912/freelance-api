@@ -1,0 +1,13 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <!-- CA1515 (make types internal) conflicts with convention-based discovery (Wolverine handlers, endpoint groups). -->
+    <NoWarn>$(NoWarn);CA1515;CA1848;CA1873</NoWarn>
+    <!-- DlibDotNet also ships a distro-specific centos-x64 RID; the portable linux-x64 asset is used instead. -->
+    <NoWarn>$(NoWarn);NETSDK1206</NoWarn>
+  </PropertyGroup>
+</Project>

@@ -1,5 +1,3 @@
-﻿namespace Freelance.ProjectManagement.Application.Requests;
+namespace Freelance.ProjectManagement.Application.Requests;
 
-public record UpdateTimeLogRequest(Guid TaskId,DateTime StartTime, DateTime EndTime)
-{
-}
+public sealed record UpdateTimeLogRequest(Guid TaskId, DateTime StartTime, DateTime EndTime);

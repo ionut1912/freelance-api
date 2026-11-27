@@ -1,5 +1,5 @@
 ﻿namespace Freelance.UserProfiles.Domain.Exceptions;
 
-public class BioAlreadyExistsException(string message) : Exception(message)
+public sealed class BioAlreadyExistsException(string message) : Exception(message)
 {
 }

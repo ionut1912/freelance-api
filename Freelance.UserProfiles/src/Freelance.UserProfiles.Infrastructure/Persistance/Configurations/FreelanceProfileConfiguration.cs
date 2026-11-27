@@ -1,10 +1,11 @@
 ﻿using Freelance.UserProfiles.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Freelance.UserProfiles.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Freelance.UserProfiles.Infrastructure.Persistance.Configurations;
 
-public class FreelanceProfileConfiguration : BaseProfileConfiguration<FreelancerProfile>
+public sealed class FreelanceProfileConfiguration : BaseProfileConfiguration<FreelancerProfile>
 {
     public override void Configure(EntityTypeBuilder<FreelancerProfile> builder)
     {
@@ -33,7 +34,7 @@ public class FreelanceProfileConfiguration : BaseProfileConfiguration<Freelancer
                 .HasColumnName("Language")
                 .HasMaxLength(100)
                 .IsRequired();
-            fl.HasKey("FreelancerProfileId");
+            fl.HasKey("FreelancerProfileId", nameof(FreelancerForeignLanguage.Language));
             fl.ToTable("FreelancerForeignLanguages");
         });
 

@@ -1,46 +1,31 @@
-﻿using Freelance.Shared.Events.Events;
+using Freelance.Shared.Events.Events;
 using Freelance.UserProfiles.Application.Mediatr.FreelancerProfiles.Commands;
 using Freelance.UserProfiles.Domain.Exceptions;
 using Freelance.UserProfiles.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
-using Shared.Application.Mediator;
-using Shared.Rabbit.Repositories;
 
 namespace Freelance.UserProfiles.Application.Mediatr.FreelancerProfiles.Handlers;
 
-public class VerifyFreelancerProfileCommandHandler : IRequestHandler<VerifyFreelancerProfileCommand, Unit>
+public sealed class VerifyFreelancerProfileCommandHandler(
+    IFreelancerProfileRepository freelancerProfileRepository,
+    ILogger<VerifyFreelancerProfileCommandHandler> logger)
 {
-    private readonly IEventBus _eventBus;
-    private readonly IFreelancerProfileRepository _freelancerProfileRepository;
-    private readonly ILogger<VerifyFreelancerProfileCommandHandler> _logger;
-
-    public VerifyFreelancerProfileCommandHandler(IEventBus eventBus,IFreelancerProfileRepository freelancerProfileRepository,ILogger<VerifyFreelancerProfileCommandHandler> logger)
+    /// <summary>
+    /// Returns the <see cref="VerifyFaceEvent"/> as a Wolverine cascading message: Wolverine publishes it
+    /// through the durable outbox to the Face service queue once the handler succeeds.
+    /// </summary>
+    public async Task<VerifyFaceEvent> Handle(VerifyFreelancerProfileCommand command, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(eventBus, nameof(eventBus));
-        ArgumentNullException.ThrowIfNull(freelancerProfileRepository, nameof(freelancerProfileRepository));
-        ArgumentNullException.ThrowIfNull(logger, nameof(logger));
-        _eventBus = eventBus;
-        _freelancerProfileRepository = freelancerProfileRepository;
-        _logger = logger;
-    }
+        var profile = await freelancerProfileRepository.GetLoggedInFreelancerProfileAsync(command.AccountId, cancellationToken)
+                      ?? throw new ProfileNotFoundException("Freelancer profile not found.");
 
-    public async Task<Unit> Handle(VerifyFreelancerProfileCommand request, CancellationToken cancellationToken = default)
-    {
-        var profile = await _freelancerProfileRepository.GetLoggedInFreelancerProfileAsync(request.AccountId, cancellationToken);
-        if (profile is null)
+        logger.LogInformation("Face verification requested for freelancer profile {ProfileId}", profile.Id);
+        return new VerifyFaceEvent
         {
-            _logger.LogError("Freelancer profile for accountId {AccountId} not found", request.AccountId);
-            throw new ProfileNotFoundException("Freelancer profile not found.");
-        }
-
-        await _eventBus.PublishAsync(new VerifyFaceEvent
-        {
-            InitialImageUrl = profile.Image,
             ProfileId = profile.Id,
-            CompareImageUrl = request.ImageUrl,
-            Role = "Freelancer",
-        });
-
-        return Unit.Value;
+            InitialImageUrl = profile.Image,
+            CompareImageUrl = command.ImageUrl,
+            Role = ProfileRoles.Freelancer
+        };
     }
 }

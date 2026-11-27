@@ -1,92 +1,63 @@
-using ApiGateway.Services;
-using Freelance.ApiGateway.Endponts;
-using Microsoft.IdentityModel.Tokens;
+using Freelance.ApiGateway.Endpoints;
+using Freelance.ApiGateway.Services;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 using Scalar.AspNetCore;
 using Shared.Api.Extensions;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.WebHost.UseUrls("http://+:8080");
-builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-
-var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]!);
-
-builder.Services.AddAuthentication("Bearer")
-    .AddJwtBearer("Bearer", options =>
-    {
-        options.RequireHttpsMetadata = false;
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = jwtSettings["Issuer"],
-            ValidAudience = jwtSettings["Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(key)
-        };
-    });
-
 var configuration = builder.Configuration;
-var otelEndpoint = configuration["OTEL_EXPORTER_OTLP_ENDPOINT"] ?? "http://tempo:4317";
+
 var serviceName = configuration["OTEL_SERVICE_NAME"] ?? "Freelance-Api-Gateway";
-var environmentName = builder.Environment.EnvironmentName ?? "Development";
+var otelEndpoint = configuration["OTEL_EXPORTER_OTLP_ENDPOINT"] ?? "http://tempo:4317";
 var lokiEndpoint = configuration["OTEL_EXPORTER_OTLP_LOGS_ENDPOINT"] ?? "http://loki:3100";
 
-var resourceBuilder = OpenTelemetryExtensions.CreateServiceResourceBuilder(serviceName, environmentName);
-builder.AddOpenTelemetry(lokiEndpoint, resourceBuilder);
-builder.Services.AddOpenTelemetryObservability(otelEndpoint, serviceName);
+builder.AddOpenTelemetry(lokiEndpoint,
+    OpenTelemetryExtensions.CreateServiceResourceBuilder(serviceName, builder.Environment.EnvironmentName));
 
-const string frontendOrigin = "_frontendOrigin";
-var feEnv = Environment.GetEnvironmentVariable("FRONTEND_BASE_URL");
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy(frontendOrigin, policy =>
-    {
-        policy.WithOrigins("https://yourfrontend.com", "http://localhost:3000",feEnv??"test")
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials();
-    });
-});
+const string FrontendCorsPolicy = "frontend";
+string[] allowedOrigins =
+[
+    .. configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [],
+    .. configuration["FRONTEND_BASE_URL"] is { Length: > 0 } frontendUrl ? [frontendUrl] : Array.Empty<string>()
+];
 
-builder.Services.AddAuthorization();
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddHttpClient();
-builder.Services.AddSingleton<OpenApiAggregatorService>();
-builder.Services.AddOcelot(builder.Configuration);
+builder.Services
+    .AddOpenTelemetryObservability(otelEndpoint, serviceName)
+    // Default scheme "Bearer" is the AuthenticationProviderKey used by the Ocelot routes.
+    .AddJwtAuthentication(configuration)
+    .AddAuthorization()
+    .AddCors(options => options.AddPolicy(FrontendCorsPolicy, policy => policy
+        .WithOrigins(allowedOrigins)
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials()))
+    .AddOutputCache(options => options.AddPolicy(OpenApiEndpoints.CachePolicy,
+        policy => policy.Expire(TimeSpan.FromMinutes(1))))
+    .AddOcelot(configuration);
+
+builder.Services.AddHealthChecks();
+builder.Services.AddHttpClient<OpenApiAggregatorService>(client => client.Timeout = TimeSpan.FromSeconds(10));
 
 var app = builder.Build();
 
-app.MapControllers();
-app.MapScalarApiReference(options =>
-{
-    options
-        .WithTitle("Freelance API Gateway")
-        .WithTheme(ScalarTheme.Purple)
-        .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient)
-        .WithOpenApiRoutePattern("/openapi/v1.json");
-});
-
-app.UseCors(frontendOrigin);
-
 app.UseRouting();
+app.UseCors(FrontendCorsPolicy);
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseOutputCache();
 
-app.MapOpenApiEndpoints();
+app.MapAggregatedOpenApi();
+app.MapHealthChecks("/healthz");
+app.MapScalarApiReference(options => options
+    .WithTitle("Freelance API Gateway")
+    .WithTheme(ScalarTheme.Purple)
+    .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient)
+    .WithOpenApiRoutePattern(OpenApiEndpoints.DocumentPath));
 
-app.UseWhen(
-    context => !context.Request.Path.StartsWithSegments("/scalar") &&
-               !context.Request.Path.StartsWithSegments("/openapi"),
-    appBuilder =>
-    {
-        appBuilder.UseOcelot().Wait();
-    });
+// Gateway endpoints (OpenAPI, Scalar, health) run here; any other request falls through to Ocelot,
+// which is terminal middleware.
+app.UseEndpoints(static _ => { });
+await app.UseOcelot();
 
-app.Run();
+await app.RunAsync();

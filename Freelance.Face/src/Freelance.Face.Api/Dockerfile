@@ -1,9 +1,10 @@
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 ARG APP_UID=0
 USER root
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y \
+# Native dependencies of DlibDotNet.
+RUN apt-get update && apt-get install -y --no-install-recommends \
     libglib2.0-0 \
     libgl1 \
     libsm6 \
@@ -17,13 +18,12 @@ USER ${APP_UID}
 EXPOSE 8080
 EXPOSE 8081
 
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
+ARG NUGET_AUTH_TOKEN
 WORKDIR /src
 
-COPY ["models","./models"]
-COPY ["nuget.config", "."]
-
+COPY ["nuget.config", "Directory.Build.props", "Directory.Packages.props", "./"]
 COPY ["src/Freelance.Face.Api/Freelance.Face.Api.csproj", "src/Freelance.Face.Api/"]
 COPY ["src/Freelance.Face.Application/Freelance.Face.Application.csproj", "src/Freelance.Face.Application/"]
 COPY ["src/Freelance.Face.Domain/Freelance.Face.Domain.csproj", "src/Freelance.Face.Domain/"]
@@ -33,11 +33,11 @@ RUN dotnet restore "./src/Freelance.Face.Api/Freelance.Face.Api.csproj"
 
 COPY . .
 WORKDIR "/src/src/Freelance.Face.Api"
-RUN dotnet build "./Freelance.Face.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "./Freelance.Face.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build --no-restore
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Freelance.Face.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./Freelance.Face.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false --no-restore
 
 FROM base AS final
 ARG APP_UID=0
@@ -50,5 +50,4 @@ COPY ["models","./models"]
 RUN chmod -R a+rX /app/models
 USER ${APP_UID}
 
-ENV ASPNETCORE_URLS=http://+:8080
 ENTRYPOINT ["dotnet", "Freelance.Face.Api.dll"]

@@ -1,47 +1,31 @@
-﻿using Freelance.Shared.Events.Events;
+using Freelance.Shared.Events.Events;
 using Freelance.UserProfiles.Application.Mediatr.ClientProfiles.Commands;
 using Freelance.UserProfiles.Domain.Exceptions;
 using Freelance.UserProfiles.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
-using Shared.Application.Mediator;
-using Shared.Rabbit.Repositories;
 
 namespace Freelance.UserProfiles.Application.Mediatr.ClientProfiles.Handlers;
 
-public class VerifyClientProfileCommandHandler : IRequestHandler<VerifyClientProfileCommand, Unit>
+public sealed class VerifyClientProfileCommandHandler(
+    IClientProfileRepository clientProfileRepository,
+    ILogger<VerifyClientProfileCommandHandler> logger)
 {
-    private readonly IEventBus _eventBus;
-    private readonly IClientProfileRepository _clientProfileRepository;
-    private readonly ILogger<VerifyClientProfileCommandHandler> _logger;
-
-    public VerifyClientProfileCommandHandler(IEventBus eventBus,IClientProfileRepository clientProfileRepository,ILogger<VerifyClientProfileCommandHandler> logger)
+    /// <summary>
+    /// Returns the <see cref="VerifyFaceEvent"/> as a Wolverine cascading message: Wolverine publishes it
+    /// through the durable outbox to the Face service queue once the handler succeeds.
+    /// </summary>
+    public async Task<VerifyFaceEvent> Handle(VerifyClientProfileCommand command, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(eventBus, nameof(eventBus));
-        ArgumentNullException.ThrowIfNull(clientProfileRepository, nameof(clientProfileRepository));
-        ArgumentNullException.ThrowIfNull(logger, nameof(logger));
-        _eventBus = eventBus;
-        _clientProfileRepository = clientProfileRepository;
-        _logger = logger;
-    }
+        var profile = await clientProfileRepository.GetLoggedInClientProfileAsync(command.AccountId, cancellationToken)
+                      ?? throw new ProfileNotFoundException("Client profile not found.");
 
-    public async Task<Unit> Handle(VerifyClientProfileCommand request, CancellationToken cancellationToken = default)
-    {
-           var profile = await _clientProfileRepository.GetLoggedInClientProfileAsync(request.AccountId, cancellationToken);
-            if (profile is null)
-            {
-                _logger.LogError("Client profile for accountId {AccountId} not found", request.AccountId);
-            throw new ProfileNotFoundException("Client profile not found.");
-            }
-            await _eventBus.PublishAsync(new VerifyFaceEvent
-            {
-                InitialImageUrl = profile.Image,
-                ProfileId = profile.Id,
-                CompareImageUrl = request.ImageUrl,
-                Role = "Client",
-            });
-      
-        
-
-        return Unit.Value;
+        logger.LogInformation("Face verification requested for client profile {ProfileId}", profile.Id);
+        return new VerifyFaceEvent
+        {
+            ProfileId = profile.Id,
+            InitialImageUrl = profile.Image,
+            CompareImageUrl = command.ImageUrl,
+            Role = ProfileRoles.Client
+        };
     }
 }

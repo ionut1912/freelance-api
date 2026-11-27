@@ -1,45 +1,49 @@
-﻿using Freelance.Identity.Domain.Entities;
-using Freelance.Identity.Domain.interfaces;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Freelance.Identity.Domain.Entities;
+using Freelance.Identity.Domain.interfaces;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
+using Shared.Infra.Settings;
 
 namespace Freelance.Identity.Infrastructure.Persistance.Repositories;
 
-public class JwtTokenService : IJwtTokenService
+/// <summary>
+/// Issues HMAC-SHA256 signed JWTs using <see cref="JsonWebTokenHandler"/> (the modern, faster replacement
+/// for <c>JwtSecurityTokenHandler</c>).
+/// </summary>
+public sealed class JwtTokenService(IOptions<JwtSettings> options, TimeProvider timeProvider) : IJwtTokenService
 {
-    private readonly IConfiguration _configuration;
-
-    public JwtTokenService(IConfiguration configuration)
-    {
-        _configuration = configuration;
-    }
+    private static readonly TimeSpan TokenLifetime = TimeSpan.FromHours(2);
+    private static readonly JsonWebTokenHandler TokenHandler = new();
 
     public string GenerateToken(Account account)
     {
-        var jwtSettings = _configuration.GetSection("JwtSettings");
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]!));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        ArgumentNullException.ThrowIfNull(account);
 
-        var claims = new List<Claim>
+        var settings = options.Value;
+        var now = timeProvider.GetUtcNow().UtcDateTime;
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.Key));
+
+        var descriptor = new SecurityTokenDescriptor
         {
-            new(JwtRegisteredClaimNames.Sub, account.Id.ToString()),
-            new(ClaimTypes.Name, account.Username),
-            new(JwtRegisteredClaimNames.Email, account.Email),
-            new(ClaimTypes.Role, account.Role.Value),
-            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            Issuer = settings.Issuer,
+            Audience = settings.Audience,
+            IssuedAt = now,
+            NotBefore = now,
+            Expires = now.Add(TokenLifetime),
+            SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256),
+            Claims = new Dictionary<string, object>
+            {
+                [JwtRegisteredClaimNames.Sub] = account.Id.ToString(),
+                [ClaimTypes.Name] = account.Username,
+                [JwtRegisteredClaimNames.Email] = account.Email,
+                [ClaimTypes.Role] = account.Role.Value,
+                [JwtRegisteredClaimNames.Jti] = Guid.NewGuid().ToString()
+            }
         };
 
-        var token = new JwtSecurityToken(
-            jwtSettings["Issuer"],
-            jwtSettings["Audience"],
-            claims,
-            expires: DateTime.UtcNow.AddHours(2),
-            signingCredentials: creds
-        );
-
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        return TokenHandler.CreateToken(descriptor);
     }
 }

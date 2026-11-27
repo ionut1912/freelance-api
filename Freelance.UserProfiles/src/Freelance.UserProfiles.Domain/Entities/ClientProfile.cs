@@ -1,8 +1,8 @@
-﻿namespace Freelance.UserProfiles.Domain.Entities;
+namespace Freelance.UserProfiles.Domain.Entities;
 
-public class ClientProfile : BaseUserProfile
+public sealed class ClientProfile : BaseUserProfile
 {
-    private ClientProfile()
+    private ClientProfile() // for EF Core
     {
     }
 
@@ -13,9 +13,6 @@ public class ClientProfile : BaseUserProfile
     }
 
     public static ClientProfile Create(Guid accountId, string street, string city, string state, string zipCode,
-        string country,
-        string streetNumber, string bio, string image)
-    {
-        return new ClientProfile(accountId, street, city, state, zipCode, country, streetNumber, bio, image);
-    }
+        string country, string streetNumber, string bio, string image) =>
+        new(accountId, street, city, state, zipCode, country, streetNumber, bio, image);
 }

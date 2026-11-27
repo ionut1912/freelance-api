@@ -3,7 +3,7 @@ using Freelance.Identity.Application.Mediatr.Accounts.Commands;
 
 namespace Freelance.Identity.Application.Validators;
 
-public class BlockAccountCommandValidator : AbstractValidator<BlockAccountCommand>
+public sealed class BlockAccountCommandValidator : AbstractValidator<BlockAccountCommand>
 {
     public BlockAccountCommandValidator()
     {

@@ -1,114 +1,102 @@
-﻿using Freelance.UserProfiles.Application.Mappings;
+using Freelance.UserProfiles.Application.Dtos;
+using Freelance.UserProfiles.Application.Mappings;
 using Freelance.UserProfiles.Application.Mediatr.FreelancerProfiles.Commands;
 using Freelance.UserProfiles.Application.Mediatr.FreelancerProfiles.Queies;
 using Freelance.UserProfiles.Application.Requests;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Shared.Api.Endpoints;
 using Shared.Api.Extensions;
-using Shared.Api.Infrastructure;
-using Shared.Application.Mediator;
+using Wolverine;
 
 namespace Freelance.UserProfiles.Api.Endpoints;
 
-public class FreelancerProfileEndpointGroup : EndpointGroup
+public sealed class FreelancerProfileEndpointGroup : EndpointGroup
 {
-    public override void Map(IEndpointRouteBuilder endpoints)
+    public override void Map(IEndpointRouteBuilder app)
     {
-        var group = endpoints.MapGroup(this);
+        // Explicit prefix: it is part of the public contract routed by the API gateway (/freelancer-profiles/*).
+        var group = app.MapGroup("/freelancer-profiles").WithTags("Freelancer Profile").RequireAuthorization();
+        var freelancers = group.MapGroup(string.Empty).RequireAuthorization(AuthorizationPolicies.FreelancerOnly);
 
-        group.MapPost(CreateFreelancerProfileAsync);
-        group.MapGet(GetFreelancersProfilesAsync);
-        group.MapGet(GetCurrentFreelancerProfileAsync, "/current");
-        group.MapPut(UpdateFreelancerDetailsAsync, "/details/{id:guid}");
-        group.MapPut(UpdateFreelancerAddressAsync, "/address/{id:guid}");
-        group.MapPut(UpdateFreelancerDataAsync, "/data/{id:guid}");
-        group.MapPut(UpdateFreelancerRatingAsync, "/rating/{id:guid}");
-        group.MapPut(VerifyFreelancerProfile, "/verify");
-        group.MapDelete(DeleteFreelancerProfileAsync, "/{id:guid}");
+        group.MapGet("", GetFreelancersProfiles).WithName(nameof(GetFreelancersProfiles));
+        group.MapPut("/rating/{id:guid}", UpdateFreelancerRating).WithName(nameof(UpdateFreelancerRating))
+            .RequireAuthorization(AuthorizationPolicies.ClientOnly);
+
+        freelancers.MapPost("", CreateFreelancerProfile).WithName(nameof(CreateFreelancerProfile));
+        freelancers.MapGet("/current", GetCurrentFreelancerProfile).WithName(nameof(GetCurrentFreelancerProfile));
+        freelancers.MapPut("/details/{id:guid}", UpdateFreelancerDetails).WithName(nameof(UpdateFreelancerDetails));
+        freelancers.MapPut("/address/{id:guid}", UpdateFreelancerAddress).WithName(nameof(UpdateFreelancerAddress));
+        freelancers.MapPut("/data/{id:guid}", UpdateFreelancerData).WithName(nameof(UpdateFreelancerData));
+        freelancers.MapPut("/verify", VerifyFreelancerProfile).WithName(nameof(VerifyFreelancerProfile));
+        freelancers.MapDelete("/{id:guid}", DeleteFreelancerProfile).WithName(nameof(DeleteFreelancerProfile));
     }
 
-    [Authorize(Policy = "FreelancerOnly")]
-    private static async Task<IResult> CreateFreelancerProfileAsync(IMediator mediator, HttpContext httpContext,
-        CreateFreelancerProfileRequest createFreelancerProfileRequest, CancellationToken ct)
+    private static async Task<Results<Created<FreelancerProfileDto>, UnauthorizedHttpResult>> CreateFreelancerProfile(
+        CreateFreelancerProfileRequest request, HttpContext httpContext, IMessageBus bus, CancellationToken ct)
     {
         var accountId = httpContext.GetAccountId();
-        if (accountId == Guid.Empty) return Results.Unauthorized();
+        if (accountId == Guid.Empty) return TypedResults.Unauthorized();
 
-        var createFreelancerProfileCommand = createFreelancerProfileRequest.ToCreateCommand(accountId);
-        var createdFreelancerProfile = await mediator.Send(createFreelancerProfileCommand, ct);
-        return Results.Created($"/api/freelancer-profiles/{createdFreelancerProfile.Id}",
-            createdFreelancerProfile);
+        var created = await bus.InvokeAsync<FreelancerProfileDto>(request.ToCreateCommand(accountId), ct);
+        return TypedResults.Created($"/freelancer-profiles/{created.Id}", created);
     }
 
-    [Authorize]
-    private static async Task<IResult> GetFreelancersProfilesAsync(IMediator mediator, CancellationToken ct)
-    {
-        var freelancers = await mediator.Send(new GetFreelancerProfilesQuery(), ct);
-        return Results.Ok(freelancers);
-    }
+    private static async Task<Ok<List<FreelancerProfileDto>>> GetFreelancersProfiles(IMessageBus bus,
+        CancellationToken ct) =>
+        TypedResults.Ok(await bus.InvokeAsync<List<FreelancerProfileDto>>(new GetFreelancerProfilesQuery(), ct));
 
-    [Authorize(Policy = "FreelancerOnly")]
-    private static async Task<IResult> GetCurrentFreelancerProfileAsync(IMediator mediator, HttpContext httpContext, CancellationToken ct)
+    private static async Task<Results<Ok<FreelancerProfileDto>, UnauthorizedHttpResult>> GetCurrentFreelancerProfile(
+        HttpContext httpContext, IMessageBus bus, CancellationToken ct)
     {
         var accountId = httpContext.GetAccountId();
-        if (accountId == Guid.Empty) return Results.Unauthorized();
+        if (accountId == Guid.Empty) return TypedResults.Unauthorized();
 
-        var getCurrentFreelancerQuery = new GetLoggedInFreelancerProfileQuery(accountId);
-        var currentFreelancer = await mediator.Send(getCurrentFreelancerQuery, ct);
-        return Results.Ok(currentFreelancer);
+        return TypedResults.Ok(
+            await bus.InvokeAsync<FreelancerProfileDto>(new GetLoggedInFreelancerProfileQuery(accountId), ct));
     }
 
-    [Authorize(Policy = "FreelancerOnly")]
-    private static async Task<IResult> UpdateFreelancerDetailsAsync(IMediator mediator, Guid id,
-        [FromBody] UpdateFreelancerDetailRequest updateFreelancerDetailRequest, CancellationToken ct)
+    private static async Task<NoContent> UpdateFreelancerDetails(Guid id, UpdateFreelancerDetailRequest request,
+        IMessageBus bus, CancellationToken ct)
     {
-        var updateFreelancerDetailsCommand = updateFreelancerDetailRequest.ToUpdateDetailsCommand(id);
-        await mediator.Send(updateFreelancerDetailsCommand, ct);
-        return Results.NoContent();
+        await bus.InvokeAsync(request.ToUpdateDetailsCommand(id), ct);
+        return TypedResults.NoContent();
     }
 
-    [Authorize(Policy = "FreelancerOnly")]
-    private static async Task<IResult> UpdateFreelancerAddressAsync(IMediator mediator, Guid id,
-        [FromBody] UpdateProfileAddressRequest updateProfileAddressRequest, CancellationToken ct)
+    private static async Task<NoContent> UpdateFreelancerAddress(Guid id, UpdateProfileAddressRequest request,
+        IMessageBus bus, CancellationToken ct)
     {
-        var updateFreelancerAddressCommand = updateProfileAddressRequest.ToUpdateFreelancerAddressCommand(id);
-        await mediator.Send(updateFreelancerAddressCommand, ct);
-        return Results.NoContent();
+        await bus.InvokeAsync(request.ToUpdateFreelancerAddressCommand(id), ct);
+        return TypedResults.NoContent();
     }
 
-    [Authorize(Policy = "FreelancerOnly")]
-    private static async Task<IResult> UpdateFreelancerDataAsync(IMediator mediator, Guid id,
-        [FromBody] UpdateProfileDataRequest updateProfileDataRequest, CancellationToken ct)
+    private static async Task<NoContent> UpdateFreelancerData(Guid id, UpdateProfileDataRequest request,
+        IMessageBus bus, CancellationToken ct)
     {
-        var updateFreelancerDataCommand = updateProfileDataRequest.ToUpdateFreelancerDataCommand(id);
-        await mediator.Send(updateFreelancerDataCommand, ct);
-        return Results.NoContent();
+        await bus.InvokeAsync(request.ToUpdateFreelancerDataCommand(id), ct);
+        return TypedResults.NoContent();
     }
 
-    [Authorize(Policy = "ClientOnly")]
-    private static async Task<IResult> UpdateFreelancerRatingAsync(IMediator mediator, Guid id,
-        [FromBody] UpdateFreelancerProfileRatingRequest updateFreelancerProfileRatingRequest, CancellationToken ct)
+    private static async Task<NoContent> UpdateFreelancerRating(Guid id, UpdateFreelancerProfileRatingRequest request,
+        IMessageBus bus, CancellationToken ct)
     {
-        var updateFreelancerRatingCommand = updateFreelancerProfileRatingRequest.ToUpdateRatingCommand(id);
-        await mediator.Send(updateFreelancerRatingCommand, ct);
-        return Results.NoContent();
+        await bus.InvokeAsync(request.ToUpdateRatingCommand(id), ct);
+        return TypedResults.NoContent();
     }
 
-    [Authorize(Policy = "FreelancerOnly")]
-    private static async Task<IResult> DeleteFreelancerProfileAsync(IMediator mediator, Guid id, CancellationToken ct)
+    private static async Task<NoContent> DeleteFreelancerProfile(Guid id, IMessageBus bus, CancellationToken ct)
     {
-        var deleteFreelancerProfileCommand = new DeleteFreelancerProfileCommand(id);
-        await mediator.Send(deleteFreelancerProfileCommand, ct);
-        return Results.NoContent();
+        await bus.InvokeAsync(new DeleteFreelancerProfileCommand(id), ct);
+        return TypedResults.NoContent();
     }
 
-    [Authorize(Policy = "FreelancerOnly")]
-    private static async Task<IResult> VerifyFreelancerProfile(IMediator mediator,VerifyProfileRequest verifyProfileRequest,HttpContext httpContext, CancellationToken ct)
+    /// <summary>Starts an asynchronous face verification; the result arrives later through RabbitMQ.</summary>
+    private static async Task<Results<NoContent, UnauthorizedHttpResult>> VerifyFreelancerProfile(
+        VerifyProfileRequest request, HttpContext httpContext, IMessageBus bus, CancellationToken ct)
     {
         var accountId = httpContext.GetAccountId();
-        if (accountId == Guid.Empty) return Results.Unauthorized();
-        var verifyFreelancerCommand = verifyProfileRequest.ToVerifyFreelancerCommand(accountId);
-        await mediator.Send(verifyFreelancerCommand, ct);
-        return Results.NoContent();
+        if (accountId == Guid.Empty) return TypedResults.Unauthorized();
+
+        await bus.InvokeAsync(request.ToVerifyFreelancerCommand(accountId), ct);
+        return TypedResults.NoContent();
     }
 }

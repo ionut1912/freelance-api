@@ -1,5 +1,3 @@
-﻿namespace Freelance.Identity.Domain.Exceptions;
+namespace Freelance.Identity.Domain.Exceptions;
 
-public class AccountBlockedException(string message) : Exception(message)
-{
-}
+public class AccountBlockedException(string message) : Exception(message);

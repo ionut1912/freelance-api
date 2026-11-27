@@ -1,81 +1,70 @@
-﻿using Freelance.Identity.Application.Mediatr.Accounts.Commands;
-using Freelance.Identity.Application.Mediatr.Accounts.Query;
-using Microsoft.AspNetCore.Authorization;
-using Shared.Api.Extensions;
-using Shared.Api.Infrastructure;
-using Shared.Application.Mediator;
 using System.Security.Claims;
+using Freelance.Identity.Application.Dtos;
+using Freelance.Identity.Application.Mediatr.Accounts.Commands;
+using Freelance.Identity.Application.Mediatr.Accounts.Query;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Shared.Api.Endpoints;
+using Shared.Api.Extensions;
+using Wolverine;
 
 namespace Freelance.Identity.Api.Endpoints;
 
-public class UserEndpointGroup : EndpointGroup
+public sealed class UserEndpointGroup : EndpointGroup
 {
-    public override void Map(IEndpointRouteBuilder endpoints)
+    public override void Map(IEndpointRouteBuilder app)
     {
-        var group = endpoints.MapGroup(this);
-        group.MapPost(RegisterUser, "/register");
-        group.MapPost(LoginUser, "/login");
-        group.MapPut(BlockUserAccount, "/block");
-        group.MapGet(GetCurrentUser, "/current");
-        group.MapPut(UnblockUserAccount, "/unblock");
-        group.MapDelete(DeleteUserAccount, "/");
+        // Explicit prefix: it is part of the public contract routed by the API gateway (/auth/*).
+        var group = app.MapGroup("/auth").WithTags("Auth");
+
+        group.MapPost("/register", RegisterUser).WithName(nameof(RegisterUser)).AllowAnonymous();
+        group.MapPost("/login", LoginUser).WithName(nameof(LoginUser)).AllowAnonymous();
+
+        var authenticated = group.MapGroup(string.Empty).RequireAuthorization();
+        authenticated.MapGet("/current", GetCurrentUser).WithName(nameof(GetCurrentUser));
+        authenticated.MapPut("/block", BlockUserAccount).WithName(nameof(BlockUserAccount));
+        authenticated.MapPut("/unblock", UnblockUserAccount).WithName(nameof(UnblockUserAccount));
+        authenticated.MapDelete("/", DeleteUserAccount).WithName(nameof(DeleteUserAccount));
     }
 
-    private static async Task<IResult> RegisterUser(IMediator mediator, CreateAccountCommand createAccountCommand,
+    private static async Task<Created<AccountDto>> RegisterUser(CreateAccountCommand command, IMessageBus bus,
         CancellationToken ct)
     {
-        var createdAccount = await mediator.Send(createAccountCommand, ct);
-        return Results.Created($"/api/auth/{createdAccount.Id}", createdAccount);
+        var account = await bus.InvokeAsync<AccountDto>(command, ct);
+        return TypedResults.Created($"/auth/{account.Id}", account);
     }
 
-    private static async Task<IResult> LoginUser(IMediator mediator, LoginQuery loginQuery,
-        CancellationToken ct)
+    private static async Task<Ok<AccountDto>> LoginUser(LoginQuery query, IMessageBus bus, CancellationToken ct) =>
+        TypedResults.Ok(await bus.InvokeAsync<AccountDto>(query, ct));
+
+    private static async Task<Results<Ok<AccountDto>, UnauthorizedHttpResult>> GetCurrentUser(HttpContext httpContext,
+        IMessageBus bus, CancellationToken ct)
     {
-        var result = await mediator.Send(loginQuery, ct);
-        return Results.Ok(result);
+        var username = httpContext.User.FindFirstValue(ClaimTypes.Name);
+        if (string.IsNullOrEmpty(username)) return TypedResults.Unauthorized();
+
+        return TypedResults.Ok(await bus.InvokeAsync<AccountDto>(new GetCurrentAccountQuery(username), ct));
     }
 
-    [Authorize]
-    private static async Task<IResult> BlockUserAccount(IMediator mediator, HttpContext httpContext, CancellationToken ct)
-    {
-        var accountId = httpContext.GetAccountId();
-        if (accountId == Guid.Empty) return Results.Unauthorized();
+    private static Task<Results<NoContent, UnauthorizedHttpResult>> BlockUserAccount(HttpContext httpContext,
+        IMessageBus bus, CancellationToken ct) =>
+        SendForCurrentAccount(httpContext, bus, id => new BlockAccountCommand(id), ct);
 
-        var blockAccountCommand = new BlockAccountCommand(accountId);
-        await mediator.Send(blockAccountCommand, ct);
-        return Results.NoContent();
-    }
+    private static Task<Results<NoContent, UnauthorizedHttpResult>> UnblockUserAccount(HttpContext httpContext,
+        IMessageBus bus, CancellationToken ct) =>
+        SendForCurrentAccount(httpContext, bus, id => new UnblockAccountCommand(id), ct);
 
-    [Authorize]
-    private static async Task<IResult> GetCurrentUser(IMediator mediator, HttpContext httpContext, CancellationToken ct)
-    {
-        var username = httpContext.User.FindFirst(ClaimTypes.Name)?.Value;
-        if (string.IsNullOrEmpty(username)) return Results.Unauthorized();
+    private static Task<Results<NoContent, UnauthorizedHttpResult>> DeleteUserAccount(HttpContext httpContext,
+        IMessageBus bus, CancellationToken ct) =>
+        SendForCurrentAccount(httpContext, bus, id => new DeleteAccountCommand(id), ct);
 
-        var currentUserQuery = new GetCurrentAccountQuery(username);
-        var result = await mediator.Send(currentUserQuery, ct);
-        return Results.Ok(result);
-    }
-
-    [Authorize]
-    private static async Task<IResult> UnblockUserAccount(IMediator mediator, HttpContext httpContext, CancellationToken ct)
+    private static async Task<Results<NoContent, UnauthorizedHttpResult>> SendForCurrentAccount<TCommand>(
+        HttpContext httpContext, IMessageBus bus, Func<Guid, TCommand> createCommand, CancellationToken ct)
+        where TCommand : notnull
     {
         var accountId = httpContext.GetAccountId();
-        if (accountId == Guid.Empty) return Results.Unauthorized();
+        if (accountId == Guid.Empty) return TypedResults.Unauthorized();
 
-        var unblockAccountCommand = new UnblockAccountCommand(accountId);
-        await mediator.Send(unblockAccountCommand, ct);
-        return Results.NoContent();
-    }
-
-    [Authorize]
-    private static async Task<IResult> DeleteUserAccount(IMediator mediator, HttpContext httpContext, CancellationToken ct)
-    {
-        var accountId = httpContext.GetAccountId();
-        if (accountId == Guid.Empty) return Results.Unauthorized();
-
-        var deleteAccountCommand = new DeleteAccountCommand(accountId);
-        await mediator.Send(deleteAccountCommand, ct);
-        return Results.NoContent();
+        await bus.InvokeAsync(createCommand(accountId), ct);
+        return TypedResults.NoContent();
     }
 }

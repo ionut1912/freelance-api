@@ -1,27 +1,24 @@
-﻿using Shared.Domain.Common;
+using Shared.Domain.Common;
 
 namespace Freelance.ProjectManagement.Domain.ValueObjects;
 
-public class ProjectTechnology : ValueObject
+public sealed class ProjectTechnology : ValueObject
 {
-    private ProjectTechnology()
+    private ProjectTechnology() // for EF Core
     {
-
     }
 
     public ProjectTechnology(string technology)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(technology);
         Technology = technology;
     }
 
-    public string Technology { get; }=string.Empty;
+    public string Technology { get; } = string.Empty;
 
-    public static ProjectTechnology Create(string technology)
-    {
-        return new ProjectTechnology(technology);
-    }
+    public static ProjectTechnology Create(string technology) => new(technology);
 
-    protected override IEnumerable<object> GetEqualityComponents()
+    protected override IEnumerable<object?> GetEqualityComponents()
     {
         yield return Technology;
     }

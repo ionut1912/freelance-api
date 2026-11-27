@@ -1,45 +1,26 @@
-﻿using Freelance.UserProfiles.Application.Mediatr.FreelancerProfiles.Commands;
-using Freelance.UserProfiles.Domain.Entities;
+using Freelance.UserProfiles.Application.Mediatr.FreelancerProfiles.Commands;
 using Freelance.UserProfiles.Domain.Exceptions;
 using Freelance.UserProfiles.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
-using Shared.Application.Mediator;
 using Shared.Domain.Interfaces;
-using System.Text.Json;
 
 namespace Freelance.UserProfiles.Application.Mediatr.FreelancerProfiles.Handlers;
 
-public class UpdateFreelancerProfileAddressCommandHandler : IRequestHandler<UpdateFreelancerProfileAddressCommand, Unit>
+public sealed class UpdateFreelancerProfileAddressCommandHandler(
+    IFreelancerProfileRepository freelancerProfileRepository,
+    IUnitOfWork unitOfWork,
+    ILogger<UpdateFreelancerProfileAddressCommandHandler> logger)
 {
-    private readonly IFreelancerProfileRepository _freelancerProfileRepository;
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly ILogger<UpdateFreelancerProfileAddressCommandHandler> _logger;
-
-    public UpdateFreelancerProfileAddressCommandHandler(IFreelancerProfileRepository freelancerProfileRepository, IUnitOfWork unitOfWork,ILogger<UpdateFreelancerProfileAddressCommandHandler> logger)
+    public async Task Handle(UpdateFreelancerProfileAddressCommand command, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(freelancerProfileRepository, nameof(freelancerProfileRepository));
-        ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));
-        ArgumentNullException.ThrowIfNull(logger,nameof(logger));
-        _unitOfWork = unitOfWork;
-        _freelancerProfileRepository = freelancerProfileRepository;
-        _logger = logger;
-    }
+        var profile = await freelancerProfileRepository.GetByIdWithTrackingAsync(command.Id, cancellationToken)
+                      ?? throw new ProfileNotFoundException($"Profile with id {command.Id} not found");
 
-    public async Task<Unit> Handle(UpdateFreelancerProfileAddressCommand request, CancellationToken cancellationToken)
-    {
-        var freelancerProfile =
-            await _freelancerProfileRepository.GetByIdAsync(request.Id, cancellationToken, s => s.Skills, fL => fL.ForeignLanguages);
-        if (freelancerProfile is null)
-        {
-            _logger.LogError("Profile with id {ProfileId} not found", request.Id);
-            throw new ProfileNotFoundException($"Profile with id {request.Id} not found");
-        }
+        var address = command.AddressDto;
+        profile.UpdateAddress(address.Street, address.City, address.State, address.ZipCode, address.Country,
+            address.StreetNumber);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        freelancerProfile.UpdateAddress(request.AddressDto.Street, request.AddressDto.City, request.AddressDto.State,
-            request.AddressDto.ZipCode, request.AddressDto.Country, request.AddressDto.StreetNumber);
-        _freelancerProfileRepository.Update(freelancerProfile);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-        _logger.LogInformation("Profile with id {ProfileId} updated successfully, {newAddress}", request.Id, JsonSerializer.Serialize(freelancerProfile.Address, new JsonSerializerOptions { WriteIndented = true }));
-        return Unit.Value;
+        logger.LogInformation("Address of freelancer profile {ProfileId} was updated", command.Id);
     }
 }

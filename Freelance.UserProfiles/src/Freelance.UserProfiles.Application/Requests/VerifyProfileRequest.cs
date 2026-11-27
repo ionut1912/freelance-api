@@ -1,6 +1,6 @@
 ﻿
 namespace Freelance.UserProfiles.Application.Requests;
 
-public record VerifyProfileRequest(string ImageUrl)
+public sealed record VerifyProfileRequest(string ImageUrl)
 {
 }

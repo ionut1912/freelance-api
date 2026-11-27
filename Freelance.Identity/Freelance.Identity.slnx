@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="src/Freelance.Identity.Api/Freelance.Identity.Api.csproj" />
+  <Project Path="src/Freelance.Identity.Application/Freelance.Identity.Application.csproj" />
+  <Project Path="src/Freelance.Identity.Domain/Freelance.Identity.Domain.csproj" />
+  <Project Path="src/Freelance.Identity.Infrastructure/Freelance.Identity.Infrastructure.csproj" />
+</Solution>

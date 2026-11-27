@@ -1,5 +1,3 @@
-﻿namespace Freelance.ProjectManagement.Application.Dtos;
+namespace Freelance.ProjectManagement.Application.Dtos;
 
-public record ProjectTechnologyDto(string Technology)
-{
-}
+public sealed record ProjectTechnologyDto(string Technology);

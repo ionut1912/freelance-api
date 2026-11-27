@@ -1,5 +1,3 @@
-﻿namespace Freelance.ProjectManagement.Application.Requests;
+namespace Freelance.ProjectManagement.Application.Requests;
 
-public record CreateProjectTaskRequest(Guid ProjectId, string Title, string Description, string Status, string Priority)
-{
-}
+public sealed record CreateProjectTaskRequest(Guid ProjectId, string Title, string Description, string Status, string Priority);

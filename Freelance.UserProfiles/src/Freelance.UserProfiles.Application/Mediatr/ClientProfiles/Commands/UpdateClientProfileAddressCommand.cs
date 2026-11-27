@@ -1,7 +1,5 @@
-﻿using Freelance.UserProfiles.Application.Dtos;
-using Shared.Application.Mediator;
+using Freelance.UserProfiles.Application.Dtos;
+
 namespace Freelance.UserProfiles.Application.Mediatr.ClientProfiles.Commands;
 
-public record UpdateClientProfileAddressCommand(Guid Id, AddressDto AddressDto) : IRequest<Unit>
-{
-}
+public sealed record UpdateClientProfileAddressCommand(Guid Id, AddressDto AddressDto);

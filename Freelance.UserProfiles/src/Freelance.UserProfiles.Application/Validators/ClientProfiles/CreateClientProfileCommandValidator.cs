@@ -3,7 +3,7 @@ using Freelance.UserProfiles.Application.Mediatr.ClientProfiles.Commands;
 
 namespace Freelance.UserProfiles.Application.Validators.ClientProfiles;
 
-public class CreateClientProfileCommandValidator : AbstractValidator<CreateClientProfileCommand>
+public sealed class CreateClientProfileCommandValidator : AbstractValidator<CreateClientProfileCommand>
 {
     public CreateClientProfileCommandValidator()
     {

@@ -2,7 +2,7 @@
 
 namespace Freelance.UserProfiles.Application.Requests;
 
-public record CreateFreelancerProfileRequest(AddressDto Address,
+public sealed record CreateFreelancerProfileRequest(AddressDto Address,
     string Bio,
     string Image,
     string Experience,

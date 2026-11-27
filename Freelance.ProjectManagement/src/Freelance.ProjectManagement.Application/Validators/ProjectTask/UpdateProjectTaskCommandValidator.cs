@@ -1,22 +1,21 @@
-﻿using FluentValidation;
+using FluentValidation;
 using Freelance.ProjectManagement.Application.Mediatr.ProjectTasks.Commands;
+using Freelance.ProjectManagement.Domain.ValueObjects;
 
 namespace Freelance.ProjectManagement.Application.Validators.ProjectTask;
 
-public class UpdateProjectTaskCommandValidator:AbstractValidator<UpdateProjectTaskCommand>
+public sealed class UpdateProjectTaskCommandValidator : AbstractValidator<UpdateProjectTaskCommand>
 {
     public UpdateProjectTaskCommandValidator()
     {
-        RuleFor(x => x.ProjectId)
-          .NotEmpty()
-          .WithMessage("Project Id can not be empty");
+        RuleFor(x => x.ProjectId).NotEmpty().WithMessage("Project Id can not be empty");
 
         RuleFor(x => x.Status)
-            .Must(status => status == "New" || status == "InProgress" || status == "Review" || status == "Done")
-            .WithMessage("Status can be only 'New',''InProgress,'Review','Done");
+            .Must(ProjectTaskStatus.IsValid)
+            .WithMessage($"Status can be only {string.Join(", ", ProjectTaskStatus.All.Select(s => $"'{s.Value}'"))}");
 
         RuleFor(x => x.Priority)
-            .Must(priority => priority == "Low" || priority == "Medium" || priority == "High")
-            .WithMessage("Priority can be only 'Low','Medium','High'");
+            .Must(ProjectTaskPriority.IsValid)
+            .WithMessage($"Priority can be only {string.Join(", ", ProjectTaskPriority.All.Select(p => $"'{p.Value}'"))}");
     }
 }

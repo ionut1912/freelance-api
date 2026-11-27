@@ -1,45 +1,49 @@
-﻿using Freelance.ApiGateway.Models;
-using Microsoft.OpenApi.Models;
-using Microsoft.OpenApi.Readers;
-using Microsoft.OpenApi.Writers;
+using Freelance.ApiGateway.Models;
+using Microsoft.OpenApi;
+using Microsoft.OpenApi.Reader;
 
-namespace ApiGateway.Services;
+namespace Freelance.ApiGateway.Services;
 
-public class OpenApiAggregatorService
+/// <summary>
+/// Downloads the OpenAPI documents of every downstream service (in parallel) and merges them into a single
+/// document whose paths are expressed as gateway (upstream) paths. Uses the Microsoft.OpenApi 2.x object model.
+/// </summary>
+public sealed class OpenApiAggregatorService(
+    HttpClient httpClient,
+    IConfiguration configuration,
+    ILogger<OpenApiAggregatorService> logger)
 {
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly IConfiguration _configuration;
-    private readonly ILogger<OpenApiAggregatorService> _logger;
+    private const string BearerSchemeName = "Bearer";
 
-    public OpenApiAggregatorService(
-        IHttpClientFactory httpClientFactory,
-        IConfiguration configuration,
-        ILogger<OpenApiAggregatorService> logger)
+    public async Task<OpenApiDocument> AggregateOpenApiDocsAsync(CancellationToken cancellationToken = default)
     {
-        _httpClientFactory = httpClientFactory;
-        _configuration = configuration;
-        _logger = logger;
-    }
+        var aggregated = CreateBaseDocument();
+        var routes = configuration.GetSection("Routes").Get<List<RouteConfig>>() ?? [];
+        var endpoints = configuration.GetSection("SwaggerEndPoints").Get<List<SwaggerEndPoint>>() ?? [];
 
-    public async Task<OpenApiDocument> AggregateOpenApiDocsAsync()
-    {
-        var aggregatedDoc = CreateBaseDocument();
-        var swaggerEndPoints = GetSwaggerEndPoints();
+        var downloads = endpoints
+            .SelectMany(endpoint => endpoint.Config.Select(config => (endpoint.Key, Config: config)))
+            .Select(async item => (item.Key, item.Config,
+                Document: await FetchOpenApiDocAsync(item.Config, cancellationToken)));
 
-        _logger.LogInformation("Starting to aggregate OpenAPI docs from {Count} swagger endpoints", swaggerEndPoints.Count);
-
-        foreach (var endPoint in swaggerEndPoints)
+        // Merge sequentially, in configuration order, so the result is deterministic.
+        foreach (var (key, config, document) in await Task.WhenAll(downloads))
         {
-            await ProcessEndPointAsync(endPoint, aggregatedDoc);
+            if (document is null) continue;
+
+            logger.LogInformation("Merging {ServiceName} ({PathCount} paths)", config.Name, document.Paths?.Count ?? 0);
+            MergePaths(aggregated, document, key, routes);
+            MergeComponents(aggregated, document);
+            MergeTags(aggregated, document);
         }
 
-        _logger.LogInformation("Aggregation complete. Total paths: {PathCount}", aggregatedDoc.Paths.Count);
-        return aggregatedDoc;
+        logger.LogInformation("OpenAPI aggregation complete: {PathCount} paths", aggregated.Paths.Count);
+        return aggregated;
     }
 
     private OpenApiDocument CreateBaseDocument()
     {
-        return new OpenApiDocument
+        var document = new OpenApiDocument
         {
             Info = new OpenApiInfo
             {
@@ -47,273 +51,91 @@ public class OpenApiAggregatorService
                 Version = "v1",
                 Description = "Combined API documentation from all downstream services"
             },
-            Servers = new List<OpenApiServer>
-            {
-                new OpenApiServer { Url = _configuration["GlobalConfiguration:BaseUrl"] ?? "http://localhost:9000" }
-            },
-            Paths = new OpenApiPaths(),
+            Servers = [new OpenApiServer { Url = configuration["GlobalConfiguration:BaseUrl"] ?? "http://localhost:9000" }],
+            Paths = [],
             Components = new OpenApiComponents
             {
-                SecuritySchemes = new Dictionary<string, OpenApiSecurityScheme>
+                Schemas = new Dictionary<string, IOpenApiSchema>(),
+                SecuritySchemes = new Dictionary<string, IOpenApiSecurityScheme>
                 {
-                    ["Bearer"] = new OpenApiSecurityScheme
+                    [BearerSchemeName] = new OpenApiSecurityScheme
                     {
                         Type = SecuritySchemeType.Http,
                         Scheme = "bearer",
                         BearerFormat = "JWT",
                         Description = "Enter your JWT token"
                     }
-                },
-                Schemas = new Dictionary<string, OpenApiSchema>()
-            }
+                }
+            },
+            Tags = new HashSet<OpenApiTag>()
         };
-    }
 
-    private List<SwaggerEndPoint> GetSwaggerEndPoints()
-    {
-        return _configuration.GetSection("SwaggerEndPoints")
-            .Get<List<SwaggerEndPoint>>() ?? new List<SwaggerEndPoint>();
-    }
-
-    private async Task ProcessEndPointAsync(SwaggerEndPoint endPoint, OpenApiDocument aggregatedDoc)
-    {
-        if (endPoint.Config == null || !endPoint.Config.Any())
-            return;
-
-        foreach (var config in endPoint.Config)
-        {
-            try
-            {
-                _logger.LogInformation("Fetching OpenAPI doc from {ServiceName} at {Url}", config.Name, config.Url);
-                var openApiDoc = await FetchOpenApiDocAsync(config.Url);
-
-                if (openApiDoc != null)
-                {
-                    _logger.LogInformation("Successfully fetched {ServiceName}. Paths: {PathCount}",
-                        config.Name, openApiDoc.Paths?.Count ?? 0);
-
-                    MergeOpenApiDoc(aggregatedDoc, openApiDoc, endPoint.Key);
-                }
-                else
-                {
-                    _logger.LogWarning("Received null document from {ServiceName}", config.Name);
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to fetch OpenAPI doc from {ServiceName} at {Url}",
-                    config.Name, config.Url);
-            }
-        }
-    }
-
-    private async Task<OpenApiDocument?> FetchOpenApiDocAsync(string url)
-    {
-        try
-        {
-            var client = _httpClientFactory.CreateClient();
-            client.Timeout = TimeSpan.FromSeconds(10);
-
-            _logger.LogDebug("Sending request to {Url}", url);
-            var response = await client.GetAsync(url);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                _logger.LogWarning("Failed to fetch OpenAPI doc. Status: {StatusCode}, Url: {Url}",
-                    response.StatusCode, url);
-                return null;
-            }
-
-            var content = await response.Content.ReadAsStringAsync();
-            _logger.LogDebug("Received content length: {Length} bytes", content.Length);
-
-            if (string.IsNullOrWhiteSpace(content))
-            {
-                _logger.LogWarning("Received empty response from {Url}", url);
-                return null;
-            }
-
-            return ParseOpenApiDocument(content, url);
-        }
-        catch (TaskCanceledException ex)
-        {
-            _logger.LogError(ex, "Timeout fetching OpenAPI doc from {Url}", url);
-            return null;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error fetching OpenAPI doc from {Url}", url);
-            return null;
-        }
-    }
-
-    private OpenApiDocument? ParseOpenApiDocument(string content, string url)
-    {
-        using var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(content));
-        var reader = new OpenApiStreamReader();
-        var document = reader.Read(stream, out var diagnostic);
-
-        if (diagnostic?.Errors?.Count > 0)
-        {
-            _logger.LogWarning("OpenAPI document has errors: {Errors}",
-                string.Join(", ", diagnostic.Errors.Select(e => e.Message)));
-        }
-
-        if (document == null)
-        {
-            _logger.LogWarning("Failed to parse OpenAPI document from {Url}", url);
-            return null;
-        }
+        document.Security =
+        [
+            new OpenApiSecurityRequirement { [new OpenApiSecuritySchemeReference(BearerSchemeName, document)] = [] }
+        ];
 
         return document;
     }
 
-    private void MergeOpenApiDoc(OpenApiDocument target, OpenApiDocument source, string swaggerKey)
+    private async Task<OpenApiDocument?> FetchOpenApiDocAsync(SwaggerConfig config, CancellationToken cancellationToken)
     {
-        MergePaths(target, source, swaggerKey);
-        MergeSchemas(target, source);
-        MergeSecuritySchemes(target, source);
-    }
-
-    private  void MergePaths(OpenApiDocument target, OpenApiDocument source, string swaggerKey)
-    {
-        if (source.Paths == null) return;
-
-        var routes = _configuration.GetSection("Routes").Get<List<RouteConfig>>() ?? new List<RouteConfig>();
-
-        foreach (var path in source.Paths)
+        try
         {
-            var newPath = TransformPath(path.Key, swaggerKey, routes);
+            using var response = await httpClient.GetAsync(config.Url, cancellationToken);
+            if (!response.IsSuccessStatusCode)
+            {
+                logger.LogWarning("Failed to fetch OpenAPI doc of {ServiceName}: {StatusCode} ({Url})", config.Name,
+                    response.StatusCode, config.Url);
+                return null;
+            }
 
-            if (!target.Paths.ContainsKey(newPath))
+            await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+            var result = await OpenApiDocument.LoadAsync(stream, OpenApiConstants.Json, new OpenApiReaderSettings(),
+                cancellationToken);
+
+            if (result.Diagnostic?.Errors is { Count: > 0 } errors)
             {
-                target.Paths.Add(newPath, path.Value);
-                _logger.LogDebug("Added path: {Path} (original: {OriginalPath})", newPath, path.Key);
+                logger.LogWarning("OpenAPI doc of {ServiceName} has errors: {Errors}", config.Name,
+                    string.Join(", ", errors.Select(e => e.Message)));
             }
-            else
-            {
-                _logger.LogWarning("Duplicate path found: {Path}", newPath);
-            }
+
+            return result.Document;
         }
-    }
-
-    private static string TransformPath(string originalPath, string swaggerKey, List<RouteConfig> routes)
-    {
-        if (!originalPath.StartsWith("/api/"))
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or OpenApiException)
         {
-            return originalPath;
-        }
-
-        var pathAfterApi = originalPath.Substring(4);
-
-        var matchingRoute = routes.FirstOrDefault(r =>
-            r.SwaggerKey == swaggerKey &&
-            r.DownstreamPathTemplate != null &&
-            PathMatchesTemplate(originalPath, r.DownstreamPathTemplate));
-
-        if (matchingRoute?.UpstreamPathTemplate != null&& matchingRoute?.DownstreamPathTemplate!=null)
-        {
-            return TransformWithTemplate(originalPath, matchingRoute.DownstreamPathTemplate, matchingRoute.UpstreamPathTemplate);
-        }
-
-        return pathAfterApi;
-    }
-
-    private static bool PathMatchesTemplate(string path, string template)
-    {
-        var pathParts = path.Split('/');
-        var templateParts = template.Split('/');
-
-        if (pathParts.Length != templateParts.Length)
-        {
-            return false;
-        }
-
-        for (int i = 0; i < pathParts.Length; i++)
-        {
-            if (templateParts[i].StartsWith("{") && templateParts[i].EndsWith("}"))
-            {
-                continue;
-            }
-
-            if (pathParts[i] != templateParts[i])
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private static string TransformWithTemplate(string originalPath, string downstreamTemplate, string upstreamTemplate)
-    {
-        var pathParts = originalPath.Split('/');
-        var downstreamParts = downstreamTemplate.Split('/');
-        var upstreamParts = upstreamTemplate.Split('/');
-
-        var parameters = new Dictionary<string, string>();
-
-        for (int i = 0; i < downstreamParts.Length; i++)
-        {
-            if (downstreamParts[i].StartsWith("{") && downstreamParts[i].EndsWith("}"))
-            {
-                var paramName = downstreamParts[i];
-                parameters[paramName] = pathParts[i];
-            }
-        }
-
-        var result = new List<string>();
-        foreach (var part in upstreamParts)
-        {
-            if (part.StartsWith("{") && part.EndsWith("}"))
-            {
-                if (parameters.TryGetValue(part, out var value))
-                {
-                    result.Add(value);
-                }
-                else
-                {
-                    result.Add(part);
-                }
-            }
-            else if (!string.IsNullOrEmpty(part))
-            {
-                result.Add(part);
-            }
-        }
-
-        return "/" + string.Join("/", result);
-    }
-
-    private static void MergeSchemas(OpenApiDocument target, OpenApiDocument source)
-    {
-        if (source.Components?.Schemas == null) return;
-
-        foreach (var schema in source.Components.Schemas)
-        {
-            var schemaKey = schema.Key;
-            var counter = 1;
-
-            while (target.Components.Schemas.ContainsKey(schemaKey))
-            {
-                schemaKey = $"{schema.Key}{counter}";
-                counter++;
-            }
-
-            target.Components.Schemas.Add(schemaKey, schema.Value);
+            // A single unavailable service must not break the whole gateway documentation.
+            logger.LogError(ex, "Error fetching OpenAPI doc of {ServiceName} at {Url}", config.Name, config.Url);
+            return null;
         }
     }
 
-    private static void MergeSecuritySchemes(OpenApiDocument target, OpenApiDocument source)
+    private void MergePaths(OpenApiDocument target, OpenApiDocument source, string swaggerKey,
+        List<RouteConfig> routes)
     {
-        if (source.Components?.SecuritySchemes == null) return;
+        if (source.Paths is null) return;
 
-        foreach (var securityScheme in source.Components.SecuritySchemes)
+        foreach (var (path, item) in source.Paths)
         {
-            if (!target.Components.SecuritySchemes.ContainsKey(securityScheme.Key))
-            {
-                target.Components.SecuritySchemes.Add(securityScheme.Key, securityScheme.Value);
-            }
+            var gatewayPath = OpenApiPathTranslator.ToUpstreamPath(path, swaggerKey, routes);
+            if (!target.Paths.TryAdd(gatewayPath, item))
+                logger.LogWarning("Duplicate path {Path} ignored (from {SwaggerKey})", gatewayPath, swaggerKey);
         }
+    }
+
+    private static void MergeComponents(OpenApiDocument target, OpenApiDocument source)
+    {
+        // NOTE: schema names are expected to be unique across services ($ref values are not rewritten).
+        foreach (var (name, schema) in source.Components?.Schemas ?? new Dictionary<string, IOpenApiSchema>())
+            target.Components!.Schemas!.TryAdd(name, schema);
+
+        foreach (var (name, scheme) in source.Components?.SecuritySchemes ?? new Dictionary<string, IOpenApiSecurityScheme>())
+            target.Components!.SecuritySchemes!.TryAdd(name, scheme);
+    }
+
+    private static void MergeTags(OpenApiDocument target, OpenApiDocument source)
+    {
+        foreach (var tag in source.Tags ?? new HashSet<OpenApiTag>())
+            target.Tags!.Add(tag);
     }
 }

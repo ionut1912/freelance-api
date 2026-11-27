@@ -1,39 +1,24 @@
-﻿using Freelance.Identity.Application.Mediatr.Accounts.Commands;
+using Freelance.Identity.Application.Mediatr.Accounts.Commands;
 using Freelance.Identity.Domain.Exceptions;
 using Freelance.Identity.Domain.interfaces;
 using Microsoft.Extensions.Logging;
-using Shared.Application.Mediator;
 using Shared.Domain.Interfaces;
 
 namespace Freelance.Identity.Application.Mediatr.Accounts.Handlers;
 
-public class DeleteAccountCommandHandler : IRequestHandler<DeleteAccountCommand, Unit>
+public sealed class DeleteAccountCommandHandler(
+    IAccountRepository accountRepository,
+    IUnitOfWork unitOfWork,
+    ILogger<DeleteAccountCommandHandler> logger)
 {
-    private readonly IAccountRepository _accountRepository;
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly ILogger<DeleteAccountCommandHandler> _logger;
-
-    public DeleteAccountCommandHandler(IAccountRepository accountRepository, IUnitOfWork unitOfWork,ILogger<DeleteAccountCommandHandler> logger)
+    public async Task Handle(DeleteAccountCommand command, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(accountRepository, nameof(accountRepository));
-        ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));
-        ArgumentNullException.ThrowIfNull(logger, nameof(logger));
-        _accountRepository = accountRepository;
-        _unitOfWork = unitOfWork;
-        _logger = logger;
-    }
+        var account = await accountRepository.GetByIdAsync(command.Id, cancellationToken)
+                      ?? throw new AccountNotFoundException($"Account with Id {command.Id} was not found.");
 
-    public async Task<Unit> Handle(DeleteAccountCommand request, CancellationToken cancellationToken)
-    {
-        var account = await _accountRepository.GetByIdAsync(request.Id);
-        if (account == null)
-        {
-            _logger.LogError("Account with id : {Id} can not be deleted because is not found",request.Id);
-            throw new AccountNotFoundException($"Account with Id {request.Id} was not found.");
-        }
-        _accountRepository.Delete(account);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-        _logger.LogInformation("Account with id: {Id} was deleted successfully", request.Id);
-        return Unit.Value;
+        accountRepository.Delete(account);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        logger.LogInformation("Account {AccountId} was deleted", command.Id);
     }
 }

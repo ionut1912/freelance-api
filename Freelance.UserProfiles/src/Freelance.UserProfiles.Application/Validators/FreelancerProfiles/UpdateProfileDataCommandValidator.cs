@@ -3,7 +3,7 @@ using Freelance.UserProfiles.Application.Mediatr.FreelancerProfiles.Commands;
 
 namespace Freelance.UserProfiles.Application.Validators.FreelancerProfiles;
 
-public class UpdateProfileDataCommandValidator : AbstractValidator<UpdateFreelancerProfileDataCommand>
+public sealed class UpdateProfileDataCommandValidator : AbstractValidator<UpdateFreelancerProfileDataCommand>
 {
     public UpdateProfileDataCommandValidator()
     {

@@ -1,43 +1,33 @@
-﻿using Freelance.UserProfiles.Application.Mediatr.ClientProfiles.Commands;
+using Freelance.UserProfiles.Application.Dtos;
+using Freelance.UserProfiles.Application.Mappings;
+using Freelance.UserProfiles.Application.Mediatr.ClientProfiles.Commands;
 using Freelance.UserProfiles.Domain.Entities;
 using Freelance.UserProfiles.Domain.Exceptions;
 using Freelance.UserProfiles.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
-using Shared.Application.Mediator;
 using Shared.Domain.Interfaces;
+
 namespace Freelance.UserProfiles.Application.Mediatr.ClientProfiles.Handlers;
 
-public class CreateClientProfileCommandHandler : IRequestHandler<CreateClientProfileCommand, ClientProfile>
+public sealed class CreateClientProfileCommandHandler(
+    IClientProfileRepository repository,
+    IUnitOfWork unitOfWork,
+    ILogger<CreateClientProfileCommandHandler> logger)
 {
-    private readonly IClientProfileRepository _repository;
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly ILogger<CreateClientProfileCommandHandler> _logger;
-
-    public CreateClientProfileCommandHandler(IClientProfileRepository repository, IUnitOfWork unitOfWork, ILogger<CreateClientProfileCommandHandler> logger)
+    public async Task<ClientProfileDto> Handle(CreateClientProfileCommand command, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(repository, nameof(repository));
-        ArgumentNullException.ThrowIfNull(unitOfWork, nameof(unitOfWork));
-        ArgumentNullException.ThrowIfNull(logger, nameof(logger));
-        _repository = repository;
-        _unitOfWork = unitOfWork;
-        _logger = logger;
-    }
+        if (await repository.GetLoggedInClientProfileAsync(command.AccountId, cancellationToken) is not null)
+            throw new ProfileAllreadyExistsException($"Profile with accountId {command.AccountId} already exists");
 
-    public async Task<ClientProfile> Handle(CreateClientProfileCommand request, CancellationToken cancellationToken)
-    {
-        var existingClientProfile=await _repository.GetLoggedInClientProfileAsync(request.AccountId, cancellationToken);
-        if (existingClientProfile != null) 
-        {
-            _logger.LogError("Profile with accountId {AccountId} allready exists", request.AccountId);
-            throw new ProfileAllreadyExistsException($"Profile with accountId {request.AccountId} allready exists");
-        }
+        var address = command.AddressDto;
+        var clientProfile = ClientProfile.Create(command.AccountId, address.Street, address.City, address.State,
+            address.ZipCode, address.Country, address.StreetNumber, command.Bio, command.Image);
 
-        var clientProfile = ClientProfile.Create(request.AccountId, request.AddressDto.Street, request.AddressDto.City,
-            request.AddressDto.State, request.AddressDto.ZipCode, request.AddressDto.Country, request
-                .AddressDto.StreetNumber, request.Bio, request.Image);
-        await _repository.AddAsync(clientProfile, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-        _logger.LogInformation("Created client profile with id {ClientProfileId} for accountId {AccountId}", clientProfile.Id, request.AccountId);
-        return clientProfile;
+        await repository.AddAsync(clientProfile, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        logger.LogInformation("Client profile {ProfileId} was created for account {AccountId}", clientProfile.Id,
+            command.AccountId);
+        return clientProfile.ToDto();
     }
 }

@@ -2,6 +2,6 @@
 
 namespace Freelance.UserProfiles.Infrastructure.Persistance.Configurations;
 
-public class ClientProfileConfiguration : BaseProfileConfiguration<ClientProfile>
+public sealed class ClientProfileConfiguration : BaseProfileConfiguration<ClientProfile>
 {
 }
