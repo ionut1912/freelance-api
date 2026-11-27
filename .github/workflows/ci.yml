@@ -45,7 +45,7 @@ jobs:
 
       - name: Restore tools
         working-directory: .
-        run: dotnet tool restore
+        run: test -f .config/dotnet-tools.json && dotnet tool restore
 
       - name: Restore (locked)
         run: dotnet restore Freelance.Shared.Events.csproj --locked-mode
@@ -120,7 +120,7 @@ jobs:
       # Checks run cheapest first, so a badly formatted file or a warning fails before the tests start.
       - name: Restore tools
         working-directory: .
-        run: dotnet tool restore
+        run: test -f .config/dotnet-tools.json && dotnet tool restore
 
       - name: Restore (locked)
         run: dotnet restore ${{ matrix.service }}.slnx --locked-mode

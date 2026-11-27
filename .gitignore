@@ -19,6 +19,8 @@ terraform/terraform.tfstate.backup
 /Freelance.Identity/.vs/Freelance.Identity
 /Freelance.Identity/src/Freelance.Identity.Api/Freelance.Identity.Api.csproj.user
 *.config
+# "*.config" also matches the .config folder, which holds the local tool manifest CI restores.
+!.config/
 /Freelance.Identity/.vs/ProjectEvaluation
 /Freelance.UserProfiles/.vs/Freelance.UserProfiles
 /Freelance.UserProfiles/.vs/ProjectEvaluation
