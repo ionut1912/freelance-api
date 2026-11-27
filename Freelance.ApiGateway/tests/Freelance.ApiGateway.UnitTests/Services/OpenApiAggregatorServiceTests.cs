@@ -1,8 +1,10 @@
 using System.Net;
+using Freelance.ApiGateway.Models;
 using Freelance.ApiGateway.Services;
 using Freelance.ApiGateway.UnitTests.TestData;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Moq.Protected;
 
 namespace Freelance.ApiGateway.UnitTests.Services;
@@ -13,7 +15,7 @@ public sealed class OpenApiAggregatorServiceTests
     private const string ProjectsUrl = "http://projects/openapi/v1.json";
     private readonly CancellationToken _ct = TestContext.Current.CancellationToken;
 
-    private static IConfiguration Configuration(bool withBaseUrl = true)
+    private static IOptionsMonitor<OpenApiAggregationOptions> Settings(bool withBaseUrl = true)
     {
         var values = new Dictionary<string, string?>
         {
@@ -28,11 +30,15 @@ public sealed class OpenApiAggregatorServiceTests
             ["Routes:0:UpstreamPathTemplate"] = "/gateway-auth/{everything}"
         };
         if (withBaseUrl) values["GlobalConfiguration:BaseUrl"] = "http://gateway:9000";
-        return new ConfigurationBuilder().AddInMemoryCollection(values).Build();
+        return Monitor(new ConfigurationBuilder().AddInMemoryCollection(values).Build());
     }
 
+    private static IOptionsMonitor<OpenApiAggregationOptions> Monitor(IConfiguration configuration) =>
+        Mock.Of<IOptionsMonitor<OpenApiAggregationOptions>>(m =>
+            m.CurrentValue == (configuration.Get<OpenApiAggregationOptions>() ?? new OpenApiAggregationOptions()));
+
     private static OpenApiAggregatorService Create(Dictionary<string, (HttpStatusCode, string)> responses, bool withBaseUrl = true) =>
-        new(new HttpClient(OpenApiDocuments.Handler(responses).Object), Configuration(withBaseUrl), NullLogger<OpenApiAggregatorService>.Instance);
+        new(new HttpClient(OpenApiDocuments.Handler(responses).Object), Settings(withBaseUrl), NullLogger<OpenApiAggregatorService>.Instance);
 
     [Fact]
     public async Task Aggregate_MergesPathsSchemasTagsAndSecurity_FromAllServices()
@@ -126,7 +132,7 @@ public sealed class OpenApiAggregatorServiceTests
                 {
                     Content = new StringContent(OpenApiDocuments.Service("/project", "Project", "ProjectDto"))
                 });
-        var service = new OpenApiAggregatorService(new HttpClient(handler.Object), Configuration(),
+        var service = new OpenApiAggregatorService(new HttpClient(handler.Object), Settings(),
             NullLogger<OpenApiAggregatorService>.Instance);
 
         var document = await service.AggregateOpenApiDocsAsync(_ct);
@@ -159,7 +165,7 @@ public sealed class OpenApiAggregatorServiceTests
         handler.Protected()
             .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
             .ReturnsAsync(() => new HttpResponseMessage(HttpStatusCode.OK) { Content = new StreamContent(new AsyncDisposingStream(body)) });
-        var service = new OpenApiAggregatorService(new HttpClient(handler.Object), Configuration(),
+        var service = new OpenApiAggregatorService(new HttpClient(handler.Object), Settings(),
             NullLogger<OpenApiAggregatorService>.Instance);
 
         var document = await service.AggregateOpenApiDocsAsync(_ct);
@@ -206,7 +212,7 @@ public sealed class OpenApiAggregatorServiceTests
     {
         var service = new OpenApiAggregatorService(new HttpClient(OpenApiDocuments.Handler(
                 new Dictionary<string, (HttpStatusCode, string)>()).Object),
-            new ConfigurationBuilder().Build(), NullLogger<OpenApiAggregatorService>.Instance);
+            Monitor(new ConfigurationBuilder().Build()), NullLogger<OpenApiAggregatorService>.Instance);
 
         var document = await service.AggregateOpenApiDocsAsync(_ct);
 

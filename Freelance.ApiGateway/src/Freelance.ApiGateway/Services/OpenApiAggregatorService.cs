@@ -1,4 +1,5 @@
 using Freelance.ApiGateway.Models;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Reader;
 
@@ -10,16 +11,19 @@ namespace Freelance.ApiGateway.Services;
 /// </summary>
 public sealed class OpenApiAggregatorService(
     HttpClient httpClient,
-    IConfiguration configuration,
+    IOptionsMonitor<OpenApiAggregationOptions> options,
     ILogger<OpenApiAggregatorService> logger)
 {
     private const string BearerSchemeName = "Bearer";
+    private const string DefaultBaseUrl = "http://localhost:9000";
 
     public async Task<OpenApiDocument> AggregateOpenApiDocsAsync(CancellationToken cancellationToken = default)
     {
-        var aggregated = CreateBaseDocument();
-        var routes = configuration.GetSection("Routes").Get<List<RouteConfig>>() ?? [];
-        var endpoints = configuration.GetSection("SwaggerEndPoints").Get<List<SwaggerEndPoint>>() ?? [];
+        // Read once per call, so a configuration reload applies to the next document.
+        var settings = options.CurrentValue;
+        var aggregated = CreateBaseDocument(settings.GlobalConfiguration.BaseUrl);
+        var routes = settings.Routes;
+        var endpoints = settings.SwaggerEndPoints;
 
         var downloads = endpoints
             .SelectMany(endpoint => endpoint.Config.Select(config => (endpoint.Key, Config: config)))
@@ -41,7 +45,7 @@ public sealed class OpenApiAggregatorService(
         return aggregated;
     }
 
-    private OpenApiDocument CreateBaseDocument()
+    private static OpenApiDocument CreateBaseDocument(string? baseUrl)
     {
         var document = new OpenApiDocument
         {
@@ -51,7 +55,7 @@ public sealed class OpenApiAggregatorService(
                 Version = "v1",
                 Description = "Combined API documentation from all downstream services"
             },
-            Servers = [new OpenApiServer { Url = configuration["GlobalConfiguration:BaseUrl"] ?? "http://localhost:9000" }],
+            Servers = [new OpenApiServer { Url = baseUrl ?? DefaultBaseUrl }],
             Paths = [],
             Components = new OpenApiComponents
             {

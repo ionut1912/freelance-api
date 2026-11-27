@@ -1,5 +1,5 @@
 using Freelance.ApiGateway.Endpoints;
-using Freelance.ApiGateway.Services;
+using Freelance.ApiGateway.Extensions;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 using Scalar.AspNetCore;
@@ -15,34 +15,21 @@ var lokiEndpoint = configuration["OTEL_EXPORTER_OTLP_LOGS_ENDPOINT"] ?? "http://
 builder.AddOpenTelemetry(lokiEndpoint,
     OpenTelemetryExtensions.CreateServiceResourceBuilder(serviceName, builder.Environment.EnvironmentName));
 
-const string FrontendCorsPolicy = "frontend";
-string[] allowedOrigins =
-[
-    .. configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [],
-    .. configuration["FRONTEND_BASE_URL"] is { Length: > 0 } frontendUrl ? [frontendUrl] : Array.Empty<string>()
-];
-
 builder.Services
     .AddOpenTelemetryObservability(otelEndpoint, serviceName)
     // Default scheme "Bearer" is the AuthenticationProviderKey used by the Ocelot routes.
     .AddJwtAuthentication(configuration)
     .AddAuthorization()
-    .AddCors(options => options.AddPolicy(FrontendCorsPolicy, policy => policy
-        .WithOrigins(allowedOrigins)
-        .AllowAnyMethod()
-        .AllowAnyHeader()
-        .AllowCredentials()))
-    .AddOutputCache(options => options.AddPolicy(OpenApiEndpoints.CachePolicy,
-        policy => policy.Expire(TimeSpan.FromMinutes(1))))
+    .AddFrontendCors(configuration)
+    .AddAggregatedOpenApi(configuration)
     .AddOcelot(configuration);
 
 builder.Services.AddHealthChecks();
-builder.Services.AddHttpClient<OpenApiAggregatorService>(client => client.Timeout = TimeSpan.FromSeconds(10));
 
 var app = builder.Build();
 
 app.UseRouting();
-app.UseCors(FrontendCorsPolicy);
+app.UseCors(FrontendCorsExtensions.PolicyName);
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseOutputCache();
