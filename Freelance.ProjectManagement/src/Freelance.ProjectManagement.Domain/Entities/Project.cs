@@ -20,7 +20,7 @@ public sealed class Project : Entity
 
         Title = title;
         Description = description;
-        Deadline = AsUtc(deadline);
+        Deadline = UtcDateTime.From(deadline);
         Budget = Money.Create(amount, currency);
     }
 
@@ -58,7 +58,7 @@ public sealed class Project : Entity
         if (!string.IsNullOrEmpty(title)) Title = title;
         if (!string.IsNullOrEmpty(description)) Description = description;
 
-        Deadline = AsUtc(deadline);
+        Deadline = UtcDateTime.From(deadline);
         Budget = Money.Create(amount, currency);
         UpdatedAt = DateTime.UtcNow;
     }
@@ -73,12 +73,18 @@ public sealed class Project : Entity
         UpdatedAt = DateTime.UtcNow;
     }
 
-    public void UpdateTechnologies(IEnumerable<ProjectTechnology> technologies) => AddTechnologies(technologies);
+    public void UpdateTechnologies(IEnumerable<ProjectTechnology> technologies)
+    {
+        ArgumentNullException.ThrowIfNull(technologies);
+
+        // Diff instead of Clear(): unchanged technologies keep their row (the key is ProjectId + Technology).
+        var desired = technologies.Distinct().ToList();
+        _technologies.RemoveAll(existing => !desired.Contains(existing));
+        AddTechnologies(desired);
+        UpdatedAt = DateTime.UtcNow;
+    }
 
     public void AssignClient(Guid clientId) => ClientId = clientId;
 
     public void AssignFreelancer(Guid freelancerId) => FreelancerId = freelancerId;
-
-    private static DateTime AsUtc(DateTime value) =>
-        value.Kind == DateTimeKind.Utc ? value : DateTime.SpecifyKind(value, DateTimeKind.Utc);
 }

@@ -17,7 +17,7 @@ public sealed class UpdateFreelancerProfileAddressCommandHandlerTests : HandlerT
     {
         GivenFreelancerById(null);
 
-        await Handler.Invoking(h => h.Handle(new UpdateFreelancerProfileAddressCommand(Guid.NewGuid(), Profiles.Address), Ct))
+        await Handler.Invoking(h => h.Handle(new UpdateFreelancerProfileAddressCommand(Guid.NewGuid(), Profiles.Address, Guid.NewGuid()), Ct))
             .Should().ThrowAsync<ProfileNotFoundException>();
     }
 
@@ -27,9 +27,19 @@ public sealed class UpdateFreelancerProfileAddressCommandHandlerTests : HandlerT
         var profile = Profiles.Freelancer();
         GivenFreelancerById(profile);
 
-        await Handler.Handle(new UpdateFreelancerProfileAddressCommand(profile.Id, new AddressDto("S", "Iasi", "IS", "7", "RO", "3")), Ct);
+        await Handler.Handle(new UpdateFreelancerProfileAddressCommand(profile.Id, new AddressDto("S", "Iasi", "IS", "7", "RO", "3"), profile.AccountId), Ct);
 
         profile.Address.City.Should().Be("Iasi");
         VerifySaved();
+    }
+    [Fact]
+    public async Task Handle_ProfileOfAnotherAccount_ThrowsProfileNotFoundWithoutSaving()
+    {
+        var profile = Profiles.Freelancer();
+        GivenFreelancerById(profile);
+
+        await Handler.Invoking(h => h.Handle(new UpdateFreelancerProfileAddressCommand(profile.Id, Profiles.Address, Guid.NewGuid()), Ct))
+            .Should().ThrowAsync<ProfileNotFoundException>();
+        VerifyNotSaved();
     }
 }

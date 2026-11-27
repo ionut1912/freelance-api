@@ -15,7 +15,7 @@ public sealed class DeleteProjectCommandHandlerTests : HandlerTestBase
     {
         GivenProject(null);
 
-        await Handler.Invoking(h => h.Handle(new DeleteProjectCommand(Guid.NewGuid()), Ct)).Should().ThrowAsync<ProjectNotFoundException>();
+        await Handler.Invoking(h => h.Handle(new DeleteProjectCommand(Guid.NewGuid(), Guid.Empty), Ct)).Should().ThrowAsync<ProjectNotFoundException>();
         VerifyNotSaved();
     }
 
@@ -25,9 +25,20 @@ public sealed class DeleteProjectCommandHandlerTests : HandlerTestBase
         var project = TestData.Projects.Project();
         GivenProject(project);
 
-        await Handler.Handle(new DeleteProjectCommand(project.Id), Ct);
+        await Handler.Handle(new DeleteProjectCommand(project.Id, project.ClientId), Ct);
 
         ProjectRepository.Verify(r => r.Delete(project), Times.Once);
         VerifySaved();
+    }
+
+    [Fact]
+    public async Task Handle_ProjectOfAnotherClient_ThrowsProjectNotFoundWithoutSaving()
+    {
+        var project = TestData.Projects.Project();
+        GivenProject(project);
+
+        await Handler.Invoking(h => h.Handle(new DeleteProjectCommand(project.Id, Guid.NewGuid()), Ct))
+            .Should().ThrowAsync<ProjectNotFoundException>();
+        VerifyNotSaved();
     }
 }

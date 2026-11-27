@@ -22,8 +22,8 @@ public sealed class ClientProfileMappingsTests
 
         new CreateClientProfileRequest(Profiles.Address, "b", "i").ToCreateCommand(id)
             .Should().BeEquivalentTo(new { AccountId = id, AddressDto = Profiles.Address, Bio = "b", Image = "i" });
-        new UpdateProfileAddressRequest(Profiles.Address).ToUpdateClientAddressCommand(id).Id.Should().Be(id);
-        new UpdateProfileDataRequest("b", "i").ToUpdateClientDataCommand(id).Should().BeEquivalentTo(new { Id = id, Bio = "b", Image = "i" });
+        new UpdateProfileAddressRequest(Profiles.Address).ToUpdateClientAddressCommand(id, id).AccountId.Should().Be(id);
+        new UpdateProfileDataRequest("b", "i").ToUpdateClientDataCommand(id, id).Should().BeEquivalentTo(new { Id = id, AccountId = id, Bio = "b", Image = "i" });
         new VerifyProfileRequest("url").ToVerifyClientCommand(id).Should().BeEquivalentTo(new { AccountId = id, ImageUrl = "url" });
     }
 }

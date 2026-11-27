@@ -1,3 +1,3 @@
 namespace Freelance.UserProfiles.Application.Mediatr.ClientProfiles.Commands;
 
-public sealed record DeleteClientProfileCommand(Guid Id);
+public sealed record DeleteClientProfileCommand(Guid Id, Guid AccountId);

@@ -8,4 +8,5 @@ public sealed record UpdateFreelancerDetailsCommand(
     string Experience,
     decimal Amount,
     string Currency,
-    string PortfolioUrl);
+    string PortfolioUrl,
+    Guid AccountId);

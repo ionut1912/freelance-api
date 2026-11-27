@@ -58,4 +58,20 @@ public sealed class ClientProfileTests
     [Fact]
     public void UpdateUserData_SameBio_Throws() =>
         Profiles.Client().Invoking(p => p.UpdateUserData("other", "Bio")).Should().Throw<BioAlreadyExistsException>();
+
+    [Fact]
+    public void UpdateUserData_OnVerifiedProfile_RemovesVerification()
+    {
+        var profile = Profiles.Client();
+        profile.Verify();
+
+        profile.UpdateUserData("new-img", "New bio");
+
+        profile.IsVerified.Should().BeFalse();
+    }
+
+    [Fact]
+    public void UpdateUserData_SameImage_DoesNotEchoTheImageInTheError() =>
+        Profiles.Client().Invoking(p => p.UpdateUserData("img", "Other"))
+            .Should().Throw<ImageAlreadyExistsException>().Which.Message.Should().NotContain("img");
 }

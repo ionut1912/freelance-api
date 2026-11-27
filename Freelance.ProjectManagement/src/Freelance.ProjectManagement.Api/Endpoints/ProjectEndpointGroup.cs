@@ -5,6 +5,7 @@ using Freelance.ProjectManagement.Application.Mediatr.Projects.Queries;
 using Freelance.ProjectManagement.Application.Requests;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Shared.Api.Endpoints;
+using Shared.Api.Extensions;
 using Wolverine;
 
 namespace Freelance.ProjectManagement.Api.Endpoints;
@@ -23,10 +24,13 @@ public sealed class ProjectEndpointGroup : EndpointGroup
         group.MapDelete("/{id:guid}", DeleteProject).WithName(nameof(DeleteProject)).RequireAuthorization(AuthorizationPolicies.ClientOnly);
     }
 
-    private static async Task<Created<ProjectDto>> CreateProject(CreateProjectRequest request, IMessageBus bus,
-        CancellationToken ct)
+    private static async Task<Results<Created<ProjectDto>, UnauthorizedHttpResult>> CreateProject(
+        CreateProjectRequest request, HttpContext httpContext, IMessageBus bus, CancellationToken ct)
     {
-        var created = await bus.InvokeAsync<ProjectDto>(request.ToCreateCommand(), ct);
+        var accountId = httpContext.GetAccountId();
+        if (accountId == Guid.Empty) return TypedResults.Unauthorized();
+
+        var created = await bus.InvokeAsync<ProjectDto>(request.ToCreateCommand(accountId), ct);
         return TypedResults.Created($"/project/{created.Id}", created);
     }
 
@@ -36,16 +40,23 @@ public sealed class ProjectEndpointGroup : EndpointGroup
     private static async Task<Ok<ProjectDto>> GetProjectById(Guid id, IMessageBus bus, CancellationToken ct) =>
         TypedResults.Ok(await bus.InvokeAsync<ProjectDto>(new GetProjectByIdQuery(id), ct));
 
-    private static async Task<NoContent> UpdateProject(Guid id, UpdateProjectRequest request, IMessageBus bus,
-        CancellationToken ct)
+    private static async Task<Results<NoContent, UnauthorizedHttpResult>> UpdateProject(Guid id, UpdateProjectRequest request,
+        HttpContext httpContext, IMessageBus bus, CancellationToken ct)
     {
-        await bus.InvokeAsync(request.ToUpdateCommand(id), ct);
+        var accountId = httpContext.GetAccountId();
+        if (accountId == Guid.Empty) return TypedResults.Unauthorized();
+
+        await bus.InvokeAsync(request.ToUpdateCommand(id, accountId), ct);
         return TypedResults.NoContent();
     }
 
-    private static async Task<NoContent> DeleteProject(Guid id, IMessageBus bus, CancellationToken ct)
+    private static async Task<Results<NoContent, UnauthorizedHttpResult>> DeleteProject(Guid id,
+        HttpContext httpContext, IMessageBus bus, CancellationToken ct)
     {
-        await bus.InvokeAsync(new DeleteProjectCommand(id), ct);
+        var accountId = httpContext.GetAccountId();
+        if (accountId == Guid.Empty) return TypedResults.Unauthorized();
+
+        await bus.InvokeAsync(new DeleteProjectCommand(id, accountId), ct);
         return TypedResults.NoContent();
     }
 }

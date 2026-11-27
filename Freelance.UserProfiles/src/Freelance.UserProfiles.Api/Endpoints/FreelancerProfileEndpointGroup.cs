@@ -55,24 +55,33 @@ public sealed class FreelancerProfileEndpointGroup : EndpointGroup
             await bus.InvokeAsync<FreelancerProfileDto>(new GetLoggedInFreelancerProfileQuery(accountId), ct));
     }
 
-    private static async Task<NoContent> UpdateFreelancerDetails(Guid id, UpdateFreelancerDetailRequest request,
-        IMessageBus bus, CancellationToken ct)
+    private static async Task<Results<NoContent, UnauthorizedHttpResult>> UpdateFreelancerDetails(Guid id, UpdateFreelancerDetailRequest request,
+        HttpContext httpContext, IMessageBus bus, CancellationToken ct)
     {
-        await bus.InvokeAsync(request.ToUpdateDetailsCommand(id), ct);
+        var accountId = httpContext.GetAccountId();
+        if (accountId == Guid.Empty) return TypedResults.Unauthorized();
+
+        await bus.InvokeAsync(request.ToUpdateDetailsCommand(id, accountId), ct);
         return TypedResults.NoContent();
     }
 
-    private static async Task<NoContent> UpdateFreelancerAddress(Guid id, UpdateProfileAddressRequest request,
-        IMessageBus bus, CancellationToken ct)
+    private static async Task<Results<NoContent, UnauthorizedHttpResult>> UpdateFreelancerAddress(Guid id, UpdateProfileAddressRequest request,
+        HttpContext httpContext, IMessageBus bus, CancellationToken ct)
     {
-        await bus.InvokeAsync(request.ToUpdateFreelancerAddressCommand(id), ct);
+        var accountId = httpContext.GetAccountId();
+        if (accountId == Guid.Empty) return TypedResults.Unauthorized();
+
+        await bus.InvokeAsync(request.ToUpdateFreelancerAddressCommand(id, accountId), ct);
         return TypedResults.NoContent();
     }
 
-    private static async Task<NoContent> UpdateFreelancerData(Guid id, UpdateProfileDataRequest request,
-        IMessageBus bus, CancellationToken ct)
+    private static async Task<Results<NoContent, UnauthorizedHttpResult>> UpdateFreelancerData(Guid id, UpdateProfileDataRequest request,
+        HttpContext httpContext, IMessageBus bus, CancellationToken ct)
     {
-        await bus.InvokeAsync(request.ToUpdateFreelancerDataCommand(id), ct);
+        var accountId = httpContext.GetAccountId();
+        if (accountId == Guid.Empty) return TypedResults.Unauthorized();
+
+        await bus.InvokeAsync(request.ToUpdateFreelancerDataCommand(id, accountId), ct);
         return TypedResults.NoContent();
     }
 
@@ -83,9 +92,13 @@ public sealed class FreelancerProfileEndpointGroup : EndpointGroup
         return TypedResults.NoContent();
     }
 
-    private static async Task<NoContent> DeleteFreelancerProfile(Guid id, IMessageBus bus, CancellationToken ct)
+    private static async Task<Results<NoContent, UnauthorizedHttpResult>> DeleteFreelancerProfile(Guid id, 
+        HttpContext httpContext, IMessageBus bus, CancellationToken ct)
     {
-        await bus.InvokeAsync(new DeleteFreelancerProfileCommand(id), ct);
+        var accountId = httpContext.GetAccountId();
+        if (accountId == Guid.Empty) return TypedResults.Unauthorized();
+
+        await bus.InvokeAsync(new DeleteFreelancerProfileCommand(id, accountId), ct);
         return TypedResults.NoContent();
     }
 

@@ -9,10 +9,10 @@ public sealed class UpdateProfileDataCommandValidatorTests
 
     [Fact]
     public void Validate_ValidCommand_Passes() =>
-        _validator.Validate(new UpdateFreelancerProfileDataCommand(Guid.NewGuid(), "b", "i")).IsValid.Should().BeTrue();
+        _validator.Validate(new UpdateFreelancerProfileDataCommand(Guid.NewGuid(), "b", "i", Guid.NewGuid())).IsValid.Should().BeTrue();
 
     [Fact]
     public void Validate_EmptyValues_ReportsBioAndImage() =>
-        _validator.Validate(new UpdateFreelancerProfileDataCommand(Guid.NewGuid(), "", "")).Errors.Select(e => e.PropertyName)
+        _validator.Validate(new UpdateFreelancerProfileDataCommand(Guid.NewGuid(), "", "", Guid.NewGuid())).Errors.Select(e => e.PropertyName)
             .Should().BeEquivalentTo("Bio", "Image");
 }

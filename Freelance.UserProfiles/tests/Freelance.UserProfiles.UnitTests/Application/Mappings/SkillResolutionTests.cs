@@ -22,4 +22,16 @@ public sealed class SkillResolutionTests
         repository.Verify(r => r.AddAsync(It.Is<Skill>(s => s.ProgrammingLanguage == "Go"), ct), Times.Once);
         repository.Verify(r => r.AddAsync(existing, It.IsAny<CancellationToken>()), Times.Never);
     }
+
+    [Fact]
+    public async Task ResolveSkillsAsync_RepeatedPair_IsAddedOnce()
+    {
+        var ct = TestContext.Current.CancellationToken;
+        var repository = new Mock<ISkillRepository>();
+
+        var skills = await repository.Object.ResolveSkillsAsync(["Go", "Go"], ["Cloud", "Cloud"], ct);
+
+        skills.Should().ContainSingle();
+        repository.Verify(r => r.AddAsync(It.IsAny<Skill>(), ct), Times.Once);
+    }
 }

@@ -1,3 +1,5 @@
+using Npgsql;
+using Microsoft.EntityFrameworkCore;
 using FluentValidation;
 using FluentValidation.Results;
 using Freelance.Identity.Api.Mappers;
@@ -65,4 +67,28 @@ public sealed class IdentityExceptionMapperTests
     [Fact]
     public void TryMap_NullException_Throws() =>
         _mapper.Invoking(m => m.TryMap(null!, out _)).Should().Throw<ArgumentNullException>();
+
+    [Theory]
+    [InlineData(PostgresErrorCodes.UniqueViolation, 400)]
+    [InlineData(PostgresErrorCodes.ForeignKeyViolation, 500)]
+    public void TryMap_DatabaseUpdateFailure_OnlyTreatsUniqueViolationAsDuplicateUser(string sqlState, int status)
+    {
+        var exception = new DbUpdateException("save failed", new PostgresException("detail", "ERROR", "ERROR", sqlState));
+
+        new IdentityExceptionMapper().TryMap(exception, out var problem);
+
+        problem.Status.Should().Be(status);
+        problem.Detail.Should().NotContain("save failed");
+    }
+
+    [Theory]
+    [InlineData(400)]
+    [InlineData(413)]
+    public void TryMap_UnreadableRequest_KeepsItsStatusAndHidesTheReason(int status)
+    {
+        new IdentityExceptionMapper().TryMap(new BadHttpRequestException("internal parser detail", status), out var problem);
+
+        problem.Status.Should().Be(status);
+        problem.Detail.Should().NotContain("internal");
+    }
 }

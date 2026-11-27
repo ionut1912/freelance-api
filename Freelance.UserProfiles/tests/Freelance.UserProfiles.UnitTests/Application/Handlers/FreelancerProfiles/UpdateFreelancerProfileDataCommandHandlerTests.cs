@@ -16,16 +16,17 @@ public sealed class UpdateFreelancerProfileDataCommandHandlerTests : HandlerTest
     {
         GivenFreelancerById(null);
 
-        await Handler.Invoking(h => h.Handle(new UpdateFreelancerProfileDataCommand(Guid.NewGuid(), "b", "i"), Ct))
+        await Handler.Invoking(h => h.Handle(new UpdateFreelancerProfileDataCommand(Guid.NewGuid(), "b", "i", Guid.NewGuid()), Ct))
             .Should().ThrowAsync<ProfileNotFoundException>();
     }
 
     [Fact]
     public async Task Handle_SameBio_ThrowsWithoutSaving()
     {
-        GivenFreelancerById(Profiles.Freelancer());
+        var existing = Profiles.Freelancer();
+        GivenFreelancerById(existing);
 
-        await Handler.Invoking(h => h.Handle(new UpdateFreelancerProfileDataCommand(Guid.NewGuid(), "Bio", "new"), Ct))
+        await Handler.Invoking(h => h.Handle(new UpdateFreelancerProfileDataCommand(Guid.NewGuid(), "Bio", "new", existing.AccountId), Ct))
             .Should().ThrowAsync<BioAlreadyExistsException>();
         VerifyNotSaved();
     }
@@ -36,9 +37,19 @@ public sealed class UpdateFreelancerProfileDataCommandHandlerTests : HandlerTest
         var profile = Profiles.Freelancer();
         GivenFreelancerById(profile);
 
-        await Handler.Handle(new UpdateFreelancerProfileDataCommand(profile.Id, "New", "new-img"), Ct);
+        await Handler.Handle(new UpdateFreelancerProfileDataCommand(profile.Id, "New", "new-img", profile.AccountId), Ct);
 
         profile.Image.Should().Be("new-img");
         VerifySaved();
+    }
+    [Fact]
+    public async Task Handle_ProfileOfAnotherAccount_ThrowsProfileNotFoundWithoutSaving()
+    {
+        var profile = Profiles.Freelancer();
+        GivenFreelancerById(profile);
+
+        await Handler.Invoking(h => h.Handle(new UpdateFreelancerProfileDataCommand(profile.Id, "New", "new-img", Guid.NewGuid()), Ct))
+            .Should().ThrowAsync<ProfileNotFoundException>();
+        VerifyNotSaved();
     }
 }

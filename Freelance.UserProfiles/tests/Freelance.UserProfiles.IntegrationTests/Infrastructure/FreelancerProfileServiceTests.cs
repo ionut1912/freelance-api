@@ -6,10 +6,12 @@ using Shared.Domain.Interfaces;
 
 namespace Freelance.UserProfiles.IntegrationTests.Infrastructure;
 
-/// <summary>Covers ClientProfileService, FreelancerProfileService and SkillRepository against PostgreSQL.</summary>
-public sealed class RepositoryTests(UserProfilesApiFactory factory)
+public sealed class FreelancerProfileServiceTests(UserProfilesApiFactory factory)
 {
     private readonly CancellationToken _ct = TestContext.Current.CancellationToken;
+
+    private static FreelancerProfile NewProfile() =>
+        FreelancerProfile.Create(Guid.NewGuid(), "s", "c", "st", "z", "co", "n", "b", "i", "e", 1, "EUR", 0, "p");
 
     private async Task SaveAsync(Func<IServiceProvider, Task> action)
     {
@@ -19,11 +21,11 @@ public sealed class RepositoryTests(UserProfilesApiFactory factory)
     }
 
     [Fact]
-    public async Task FreelancerProfile_RoundTripsLanguagesAndSharedSkills()
+    public async Task GetLoggedInFreelancerProfile_LoadsLanguagesAndSharedSkills()
     {
         var skill = Skill.Create($"Lang{Guid.NewGuid():N}", "Backend");
-        var first = FreelancerProfile.Create(Guid.NewGuid(), "s", "c", "st", "z", "co", "n", "b", "i", "e", 1, "EUR", 0, "p");
-        var second = FreelancerProfile.Create(Guid.NewGuid(), "s", "c", "st", "z", "co", "n", "b", "i", "e", 1, "EUR", 0, "p");
+        var first = NewProfile();
+        var second = NewProfile();
         first.AddLanguages([FreelancerForeignLanguage.Create("English"), FreelancerForeignLanguage.Create("French")]);
         first.AddSkills([skill]);
 
@@ -46,28 +48,25 @@ public sealed class RepositoryTests(UserProfilesApiFactory factory)
 
         loaded!.ForeignLanguages.Select(l => l.Language).Should().BeEquivalentTo("English", "French");
         other!.Skills.Should().ContainSingle().Which.Id.Should().Be(skill.Id, "skills are shared, not duplicated");
-        (await repository.GetLoggedInFreelancerProfileAsync(Guid.NewGuid(), _ct)).Should().BeNull();
-        (await repository.GetByIdWithTrackingAsync(first.Id, _ct, null!)).Should().NotBeNull();
     }
 
     [Fact]
-    public async Task ClientProfile_CanBeFoundByAccount()
+    public async Task GetLoggedInFreelancerProfile_UnknownAccount_ReturnsNull()
     {
-        var profile = ClientProfile.Create(Guid.NewGuid(), "s", "c", "st", "z", "co", "n", "b", "i");
-        await SaveAsync(sp => sp.GetRequiredService<IClientProfileRepository>().AddAsync(profile, _ct));
-
         using var scope = factory.Services.CreateScope();
-        var repository = scope.ServiceProvider.GetRequiredService<IClientProfileRepository>();
 
-        (await repository.GetLoggedInClientProfileAsync(profile.AccountId, _ct))!.Id.Should().Be(profile.Id);
-        (await repository.GetLoggedInClientProfileAsync(Guid.NewGuid(), _ct)).Should().BeNull();
+        (await scope.ServiceProvider.GetRequiredService<IFreelancerProfileRepository>()
+            .GetLoggedInFreelancerProfileAsync(Guid.NewGuid(), _ct)).Should().BeNull();
     }
 
     [Fact]
-    public async Task SkillRepository_FindAsync_Unknown_ReturnsNull()
+    public async Task GetByIdWithTracking_WithoutIncludes_ReturnsTheProfile()
     {
+        var profile = NewProfile();
+        await SaveAsync(sp => sp.GetRequiredService<IFreelancerProfileRepository>().AddAsync(profile, _ct));
         using var scope = factory.Services.CreateScope();
 
-        (await scope.ServiceProvider.GetRequiredService<ISkillRepository>().FindAsync("none", "none", _ct)).Should().BeNull();
+        (await scope.ServiceProvider.GetRequiredService<IFreelancerProfileRepository>()
+            .GetByIdWithTrackingAsync(profile.Id, _ct, null!)).Should().NotBeNull();
     }
 }

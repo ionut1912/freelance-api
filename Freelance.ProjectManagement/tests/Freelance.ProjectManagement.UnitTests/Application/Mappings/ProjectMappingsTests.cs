@@ -25,11 +25,11 @@ public sealed class ProjectMappingsTests
     [Fact]
     public void Requests_MapToCommands()
     {
-        var create = new CreateProjectRequest("t", "d", Projects.Deadline, 5, "EUR", ["x"]).ToCreateCommand();
+        var create = new CreateProjectRequest("t", "d", Projects.Deadline, 5, "EUR", ["x"]).ToCreateCommand(Guid.Empty);
         var id = Guid.NewGuid();
-        var update = new UpdateProjectRequest("t2", "d2", Projects.Deadline, 6, "USD", ["y"]).ToUpdateCommand(id);
+        var update = new UpdateProjectRequest("t2", "d2", Projects.Deadline, 6, "USD", ["y"]).ToUpdateCommand(id, id);
 
         create.Should().BeEquivalentTo(new { Title = "t", Description = "d", Amount = 5m, Currency = "EUR", Technologies = new[] { "x" } });
-        update.Should().BeEquivalentTo(new { Id = id, Title = "t2", Amount = 6m, Technologies = new[] { "y" } });
+        update.Should().BeEquivalentTo(new { Id = id, ClientId = id, Title = "t2", Amount = 6m, Technologies = new[] { "y" } });
     }
 }

@@ -52,9 +52,11 @@ public sealed class FaceService : IFaceService, IDisposable
                 using var embeddings = _recognition.Operator(chipMatrix, 1);
                 using var embedding = embeddings[0];
 
-                descriptor = new float[embedding.Columns];
+                // dlib returns a column vector (128 rows x 1 column). Sizing by Columns kept only the first value,
+                // which made different people match each other.
+                descriptor = new float[embedding.Rows];
                 for (var i = 0; i < descriptor.Length; i++)
-                    descriptor[i] = embedding[0, i];
+                    descriptor[i] = embedding[i, 0];
 
                 return true;
             }

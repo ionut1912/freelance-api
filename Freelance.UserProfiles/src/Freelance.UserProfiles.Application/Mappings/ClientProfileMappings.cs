@@ -31,12 +31,14 @@ public static class ClientProfileMappings
 
     extension(UpdateProfileAddressRequest request)
     {
-        public UpdateClientProfileAddressCommand ToUpdateClientAddressCommand(Guid id) => new(id, request.AddressDto);
+        public UpdateClientProfileAddressCommand ToUpdateClientAddressCommand(Guid id, Guid accountId) =>
+            new(id, request.AddressDto, accountId);
     }
 
     extension(UpdateProfileDataRequest request)
     {
-        public UpdateClientProfileDataCommand ToUpdateClientDataCommand(Guid id) => new(id, request.Bio, request.Image);
+        public UpdateClientProfileDataCommand ToUpdateClientDataCommand(Guid id, Guid accountId) =>
+            new(id, request.Bio, request.Image, accountId);
     }
 
     extension(VerifyProfileRequest request)

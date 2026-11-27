@@ -5,7 +5,7 @@ namespace Freelance.ProjectManagement.UnitTests.Application.Validators;
 
 public sealed class CreateProjectCommandValidatorTests
 {
-    private static readonly CreateProjectCommand Valid = new("Site", "Build", TestData.Projects.Deadline, 100, "EUR", ["dotnet"]);
+    private static readonly CreateProjectCommand Valid = new("Site", "Build", TestData.Projects.Deadline, 100, "EUR", ["dotnet"], Guid.NewGuid());
     private readonly CreateProjectCommandValidator _validator = new();
 
     [Fact]
@@ -18,7 +18,11 @@ public sealed class CreateProjectCommandValidatorTests
         { Valid with { Deadline = default }, nameof(CreateProjectCommand.Deadline) },
         { Valid with { Amount = 0 }, nameof(CreateProjectCommand.Amount) },
         { Valid with { Currency = "EU" }, nameof(CreateProjectCommand.Currency) },
-        { Valid with { Technologies = [] }, nameof(CreateProjectCommand.Technologies) }
+        { Valid with { Technologies = [] }, nameof(CreateProjectCommand.Technologies) },
+        { Valid with { Title = new string('a', 51) }, nameof(CreateProjectCommand.Title) },
+        { Valid with { Description = new string('a', 51) }, nameof(CreateProjectCommand.Description) },
+        { Valid with { Technologies = [" "] }, "Technologies[0]" },
+        { Valid with { Technologies = [new string('a', 101)] }, "Technologies[0]" }
     };
 
     [Theory]

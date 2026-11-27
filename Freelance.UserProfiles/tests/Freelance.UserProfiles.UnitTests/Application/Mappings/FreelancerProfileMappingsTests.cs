@@ -32,11 +32,11 @@ public sealed class FreelancerProfileMappingsTests
 
         new CreateFreelancerProfileRequest(Profiles.Address, "b", "i", "e", 1, "EUR", "p", ["en"], ["C#"], ["Backend"]).ToCreateCommand(id)
             .Should().BeEquivalentTo(new { AccountId = id, Experience = "e", ForeignLanguages = new[] { "en" }, Areas = new[] { "Backend" } });
-        new UpdateFreelancerDetailRequest(["en"], ["C#"], ["Backend"], "e", 2, "USD", "p").ToUpdateDetailsCommand(id)
+        new UpdateFreelancerDetailRequest(["en"], ["C#"], ["Backend"], "e", 2, "USD", "p").ToUpdateDetailsCommand(id, id)
             .Should().BeEquivalentTo(new { Id = id, Amount = 2m, Currency = "USD" });
         new UpdateFreelancerProfileRatingRequest(5).ToUpdateRatingCommand(id).Should().BeEquivalentTo(new { Id = id, Rating = 5 });
-        new UpdateProfileAddressRequest(Profiles.Address).ToUpdateFreelancerAddressCommand(id).Id.Should().Be(id);
-        new UpdateProfileDataRequest("b", "i").ToUpdateFreelancerDataCommand(id).Bio.Should().Be("b");
+        new UpdateProfileAddressRequest(Profiles.Address).ToUpdateFreelancerAddressCommand(id, id).AccountId.Should().Be(id);
+        new UpdateProfileDataRequest("b", "i").ToUpdateFreelancerDataCommand(id, id).Bio.Should().Be("b");
         new VerifyProfileRequest("url").ToVerifyFreelancerCommand(id).ImageUrl.Should().Be("url");
     }
 }

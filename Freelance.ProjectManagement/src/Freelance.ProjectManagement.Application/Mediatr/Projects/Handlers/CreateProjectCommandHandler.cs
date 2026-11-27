@@ -17,6 +17,7 @@ public sealed class CreateProjectCommandHandler(
     public async Task<ProjectDto> Handle(CreateProjectCommand command, CancellationToken cancellationToken)
     {
         var project = Project.Create(command.Title, command.Description, command.Deadline, command.Amount, command.Currency);
+        project.AssignClient(command.ClientId);
         project.AddTechnologies(command.Technologies.Select(ProjectTechnology.Create));
 
         await projectRepository.AddAsync(project, cancellationToken);

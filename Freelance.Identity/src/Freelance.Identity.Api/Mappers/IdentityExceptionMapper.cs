@@ -1,6 +1,9 @@
 using FluentValidation;
 using Freelance.Identity.Domain.Exceptions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using Shared.Api.Abstractions;
 using Shared.Domain.Common;
 using Shared.Domain.Exceptions;
@@ -22,8 +25,13 @@ public sealed class IdentityExceptionMapper : IExceptionProblemDetailsMapper
             PasswordNotMatchException ex => Create(StatusCodes.Status400BadRequest, "Password Not Match", ex.Message),
             AccountBlockedException ex => Create(StatusCodes.Status400BadRequest, "Account Blocked", ex.Message),
             UserAlreadyExistsException ex => Create(StatusCodes.Status400BadRequest, "User Already Exists", ex.Message),
+            // Two concurrent registrations can both pass the lookup; the unique username index stops the second.
+            DbUpdateException { InnerException: PostgresException { SqlState: PostgresErrorCodes.UniqueViolation } } =>
+                Create(StatusCodes.Status400BadRequest, "User Already Exists", "Account with this username already exists"),
             ValidationException ex => CreateValidation(ex.Errors.Select(e => new ValidationError(e.PropertyName, e.ErrorMessage))),
             CustomValidationException ex => CreateValidation(ex.ValidationErrors),
+            // Thrown for unreadable requests (bad JSON, wrong types): the client's fault, with its own status code.
+            BadHttpRequestException ex => Create(ex.StatusCode, "Bad Request", "The request could not be read."),
             _ => Create(StatusCodes.Status500InternalServerError, "Internal Server Error", "An unexpected error occurred")
         };
 

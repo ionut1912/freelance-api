@@ -32,4 +32,15 @@ public sealed class CreateProjectTaskCommandHandlerTests : HandlerTestBase
         dto.Should().BeEquivalentTo(new { ProjectId = project.Id, Status = "InProgress", Priority = "Medium" });
         VerifySaved();
     }
+
+    [Fact]
+    public async Task Handle_ProjectOfAnotherClient_ThrowsProjectNotFoundWithoutSaving()
+    {
+        var project = TestData.Projects.Project();
+        GivenProject(project, tracked: true);
+
+        await Handler.Invoking(h => h.Handle(new CreateProjectTaskCommand(project.Id, "API", "Build", "New", "Low", Guid.NewGuid()), Ct))
+            .Should().ThrowAsync<ProjectNotFoundException>();
+        VerifyNotSaved();
+    }
 }

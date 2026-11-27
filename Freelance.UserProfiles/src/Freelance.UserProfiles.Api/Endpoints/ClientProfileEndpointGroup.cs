@@ -50,23 +50,33 @@ public sealed class ClientProfileEndpointGroup : EndpointGroup
         return TypedResults.Ok(await bus.InvokeAsync<ClientProfileDto>(new GetLoggedInClientProfileQuery(accountId), ct));
     }
 
-    private static async Task<NoContent> UpdateClientProfileAddress(Guid id, UpdateProfileAddressRequest request,
-        IMessageBus bus, CancellationToken ct)
+    private static async Task<Results<NoContent, UnauthorizedHttpResult>> UpdateClientProfileAddress(Guid id, UpdateProfileAddressRequest request,
+        HttpContext httpContext, IMessageBus bus, CancellationToken ct)
     {
-        await bus.InvokeAsync(request.ToUpdateClientAddressCommand(id), ct);
+        var accountId = httpContext.GetAccountId();
+        if (accountId == Guid.Empty) return TypedResults.Unauthorized();
+
+        await bus.InvokeAsync(request.ToUpdateClientAddressCommand(id, accountId), ct);
         return TypedResults.NoContent();
     }
 
-    private static async Task<NoContent> UpdateClientProfileData(Guid id, UpdateProfileDataRequest request,
-        IMessageBus bus, CancellationToken ct)
+    private static async Task<Results<NoContent, UnauthorizedHttpResult>> UpdateClientProfileData(Guid id, UpdateProfileDataRequest request,
+        HttpContext httpContext, IMessageBus bus, CancellationToken ct)
     {
-        await bus.InvokeAsync(request.ToUpdateClientDataCommand(id), ct);
+        var accountId = httpContext.GetAccountId();
+        if (accountId == Guid.Empty) return TypedResults.Unauthorized();
+
+        await bus.InvokeAsync(request.ToUpdateClientDataCommand(id, accountId), ct);
         return TypedResults.NoContent();
     }
 
-    private static async Task<NoContent> DeleteClientProfile(Guid id, IMessageBus bus, CancellationToken ct)
+    private static async Task<Results<NoContent, UnauthorizedHttpResult>> DeleteClientProfile(Guid id, 
+        HttpContext httpContext, IMessageBus bus, CancellationToken ct)
     {
-        await bus.InvokeAsync(new DeleteClientProfileCommand(id), ct);
+        var accountId = httpContext.GetAccountId();
+        if (accountId == Guid.Empty) return TypedResults.Unauthorized();
+
+        await bus.InvokeAsync(new DeleteClientProfileCommand(id, accountId), ct);
         return TypedResults.NoContent();
     }
 

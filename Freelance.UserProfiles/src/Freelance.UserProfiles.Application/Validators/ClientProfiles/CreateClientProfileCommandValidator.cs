@@ -8,8 +8,10 @@ public sealed class CreateClientProfileCommandValidator : AbstractValidator<Crea
     public CreateClientProfileCommandValidator()
     {
         RuleFor(x => x.AccountId).NotEmpty().WithMessage("AccountId is required");
-        RuleFor(x => x.AddressDto).NotEmpty().WithMessage("Address is required");
-        RuleFor(x => x.Bio).NotEmpty().WithMessage("Bio is required");
+        RuleFor(x => x.AddressDto).NotEmpty().WithMessage("Address is required")
+            .SetValidator(new AddressDtoValidator());
+        RuleFor(x => x.Bio).NotEmpty().WithMessage("Bio is required")
+            .MaximumLength(100);
         RuleFor(x => x.Image).NotEmpty().WithMessage("Image is required");
     }
 }

@@ -91,4 +91,16 @@ public sealed class AccountTests
     [Fact]
     public void HashPassword_WithNullService_Throws() =>
         Accounts.Freelancer().Invoking(a => a.HashPassword(null!)).Should().Throw<ArgumentNullException>();
+
+    [Fact]
+    public void HashPassword_WhenPasswordIsEmpty_Throws()
+    {
+        // The private constructor is the one EF Core uses to materialize rows; it leaves the password empty.
+        var account = (Account)Activator.CreateInstance(typeof(Account), nonPublic: true)!;
+        var passwordService = new Mock<IPasswordService>();
+
+        account.Invoking(a => a.HashPassword(passwordService.Object))
+            .Should().Throw<InvalidOperationException>().WithMessage("Password cannot be empty before hashing.");
+        passwordService.VerifyNoOtherCalls();
+    }
 }

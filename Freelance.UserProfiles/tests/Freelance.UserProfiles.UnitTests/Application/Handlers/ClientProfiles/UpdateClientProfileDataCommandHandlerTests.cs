@@ -16,16 +16,17 @@ public sealed class UpdateClientProfileDataCommandHandlerTests : HandlerTestBase
     {
         GivenClientById(null);
 
-        await Handler.Invoking(h => h.Handle(new UpdateClientProfileDataCommand(Guid.NewGuid(), "b", "i"), Ct))
+        await Handler.Invoking(h => h.Handle(new UpdateClientProfileDataCommand(Guid.NewGuid(), "b", "i", Guid.NewGuid()), Ct))
             .Should().ThrowAsync<ProfileNotFoundException>();
     }
 
     [Fact]
     public async Task Handle_SameImage_ThrowsWithoutSaving()
     {
-        GivenClientById(Profiles.Client());
+        var existing = Profiles.Client();
+        GivenClientById(existing);
 
-        await Handler.Invoking(h => h.Handle(new UpdateClientProfileDataCommand(Guid.NewGuid(), "new", "img"), Ct))
+        await Handler.Invoking(h => h.Handle(new UpdateClientProfileDataCommand(Guid.NewGuid(), "new", "img", existing.AccountId), Ct))
             .Should().ThrowAsync<ImageAlreadyExistsException>();
         VerifyNotSaved();
     }
@@ -36,9 +37,19 @@ public sealed class UpdateClientProfileDataCommandHandlerTests : HandlerTestBase
         var profile = Profiles.Client();
         GivenClientById(profile);
 
-        await Handler.Handle(new UpdateClientProfileDataCommand(profile.Id, "New bio", "new-img"), Ct);
+        await Handler.Handle(new UpdateClientProfileDataCommand(profile.Id, "New bio", "new-img", profile.AccountId), Ct);
 
         profile.Bio.Should().Be("New bio");
         VerifySaved();
+    }
+    [Fact]
+    public async Task Handle_ProfileOfAnotherAccount_ThrowsProfileNotFoundWithoutSaving()
+    {
+        var profile = Profiles.Client();
+        GivenClientById(profile);
+
+        await Handler.Invoking(h => h.Handle(new UpdateClientProfileDataCommand(profile.Id, "New bio", "new-img", Guid.NewGuid()), Ct))
+            .Should().ThrowAsync<ProfileNotFoundException>();
+        VerifyNotSaved();
     }
 }

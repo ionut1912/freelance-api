@@ -9,11 +9,13 @@ public sealed class CreateProjectCommandValidator : AbstractValidator<CreateProj
     {
         RuleFor(x => x.Title)
             .NotEmpty()
-            .WithMessage("Project Title can not be empty");
+            .WithMessage("Project Title can not be empty")
+            .MaximumLength(50);
 
         RuleFor(x => x.Description)
             .NotEmpty()
-            .WithMessage("Description can not be empty");
+            .WithMessage("Description can not be empty")
+            .MaximumLength(50);
 
         RuleFor(x => x.Deadline)
             .NotEmpty()
@@ -32,5 +34,7 @@ public sealed class CreateProjectCommandValidator : AbstractValidator<CreateProj
         RuleFor(x => x.Technologies)
             .NotEmpty()
             .WithMessage("Technologies can not be empty");
+
+        RuleForEach(x => x.Technologies).NotEmpty().MaximumLength(100);
     }
 }

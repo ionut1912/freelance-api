@@ -10,6 +10,9 @@ public sealed class UpdateProjectTaskCommandValidator : AbstractValidator<Update
     {
         RuleFor(x => x.ProjectId).NotEmpty().WithMessage("Project Id can not be empty");
 
+        RuleFor(x => x.Title).MaximumLength(100);
+        RuleFor(x => x.Description).MaximumLength(500);
+
         RuleFor(x => x.Status)
             .Must(ProjectTaskStatus.IsValid)
             .WithMessage($"Status can be only {string.Join(", ", ProjectTaskStatus.All.Select(s => $"'{s.Value}'"))}");

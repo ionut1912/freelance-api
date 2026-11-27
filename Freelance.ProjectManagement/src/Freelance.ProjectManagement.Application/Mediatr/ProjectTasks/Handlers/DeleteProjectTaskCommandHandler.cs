@@ -8,6 +8,7 @@ namespace Freelance.ProjectManagement.Application.Mediatr.ProjectTasks.Handlers;
 
 public sealed class DeleteProjectTaskCommandHandler(
     IProjectTaskRepository projectTaskRepository,
+    IProjectRepository projectRepository,
     IUnitOfWork unitOfWork,
     ILogger<DeleteProjectTaskCommandHandler> logger)
 {
@@ -15,6 +16,10 @@ public sealed class DeleteProjectTaskCommandHandler(
     {
         var projectTask = await projectTaskRepository.GetByIdAsync(command.Id, cancellationToken)
                           ?? throw new ProjectTaskNotFoundException($"Project task with id {command.Id} was not found");
+
+        var project = await projectRepository.GetByIdAsync(projectTask.ProjectId, cancellationToken);
+        if (project?.ClientId != command.ClientId)
+            throw new ProjectTaskNotFoundException($"Project task with id {command.Id} was not found");
 
         projectTaskRepository.Delete(projectTask);
         await unitOfWork.SaveChangesAsync(cancellationToken);

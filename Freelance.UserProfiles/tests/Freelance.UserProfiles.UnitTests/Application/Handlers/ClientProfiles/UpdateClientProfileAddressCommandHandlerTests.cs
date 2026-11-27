@@ -17,7 +17,7 @@ public sealed class UpdateClientProfileAddressCommandHandlerTests : HandlerTestB
     {
         GivenClientById(null);
 
-        await Handler.Invoking(h => h.Handle(new UpdateClientProfileAddressCommand(Guid.NewGuid(), Profiles.Address), Ct))
+        await Handler.Invoking(h => h.Handle(new UpdateClientProfileAddressCommand(Guid.NewGuid(), Profiles.Address, Guid.NewGuid()), Ct))
             .Should().ThrowAsync<ProfileNotFoundException>();
     }
 
@@ -27,10 +27,20 @@ public sealed class UpdateClientProfileAddressCommandHandlerTests : HandlerTestB
         var profile = Profiles.Client();
         GivenClientById(profile);
 
-        await Handler.Handle(new UpdateClientProfileAddressCommand(profile.Id, new AddressDto("S", "Cluj", "CJ", "4", "RO", "1")), Ct);
+        await Handler.Handle(new UpdateClientProfileAddressCommand(profile.Id, new AddressDto("S", "Cluj", "CJ", "4", "RO", "1"), profile.AccountId), Ct);
 
         profile.Address.City.Should().Be("Cluj");
         Clients.Verify(r => r.Update(profile), Times.Once);
         VerifySaved();
+    }
+    [Fact]
+    public async Task Handle_ProfileOfAnotherAccount_ThrowsProfileNotFoundWithoutSaving()
+    {
+        var profile = Profiles.Client();
+        GivenClientById(profile);
+
+        await Handler.Invoking(h => h.Handle(new UpdateClientProfileAddressCommand(profile.Id, Profiles.Address, Guid.NewGuid()), Ct))
+            .Should().ThrowAsync<ProfileNotFoundException>();
+        VerifyNotSaved();
     }
 }

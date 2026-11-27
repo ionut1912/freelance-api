@@ -7,7 +7,8 @@ public sealed class UpdateClientProfileDataCommandValidator : AbstractValidator<
 {
     public UpdateClientProfileDataCommandValidator()
     {
-        RuleFor(x => x.Bio).NotEmpty().WithMessage("Bio is required");
+        RuleFor(x => x.Bio).NotEmpty().WithMessage("Bio is required")
+            .MaximumLength(100);
         RuleFor(x => x.Image).NotEmpty().WithMessage("Image is required");
     }
 }

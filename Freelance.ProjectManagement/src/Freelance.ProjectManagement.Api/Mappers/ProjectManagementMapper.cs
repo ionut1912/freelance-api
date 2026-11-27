@@ -1,5 +1,6 @@
 using FluentValidation;
 using Freelance.ProjectManagement.Domain.Exceptions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Api.Abstractions;
 using Shared.Domain.Common;
@@ -21,6 +22,8 @@ public sealed class ProjectManagementMapper : IExceptionProblemDetailsMapper
             TimeLogNotFoundException ex => Create(StatusCodes.Status404NotFound, "Time Log Not Found", ex.Message),
             ValidationException ex => CreateValidation(ex.Errors.Select(e => new ValidationError(e.PropertyName, e.ErrorMessage))),
             CustomValidationException ex => CreateValidation(ex.ValidationErrors),
+            // Thrown for unreadable requests (bad JSON, wrong types): the client's fault, with its own status code.
+            BadHttpRequestException ex => Create(ex.StatusCode, "Bad Request", "The request could not be read."),
             _ => Create(StatusCodes.Status500InternalServerError, "Internal Server Error", "An unexpected error occurred")
         };
 

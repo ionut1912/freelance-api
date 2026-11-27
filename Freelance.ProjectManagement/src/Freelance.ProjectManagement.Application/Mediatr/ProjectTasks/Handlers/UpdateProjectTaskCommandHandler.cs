@@ -16,6 +16,9 @@ public sealed class UpdateProjectTaskCommandHandler(
     {
         var project = await projectRepository.GetByIdWithTrackingAsync(command.ProjectId, cancellationToken, p => p.Tasks)
                       ?? throw new ProjectNotFoundException($"Project with Id {command.ProjectId} was not found");
+        // Clients may only touch their own projects.
+        if (command.ClientId is { } clientId && project.ClientId != clientId)
+            throw new ProjectNotFoundException($"Project with Id {command.ProjectId} was not found");
 
         // Throws ProjectTaskNotFoundException when the task does not belong to the project.
         project.UpdateTask(command.Id, command.Title, command.Description,

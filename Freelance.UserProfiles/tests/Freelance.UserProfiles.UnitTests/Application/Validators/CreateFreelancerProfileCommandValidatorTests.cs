@@ -23,4 +23,14 @@ public sealed class CreateFreelancerProfileCommandValidatorTests
         _validator.Validate(new CreateFreelancerProfileCommand(Guid.Empty, null!, "", "", "", 0, "", "", [], [], [])).Errors
             .Select(e => e.PropertyName).Should().Contain(["AccountId", "Address", "Bio", "Image", "Experience", "Amount", "Currency",
                 "PortfolioUrl", "ForeignLanguages", "ProgrammingLanguages", "Areas"]);
+
+    [Theory]
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    public void Validate_OneSkillListMissing_ReportsTheMismatch(bool noLanguages, bool noAreas) =>
+        _validator.Validate(Valid with
+        {
+            ProgrammingLanguages = noLanguages ? null! : ["C#"],
+            Areas = noAreas ? null! : ["Backend"]
+        }).Errors.Should().Contain(e => e.ErrorMessage.Contains("same number", StringComparison.Ordinal));
 }

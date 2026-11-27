@@ -1,6 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <None Include="TestData\Faces\*.jpg" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\src\Freelance.Face.Application\Freelance.Face.Application.csproj" />
     <ProjectReference Include="..\..\src\Freelance.Face.Infrastructure\Freelance.Face.Infrastructure.csproj" />
   </ItemGroup>

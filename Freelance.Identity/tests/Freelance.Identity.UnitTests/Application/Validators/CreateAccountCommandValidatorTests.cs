@@ -27,4 +27,22 @@ public sealed class CreateAccountCommandValidatorTests
     [MemberData(nameof(InvalidCommands))]
     public void Validate_InvalidField_ReportsThatField(CreateAccountCommand command, string property) =>
         _validator.Validate(command).Errors.Should().Contain(e => e.PropertyName == property);
+
+    [Theory]
+    [InlineData(50, 'a', 72, true)]
+    [InlineData(51, 'a', 72, false)]
+    [InlineData(50, 'a', 73, false)]
+    [InlineData(50, 'é', 36, true)]
+    [InlineData(50, 'é', 37, false)]
+    public void Validate_UsernameAndPasswordLimits(int usernameLength, char passwordCharacter, int passwordLength, bool valid) =>
+        new CreateAccountCommandValidator()
+            .Validate(new CreateAccountCommand("a@test.io", new string(passwordCharacter, passwordLength), "0700000000",
+                new string('u', usernameLength), "Client"))
+            .IsValid.Should().Be(valid);
+
+    [Fact]
+    public void Validate_NullPassword_ReportsRequiredWithoutThrowing() =>
+        new CreateAccountCommandValidator()
+            .Validate(new CreateAccountCommand("a@test.io", null!, "0700000000", "user", "Client"))
+            .Errors.Should().ContainSingle(e => e.PropertyName == nameof(CreateAccountCommand.Password));
 }

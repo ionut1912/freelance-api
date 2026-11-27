@@ -13,8 +13,10 @@ public sealed class UpdateFreelancerProfileDataCommandHandler(
 {
     public async Task Handle(UpdateFreelancerProfileDataCommand command, CancellationToken cancellationToken)
     {
-        var profile = await freelancerProfileRepository.GetByIdWithTrackingAsync(command.Id, cancellationToken)
-                      ?? throw new ProfileNotFoundException($"Profile with id {command.Id} not found");
+        var profile = await freelancerProfileRepository.GetByIdWithTrackingAsync(command.Id, cancellationToken);
+        // Someone else's profile is reported as missing, so ids cannot be probed.
+        if (profile?.AccountId != command.AccountId)
+            throw new ProfileNotFoundException($"Profile with id {command.Id} not found");
 
         profile.UpdateUserData(command.Image, command.Bio);
         await unitOfWork.SaveChangesAsync(cancellationToken);

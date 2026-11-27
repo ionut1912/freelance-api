@@ -25,14 +25,14 @@ public sealed class ProjectTests
     }
 
     [Fact]
-    public void AddTechnologies_IgnoresDuplicates()
+    public void UpdateTechnologies_ReplacesTheList_WithoutDuplicates()
     {
         var project = Projects.Project();
 
         project.AddTechnologies([ProjectTechnology.Create("dotnet"), ProjectTechnology.Create("react")]);
         project.UpdateTechnologies([ProjectTechnology.Create("dotnet"), ProjectTechnology.Create("vue")]);
 
-        project.Technologies.Select(t => t.Technology).Should().Equal("dotnet", "react", "vue");
+        project.Technologies.Select(t => t.Technology).Should().Equal("dotnet", "vue");
     }
 
     [Fact]

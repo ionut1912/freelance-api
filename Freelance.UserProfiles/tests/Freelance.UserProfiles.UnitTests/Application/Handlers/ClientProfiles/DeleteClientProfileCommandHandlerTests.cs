@@ -16,7 +16,7 @@ public sealed class DeleteClientProfileCommandHandlerTests : HandlerTestBase
     {
         GivenClientById(null);
 
-        await Handler.Invoking(h => h.Handle(new DeleteClientProfileCommand(Guid.NewGuid()), Ct)).Should().ThrowAsync<ProfileNotFoundException>();
+        await Handler.Invoking(h => h.Handle(new DeleteClientProfileCommand(Guid.NewGuid(), Guid.NewGuid()), Ct)).Should().ThrowAsync<ProfileNotFoundException>();
     }
 
     [Fact]
@@ -25,9 +25,19 @@ public sealed class DeleteClientProfileCommandHandlerTests : HandlerTestBase
         var profile = Profiles.Client();
         GivenClientById(profile);
 
-        await Handler.Handle(new DeleteClientProfileCommand(profile.Id), Ct);
+        await Handler.Handle(new DeleteClientProfileCommand(profile.Id, profile.AccountId), Ct);
 
         Clients.Verify(r => r.Delete(profile), Times.Once);
         VerifySaved();
+    }
+    [Fact]
+    public async Task Handle_ProfileOfAnotherAccount_ThrowsProfileNotFoundWithoutSaving()
+    {
+        var profile = Profiles.Client();
+        GivenClientById(profile);
+
+        await Handler.Invoking(h => h.Handle(new DeleteClientProfileCommand(profile.Id, Guid.NewGuid()), Ct))
+            .Should().ThrowAsync<ProfileNotFoundException>();
+        VerifyNotSaved();
     }
 }

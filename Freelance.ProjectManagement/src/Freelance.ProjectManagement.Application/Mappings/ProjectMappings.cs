@@ -29,13 +29,15 @@ public static class ProjectMappings
 
     extension(CreateProjectRequest request)
     {
-        public CreateProjectCommand ToCreateCommand() =>
-            new(request.Title, request.Description, request.Deadline, request.Amount, request.Currency, request.Technologies);
+        public CreateProjectCommand ToCreateCommand(Guid clientId) =>
+            new(request.Title, request.Description, request.Deadline, request.Amount, request.Currency, request.Technologies,
+                clientId);
     }
 
     extension(UpdateProjectRequest request)
     {
-        public UpdateProjectCommand ToUpdateCommand(Guid id) =>
-            new(id, request.Title, request.Description, request.Deadline, request.Amount, request.Currency, request.Technologies);
+        public UpdateProjectCommand ToUpdateCommand(Guid id, Guid clientId) =>
+            new(id, request.Title, request.Description, request.Deadline, request.Amount, request.Currency, request.Technologies,
+                clientId);
     }
 }

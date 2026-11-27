@@ -15,7 +15,7 @@ public static class SkillResolution
             IReadOnlyList<string> areas, CancellationToken cancellationToken)
         {
             var skills = new List<Skill>(programmingLanguages.Count);
-            foreach (var (language, area) in programmingLanguages.Zip(areas))
+            foreach (var (language, area) in programmingLanguages.Zip(areas).Distinct())
             {
                 var skill = await skillRepository.FindAsync(language, area, cancellationToken);
                 if (skill is null)

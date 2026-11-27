@@ -13,8 +13,10 @@ public sealed class DeleteProjectCommandHandler(
 {
     public async Task Handle(DeleteProjectCommand command, CancellationToken cancellationToken)
     {
-        var project = await projectRepository.GetByIdAsync(command.Id, cancellationToken, p => p.Tasks, p => p.Technologies)
-                      ?? throw new ProjectNotFoundException($"Project with id {command.Id} was not found");
+        var project = await projectRepository.GetByIdAsync(command.Id, cancellationToken, p => p.Tasks, p => p.Technologies);
+        // Someone else's project is reported as missing, so ids cannot be probed.
+        if (project?.ClientId != command.ClientId)
+            throw new ProjectNotFoundException($"Project with id {command.Id} was not found");
 
         projectRepository.Delete(project);
         await unitOfWork.SaveChangesAsync(cancellationToken);

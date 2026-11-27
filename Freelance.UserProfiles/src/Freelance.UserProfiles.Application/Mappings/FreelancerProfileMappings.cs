@@ -49,7 +49,7 @@ public static class FreelancerProfileMappings
 
     extension(UpdateFreelancerDetailRequest request)
     {
-        public UpdateFreelancerDetailsCommand ToUpdateDetailsCommand(Guid id) => new(
+        public UpdateFreelancerDetailsCommand ToUpdateDetailsCommand(Guid id, Guid accountId) => new(
             id,
             request.ForeignLanguages,
             request.ProgrammingLanguages,
@@ -57,7 +57,8 @@ public static class FreelancerProfileMappings
             request.Experience,
             request.Amount,
             request.Currency,
-            request.PortfolioUrl);
+            request.PortfolioUrl,
+            accountId);
     }
 
     extension(UpdateFreelancerProfileRatingRequest request)
@@ -67,12 +68,14 @@ public static class FreelancerProfileMappings
 
     extension(UpdateProfileAddressRequest request)
     {
-        public UpdateFreelancerProfileAddressCommand ToUpdateFreelancerAddressCommand(Guid id) => new(id, request.AddressDto);
+        public UpdateFreelancerProfileAddressCommand ToUpdateFreelancerAddressCommand(Guid id, Guid accountId) =>
+            new(id, request.AddressDto, accountId);
     }
 
     extension(UpdateProfileDataRequest request)
     {
-        public UpdateFreelancerProfileDataCommand ToUpdateFreelancerDataCommand(Guid id) => new(id, request.Bio, request.Image);
+        public UpdateFreelancerProfileDataCommand ToUpdateFreelancerDataCommand(Guid id, Guid accountId) =>
+            new(id, request.Bio, request.Image, accountId);
     }
 
     extension(VerifyProfileRequest request)

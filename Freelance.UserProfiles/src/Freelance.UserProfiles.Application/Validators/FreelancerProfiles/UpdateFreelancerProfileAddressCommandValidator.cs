@@ -7,6 +7,7 @@ public sealed class UpdateFreelancerProfileAddressCommandValidator : AbstractVal
 {
     public UpdateFreelancerProfileAddressCommandValidator()
     {
-        RuleFor(x => x.AddressDto).NotEmpty().WithMessage("Address is required");
+        RuleFor(x => x.AddressDto).NotEmpty().WithMessage("Address is required")
+            .SetValidator(new AddressDtoValidator());
     }
 }

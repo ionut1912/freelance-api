@@ -16,7 +16,7 @@ public sealed class DeleteFreelancerProfileCommandHandlerTests : HandlerTestBase
     {
         GivenFreelancerById(null);
 
-        await Handler.Invoking(h => h.Handle(new DeleteFreelancerProfileCommand(Guid.NewGuid()), Ct)).Should().ThrowAsync<ProfileNotFoundException>();
+        await Handler.Invoking(h => h.Handle(new DeleteFreelancerProfileCommand(Guid.NewGuid(), Guid.NewGuid()), Ct)).Should().ThrowAsync<ProfileNotFoundException>();
     }
 
     [Fact]
@@ -25,9 +25,19 @@ public sealed class DeleteFreelancerProfileCommandHandlerTests : HandlerTestBase
         var profile = Profiles.Freelancer();
         GivenFreelancerById(profile);
 
-        await Handler.Handle(new DeleteFreelancerProfileCommand(profile.Id), Ct);
+        await Handler.Handle(new DeleteFreelancerProfileCommand(profile.Id, profile.AccountId), Ct);
 
         Freelancers.Verify(r => r.Delete(profile), Times.Once);
         VerifySaved();
+    }
+    [Fact]
+    public async Task Handle_ProfileOfAnotherAccount_ThrowsProfileNotFoundWithoutSaving()
+    {
+        var profile = Profiles.Freelancer();
+        GivenFreelancerById(profile);
+
+        await Handler.Invoking(h => h.Handle(new DeleteFreelancerProfileCommand(profile.Id, Guid.NewGuid()), Ct))
+            .Should().ThrowAsync<ProfileNotFoundException>();
+        VerifyNotSaved();
     }
 }

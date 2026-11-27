@@ -8,26 +8,42 @@ namespace Freelance.ProjectManagement.UnitTests.Application.Handlers.ProjectTask
 public sealed class DeleteProjectTaskCommandHandlerTests : HandlerTestBase
 {
     private DeleteProjectTaskCommandHandler Handler =>
-        new(TaskRepository.Object, UnitOfWork.Object, NullLogger<DeleteProjectTaskCommandHandler>.Instance);
+        new(TaskRepository.Object, ProjectRepository.Object, UnitOfWork.Object, NullLogger<DeleteProjectTaskCommandHandler>.Instance);
 
     [Fact]
     public async Task Handle_Missing_ThrowsProjectTaskNotFound()
     {
         GivenTask(null);
 
-        await Handler.Invoking(h => h.Handle(new DeleteProjectTaskCommand(Guid.NewGuid()), Ct))
+        await Handler.Invoking(h => h.Handle(new DeleteProjectTaskCommand(Guid.NewGuid(), Guid.Empty), Ct))
             .Should().ThrowAsync<ProjectTaskNotFoundException>();
     }
 
     [Fact]
     public async Task Handle_Existing_DeletesAndSaves()
     {
-        var task = TestData.Projects.Task();
+        var project = TestData.Projects.Project();
+        var task = TestData.Projects.Task(project.Id);
         GivenTask(task);
+        GivenProject(project);
 
-        await Handler.Handle(new DeleteProjectTaskCommand(task.Id), Ct);
+        await Handler.Handle(new DeleteProjectTaskCommand(task.Id, project.ClientId), Ct);
 
         TaskRepository.Verify(r => r.Delete(task), Times.Once);
         VerifySaved();
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Handle_ProjectMissingOrOfAnotherClient_ThrowsWithoutDeleting(bool projectExists)
+    {
+        var task = TestData.Projects.Task();
+        GivenTask(task);
+        GivenProject(projectExists ? TestData.Projects.Project() : null);
+
+        await Handler.Invoking(h => h.Handle(new DeleteProjectTaskCommand(task.Id, Guid.NewGuid()), Ct))
+            .Should().ThrowAsync<ProjectTaskNotFoundException>();
+        VerifyNotSaved();
     }
 }

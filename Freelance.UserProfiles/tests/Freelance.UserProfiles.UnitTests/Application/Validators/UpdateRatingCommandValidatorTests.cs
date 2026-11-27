@@ -11,6 +11,15 @@ public sealed class UpdateRatingCommandValidatorTests
     public void Validate_WithRating_Passes() =>
         _validator.Validate(new UpdateFreelancerRatingCommand(Guid.NewGuid(), 4)).IsValid.Should().BeTrue();
 
+    [Theory]
+    [InlineData(1, true)]
+    [InlineData(5, true)]
+    [InlineData(-1, false)]
+    [InlineData(6, false)]
+    [InlineData(int.MaxValue, false)]
+    public void Validate_Boundaries_AllowOneToFive(int rating, bool valid) =>
+        _validator.Validate(new UpdateFreelancerRatingCommand(Guid.NewGuid(), rating)).IsValid.Should().Be(valid);
+
     [Fact]
     public void Validate_ZeroRating_Fails() =>
         _validator.Validate(new UpdateFreelancerRatingCommand(Guid.NewGuid(), 0)).IsValid.Should().BeFalse();

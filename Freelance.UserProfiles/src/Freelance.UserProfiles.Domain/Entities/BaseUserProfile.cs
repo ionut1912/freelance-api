@@ -41,11 +41,13 @@ public abstract class BaseUserProfile : Entity
 
     public void UpdateUserData(string newImage, string newBio)
     {
-        if (Image == newImage) throw new ImageAlreadyExistsException($"Image {newImage} already exists");
-        if (Bio == newBio) throw new BioAlreadyExistsException($"Bio {newBio} is the same as previous");
+        if (Image == newImage) throw new ImageAlreadyExistsException("The image is the same as the current one");
+        if (Bio == newBio) throw new BioAlreadyExistsException("The bio is the same as the current one");
 
         Bio = newBio;
         Image = newImage;
+        // The verification was made against the previous image.
+        IsVerified = false;
         UpdatedAt = DateTime.UtcNow;
     }
 }

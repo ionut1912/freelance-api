@@ -44,4 +44,15 @@ public sealed class UpdateProjectTaskCommandHandlerTests : HandlerTestBase
         task.Title.Should().Be("v2");
         VerifySaved();
     }
+
+    [Fact]
+    public async Task Handle_ProjectOfAnotherClient_ThrowsProjectNotFoundWithoutSaving()
+    {
+        var project = TestData.Projects.Project();
+        GivenProject(project, tracked: true);
+
+        await Handler.Invoking(h => h.Handle(new UpdateProjectTaskCommand(Guid.NewGuid(), project.Id, "v2", "d2", "Done", "Low", Guid.NewGuid()), Ct))
+            .Should().ThrowAsync<ProjectNotFoundException>();
+        VerifyNotSaved();
+    }
 }

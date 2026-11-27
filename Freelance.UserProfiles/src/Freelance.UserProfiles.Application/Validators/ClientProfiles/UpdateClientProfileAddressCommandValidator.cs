@@ -7,6 +7,7 @@ public sealed class UpdateClientProfileAddressCommandValidator : AbstractValidat
 {
     public UpdateClientProfileAddressCommandValidator()
     {
-        RuleFor(x => x.AddressDto).NotEmpty().WithMessage("Address is required");
+        RuleFor(x => x.AddressDto).NotEmpty().WithMessage("Address is required")
+            .SetValidator(new AddressDtoValidator());
     }
 }

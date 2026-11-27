@@ -4,6 +4,7 @@ using Freelance.Face.Infrastructure.Services;
 namespace Freelance.Face.UnitTests.Infrastructure;
 
 /// <summary>Runs the real dlib models from Freelance.Face/models (native DlibDotNet libraries required).</summary>
+[Collection("FaceService")]
 public sealed class FaceServiceTests : IDisposable
 {
     private readonly FaceService _service = new();

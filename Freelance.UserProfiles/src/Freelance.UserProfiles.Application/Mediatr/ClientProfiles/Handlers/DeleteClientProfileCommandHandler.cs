@@ -13,8 +13,10 @@ public sealed class DeleteClientProfileCommandHandler(
 {
     public async Task Handle(DeleteClientProfileCommand command, CancellationToken cancellationToken)
     {
-        var clientProfile = await clientProfileRepository.GetByIdAsync(command.Id, cancellationToken)
-                            ?? throw new ProfileNotFoundException($"Client Profile with id {command.Id} does not exist");
+        var clientProfile = await clientProfileRepository.GetByIdAsync(command.Id, cancellationToken);
+        // Someone else's profile is reported as missing, so ids cannot be probed.
+        if (clientProfile?.AccountId != command.AccountId)
+            throw new ProfileNotFoundException($"Client Profile with id {command.Id} does not exist");
 
         clientProfileRepository.Delete(clientProfile);
         await unitOfWork.SaveChangesAsync(cancellationToken);

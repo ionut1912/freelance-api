@@ -50,4 +50,15 @@ public sealed class ProjectManagementMapperTests
     [Fact]
     public void TryMap_NullException_Throws() =>
         _mapper.Invoking(m => m.TryMap(null!, out _)).Should().Throw<ArgumentNullException>();
+
+    [Theory]
+    [InlineData(400)]
+    [InlineData(413)]
+    public void TryMap_UnreadableRequest_KeepsItsStatusAndHidesTheReason(int status)
+    {
+        new ProjectManagementMapper().TryMap(new BadHttpRequestException("internal parser detail", status), out var problem);
+
+        problem.Status.Should().Be(status);
+        problem.Detail.Should().NotContain("internal");
+    }
 }

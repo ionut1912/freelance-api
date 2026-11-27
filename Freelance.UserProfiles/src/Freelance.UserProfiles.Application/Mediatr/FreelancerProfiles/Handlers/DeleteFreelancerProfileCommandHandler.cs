@@ -13,8 +13,10 @@ public sealed class DeleteFreelancerProfileCommandHandler(
 {
     public async Task Handle(DeleteFreelancerProfileCommand command, CancellationToken cancellationToken)
     {
-        var profile = await freelancerProfileRepository.GetByIdAsync(command.Id, cancellationToken)
-                      ?? throw new ProfileNotFoundException($"Profile with id {command.Id} not found");
+        var profile = await freelancerProfileRepository.GetByIdAsync(command.Id, cancellationToken);
+        // Someone else's profile is reported as missing, so ids cannot be probed.
+        if (profile?.AccountId != command.AccountId)
+            throw new ProfileNotFoundException($"Profile with id {command.Id} not found");
 
         freelancerProfileRepository.Delete(profile);
         await unitOfWork.SaveChangesAsync(cancellationToken);

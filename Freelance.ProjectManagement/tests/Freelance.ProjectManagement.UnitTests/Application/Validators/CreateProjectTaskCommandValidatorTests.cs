@@ -29,4 +29,12 @@ public sealed class CreateProjectTaskCommandValidatorTests
     public void Validate_InvalidStatus_ListsAllowedValues() =>
         _validator.Validate(Valid with { Status = "Bogus" }).Errors.Should()
             .Contain(e => e.ErrorMessage.Contains("'InProgress'", StringComparison.Ordinal));
+
+    [Theory]
+    [InlineData(100, 500, true)]
+    [InlineData(101, 500, false)]
+    [InlineData(100, 501, false)]
+    public void Validate_TextLengthBoundaries_MatchTheColumns(int title, int description, bool valid) =>
+        _validator.Validate(new CreateProjectTaskCommand(Guid.NewGuid(), new string('a', title), new string('a', description), "New", "Low"))
+            .IsValid.Should().Be(valid);
 }

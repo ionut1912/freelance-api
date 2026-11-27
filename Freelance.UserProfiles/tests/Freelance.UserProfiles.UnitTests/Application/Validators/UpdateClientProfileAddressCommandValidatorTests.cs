@@ -10,9 +10,9 @@ public sealed class UpdateClientProfileAddressCommandValidatorTests
 
     [Fact]
     public void Validate_WithAddress_Passes() =>
-        _validator.Validate(new UpdateClientProfileAddressCommand(Guid.NewGuid(), Profiles.Address)).IsValid.Should().BeTrue();
+        _validator.Validate(new UpdateClientProfileAddressCommand(Guid.NewGuid(), Profiles.Address, Guid.NewGuid())).IsValid.Should().BeTrue();
 
     [Fact]
     public void Validate_WithoutAddress_Fails() =>
-        _validator.Validate(new UpdateClientProfileAddressCommand(Guid.NewGuid(), null!)).IsValid.Should().BeFalse();
+        _validator.Validate(new UpdateClientProfileAddressCommand(Guid.NewGuid(), null!, Guid.NewGuid())).IsValid.Should().BeFalse();
 }

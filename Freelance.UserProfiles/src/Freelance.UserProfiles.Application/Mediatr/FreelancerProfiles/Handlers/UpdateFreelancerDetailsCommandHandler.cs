@@ -18,8 +18,10 @@ public sealed class UpdateFreelancerDetailsCommandHandler(
     {
         // Tracked load so EF computes the exact inserts/deletes for the languages and the skills join table.
         var profile = await freelancerProfileRepository.GetByIdWithTrackingAsync(command.Id, cancellationToken,
-                          p => p.Skills, p => p.ForeignLanguages)
-                      ?? throw new ProfileNotFoundException($"Profile with id {command.Id} not found");
+                          p => p.Skills, p => p.ForeignLanguages);
+        // Someone else's profile is reported as missing, so ids cannot be probed.
+        if (profile?.AccountId != command.AccountId)
+            throw new ProfileNotFoundException($"Profile with id {command.Id} not found");
 
         profile.UpdateLanguages(command.ForeignLanguages.Select(FreelancerForeignLanguage.Create));
         profile.UpdateFreelancerDetails(command.Experience, command.Amount, command.Currency, command.PortfolioUrl);

@@ -21,4 +21,20 @@ public sealed class AddressTests
     [Fact]
     public void Create_NullComponent_Throws() =>
         FluentActions.Invoking(() => Address.Create("Main", null!, "B", "1", "RO", "1")).Should().Throw<ArgumentNullException>();
+
+    [Theory]
+    [InlineData(0, "street")]
+    [InlineData(1, "city")]
+    [InlineData(2, "state")]
+    [InlineData(3, "zipCode")]
+    [InlineData(4, "country")]
+    [InlineData(5, "streetNumber")]
+    public void Create_NullPart_ThrowsNamingIt(int index, string parameter)
+    {
+        string[] parts = ["s", "c", "st", "z", "co", "n"];
+        parts[index] = null!;
+
+        FluentActions.Invoking(() => Address.Create(parts[0], parts[1], parts[2], parts[3], parts[4], parts[5]))
+            .Should().Throw<ArgumentNullException>().WithParameterName(parameter);
+    }
 }
